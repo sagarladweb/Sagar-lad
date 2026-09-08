@@ -4,7 +4,7 @@ let inflight: Promise<{ published: number; alive: boolean }> | null = null;
 let lastHeartbeat = 0;
 let lastFailure = 0;
 const HEARTBEAT_INTERVAL = 60_000;
-const FAILURE_BACKOFF = 300_000; // 5 min — don't retry immediately if DB is down
+const FAILURE_BACKOFF = 30_000; // 30 sec — quickly resume keepalives after transient hiccups
 
 /**
  * Self-contained heartbeat that keeps the system alive.

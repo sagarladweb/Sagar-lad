@@ -61,6 +61,7 @@ export const adminPostSchema = z.object({
   kicker: z.string().trim().max(80).optional().or(z.literal("")),
   showCover: z.boolean().optional(),
   showAuthorBox: z.boolean().optional(),
+  showTimeline: z.boolean().optional(),
   footerNote: z.string().trim().max(300).optional().or(z.literal("")),
   sources: z
     .array(

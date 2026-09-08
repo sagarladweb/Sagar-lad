@@ -80,9 +80,9 @@ const TABS: { value: BookType | "ALL"; label: string }[] = [
   { value: "EBOOK", label: "E-books" },
 ];
 
-export function BooksManager() {
+export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookType | "ALL" }) {
   const [books, setBooks] = useState<Book[]>([]);
-  const [tab, setTab] = useState<BookType | "ALL">("ALL");
+  const [tab, setTab] = useState<BookType | "ALL">(initialFilter);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<BookForm | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);

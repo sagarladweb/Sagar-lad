@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Link,
   Highlighter,
+  Table,
   type LucideIcon,
 } from "lucide-react";
 import { showPrompt } from "@/components/admin/ConfirmDialog";
@@ -111,5 +112,11 @@ export const SLASH_COMMANDS: SlashCommand[] = [
     icon: Highlighter,
     description: "Highlight text with color",
     action: (e) => e.chain().focus().toggleHighlight().run(),
+  },
+  {
+    label: "Table",
+    icon: Table,
+    description: "Insert a 3×3 table",
+    action: (e) => e.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
   },
 ];

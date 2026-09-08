@@ -22,7 +22,7 @@ function getSanitizer(): (html: string) => string {
       instance.sanitize(html, {
         USE_PROFILES: { html: true },
         FORBID_TAGS: [
-          "script", "style", "iframe", "object", "embed",
+          "script", "iframe", "object", "embed",
           "form", "input", "textarea", "button", "select",
           "svg", "math", "meta", "template", "slot",
         ],
@@ -42,7 +42,7 @@ function regexSanitize(dirty: string): string {
   // Remove script tags and content
   clean = clean.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
   // Remove remaining dangerous tags
-  clean = clean.replace(/<\/?(?:iframe|object|embed|form|input|textarea|button|select|svg|math|meta|template|slot|style)\b[^>]*>/gi, "");
+  clean = clean.replace(/<\/?(?:iframe|object|embed|form|input|textarea|button|select|svg|math|meta|template|slot)\b[^>]*>/gi, "");
   // Remove on* event handlers
   clean = clean.replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "");
   // Remove javascript: / vbscript: URIs in attributes

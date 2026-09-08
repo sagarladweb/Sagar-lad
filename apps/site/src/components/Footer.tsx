@@ -39,6 +39,13 @@ const footerCols: {
       { label: "Speaking", href: "/speaking" },
     ],
   },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+    ],
+  },
 ];
 
 const LEGAL_LINKS = [
@@ -138,7 +145,7 @@ export function Footer() {
           <div className="md:col-span-8">
             {/* Mobile: accordion */}
             <div className="md:hidden divide-y divide-background/15">
-              {footerCols.map((col) => {
+              {footerCols.filter((col) => col.title !== "Legal").map((col) => {
                 const isOpen = openCol === col.title;
                 return (
                   <div key={col.title}>
@@ -182,8 +189,8 @@ export function Footer() {
               })}
             </div>
 
-            {/* Desktop: 3-column grid — icon + text labels */}
-            <div className="hidden md:grid grid-cols-3 gap-6">
+            {/* Desktop: 4-column grid — icon + text labels */}
+            <div className="hidden md:grid grid-cols-4 gap-6">
               {footerCols.map((col) => (
                 <div key={col.title}>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-background/50 mb-3">
@@ -233,8 +240,8 @@ export function Footer() {
           </div>
         )}
 
-        {/* Legal links — always visible, outside collapsible */}
-        <div className="mt-8 flex items-center justify-center gap-4 text-xs text-background/50">
+        {/* Legal links — mobile only, outside collapsible */}
+        <div className="mt-8 md:hidden flex items-center justify-center gap-4 text-xs text-background/50">
           {LEGAL_LINKS.map((l) => (
             <Link
               key={l.href}

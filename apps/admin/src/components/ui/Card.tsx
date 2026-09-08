@@ -1,11 +1,13 @@
 export function Card({
   title,
   icon: Icon,
+  action,
   children,
   className = "",
 }: {
   title?: string;
   icon?: React.ComponentType<{ className?: string }>;
+  action?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 }) {
@@ -13,12 +15,15 @@ export function Card({
     <div
       className={`rounded-2xl border border-border/50 bg-card p-5 transition-all duration-300 ease-out hover:border-accent/25 hover:bg-accent/[0.015] ${className}`}
     >
-      {(title || Icon) && (
+      {(title || Icon || action) && (
         <div className="flex items-center justify-between mb-4">
-          {title && (
-            <h2 className="font-display text-lg font-semibold tracking-tight">{title}</h2>
-          )}
-          {Icon && <Icon className="w-4 h-4 text-accent/70" />}
+          <div className="flex items-center gap-2">
+            {Icon && <Icon className="w-4 h-4 text-accent/70" />}
+            {title && (
+              <h2 className="font-display text-lg font-semibold tracking-tight">{title}</h2>
+            )}
+          </div>
+          {action}
         </div>
       )}
       {children}

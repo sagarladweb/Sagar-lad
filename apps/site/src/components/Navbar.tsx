@@ -25,45 +25,6 @@ import { FaInstagram, FaLinkedinIn } from "@/lib/icons";
 
 const HEADER_SOCIALS = ["instagram", "linkedin"];
 
-const FALLBACK_BOOKS = [
-  {
-    title: "The MIND UP Theory: Simple Shift That Will Make You Unshakable",
-    tagline: "Mindset",
-    image: "https://m.media-amazon.com/images/P/B0GYQ7HBBB.jpg",
-    buyUrl: "https://www.amazon.com/dp/B0GYQ7HBBB",
-  },
-  {
-    title: "Level Up with Azure AI Foundry",
-    tagline: "Data & AI",
-    image: "https://m.media-amazon.com/images/P/B0FHP511FM.jpg",
-    buyUrl: "https://www.amazon.com/dp/B0FHP511FM",
-  },
-  {
-    title: "Mastering Databricks Lakehouse Platform",
-    tagline: "Data Engineering",
-    image: "https://m.media-amazon.com/images/P/9355511396.jpg",
-    buyUrl: "https://www.amazon.com/dp/9355511396",
-  },
-  {
-    title: "Hands-On Azure Data Platform",
-    tagline: "Data Platform",
-    image: "https://m.media-amazon.com/images/P/9355510306.jpg",
-    buyUrl: "https://www.amazon.com/dp/9355510306",
-  },
-  {
-    title: "Modern Data Architecture on Azure",
-    tagline: "Architecture",
-    image: "https://m.media-amazon.com/images/P/1484297598.jpg",
-    buyUrl: "https://www.amazon.com/dp/1484297598",
-  },
-  {
-    title: "Azure Security for Critical Workloads",
-    tagline: "Security",
-    image: "https://m.media-amazon.com/images/P/1484289358.jpg",
-    buyUrl: "https://www.amazon.com/dp/1484289358",
-  },
-];
-
 type NavBook = {
   id: string;
   type: "PUBLISHED" | "READ" | "EBOOK";
@@ -86,17 +47,6 @@ type ApiBook = {
   buyUrl: string | null;
   free: boolean;
 };
-
-const FALLBACK_PUBLISHED: NavBook[] = FALLBACK_BOOKS.map((b) => ({
-  id: `fb-${b.title}`,
-  type: "PUBLISHED",
-  title: b.title,
-  tagline: b.tagline,
-  author: null,
-  image: b.image,
-  buyUrl: b.buyUrl,
-  free: false,
-}));
 
 const SOCIAL_ICONS: Record<string, { icon: typeof FaInstagram; label: string }> = {
   instagram: { icon: FaInstagram, label: "Instagram" },
@@ -265,7 +215,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
-  const [publishedBooks, setPublishedBooks] = useState<NavBook[]>(FALLBACK_PUBLISHED);
+  const [publishedBooks, setPublishedBooks] = useState<NavBook[]>([]);
   const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [mobileOpen, setMobileOpen] = useState<string | null>(null);
   const [prevPathname, setPrevPathname] = useState(pathname);

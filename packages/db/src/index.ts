@@ -38,13 +38,19 @@ function createPool(): pg.Pool {
     ssl: { rejectUnauthorized: false },
     max,
     family: 4,
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000,
     connectionTimeoutMillis: 10000,
     idleTimeoutMillis: 30000,
     query_timeout: 15000,
     statement_timeout: 15000,
   } as Record<string, unknown>);
+
   pool.on("error", (err) => {
     console.error("[db] idle pool error:", err.message);
+    if (isConnectionError(err)) {
+      resetPool().catch(() => {});
+    }
   });
 
   return pool;
@@ -91,7 +97,8 @@ export const prisma = new Proxy({} as PrismaClient, {
  * ─────────────────────────────────────────────────────────────────── */
 const CONNECTION_ERROR_CODES = new Set([
   "P1001", "P1002", "P1003", "P1008", "P1010", "P1011", "P1012", "P1017",
-  "ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "ENOTFOUND",
+  "ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "ENOTFOUND", "EPIPE",
+  "57P01", "57P02", "57P03", "08006", "08001", "08004",
 ]);
 
 function isConnectionError(err: unknown): boolean {
@@ -104,10 +111,12 @@ function isConnectionError(err: unknown): boolean {
     msg.includes("timeout") ||
     msg.includes("econnrefused") ||
     msg.includes("econnreset") ||
+    msg.includes("epipe") ||
     msg.includes("database is paused") ||
     msg.includes("server closed the connection unexpectedly") ||
     msg.includes("connection terminated") ||
-    msg.includes("remaining connection slots are reserved")
+    msg.includes("remaining connection slots are reserved") ||
+    msg.includes("terminating connection")
   );
 }
 
@@ -129,14 +138,12 @@ async function resetPool() {
 
 /**
  * Run a DB query with retry logic.
- * Retries at 2s and 5s — enough time for Supabase free-tier to wake
+ * Retries at 1s, 3s, and 5s — enough time for Supabase free-tier to wake
  * from a paused state (typically 5-15s).
  * Returns `fallback` if all retries fail.
  */
 export async function dbSafe<T>(query: () => Promise<T>, fallback: T): Promise<T> {
-  // Retry delays: 2s first retry, 5s second retry.
-  // Supabase free-tier takes 5-15s to wake from pause.
-  const RETRY_DELAYS = [2000, 5000];
+  const RETRY_DELAYS = [1000, 3000, 5000];
   const MAX_RETRIES = RETRY_DELAYS.length;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -148,6 +155,10 @@ export async function dbSafe<T>(query: () => Promise<T>, fallback: T): Promise<T
       if (!isConnectionError(err)) throw err;
 
       if (attempt < MAX_RETRIES) {
+        // If attempt failed, clear stale sockets before next retry
+        if (attempt > 0) {
+          resetPool().catch(() => {});
+        }
         await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt]));
         continue;
       }

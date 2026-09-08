@@ -32,45 +32,41 @@ export default async function BlogPage({
   const vpage = Math.max(1, Number(params.vpage) || 1);
   const q = (params.q ?? "").trim();
 
-  const [categories, totalPosts, totalVideos] = await Promise.all([
-    getCategoriesWithFallback(),
-    getPostCountWithFallback(VISIBLE_POST_WHERE),
-    getVideoCountWithFallback(),
-  ]);
-  const categorySlug = categories.some((c) => c.slug === params.category)
-    ? params.category
-    : undefined;
+  const categorySlug = params.category?.trim() || undefined;
 
   const where: Record<string, unknown> = {
     published: true,
     deletedAt: null,
+    OR: [{ scheduledAt: null }, { scheduledAt: { lte: new Date() } }],
   };
   if (categorySlug) {
     where.category = { slug: categorySlug };
   }
   if (q) {
     where.AND = [
-      { OR: [{ scheduledAt: null }, { scheduledAt: { lte: new Date() } }] },
       { OR: [{ title: { contains: q } }, { excerpt: { contains: q } }] },
     ];
-  } else {
-    where.OR = [{ scheduledAt: null }, { scheduledAt: { lte: new Date() } }];
   }
 
-  // Only fetch the rows for the active tab. Categories and the two stats
-  // counts are always needed; the list+count for the other tab are not.
-  let posts: { id: string; slug: string; title: string; coverImage: string | null; publishedAt: Date; excerpt: string | null; views: number; likes: number; category: { name: string; slug: string } | null }[] = [];
-  let total = 0;
-  let videos: Awaited<ReturnType<typeof getPublishedVideosWithFallback>> = [];
+  const isFiltered = Boolean(categorySlug || q);
 
-  if (tab === "posts") {
-    [posts, total] = await Promise.all([
-      getPostListWithFallback(where, { take: PAGE_SIZE, skip: (page - 1) * PAGE_SIZE }),
-      getPostCountWithFallback(where),
-    ]);
-  } else {
-    videos = await getPublishedVideosWithFallback(PAGE_SIZE, undefined, (vpage - 1) * PAGE_SIZE);
-  }
+  // Parallelize ALL data fetching concurrently in a single round-trip
+  const [categories, totalPosts, totalVideos, posts, filteredCount, videos] = await Promise.all([
+    getCategoriesWithFallback(),
+    getPostCountWithFallback(VISIBLE_POST_WHERE),
+    getVideoCountWithFallback(),
+    tab === "posts"
+      ? getPostListWithFallback(where, { take: PAGE_SIZE, skip: (page - 1) * PAGE_SIZE })
+      : Promise.resolve([]),
+    tab === "posts" && isFiltered
+      ? getPostCountWithFallback(where)
+      : Promise.resolve(null),
+    tab === "videos"
+      ? getPublishedVideosWithFallback(PAGE_SIZE, undefined, (vpage - 1) * PAGE_SIZE)
+      : Promise.resolve([]),
+  ]);
+
+  const total = isFiltered ? (filteredCount ?? 0) : totalPosts;
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const videoPages = Math.max(1, Math.ceil(totalVideos / PAGE_SIZE));
@@ -182,7 +178,6 @@ export default async function BlogPage({
       <nav
         className="mt-10 border-t border-border flex items-stretch"
         aria-label="Blog content"
-        data-animate
       >
         {(["posts", "videos"] as Tab[]).map((t) => (
           <Link

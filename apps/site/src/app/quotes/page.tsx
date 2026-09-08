@@ -28,7 +28,7 @@ export default async function QuotesPage() {
       />
       <header className="border-b border-border bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14 md:py-20">
-          <p className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+          <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
             Words to live by
           </p>
           <h1 className="mt-3 font-display text-4xl md:text-5xl font-bold tracking-tight">

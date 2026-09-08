@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
-import { FALLBACK_CATEGORIES } from "@/lib/content";
 
 export const runtime = "nodejs";
 
@@ -20,7 +19,7 @@ export async function GET() {
     const categories = await getCategories();
     return NextResponse.json({ categories });
   } catch (err) {
-    console.warn("[api/categories] DB unavailable, using fallback categories:", (err as Error).message);
-    return NextResponse.json({ categories: FALLBACK_CATEGORIES });
+    console.warn("[api/categories] DB unavailable, returning empty:", (err as Error).message);
+    return NextResponse.json({ categories: [] });
   }
 }

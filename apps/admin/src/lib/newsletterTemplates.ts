@@ -339,8 +339,7 @@ function sectionHtml(s: { heading: string; body: string }, accent: string, socia
     case "code": {
       let html = s.body;
       try { const d = JSON.parse(s.body); html = d.html || s.body; } catch { /* raw HTML */ }
-      const codeReset = `<style>pre{white-space:pre-wrap!important;word-break:break-word!important;overflow-x:hidden!important;max-width:100%!important}table{max-width:100%!important;width:100%!important;border-collapse:collapse!important}code,pre,div,span,img,iframe{max-width:100%!important;overflow:hidden!important;width:100%!important}*{box-sizing:border-box!important}</style>`;
-      return `<tr><td style="padding:8px 40px;overflow:hidden;max-width:100%"><div style="background:#f8f7f4;border:1px solid #e8e6e1;border-radius:8px;padding:20px;font-size:14px;color:#2a2926;overflow:hidden;max-width:100%;box-sizing:border-box;word-break:break-word">${codeReset}${html}</div></td></tr>`;
+      return `<tr><td style="padding:8px 40px;overflow:hidden;max-width:100%"><div style="background:#f8f7f4;border:1px solid #e8e6e1;border-radius:8px;padding:20px;font-size:14px;color:#2a2926;overflow:hidden;max-width:100%;box-sizing:border-box;word-break:break-word">${html}</div></td></tr>`;
     }
 
     case "quote": {

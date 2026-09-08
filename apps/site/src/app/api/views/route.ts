@@ -12,40 +12,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing postSlug" }, { status: 400 });
     }
 
-    // Rate limit: 20 views per IP per minute (generous — avoids counting bot floods)
-    const rl = await rateLimitByIp(`view:${getClientIp(request)}`, 20, 60_000);
-    if (!rl.ok) {
-      return NextResponse.json(
-        { error: "Too many requests" },
-        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
-      );
+    const ip = getClientIp(request);
+
+    // Dedup: 1 view per IP per post per 24h (generous — avoids counting repeat visits)
+    const { ok } = await rateLimitByIp(`view:${ip}:${postSlug}`, 1, 24 * 60 * 60_000);
+    if (!ok) {
+      // Already counted today — return current views without incrementing
+      const post = await prisma.post.findUnique({
+        where: { slug: postSlug },
+        select: { views: true },
+      }).catch(() => null);
+      return NextResponse.json({ views: post?.views ?? 0 });
     }
 
-    let post;
-    try {
-      post = await prisma.post.findUnique({
-        where: { slug: postSlug },
-        select: { id: true, views: true },
-      });
-    } catch {
-      return NextResponse.json({ error: "DB error" }, { status: 500 });
-    }
+    const post = await prisma.post.findUnique({
+      where: { slug: postSlug },
+      select: { id: true, views: true },
+    }).catch(() => null);
+
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    let updated;
-    try {
-      updated = await prisma.post.update({
-        where: { id: post.id },
-        data: { views: { increment: 1 } },
-        select: { views: true },
-      });
-    } catch {
-      return NextResponse.json({ views: post.views + 1 });
-    }
+    const updated = await prisma.post.update({
+      where: { id: post.id },
+      data: { views: { increment: 1 } },
+      select: { views: true },
+    }).catch(() => null);
 
-    return NextResponse.json({ views: updated.views });
+    return NextResponse.json({ views: updated?.views ?? post.views + 1 });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

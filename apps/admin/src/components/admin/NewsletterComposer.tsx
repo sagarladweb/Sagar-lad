@@ -46,6 +46,7 @@ const smallBtnCls = "rounded-md border border-border/50 px-2 py-1 text-[10px] fo
 /* ── Helpers ────────────────────────────────────────── */
 function safeParse<T>(body: string, fallback: T): T { try { return JSON.parse(body); } catch { return fallback; } }
 function resetContentValue() { return { ...defaultNewsletter, greeting: "", intro: "", sections: [], quote: null, cta: null, socials: [] as NewsletterContent["socials"] }; }
+function accentFg(hex: string): string { const h = hex.replace("#", ""); const r = parseInt(h.slice(0, 2), 16); const g = parseInt(h.slice(2, 4), 16); const b = parseInt(h.slice(4, 6), 16); return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.5 ? "#111110" : "#ffffff"; }
 
 /* ── Block definitions ───────────────────────────────── */
 const BLOCKS = [
@@ -53,7 +54,6 @@ const BLOCKS = [
   { id: "heading",      label: "Heading",       icon: Heading2,   hint: "Large title" },
   { id: "text",         label: "Text",          icon: AlignLeft,  hint: "Paragraph" },
   { id: "image",        label: "Image",         icon: ImageIcon,  hint: "URL or upload" },
-  { id: "button",       label: "Button",        icon: MousePointerClick, hint: "CTA link" },
   { id: "quote",        label: "Quote",         icon: Quote,      hint: "Attributed text" },
   { id: "table",        label: "Table",         icon: Table2,     hint: "Rows & columns" },
   { id: "divider",      label: "Divider",       icon: Minus,      hint: "Horizontal line" },
@@ -273,7 +273,6 @@ export function NewsletterComposer({ subscriberCount, onSent, onBack, onDirtyCha
         case "blog":         return { heading: "__BLOG__", body: JSON.stringify({ title: "", url: "", excerpt: "" }) };
         case "video":        return { heading: "__VIDEO__", body: JSON.stringify({ title: "", url: "", thumbnail: "" }) };
         case "book":         return { heading: "__BOOK__", body: JSON.stringify({ title: "", author: "", url: "", cover: "" }) };
-        case "button":       update({ cta: content.cta ?? { label: "Click here", url: "https://example.com" } }); return null;
         case "quote":        return { heading: "__QUOTE__", body: JSON.stringify({ text: "Your quote here", author: "Author Name" }) };
         case "social":       return { heading: "__SOCIAL__", body: JSON.stringify({ selected: dbSocials.length > 0 ? dbSocials.slice(0, 3).map((s) => s.key) : ["twitter", "linkedin"] }) };
         case "table":        return { heading: "__TABLE__", body: JSON.stringify({ headerRow: true, rows: [["Header 1", "Header 2", "Header 3"], ["Cell 1", "Cell 2", "Cell 3"], ["Cell 4", "Cell 5", "Cell 6"]] }) };
@@ -344,7 +343,13 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
 
   /* ── Preview ────────────────────────────────────────── */
   const bodyHtml = useMemo(() => buildTemplateBody(content.template, content), [content]);
-  const previewHtml = useMemo(() => emailShell(SITE.name, bodyHtml, `/api/newsletter/unsubscribe?token=preview`), [bodyHtml]);
+  const previewHtml = useMemo(() => {
+    const raw = emailShell(SITE.name, bodyHtml, `/api/newsletter/unsubscribe?token=preview`);
+    // Force light mode in preview — strip dark mode styles and lock color-scheme
+    return raw
+      .replace('<meta name="color-scheme" content="light dark">', '<meta name="color-scheme" content="light">')
+      .replace(/<style>@media\(prefers-color-scheme:dark\)\{[\s\S]*?\}<\/style>/, '<style></style>');
+  }, [bodyHtml]);
   const ready = subject.trim().length >= 3;
 
   /* ── Actions ────────────────────────────────────────── */
@@ -494,7 +499,7 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                 <BlockGroup title="Content" ids={["section", "heading", "text", "list", "ordered-list"]} onInsert={insertBlock} onDragStart={handleDragStart} />
                 <BlockGroup title="Media" ids={["image", "code"]} onInsert={insertBlock} onDragStart={handleDragStart} />
                 <BlockGroup title="Layout" ids={["divider", "spacer", "columns", "table"]} onInsert={insertBlock} onDragStart={handleDragStart} />
-                <BlockGroup title="Actions" ids={["button", "quote", "social"]} onInsert={insertBlock} onDragStart={handleDragStart} />
+                <BlockGroup title="Actions" ids={["quote", "social"]} onInsert={insertBlock} onDragStart={handleDragStart} />
                 {insert && (
                   <div className="pt-2 border-t border-border/30">
                     <p className={sectionHeaderCls}>Link Content</p>
@@ -722,7 +727,7 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                           )}
                           {kind === "button" && (
                             <div style={{ textAlign: "center", padding: "8px 0" }}>
-                              <a href={content.cta?.url || "#"} style={{ background: content.accent, color: "#111110", textDecoration: "none", fontWeight: 700, fontSize: "15px", padding: "13px 34px", borderRadius: "999px", display: "inline-block" }}>
+                              <a href={content.cta?.url || "#"} style={{ background: content.accent, color: accentFg(content.accent), textDecoration: "none", fontWeight: 700, fontSize: "15px", padding: "13px 34px", borderRadius: "999px", display: "inline-block" }}>
                                 {content.cta?.label || "Button"} →
                               </a>
                             </div>
@@ -903,7 +908,7 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                   {/* CTA — matches email: padding:26px 40px 0 40px, separate row */}
                   {content.cta && (
                     <div style={{ padding: "26px 40px 0 40px", textAlign: "center" }}>
-                      <a href={content.cta.url} style={{ background: content.accent, color: "#111110", textDecoration: "none", fontWeight: 700, fontSize: "15px", padding: "13px 34px", borderRadius: "999px", display: "inline-block" }}>{content.cta.label}</a>
+                      <a href={content.cta.url} style={{ background: content.accent, color: accentFg(content.accent), textDecoration: "none", fontWeight: 700, fontSize: "15px", padding: "13px 34px", borderRadius: "999px", display: "inline-block" }}>{content.cta.label}</a>
                     </div>
                   )}
 
@@ -1009,7 +1014,7 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                     </div>
                   </SettingGroup>
 
-                  <SettingGroup title="Template">
+                  <SettingGroup title="Style">
                     <div className="space-y-1">
                       {TEMPLATES.map((t) => (
                         <button key={t.id} type="button" onClick={() => update({ template: t.id as TemplateId })}
@@ -1018,15 +1023,16 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                         </button>
                       ))}
                     </div>
-                  </SettingGroup>
-
-                  <SettingGroup title="Accent Color">
-                    <div className="flex items-center gap-1.5">
-                      {BRAND_ACCENTS.map((a) => (
-                        <button key={a.value} type="button" onClick={() => update({ accent: a.value })} title={a.name}
-                          className={`h-7 w-7 rounded-full border-2 transition-all ${content.accent === a.value ? "border-foreground scale-110 shadow-md" : "border-border/50 hover:border-muted-foreground/30 hover:scale-105"}`}
-                          style={{ background: a.value }} />
-                      ))}
+                    <div>
+                      <label className={labelCls}>Button color</label>
+                      <div className="flex items-center gap-1.5">
+                        {BRAND_ACCENTS.map((a) => (
+                          <button key={a.value} type="button" onClick={() => update({ accent: a.value })} title={a.name}
+                            className={`h-7 w-7 rounded-full border-2 transition-all ${content.accent === a.value ? "border-foreground scale-110 shadow-md" : "border-border/50 hover:border-muted-foreground/30 hover:scale-105"}`}
+                            style={{ background: a.value }} />
+                        ))}
+                      </div>
+                      <p className="text-[9px] text-muted-foreground/50 mt-1">Changes the button and accent throughout the email</p>
                     </div>
                   </SettingGroup>
 

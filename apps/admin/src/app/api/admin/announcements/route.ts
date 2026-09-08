@@ -13,6 +13,7 @@ const fullSchema = z.object({
   imageUrl: z.string().max(500).nullable().optional(),
   buttonText: z.string().max(100).nullable().optional(),
   buttonLink: z.string().max(500).nullable().optional(),
+  showBar: z.boolean().optional().default(true),
   barText: z.string().max(200).nullable().optional(),
   barLink: z.string().max(500).nullable().optional(),
   barStyle: z.string().optional().default("scrolling"),

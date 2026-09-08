@@ -44,7 +44,7 @@ export const getCategories = unstable_cache(
 export const getPublishedVideos = unstable_cache(
   async (take?: number, platform?: "youtube" | "instagram", skip?: number) =>
     prisma.video.findMany({
-      where: { published: true },
+      where: { published: true, deletedAt: null },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       ...(take ? { take } : {}),
       ...(skip ? { skip } : {}),
@@ -74,7 +74,7 @@ export const getPublishedVideos = unstable_cache(
 export const getPublishedVideoBySlug = unstable_cache(
   (slug: string) =>
     prisma.video.findFirst({
-      where: { slug, published: true },
+      where: { slug, published: true, deletedAt: null },
       select: {
         id: true,
         title: true,
@@ -173,7 +173,7 @@ export function getDashboardExtras() {
         prisma.comment.count({ where: { approved: false } }),
         prisma.auditLogEntry.findMany({
           orderBy: { createdAt: "desc" },
-          take: 10,
+          take: 5,
           select: { action: true, createdAt: true },
         }),
       ]).then(
@@ -207,6 +207,37 @@ export function getDashboardExtras() {
       pendingComments: 0,
       activity: [],
     }
+  );
+}
+
+// Full activity history for the /admin/activity page.
+export function getActivityHistory(skip = 0, take = 50) {
+  return dbSafe(
+    () =>
+      Promise.all([
+        prisma.auditLogEntry.findMany({
+          orderBy: { createdAt: "desc" },
+          skip,
+          take,
+          select: { action: true, createdAt: true, ip: true },
+        }),
+        prisma.auditLogEntry.count(),
+      ]).then(([entries, total]) => ({ entries, total })),
+    { entries: [], total: 0 }
+  );
+}
+
+// Social links configured in the admin — used as a fallback "sources" widget
+// when Google Analytics is not connected.
+export function getSocialLinksForDashboard() {
+  return dbSafe(
+    () =>
+      prisma.socialLink.findMany({
+        where: { active: true },
+        orderBy: { sortOrder: "asc" },
+        select: { label: true, href: true, icon: true },
+      }),
+    []
   );
 }
 

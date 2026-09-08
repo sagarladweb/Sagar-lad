@@ -100,7 +100,7 @@ export default async function VideoArticlePage({
             <ArrowLeft className="w-4 h-4" /> All videos
           </Link>
           {video.category && (
-            <p className="btn-premium mt-6 inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+            <p className="mt-6 inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
               {video.category.name}
             </p>
           )}

@@ -133,8 +133,8 @@ function BookViewerInner({ bookId, buyUrl, open, onClose }: Props) {
         <X className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
-      {/* Floating Buy Button */}
-      <div className="absolute bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 z-[10000]" onClick={(e) => e.stopPropagation()}>
+      {/* Floating Buy Button — mobile only */}
+      <div className="absolute bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 z-[10000] sm:hidden" onClick={(e) => e.stopPropagation()}>
         <a
           href={buyUrl ?? "/books"}
           target="_blank"

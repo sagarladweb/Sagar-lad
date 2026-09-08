@@ -74,7 +74,7 @@ export default async function ContentCategoryPage({
           >
             <ArrowLeft className="w-4 h-4" /> All topics
           </Link>
-          <p className="btn-premium mt-6 inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+          <p className="mt-6 inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
             Read
           </p>
           <h1 className="mt-3 font-display text-4xl md:text-5xl font-bold tracking-tight">

@@ -137,7 +137,7 @@ export default function SpeakingContactPage() {
           </div>
 
           <div className="lg:col-span-7 lg:pl-6">
-            <span className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+            <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
               Book Sagar
               Speaking &amp; Keynotes
             </span>

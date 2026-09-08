@@ -311,7 +311,7 @@ export default function AboutPage() {
       {/* ---------- The Belief / Philosophy ---------- */}
       <section id="belief" className="scroll-mt-32 py-20 md:py-28 border-b border-border">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-          <p data-reveal className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+          <p data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
             What drives me
           </p>
           <h2
@@ -341,7 +341,7 @@ export default function AboutPage() {
       {/* ---------- Rules I live by ---------- */}
       <section className="py-16 md:py-24 border-b border-border bg-background">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-          <p data-reveal className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+          <p data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
             Current Life Razor
           </p>
           <h2
@@ -376,7 +376,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             {/* Left: header text */}
             <div className="lg:col-span-5 text-center lg:text-left">
-              <span data-reveal className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Off the clock</span>
+              <span data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Off the clock</span>
               <h2 data-reveal className="mt-3 font-display text-3xl sm:text-4xl font-bold">
                 Runner for life
               </h2>

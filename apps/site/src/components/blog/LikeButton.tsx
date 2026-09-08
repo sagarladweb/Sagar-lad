@@ -31,9 +31,13 @@ function saveLikedPosts(liked: Set<string>) {
 export function LikeButton({
   slug,
   initialLikes,
+  size = "sm",
+  showLabel = false,
 }: {
   slug: string;
   initialLikes: number;
+  size?: "sm" | "md" | "lg";
+  showLabel?: boolean;
 }) {
   const [likes, setLikes] = useState(initialLikes);
   const [liked, setLiked] = useState(false);
@@ -76,6 +80,15 @@ export function LikeButton({
       if (res.ok) {
         const data = await res.json();
         setLikes(data.likes);
+        setLiked(data.liked);
+        // Sync localStorage with server truth
+        const current = getLikedPosts();
+        if (data.liked) {
+          current.add(slug);
+        } else {
+          current.delete(slug);
+        }
+        saveLikedPosts(current);
       }
     } catch {
       // Revert on network error
@@ -90,6 +103,9 @@ export function LikeButton({
     }
   }, [slug, likes, liked, loading]);
 
+  const isMedium = size === "md";
+  const isLarge = size === "lg";
+
   return (
     <button
       onClick={(e) => {
@@ -98,21 +114,32 @@ export function LikeButton({
         toggle();
       }}
       disabled={loading}
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+      className={`inline-flex items-center justify-center font-medium transition-all duration-200 active:scale-95 ${
+        isLarge
+          ? "gap-2.5 rounded-full border px-5 py-2.5 text-sm"
+          : isMedium
+          ? "gap-2 rounded-full border px-4 py-2 text-sm min-h-[40px]"
+          : "gap-1.5 rounded-full border px-2.5 py-1 text-[11px]"
+      } ${
         liked
-          ? "border-red-200 bg-red-50 text-red-500"
-          : "border-border text-muted-foreground hover:bg-muted"
+          ? "border-red-300 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 shadow-sm"
+          : "border-border bg-card/80 text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:border-border/80"
       }`}
       aria-label={liked ? `Unlike (${likes})` : `Like (${likes})`}
     >
-      <span className="relative flex items-center justify-center w-3.5 h-3.5">
+      <span className={`relative flex items-center justify-center ${isLarge ? "w-4 h-4" : isMedium ? "w-4 h-4" : "w-3.5 h-3.5"}`}>
         <Heart
-          className={`absolute inset-0 w-3.5 h-3.5 transition-all duration-200 ${
+          className={`w-full h-full transition-transform duration-300 ease-out ${
             liked ? "fill-red-500 text-red-500 scale-110" : ""
           }`}
         />
       </span>
-      {likes.toLocaleString()}
+      {showLabel && (
+        <span className="font-medium text-xs">
+          {liked ? "Liked" : "Like"}
+        </span>
+      )}
+      <span className="font-semibold">{likes.toLocaleString()}</span>
     </button>
   );
 }

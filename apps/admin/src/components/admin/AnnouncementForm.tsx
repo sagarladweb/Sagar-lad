@@ -30,6 +30,7 @@ type Announcement = {
   imageUrl: string | null;
   buttonText: string | null;
   buttonLink: string | null;
+  showBar: boolean;
   barText: string | null;
   barLink: string | null;
   barStyle: string;
@@ -48,6 +49,7 @@ function emptyForm(): Omit<Announcement, "id" | "createdAt"> {
     imageUrl: null,
     buttonText: null,
     buttonLink: null,
+    showBar: true,
     barText: null,
     barLink: null,
     barStyle: "scrolling",
@@ -66,6 +68,7 @@ function toForm(a: Announcement): Omit<Announcement, "id" | "createdAt"> {
     imageUrl: a.imageUrl,
     buttonText: a.buttonText,
     buttonLink: a.buttonLink,
+    showBar: a.showBar ?? true,
     barText: a.barText,
     barLink: a.barLink,
     barStyle: a.barStyle,
@@ -99,21 +102,48 @@ const DEVICE_WIDTHS: Record<Device, string> = {
 /* ── Bar Preview ─────────────────────────────────────────── */
 
 function BarPreview({ form }: { form: Omit<Announcement, "id" | "createdAt"> }) {
+  if (form.showBar === false) {
+    return (
+      <div className="rounded-lg border border-dashed border-border py-4 px-4 text-center bg-muted/20">
+        <span className="text-xs text-muted-foreground italic">Announcement bar is toggled OFF for this announcement</span>
+      </div>
+    );
+  }
   const text = form.barText || form.title || "Announcement text";
-  const dur = Math.max(8, 60 / form.barSpeed);
+  const dur = Math.max(8, Math.round(600 / Math.max(10, form.barSpeed)));
   const bg = form.barBgColor || "#dbeafe";
   const fg = form.barColor || "#1e3a5f";
+
+  const renderItemSet = () => (
+    <div className="flex items-center shrink-0">
+      {Array.from({ length: 12 }).map((_, idx) => (
+        <span
+          key={idx}
+          className="nl-marquee-text inline-flex items-center gap-6 shrink-0"
+          style={{ color: fg }}
+        >
+          <span>{text}</span>
+          <span className="opacity-40" aria-hidden="true">•</span>
+        </span>
+      ))}
+    </div>
+  );
+
   return (
-    <div className="rounded-lg overflow-hidden" style={{ background: bg }}>
+    <div className="rounded-lg overflow-hidden border border-border/40 shadow-xs" style={{ background: bg }}>
       {form.barStyle === "scrolling" ? (
         <div className="overflow-hidden">
           <div
-            key={`${form.barStyle}-${form.barSpeed}-${text}`}
-            className="flex whitespace-nowrap"
-            style={{ animation: `marquee-right-to-left ${dur}s linear infinite`, width: "max-content" }}
+            key={`${form.barStyle}-${form.barSpeed}-${dur}-${text}`}
+            className="nl-marquee flex items-center whitespace-nowrap select-none"
+            style={{ "--marquee-duration": `${dur}s` } as React.CSSProperties}
           >
-            <span className="whitespace-nowrap px-6 py-2 text-xs sm:text-sm font-semibold tracking-wide" style={{ color: fg }}>{text}</span>
-            <span className="whitespace-nowrap px-6 py-2 text-xs sm:text-sm font-semibold tracking-wide" style={{ color: fg }}>{text}</span>
+            <div className="flex items-center shrink-0">
+              {renderItemSet()}
+            </div>
+            <div className="flex items-center shrink-0" aria-hidden>
+              {renderItemSet()}
+            </div>
           </div>
         </div>
       ) : (
@@ -225,7 +255,7 @@ function SectionPreview({ form }: { form: Omit<Announcement, "id" | "createdAt">
 function FullPreview({ form }: { form: Omit<Announcement, "id" | "createdAt"> }) {
   return (
     <div className="rounded-xl border border-border overflow-hidden bg-background">
-      <BarPreview form={form} />
+      {form.showBar && <BarPreview form={form} />}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background/80 backdrop-blur">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full" style={{ background: "#0d21a1" }} />
@@ -510,82 +540,128 @@ export function AnnouncementForm({ initial }: AnnouncementFormProps) {
 
           {/* Bar */}
           <div className="rounded-xl border border-border bg-card p-5 sm:p-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <Megaphone className="w-4 h-4 text-muted-foreground" />
-              <h2 className="font-display text-sm font-bold">Announcement Bar</h2>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Always shown above the header when announcement is active.
-            </p>
-
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-muted-foreground">Bar Text</label>
-                <input
-                  type="text"
-                  value={form.barText ?? ""}
-                  onChange={(e) => setForm({ ...form, barText: e.target.value || null })}
-                  placeholder="Uses section title if empty"
-                  className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
-                />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Megaphone className="w-4 h-4 text-muted-foreground" />
+                <h2 className="font-display text-sm font-bold">Announcement Bar</h2>
               </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-muted-foreground">Bar Link</label>
-                <input
-                  type="url"
-                  value={form.barLink ?? ""}
-                  onChange={(e) => setForm({ ...form, barLink: e.target.value || null })}
-                  placeholder="Uses button link if empty"
-                  className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-muted-foreground">Style</label>
-                  <div className="flex rounded-lg border border-border overflow-hidden">
-                    {(["scrolling", "static"] as const).map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setForm({ ...form, barStyle: s })}
-                        className={`flex-1 px-4 py-2 text-xs font-medium transition-colors ${
-                          form.barStyle === s
-                            ? "bg-accent text-accent-foreground"
-                            : "bg-background text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {s === "scrolling" ? "Scrolling" : "Static"}
-                      </button>
-                    ))}
-                  </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-muted-foreground">Show Bar:</span>
+                <div className="inline-flex rounded-lg border border-border p-0.5 bg-background shadow-xs">
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, showBar: true })}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                      form.showBar
+                        ? "bg-foreground text-background shadow-xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, showBar: false })}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                      !form.showBar
+                        ? "bg-foreground text-background shadow-xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    No
+                  </button>
                 </div>
+              </div>
+            </div>
 
-                {form.barStyle === "scrolling" && (
+            {!form.showBar ? (
+              <div className="rounded-lg border border-dashed border-border/80 p-4 text-center bg-muted/20">
+                <p className="text-xs text-muted-foreground">
+                  Announcement bar is <span className="font-semibold text-foreground">turned off</span> for this announcement. Only the hero, section, and popup will be used if active.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4 pt-1">
+                <p className="text-xs text-muted-foreground">
+                  Renders as a sticky notification ribbon above the header on the public website.
+                </p>
+
+                <div className="space-y-3">
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-muted-foreground">
-                      Speed: {form.barSpeed}px/s
-                    </label>
+                    <label className="text-xs font-semibold text-muted-foreground">Bar Text</label>
                     <input
-                      type="range"
-                      min={10}
-                      max={60}
-                      value={form.barSpeed}
-                      onChange={(e) => setForm({ ...form, barSpeed: Number(e.target.value) })}
-                      className="w-full accent-accent"
+                      type="text"
+                      value={form.barText ?? ""}
+                      onChange={(e) => setForm({ ...form, barText: e.target.value || null })}
+                      placeholder="Uses announcement title if empty"
+                      className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
                     />
                   </div>
-                )}
-              </div>
 
-              <BarColorPicker
-                bgColor={form.barBgColor || "#dbeafe"}
-                textColor={form.barColor || "#1e3a5f"}
-                onChangeBg={(c) => setForm({ ...form, barBgColor: c })}
-                onChangeText={(c) => setForm({ ...form, barColor: c })}
-              />
-            </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-muted-foreground">Bar Link</label>
+                    <input
+                      type="url"
+                      value={form.barLink ?? ""}
+                      onChange={(e) => setForm({ ...form, barLink: e.target.value || null })}
+                      placeholder="Uses button link if empty"
+                      className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-muted-foreground">Style</label>
+                      <div className="flex rounded-lg border border-border overflow-hidden">
+                        {(["scrolling", "static"] as const).map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => setForm({ ...form, barStyle: s })}
+                            className={`flex-1 px-4 py-2 text-xs font-medium transition-colors ${
+                              form.barStyle === s
+                                ? "bg-accent text-accent-foreground"
+                                : "bg-background text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {s === "scrolling" ? "Scrolling (Ticker)" : "Static"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {form.barStyle === "scrolling" && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-semibold text-muted-foreground">
+                            Speed: <span className="font-mono text-foreground font-bold">{form.barSpeed}px/s</span>
+                          </label>
+                          <span className="text-[10px] text-muted-foreground">
+                            {form.barSpeed <= 18 ? "Gentle / Slow" : form.barSpeed <= 35 ? "Smooth / Normal" : "Brisk / Fast"}
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min={10}
+                          max={60}
+                          step={2}
+                          value={form.barSpeed}
+                          onChange={(e) => setForm({ ...form, barSpeed: Number(e.target.value) })}
+                          className="w-full accent-accent cursor-pointer"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <BarColorPicker
+                    bgColor={form.barBgColor || "#dbeafe"}
+                    textColor={form.barColor || "#1e3a5f"}
+                    onChangeBg={(c) => setForm({ ...form, barBgColor: c })}
+                    onChangeText={(c) => setForm({ ...form, barColor: c })}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Popup */}

@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Play, Pause, Brain, Heart, Users, Briefcase, TrendingUp, Star } from "lucide-react";
+import { Play, Pause, Brain, Heart, Users, Briefcase, TrendingUp, Star, ArrowRight } from "lucide-react";
 import { MINDUP_PILLARS, type MindUpPillar } from "@/lib/mindup";
 import { Pill } from "@/components/ui/Pill";
 
@@ -367,7 +368,7 @@ export function MindUpPillars() {
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-8">
         {/* Mobile / tablet */}
-        <div className="text-center lg:hidden" data-animate="up" suppressHydrationWarning>
+        <div className="text-center lg:hidden">
           <Pill>The Mind Up Theory</Pill>
           <h2 className="mt-8 font-display text-4xl font-bold leading-[1.1] tracking-tight text-[#1e293b] sm:text-5xl">
             Six Pillars.
@@ -382,8 +383,8 @@ export function MindUpPillars() {
         </div>
 
         {/* Desktop */}
-        <div className="hidden lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-24" suppressHydrationWarning>
-          <div className="lg:min-h-[280px]" data-animate="left" suppressHydrationWarning>
+        <div className="hidden lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-24">
+          <div className="lg:min-h-[280px]">
             <Pill>The Mind Up Theory</Pill>
             <div key={activePillar?.id ?? "intro"} className="pillar-swap mt-8">
               {activePillar && !playing ? (
@@ -413,9 +414,16 @@ export function MindUpPillars() {
                 </>
               )}
             </div>
+            <Link
+              href="/mindup-score"
+              className="btn-premium group inline-flex items-center gap-2 mt-8 px-8 py-3.5 rounded-full bg-accent text-accent-foreground font-semibold text-sm hover:shadow-lg active:scale-100 active:opacity-100"
+            >
+              Take the MindUp Quiz
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </Link>
           </div>
 
-          <div data-animate="right" suppressHydrationWarning>
+          <div>
             <PillarRing
               active={active}
               activePillar={activePillar}
@@ -431,7 +439,7 @@ export function MindUpPillars() {
         </div>
 
         {/* Mobile / tablet ring */}
-        <div className="mt-14 lg:hidden" data-animate="zoom" suppressHydrationWarning>
+        <div className="mt-14 lg:hidden">
           <PillarRing
             active={active}
             activePillar={activePillar}
@@ -443,6 +451,17 @@ export function MindUpPillars() {
             onSelect={select}
             onPlayToggle={startPlay}
           />
+        </div>
+
+        {/* Mobile / tablet button — below donut */}
+        <div className="mt-10 text-center lg:hidden">
+          <Link
+            href="/mindup-score"
+            className="btn-premium group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-accent-foreground font-semibold text-sm hover:shadow-lg active:scale-100 active:opacity-100"
+          >
+            Take the MindUp Quiz
+            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+          </Link>
         </div>
       </div>
     </section>

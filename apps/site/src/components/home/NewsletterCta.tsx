@@ -62,9 +62,7 @@ export function NewsletterCta() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div
-          className="mx-auto max-w-2xl overflow-hidden rounded-xl border border-border bg-card shadow-lg"
-          data-animate
-          suppressHydrationWarning
+          className="mx-auto max-w-2xl overflow-hidden rounded-xl border border-border bg-card shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08)]"
         >
           {/* Full-width blog image — top 60%, no gradient overlay */}
           <div className="relative w-full aspect-[16/10] overflow-hidden">
@@ -90,7 +88,7 @@ export function NewsletterCta() {
               background: "linear-gradient(180deg, #e8f0fe 0%, #f4f7fd 35%, #ffffff 70%)",
             }}
           >
-            <div className="w-full text-center mx-auto max-w-md" data-animate suppressHydrationWarning>
+            <div className="w-full text-center mx-auto max-w-md">
               <Pill>The Sagar Lad Letter</Pill>
               <h2 className="mt-3 font-display text-3xl md:text-4xl font-bold leading-tight text-foreground">
                 One practical idea. Every week.

@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { getPublishedBooks } from "@/lib/content";
 import { SITE, pageMetadata } from "@/lib/site";
 import { BookLibrary } from "@/components/books/BookLibrary";
+import { PublishedBookStats } from "@/components/books/PublishedBookStats";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
@@ -35,11 +36,11 @@ export default async function BooksPage() {
       />
 
       {/* -------- The Library -------- */}
-      <section className="card-hover border-b border-border bg-card/40">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-24">
+      <section className="border-b border-border bg-card/40">
+        <div className="mx-auto max-w-7xl px-4 pt-24 pb-20 sm:px-6 md:pt-28 md:pb-24">
           <div className="flex flex-wrap items-end justify-between gap-4" data-animate>
             <div>
-              <p className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+              <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
                 All books
               </p>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">
@@ -52,6 +53,10 @@ export default async function BooksPage() {
           </div>
 
           <div className="mt-10">
+            <PublishedBookStats books={books} />
+          </div>
+
+          <div className="mt-10">
             <BookLibrary books={books} variant="published" />
           </div>
         </div>
@@ -60,7 +65,7 @@ export default async function BooksPage() {
       {/* -------- Colophon -------- */}
       <section className="bg-background">
         <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6 md:py-24" data-animate>
-          <p className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+          <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
             Details
           </p>
           <p className="mt-5 leading-relaxed text-muted-foreground">

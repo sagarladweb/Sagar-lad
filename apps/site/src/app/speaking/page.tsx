@@ -126,7 +126,7 @@ export default function SpeakingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             <div className="lg:col-span-5 text-center lg:text-left" data-animate="left">
-              <span className="btn-premium inline-flex items-center justify-center lg:justify-start rounded-full bg-brand-light/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-brand">
+              <span className="inline-flex items-center justify-center lg:justify-start rounded-full bg-brand-light/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-brand">
                 Watch
               </span>
               <div className="mt-6">
@@ -242,7 +242,7 @@ export default function SpeakingPage() {
           {/* Events Hosted — visual cards */}
           <div data-animate>
             <div className="max-w-2xl mb-10 text-center sm:text-left mx-auto sm:mx-0">
-              <span className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Where I&apos;ve spoken</span>
+              <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Where I&apos;ve spoken</span>
               <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">On stage, around the world</h2>
               <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
                 From local meetups to international summits — here are some of the rooms I&apos;ve had the privilege to speak in.
@@ -263,16 +263,15 @@ export default function SpeakingPage() {
                   <div
                     key={e.title}
                     data-animate-item
-                    className="card-hover group relative rounded-xl border border-border bg-card p-6"
+                    className="relative rounded-xl border border-border bg-card p-6"
                   >
-                    <div className="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-brand/0 via-brand/20 to-brand/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <span className="absolute top-4 right-4 text-[10px] font-bold tabular-nums text-muted-foreground/30">
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <div className="w-12 h-12 rounded-lg bg-brand/10 text-brand grid place-items-center mb-4 transition-all duration-300 group-hover:bg-brand group-hover:text-white group-hover:scale-110">
+                    <div className="w-12 h-12 rounded-lg bg-brand/10 text-brand grid place-items-center mb-4">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <h3 className="font-display text-base font-bold leading-snug text-foreground group-hover:text-accent-strong transition-colors">
+                    <h3 className="font-display text-base font-bold leading-snug text-foreground">
                       {e.title}
                     </h3>
                     <p className="mt-1 text-xs text-muted-foreground">{e.role}</p>
@@ -288,7 +287,7 @@ export default function SpeakingPage() {
           {/* Memberships & Certifications — visual cards */}
           <div data-animate>
             <div className="max-w-2xl mb-10 text-center sm:text-left mx-auto sm:mx-0">
-              <span className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Background</span>
+              <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Background</span>
               <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">Certified &amp; connected</h2>
               <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
                 Backed by real training, real certifications, and active roles in global tech communities.
@@ -304,16 +303,16 @@ export default function SpeakingPage() {
                   <div
                     key={m.title}
                     data-animate-item
-                    className="card-hover group relative flex items-start gap-4 rounded-xl border border-border bg-card p-6"
+                    className="relative flex items-start gap-4 rounded-xl border border-border bg-card p-6"
                   >
                     {/* Icon */}
-                    <div className="shrink-0 w-12 h-12 rounded-lg bg-accent/10 text-accent-strong grid place-items-center transition-all duration-300 group-hover:bg-accent group-hover:text-accent-foreground group-hover:scale-110">
+                    <div className="shrink-0 w-12 h-12 rounded-lg bg-accent/10 text-accent-strong grid place-items-center">
                       <Icon className="w-5 h-5" />
                     </div>
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-display text-base font-bold leading-snug text-foreground group-hover:text-accent-strong transition-colors">
+                        <h3 className="font-display text-base font-bold leading-snug text-foreground">
                           {m.title}
                         </h3>
                         <span className="btn-premium inline-flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-accent-strong shrink-0">
@@ -334,7 +333,7 @@ export default function SpeakingPage() {
       <section className="card-hover py-20 md:py-28 border-b border-border bg-card/40" aria-label="Professional experience">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-2xl text-center sm:text-left mx-auto sm:mx-0" data-animate>
-            <span className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">How it works</span>
+            <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">How it works</span>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">Three simple steps</h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
               No confusion, no last-minute surprises. Here&apos;s exactly how we&apos;ll work together from start to finish.
@@ -397,7 +396,7 @@ export default function SpeakingPage() {
       <section className="py-20 md:py-28 bg-background" aria-label="What organizers say">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16" data-animate>
-            <span className="btn-premium inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Kind words</span>
+            <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Kind words</span>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">What people say</h2>
             <p className="mt-3 text-sm sm:text-base text-muted-foreground">
               Honest feedback from organizers and attendees who&apos;ve experienced the talks firsthand.

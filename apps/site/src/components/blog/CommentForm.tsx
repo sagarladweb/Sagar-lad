@@ -66,8 +66,18 @@ export function CommentForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="card-hover mt-8 rounded-lg border border-border bg-card p-6 space-y-4" noValidate>
-      <h3 className="font-display text-lg font-bold">Leave a comment</h3>
+    <form
+      onSubmit={onSubmit}
+      className="mt-8 rounded-2xl border border-border bg-card/60 p-5 sm:p-6 space-y-4 shadow-sm"
+      noValidate
+    >
+      <div>
+        <h3 className="font-display text-lg font-bold text-foreground">Leave a comment</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Share your reflections or questions. Moderated for spam.
+        </p>
+      </div>
+
       <div>
         <input
           type="text"
@@ -79,12 +89,13 @@ export function CommentForm({
           placeholder="Your name"
           aria-label="Your name"
           required
-          className={`w-full rounded-md border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent ${
+          className={`w-full rounded-xl border bg-background px-4 py-2.5 text-base sm:text-sm outline-none transition-all focus:border-brand focus:ring-2 focus:ring-brand/20 ${
             errors.name ? "border-red-500" : "border-border"
           }`}
         />
         {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
       </div>
+
       <div>
         <textarea
           value={form.content}
@@ -96,29 +107,35 @@ export function CommentForm({
           aria-label="Comment"
           required
           rows={4}
-          className={`w-full rounded-md border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent resize-y ${
+          className={`w-full rounded-xl border bg-background px-4 py-2.5 text-base sm:text-sm outline-none transition-all focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y ${
             errors.content ? "border-red-500" : "border-border"
           }`}
         />
         {errors.content && <p className="mt-1 text-xs text-red-500">{errors.content}</p>}
-        <p className="mt-1 text-xs text-muted-foreground">{form.content.length}/1000</p>
+        <div className="flex justify-end mt-1">
+          <span className="text-[11px] text-muted-foreground">{form.content.length}/1000</span>
+        </div>
       </div>
-      <button
-        type="submit"
-        disabled={state === "loading"}
-        className="btn-premium inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-6 py-2.5 text-sm font-semibold disabled:opacity-60 hover:opacity-90"
-      >
-        {state === "loading" && <Loader2 className="w-4 h-4 animate-spin" />}
-        Post comment
-      </button>
+
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={state === "loading"}
+          className="btn-premium inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-2.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-95 disabled:opacity-60"
+        >
+          {state === "loading" && <Loader2 className="w-4 h-4 animate-spin" />}
+          Post comment
+        </button>
+      </div>
+
       {state === "success" && (
-        <p className="flex items-center gap-1.5 text-sm text-green-600 font-medium">
-          <CheckCircle2 className="w-4 h-4" /> {message}
+        <p className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/40">
+          <CheckCircle2 className="w-4 h-4 shrink-0" /> {message}
         </p>
       )}
       {state === "error" && (
-        <p className="flex items-center gap-1.5 text-sm text-red-600">
-          <AlertCircle className="w-4 h-4" /> {message}
+        <p className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 font-medium bg-red-50 dark:bg-red-950/30 p-3 rounded-xl border border-red-200 dark:border-red-900/40">
+          <AlertCircle className="w-4 h-4 shrink-0" /> {message}
         </p>
       )}
     </form>

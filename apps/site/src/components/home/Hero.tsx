@@ -21,8 +21,8 @@ export function Hero() {
       // Background image: subtle zoom-in
       tl.fromTo(
         "[data-hero-bg]",
-        { scale: 1.1, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 1.8, ease: "power2.out" },
+        { scale: 1.05, opacity: 0.85 },
+        { scale: 1, opacity: 1, duration: 1.4, ease: "power2.out" },
         0
       );
 

@@ -16,23 +16,32 @@ export async function revalidatePublic(): Promise<boolean> {
   revalidateTag("content", "max");
   revalidateTag("announcements", "max");
 
+  const candidateUrls: string[] = [];
+  if (process.env.NODE_ENV === "development") {
+    candidateUrls.push("http://localhost:3002", "http://localhost:3000");
+  }
   let rawUrl = (process.env.SITE_URL ?? "https://sagarlad.com").trim().replace(/\/$/, "");
   if (!/^https?:\/\//i.test(rawUrl)) {
     rawUrl = `https://${rawUrl}`;
   }
-
-  try {
-    await fetch(`${rawUrl}/api/revalidate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-revalidate-secret": process.env.CRON_SECRET ?? "",
-      },
-      signal: AbortSignal.timeout(5000),
-    });
-    return true;
-  } catch (err) {
-    console.warn("[revalidate] site refresh failed:", (err as Error).message);
-    return false;
+  if (!candidateUrls.includes(rawUrl)) {
+    candidateUrls.push(rawUrl);
   }
+
+  for (const url of candidateUrls) {
+    try {
+      const res = await fetch(`${url}/api/revalidate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-revalidate-secret": process.env.CRON_SECRET ?? "",
+        },
+        signal: AbortSignal.timeout(3000),
+      });
+      if (res.ok) return true;
+    } catch {
+      // try next candidate
+    }
+  }
+  return false;
 }

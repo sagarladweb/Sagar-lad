@@ -99,7 +99,7 @@ export function TopicsGrid({ topics }: { topics: Topic[] }) {
 
   return (
     <section className="py-16 md:py-24 border-b border-border bg-background overflow-hidden" aria-label="Explore Topics">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center" data-animate="up" suppressHydrationWarning>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <div className="w-full flex justify-center text-center">
           <Pill>Explore</Pill>
         </div>

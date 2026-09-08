@@ -5,7 +5,6 @@ import {
   MessagesSquare,
   ExternalLink,
   Settings,
-  Share2,
   Mail,
   Layers,
   ShieldOff,
@@ -30,7 +29,6 @@ const nav: { label: string; href: string; icon: LucideIcon; phase: number }[] = 
   { label: "Content", href: "/admin/content", icon: Layers, phase: 2 },
   { label: "Announcement", href: "/admin/announcement", icon: Megaphone, phase: 2 },
   { label: "Newsletter", href: "/admin/newsletter", icon: Mail, phase: 2 },
-  { label: "Social", href: "/admin/social", icon: Share2, phase: 2 },
   { label: "Community", href: "/admin/moderation", icon: MessagesSquare, phase: 2 },
   { label: "Settings", href: "/admin/settings", icon: Settings, phase: 1 },
 ].filter((item) => !PHASE_1 || item.phase === 1);

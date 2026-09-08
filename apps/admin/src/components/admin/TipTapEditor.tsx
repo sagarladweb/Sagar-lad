@@ -15,9 +15,14 @@ import TextAlign from "@tiptap/extension-text-align";
 import Typography from "@tiptap/extension-typography";
 import Dropcursor from "@tiptap/extension-dropcursor";
 import Gapcursor from "@tiptap/extension-gapcursor";
+import { Table } from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
 import ListBulletList from "@tiptap/extension-bullet-list";
 import ListOrderedList from "@tiptap/extension-ordered-list";
 import { TextStyle } from "@tiptap/extension-text-style";
+import { FontSize } from "@tiptap/extension-text-style/font-size";
 import Color from "@tiptap/extension-color";
 import { ColorWheel } from "@/components/admin/ColorWheel";
 import { youtubeId, youtubeThumb, youtubeWatchUrl } from "@/lib/youtube";
@@ -40,6 +45,7 @@ import {
   Undo2,
   Redo2,
   Minus,
+  Plus,
   Highlighter,
   AlignLeft,
   AlignCenter,
@@ -51,6 +57,12 @@ import {
   Check,
   Keyboard,
   PanelTop,
+  Columns,
+  Rows,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ArrowDown,
   PanelLeft,
   PanelRight,
   MoveHorizontal,
@@ -62,6 +74,8 @@ import {
   SquarePlus,
   Trash2,
   ListTree,
+  Table as TableIcon,
+  Trash,
 } from "lucide-react";
 
 type Shortcut = string;
@@ -950,6 +964,8 @@ function EditorContextMenu({
   const left = typeof window !== "undefined" ? Math.min(position.x, window.innerWidth - 270) : position.x;
   const top = typeof window !== "undefined" ? Math.min(position.y, window.innerHeight - 490) : position.y;
 
+  const inTable = editor.isActive("table");
+
   return (
     <div
       ref={menuRef}
@@ -958,195 +974,264 @@ function EditorContextMenu({
       className="fixed z-50 w-64 rounded-2xl border border-border bg-card p-2.5 shadow-2xl space-y-2 text-xs"
       style={{ left: `${Math.max(10, left)}px`, top: `${Math.max(10, top)}px` }}
     >
-      <div>
-        <p className="px-2 py-0.5 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
-          Headings & Tags
-        </p>
-        <div className="grid grid-cols-2 gap-1 mt-1">
-          <button
-            type="button"
-            onClick={() => setHeading(1)}
-            className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
-              editor.isActive("heading", { level: 1 }) ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-            }`}
-          >
-            <span className="font-display font-bold text-xs">H1</span> Heading 1
-          </button>
-          <button
-            type="button"
-            onClick={() => setHeading(2)}
-            className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
-              editor.isActive("heading", { level: 2 }) ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-            }`}
-          >
-            <span className="font-display font-bold text-xs">H2</span> Heading 2
-          </button>
-          <button
-            type="button"
-            onClick={() => setHeading(3)}
-            className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
-              editor.isActive("heading", { level: 3 }) ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-            }`}
-          >
-            <span className="font-display font-bold text-xs">H3</span> Heading 3
-          </button>
-          <button
-            type="button"
-            onClick={() => setHeading(4)}
-            className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
-              editor.isActive("heading", { level: 4 }) ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-            }`}
-          >
-            <span className="font-display font-bold text-xs">H4</span> Heading 4
-          </button>
-          <button
-            type="button"
-            onClick={setParagraph}
-            className={`col-span-2 flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
-              editor.isActive("paragraph") ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-            }`}
-          >
-            <span>¶</span> Paragraph Text
-          </button>
-        </div>
-      </div>
-
-      <div className="border-t border-border pt-1.5">
-        <p className="px-2 py-0.5 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
-          Bullet Points & Lists
-        </p>
-        <div className="space-y-1 mt-1">
-          <div className="px-2 text-[10px] font-semibold text-muted-foreground">Bullet Variants</div>
+      {/* Table-only context menu */}
+      {inTable ? (
+        <div className="space-y-2">
+          <p className="px-1 font-semibold text-[11px] text-muted-foreground">Table</p>
+          <div className="grid grid-cols-4 gap-1">
+            <button type="button" onClick={() => { editor.chain().focus().addColumnBefore().run(); onClose(); }}
+              className="flex flex-col items-center gap-0.5 rounded-lg p-2 hover:bg-muted" title="Add column left">
+              <span className="flex items-center"><Columns className="w-4 h-4" /><ArrowLeft className="w-3 h-3 -ml-1" /></span>
+              <span className="text-[9px] text-muted-foreground">Left</span>
+            </button>
+            <button type="button" onClick={() => { editor.chain().focus().addColumnAfter().run(); onClose(); }}
+              className="flex flex-col items-center gap-0.5 rounded-lg p-2 hover:bg-muted" title="Add column right">
+              <span className="flex items-center"><Columns className="w-4 h-4" /><ArrowRight className="w-3 h-3 -ml-1" /></span>
+              <span className="text-[9px] text-muted-foreground">Right</span>
+            </button>
+            <button type="button" onClick={() => { editor.chain().focus().addRowBefore().run(); onClose(); }}
+              className="flex flex-col items-center gap-0.5 rounded-lg p-2 hover:bg-muted" title="Add row above">
+              <span className="flex items-center"><Rows className="w-4 h-4" /><ArrowUp className="w-3 h-3 -ml-1" /></span>
+              <span className="text-[9px] text-muted-foreground">Above</span>
+            </button>
+            <button type="button" onClick={() => { editor.chain().focus().addRowAfter().run(); onClose(); }}
+              className="flex flex-col items-center gap-0.5 rounded-lg p-2 hover:bg-muted" title="Add row below">
+              <span className="flex items-center"><Rows className="w-4 h-4" /><ArrowDown className="w-3 h-3 -ml-1" /></span>
+              <span className="text-[9px] text-muted-foreground">Below</span>
+            </button>
+          </div>
           <div className="grid grid-cols-3 gap-1">
-            <button
-              type="button"
-              onClick={() => applyBulletStyle("disc")}
-              className={`flex items-center justify-center gap-1 rounded-lg px-1 py-1 transition-colors ${
-                inBullet && currentBulletStyle === "disc" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-              }`}
-              title="Disc Bullet (●)"
-            >
-              ● Disc
+            <button type="button" onClick={() => { editor.chain().focus().deleteColumn().run(); onClose(); }}
+              className="flex flex-col items-center gap-0.5 rounded-lg p-2 hover:bg-red-500/10 text-red-600" title="Delete column">
+              <Minus className="w-4 h-4" />
+              <span className="text-[9px]">Col</span>
             </button>
-            <button
-              type="button"
-              onClick={() => applyBulletStyle("circle")}
-              className={`flex items-center justify-center gap-1 rounded-lg px-1 py-1 transition-colors ${
-                inBullet && currentBulletStyle === "circle" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-              }`}
-              title="Circle Bullet (○)"
-            >
-              ○ Circle
+            <button type="button" onClick={() => { editor.chain().focus().deleteRow().run(); onClose(); }}
+              className="flex flex-col items-center gap-0.5 rounded-lg p-2 hover:bg-red-500/10 text-red-600" title="Delete row">
+              <Minus className="w-4 h-4" />
+              <span className="text-[9px]">Row</span>
             </button>
-            <button
-              type="button"
-              onClick={() => applyBulletStyle("square")}
-              className={`flex items-center justify-center gap-1 rounded-lg px-1 py-1 transition-colors ${
-                inBullet && currentBulletStyle === "square" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-              }`}
-              title="Square Bullet (■)"
-            >
-              ■ Square
+            <button type="button" onClick={() => { editor.chain().focus().deleteTable().run(); onClose(); }}
+              className="flex flex-col items-center gap-0.5 rounded-lg p-2 hover:bg-red-500/10 text-red-600" title="Delete table">
+              <Trash2 className="w-4 h-4" />
+              <span className="text-[9px]">Table</span>
             </button>
           </div>
-
-          <div className="px-2 pt-1 text-[10px] font-semibold text-muted-foreground">Numbered / Hierarchical</div>
-          <div className="grid grid-cols-1 gap-1">
-            <button
-              type="button"
-              onClick={() => applyOrderedStyle("decimal")}
-              className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
-                inOrdered && currentOrderedStyle === "decimal" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-              }`}
-            >
-              <span className="font-mono font-bold w-6">1.</span> Numbers (1, 2, 3)
-            </button>
-            <button
-              type="button"
-              onClick={() => applyOrderedStyle("nested-decimal")}
-              className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
-                inOrdered && currentOrderedStyle === "nested-decimal" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-              }`}
-            >
-              <span className="font-mono font-bold w-6">1.1</span> Hierarchical (1.1, 1.2)
-            </button>
-            <button
-              type="button"
-              onClick={() => applyOrderedStyle("lower-roman")}
-              className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
-                inOrdered && currentOrderedStyle === "lower-roman" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-              }`}
-            >
-              <span className="font-mono font-bold w-6">i.</span> Lower Roman (i, ii)
-            </button>
-            <button
-              type="button"
-              onClick={() => applyOrderedStyle("upper-roman")}
-              className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
-                inOrdered && currentOrderedStyle === "upper-roman" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-              }`}
-            >
-              <span className="font-mono font-bold w-6">I.</span> Upper Roman (I, II)
-            </button>
-            <button
-              type="button"
-              onClick={() => applyOrderedStyle("lower-alpha")}
-              className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
-                inOrdered && currentOrderedStyle === "lower-alpha" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-              }`}
-            >
-              <span className="font-mono font-bold w-6">a.</span> Lower Alpha (a, b)
-            </button>
-            <button
-              type="button"
-              onClick={() => applyOrderedStyle("upper-alpha")}
-              className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
-                inOrdered && currentOrderedStyle === "upper-alpha" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
-              }`}
-            >
-              <span className="font-mono font-bold w-6">A.</span> Upper Alpha (A, B)
-            </button>
+          <div className="border-t border-border pt-2">
+            <p className="px-1 font-semibold text-[11px] text-muted-foreground mb-1">Align</p>
+            <div className="grid grid-cols-3 gap-1">
+              <button type="button" onClick={() => { editor.chain().focus().setTextAlign("left").run(); onClose(); }}
+                className={`flex flex-col items-center gap-0.5 rounded-lg p-2 ${editor.isActive({ textAlign: "left" }) ? "bg-accent text-accent-foreground" : "hover:bg-muted"}`} title="Align left">
+                <AlignLeft className="w-4 h-4" />
+                <span className="text-[9px]">Left</span>
+              </button>
+              <button type="button" onClick={() => { editor.chain().focus().setTextAlign("center").run(); onClose(); }}
+                className={`flex flex-col items-center gap-0.5 rounded-lg p-2 ${editor.isActive({ textAlign: "center" }) ? "bg-accent text-accent-foreground" : "hover:bg-muted"}`} title="Align center">
+                <AlignCenter className="w-4 h-4" />
+                <span className="text-[9px]">Center</span>
+              </button>
+              <button type="button" onClick={() => { editor.chain().focus().setTextAlign("right").run(); onClose(); }}
+                className={`flex flex-col items-center gap-0.5 rounded-lg p-2 ${editor.isActive({ textAlign: "right" }) ? "bg-accent text-accent-foreground" : "hover:bg-muted"}`} title="Align right">
+                <AlignRight className="w-4 h-4" />
+                <span className="text-[9px]">Right</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Normal context menu */}
+          <div>
+            <p className="px-2 py-0.5 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
+              Headings & Tags
+            </p>
+            <div className="grid grid-cols-2 gap-1 mt-1">
+              <button
+                type="button"
+                onClick={() => setHeading(1)}
+                className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
+                  editor.isActive("heading", { level: 1 }) ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                }`}
+              >
+                <span className="font-display font-bold text-xs">H1</span> Heading 1
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeading(2)}
+                className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
+                  editor.isActive("heading", { level: 2 }) ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                }`}
+              >
+                <span className="font-display font-bold text-xs">H2</span> Heading 2
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeading(3)}
+                className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
+                  editor.isActive("heading", { level: 3 }) ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                }`}
+              >
+                <span className="font-display font-bold text-xs">H3</span> Heading 3
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeading(4)}
+                className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
+                  editor.isActive("heading", { level: 4 }) ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                }`}
+              >
+                <span className="font-display font-bold text-xs">H4</span> Heading 4
+              </button>
+              <button
+                type="button"
+                onClick={setParagraph}
+                className={`col-span-2 flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium transition-colors ${
+                  editor.isActive("paragraph") ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                }`}
+              >
+                <span>¶</span> Paragraph Text
+              </button>
+            </div>
+          </div>
 
-      {inList && (
-        <div className="border-t border-border pt-1.5 flex items-center justify-between gap-1">
-          <button
-            type="button"
-            onClick={indentList}
-            className="flex-1 flex items-center justify-center gap-1 rounded-lg px-2 py-1 hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
-            title="Sub-category level (Tab)"
-          >
-            ↳ Indent Level
-          </button>
-          <button
-            type="button"
-            onClick={outdentList}
-            className="flex-1 flex items-center justify-center gap-1 rounded-lg px-2 py-1 hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
-            title="Outdent level (Shift+Tab)"
-          >
-            ↰ Outdent Level
-          </button>
-        </div>
+          <div className="border-t border-border pt-1.5">
+            <p className="px-2 py-0.5 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
+              Bullet Points & Lists
+            </p>
+            <div className="space-y-1 mt-1">
+              <div className="px-2 text-[10px] font-semibold text-muted-foreground">Bullet Variants</div>
+              <div className="grid grid-cols-3 gap-1">
+                <button
+                  type="button"
+                  onClick={() => applyBulletStyle("disc")}
+                  className={`flex items-center justify-center gap-1 rounded-lg px-1 py-1 transition-colors ${
+                    inBullet && currentBulletStyle === "disc" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                  }`}
+                  title="Disc Bullet (●)"
+                >
+                  ● Disc
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyBulletStyle("circle")}
+                  className={`flex items-center justify-center gap-1 rounded-lg px-1 py-1 transition-colors ${
+                    inBullet && currentBulletStyle === "circle" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                  }`}
+                  title="Circle Bullet (○)"
+                >
+                  ○ Circle
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyBulletStyle("square")}
+                  className={`flex items-center justify-center gap-1 rounded-lg px-1 py-1 transition-colors ${
+                    inBullet && currentBulletStyle === "square" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                  }`}
+                  title="Square Bullet (■)"
+                >
+                  ■ Square
+                </button>
+              </div>
+
+              <div className="px-2 pt-1 text-[10px] font-semibold text-muted-foreground">Numbered / Hierarchical</div>
+              <div className="grid grid-cols-1 gap-1">
+                <button
+                  type="button"
+                  onClick={() => applyOrderedStyle("decimal")}
+                  className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
+                    inOrdered && currentOrderedStyle === "decimal" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                  }`}
+                >
+                  <span className="font-mono font-bold w-6">1.</span> Numbers (1, 2, 3)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyOrderedStyle("nested-decimal")}
+                  className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
+                    inOrdered && currentOrderedStyle === "nested-decimal" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                  }`}
+                >
+                  <span className="font-mono font-bold w-6">1.1</span> Hierarchical (1.1, 1.2)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyOrderedStyle("lower-roman")}
+                  className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
+                    inOrdered && currentOrderedStyle === "lower-roman" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                  }`}
+                >
+                  <span className="font-mono font-bold w-6">i.</span> Lower Roman (i, ii)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyOrderedStyle("upper-roman")}
+                  className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
+                    inOrdered && currentOrderedStyle === "upper-roman" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                  }`}
+                >
+                  <span className="font-mono font-bold w-6">I.</span> Upper Roman (I, II)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyOrderedStyle("lower-alpha")}
+                  className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
+                    inOrdered && currentOrderedStyle === "lower-alpha" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                  }`}
+                >
+                  <span className="font-mono font-bold w-6">a.</span> Lower Alpha (a, b)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyOrderedStyle("upper-alpha")}
+                  className={`flex items-center gap-1.5 rounded-lg px-2 py-1 transition-colors ${
+                    inOrdered && currentOrderedStyle === "upper-alpha" ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted"
+                  }`}
+                >
+                  <span className="font-mono font-bold w-6">A.</span> Upper Alpha (A, B)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {inList && (
+            <div className="border-t border-border pt-1.5 flex items-center justify-between gap-1">
+              <button
+                type="button"
+                onClick={indentList}
+                className="flex-1 flex items-center justify-center gap-1 rounded-lg px-2 py-1 hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
+                title="Sub-category level (Tab)"
+              >
+                ↳ Indent Level
+              </button>
+              <button
+                type="button"
+                onClick={outdentList}
+                className="flex-1 flex items-center justify-center gap-1 rounded-lg px-2 py-1 hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
+                title="Outdent level (Shift+Tab)"
+              >
+                ↰ Outdent Level
+              </button>
+            </div>
+          )}
+
+          <div className="border-t border-border pt-1.5 flex items-center justify-between gap-1">
+            <button
+              type="button"
+              onClick={setCallout}
+              className="flex-1 flex items-center justify-center gap-1 rounded-lg px-2 py-1 hover:bg-muted font-medium"
+            >
+              Callout
+            </button>
+            <button
+              type="button"
+              onClick={setBlockquote}
+              className="flex-1 flex items-center justify-center gap-1 rounded-lg px-2 py-1 hover:bg-muted font-medium"
+            >
+              Quote
+            </button>
+          </div>
+        </>
       )}
-
-      <div className="border-t border-border pt-1.5 flex items-center justify-between gap-1">
-        <button
-          type="button"
-          onClick={setCallout}
-          className="flex-1 flex items-center justify-center gap-1 rounded-lg px-2 py-1 hover:bg-muted font-medium"
-        >
-          Callout
-        </button>
-        <button
-          type="button"
-          onClick={setBlockquote}
-          className="flex-1 flex items-center justify-center gap-1 rounded-lg px-2 py-1 hover:bg-muted font-medium"
-        >
-          Quote
-        </button>
-      </div>
     </div>
   );
 }
@@ -1232,12 +1317,17 @@ export function TipTapEditor({
       Highlight.configure({ multicolor: true }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       TextStyle,
+      FontSize,
       Color,
       Typography,
       Dropcursor.configure({ color: "var(--accent)", width: 2 }),
       Gapcursor,
       Callout,
       ContentEmbed,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableCell,
+      TableHeader,
     ],
     content: initialContent || "",
     immediatelyRender: false,
@@ -1677,6 +1767,8 @@ export function TipTapEditor({
     </div>
   ) : null;
 
+  // Table toolbar removed — controls are in right-click context menu only
+
   const onUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -1720,6 +1812,31 @@ export function TipTapEditor({
     { label: "Inline code", shortcut: "Mod e", icon: <Code className="w-4 h-4" />, active: editor.isActive("code"), onClick: () => editor.chain().focus().toggleCode().run() },
   ];
 
+  const FONT_SIZES = [12, 14, 16, 18, 20, 24, 28, 32];
+  const getCurrentFontSize = (): number => {
+    const attrs = editor.getAttributes("textStyle");
+    if (attrs.fontSize) return parseInt(attrs.fontSize);
+    return 16;
+  };
+  const currentFontSize = getCurrentFontSize();
+
+  const fontSizeGroup = [
+    { label: "Decrease font size", icon: <Minus className="w-4 h-4" />, onClick: () => {
+      const idx = FONT_SIZES.indexOf(currentFontSize);
+      const next = idx > 0 ? FONT_SIZES[idx - 1] : FONT_SIZES[0];
+      editor.chain().focus().setFontSize(`${next}px`).run();
+    }},
+    { label: "Current font size", icon: <span className="text-xs font-mono min-w-[2ch] text-center">{currentFontSize}</span>, onClick: () => {}, active: false },
+    { label: "Increase font size", icon: <Plus className="w-4 h-4" />, onClick: () => {
+      const idx = FONT_SIZES.indexOf(currentFontSize);
+      const next = idx < FONT_SIZES.length - 1 ? FONT_SIZES[idx + 1] : FONT_SIZES[FONT_SIZES.length - 1];
+      editor.chain().focus().setFontSize(`${next}px`).run();
+    }},
+    { label: "Reset font size", icon: <X className="w-4 h-4" />, onClick: () => {
+      editor.chain().focus().unsetFontSize().run();
+    }},
+  ];
+
   const blockGroup = [
     { label: "Heading 1", shortcut: "Mod Alt 1", icon: <Heading1 className="w-4 h-4" />, active: editor.isActive("heading", { level: 1 }), onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run() },
     { label: "Heading 2", shortcut: "Mod Alt 2", icon: <Heading2 className="w-4 h-4" />, active: editor.isActive("heading", { level: 2 }), onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
@@ -1727,6 +1844,7 @@ export function TipTapEditor({
     { label: "Quote", shortcut: "Mod Shift b", icon: <QuoteIcon className="w-4 h-4" />, active: editor.isActive("blockquote"), onClick: () => editor.chain().focus().toggleBlockquote().run() },
     { label: "Callout", shortcut: "Mod Alt c", icon: <Wand2 className="w-4 h-4" />, active: editor.isActive("callout"), onClick: () => editor.chain().focus().toggleWrap("callout").run() },
     { label: "Divider", icon: <Minus className="w-4 h-4" />, onClick: () => editor.chain().focus().setHorizontalRule().run() },
+    { label: "Table", icon: <TableIcon className="w-4 h-4" />, active: editor.isActive("table"), onClick: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run() },
   ];
 
   const alignGroup = [
@@ -1787,7 +1905,7 @@ export function TipTapEditor({
   };
 
   const renderGroup = (vertical: boolean) => {
-    const groups = [textGroup, blockGroup, alignGroup, linkImageGroup, historyGroup, insertGroup];
+    const groups = [textGroup, fontSizeGroup, blockGroup, alignGroup, linkImageGroup, historyGroup, insertGroup];
     return groups.map((group, gi) => (
       <div
         key={gi}
@@ -1810,7 +1928,7 @@ export function TipTapEditor({
         {group.map((b) => (
           <ToolbarButton key={b.label} {...b} />
         ))}
-        {gi === 1 && (
+        {gi === 2 && (
           <ListStylePicker
             editor={editor}
             vertical
@@ -1827,6 +1945,10 @@ export function TipTapEditor({
       <ColorPicker editor={editor} />
       <HighlightPicker editor={editor} />
       {textGroup.map((b) => (
+        <ToolbarButton key={b.label} {...b} />
+      ))}
+      <ToolbarDivider />
+      {fontSizeGroup.map((b) => (
         <ToolbarButton key={b.label} {...b} />
       ))}
       <ToolbarDivider />

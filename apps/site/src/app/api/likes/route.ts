@@ -28,46 +28,70 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    // Sanitize: slug and token are alphanumeric + dashes only
     const safeSlug = postSlug.replace(/[^a-z0-9-]/g, "").slice(0, 200);
     const safeToken = clientToken.replace(/[^a-zA-Z0-9]/g, "").slice(0, 64);
 
-    let post;
-    try {
-      post = await prisma.post.findUnique({
-        where: { slug: safeSlug },
-        select: { id: true },
-      });
-    } catch {
-      return NextResponse.json({ error: "DB error" }, { status: 500 });
-    }
+    const post = await prisma.post.findUnique({
+      where: { slug: safeSlug },
+      select: { id: true, likes: true },
+    }).catch(() => null);
+
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    // Check if this token already liked this post using a lightweight approach:
-    // We store liked posts in a simple JSON cookie on the client, but for
-    // server-side dedup we check the like_events table (not in schema — we
-    // use a simpler approach: just track in a JSONB field or rely on client
-    // token uniqueness). Since we don't have a likes table, we'll keep it
-    // simple: the client manages dedup via localStorage, and the server
-    // just increments/decrements. For a low-traffic blog this is fine.
+    if (action === "like") {
+      // Check for existing like event (server-side dedup)
+      const existing = await prisma.postLikeEvent.findUnique({
+        where: { postSlug_clientToken: { postSlug: safeSlug, clientToken: safeToken } },
+        select: { id: true },
+      }).catch(() => null);
 
-    let updated;
-    try {
-      updated = await prisma.post.update({
-        where: { id: post.id },
-        data: { likes: action === "like" ? { increment: 1 } : { decrement: 1 } },
-        select: { likes: true },
-      });
-    } catch {
-      return NextResponse.json({ likes: 0, liked: action === "unlike" }, { status: 500 });
+      if (existing) {
+        // Already liked — return current count, no-op
+        return NextResponse.json({ likes: post.likes, liked: true });
+      }
+
+      // Create like event + increment atomically
+      const [, updated] = await prisma.$transaction([
+        prisma.postLikeEvent.create({
+          data: { postSlug: safeSlug, clientToken: safeToken },
+        }),
+        prisma.post.update({
+          where: { id: post.id },
+          data: { likes: { increment: 1 } },
+          select: { likes: true },
+        }),
+      ]);
+
+      return NextResponse.json({ likes: updated.likes, liked: true });
+    } else {
+      // Unlike: remove event + decrement (floor at 0)
+      const existing = await prisma.postLikeEvent.findUnique({
+        where: { postSlug_clientToken: { postSlug: safeSlug, clientToken: safeToken } },
+        select: { id: true },
+      }).catch(() => null);
+
+      if (!existing) {
+        // Never liked — return current count, no-op
+        return NextResponse.json({ likes: post.likes, liked: false });
+      }
+
+      const newLikes = Math.max(0, post.likes - 1);
+
+      const [, updated] = await prisma.$transaction([
+        prisma.postLikeEvent.delete({
+          where: { postSlug_clientToken: { postSlug: safeSlug, clientToken: safeToken } },
+        }),
+        prisma.post.update({
+          where: { id: post.id },
+          data: { likes: newLikes },
+          select: { likes: true },
+        }),
+      ]);
+
+      return NextResponse.json({ likes: updated.likes, liked: false });
     }
-
-    return NextResponse.json({
-      likes: updated.likes,
-      liked: action === "like",
-    });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

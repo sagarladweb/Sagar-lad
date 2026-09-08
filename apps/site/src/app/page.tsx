@@ -32,12 +32,19 @@ export default async function HomePage({
     ? prisma.announcement.findUnique({ where: { id: params.id } }).catch(() => null)
     : getActiveAnnouncement();
 
-  const [posts, socials, allCategories, announcement] = await Promise.all([
-    getFeaturedPostsWithFallback(VISIBLE_POST_WHERE, 4),
-    getSiteSocials(),
-    getCategoriesWithFallback(),
-    fetchAnnouncement,
+  const results = await Promise.all([
+    getFeaturedPostsWithFallback(VISIBLE_POST_WHERE, 4).catch(() => []),
+    getSiteSocials().catch(() => []),
+    getCategoriesWithFallback().catch(() => []),
+    fetchAnnouncement.catch(() => null),
   ]);
+
+  const [posts, socials, allCategories, announcement] = results as [
+    Awaited<ReturnType<typeof getFeaturedPostsWithFallback>>,
+    Awaited<ReturnType<typeof getSiteSocials>>,
+    Awaited<ReturnType<typeof getCategoriesWithFallback>>,
+    Awaited<typeof fetchAnnouncement>,
+  ];
 
   const topicsWithViews = allCategories
     .map((c) => ({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
@@ -23,6 +23,7 @@ const NewsletterPopup = dynamic(
 type AnnouncementBarData = {
   id: string;
   title: string;
+  showBar?: boolean;
   barText?: string | null;
   barLink?: string | null;
   buttonLink?: string | null;
@@ -32,7 +33,7 @@ type AnnouncementBarData = {
   barColor?: string | null;
 };
 
-export function SiteFrame({
+function SiteFrameInner({
   children,
   announcement,
 }: {
@@ -59,7 +60,11 @@ export function SiteFrame({
   const showRss = pathname === "/" || pathname === "/blog";
   const barText = effectiveAnnouncement?.barText || effectiveAnnouncement?.title || null;
   const barLink = effectiveAnnouncement?.barLink || effectiveAnnouncement?.buttonLink || null;
-  const shouldShowBar = barText && (effectiveAnnouncement || isBarPreview);
+  const isBarEnabled =
+    effectiveAnnouncement?.showBar !== false &&
+    effectiveAnnouncement?.barStyle !== "none" &&
+    effectiveAnnouncement?.barStyle !== "hidden";
+  const shouldShowBar = isBarEnabled && barText && (effectiveAnnouncement || isBarPreview);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -107,5 +112,19 @@ export function SiteFrame({
       {!isAdmin && pathname === "/" && <NewsletterPopup />}
       {!isAdmin && showRss && <RssBanner />}
     </>
+  );
+}
+
+export function SiteFrame({
+  children,
+  announcement,
+}: {
+  children: React.ReactNode;
+  announcement?: AnnouncementBarData | null;
+}) {
+  return (
+    <Suspense>
+      <SiteFrameInner children={children} announcement={announcement} />
+    </Suspense>
   );
 }

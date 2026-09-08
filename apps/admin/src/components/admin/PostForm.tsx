@@ -57,6 +57,7 @@ export function PostForm({
     sources?: Source[] | null;
     views?: number;
     likes?: number;
+    showTimeline?: boolean;
   };
 }) {
   const router = useRouter();
@@ -80,6 +81,7 @@ export function PostForm({
     sources: initial?.sources ?? [],
     views: initial?.views ?? 0,
     likes: initial?.likes ?? 0,
+    showTimeline: initial?.showTimeline ?? false,
   });
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [previewError, setPreviewError] = useState("");
@@ -748,6 +750,9 @@ export function PostForm({
                   scheduledAt: next ? "" : f.scheduledAt,
                 };
               })
+            )}
+            {statusToggle("Timeline Index", form.showTimeline, () =>
+              setForm((f) => ({ ...f, showTimeline: !f.showTimeline }))
             )}
           </div>
 

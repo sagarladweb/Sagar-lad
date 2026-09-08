@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { VerticalTimeline } from "@/components/mentorship/VerticalTimeline";
 
 const PILLARS = [
   {
@@ -475,7 +476,6 @@ export function MentorshipClient() {
         ctx = gsap.context(() => {
           // Clear CSS initial state before GSAP takes over
           gsap.utils.toArray<HTMLElement>("[data-m-hero]").forEach((e) => gsap.set(e, { clearProps: "all" }));
-          gsap.utils.toArray<HTMLElement>("[data-m-pillar]").forEach((e) => gsap.set(e, { clearProps: "all" }));
           gsap.utils.toArray<HTMLElement>("[data-m-cta]").forEach((e) => gsap.set(e, { clearProps: "all" }));
 
           gsap.fromTo(
@@ -490,27 +490,6 @@ export function MentorshipClient() {
           stagger: 0.15,
         }
       );
-
-      const pillarCards = gsap.utils.toArray<HTMLElement>("[data-m-pillar]");
-      if (pillarCards.length) {
-        gsap.fromTo(
-          pillarCards,
-          { opacity: 0, y: 30, scale: 0.97 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: pillarCards[0]?.parentElement,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-      }
 
       gsap.fromTo(
         "[data-m-cta]",
@@ -543,7 +522,7 @@ export function MentorshipClient() {
     <div ref={rootRef} className="min-h-screen bg-background text-foreground">
       {/* ── 1. Profile Hero ── */}
       <section className="relative overflow-hidden border-b border-border bg-background">
-        <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 md:py-32">
+        <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 md:pt-20 pb-16 sm:pb-24 md:pb-32">
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-14">
             <div data-m-hero className="relative shrink-0 pb-3">
               <div className="relative h-36 w-36 sm:h-48 sm:w-48 rounded-full overflow-hidden border-2 border-border shadow-lg">
@@ -597,7 +576,7 @@ export function MentorshipClient() {
         </div>
       </section>
 
-      {/* ── 2. What You Get — 4 Pillars ── */}
+      {/* ── 2. What You Get — Vertical Timeline ── */}
       <section className="relative py-20 md:py-28 border-b border-border overflow-hidden">
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
@@ -612,41 +591,7 @@ export function MentorshipClient() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-            {PILLARS.map((p, i) => {
-              const Icon = p.icon;
-              return (
-                <div
-                  key={p.title}
-                  data-m-pillar
-                  className="card-hover group relative flex items-start gap-5 rounded-2xl bg-card border border-border p-6 sm:p-7"
-                >
-                  {/* left accent bar */}
-                  <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-full bg-brand/0 group-hover:bg-brand transition-all duration-400" />
-
-                  {/* number */}
-                  <span className="absolute right-5 top-4 text-[11px] font-bold tracking-widest text-brand/10 transition-colors duration-400 group-hover:text-brand/25">
-                    0{i + 1}
-                  </span>
-
-                  {/* icon */}
-                  <div className="shrink-0 w-12 h-12 rounded-xl bg-brand/8 border border-brand/10 grid place-items-center transition-all duration-400 group-hover:bg-brand group-hover:border-brand group-hover:shadow-[0_4px_20px_rgba(13,33,161,0.2)]">
-                    <Icon className="w-5 h-5 text-brand transition-all duration-400 group-hover:text-white group-hover:scale-110" />
-                  </div>
-
-                  {/* content */}
-                  <div className="flex-1 min-w-0 space-y-1.5 pt-0.5">
-                    <h3 className="font-display text-base sm:text-lg font-bold text-foreground transition-colors duration-300 group-hover:text-brand">
-                      {p.title}
-                    </h3>
-                    <p className="text-[13px] sm:text-sm leading-relaxed text-muted-foreground">
-                      {p.description}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <VerticalTimeline items={PILLARS} />
         </div>
       </section>
 
@@ -760,7 +705,7 @@ export function MentorshipClient() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-              Frequently Asked Questions
+              FAQ
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Everything you need to know before booking.

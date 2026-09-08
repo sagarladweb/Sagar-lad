@@ -34,40 +34,65 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
   const afterPosted = useCallback(() => setReload((n) => n + 1), []);
 
   return (
-    <div className="mt-14">
-      <h2 className="font-display text-2xl font-bold">
-        {comments && comments.length > 0
-          ? `${comments.length} ${comments.length === 1 ? "comment" : "comments"}`
-          : "Add a comment"}
-      </h2>
+    <section className="mt-14" aria-label="Comments section">
+      <div className="flex items-center justify-between pb-3 border-b border-border">
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">
+          {comments && comments.length > 0
+            ? `${comments.length} ${comments.length === 1 ? "Comment" : "Comments"}`
+            : "Discussion"}
+        </h2>
+        {comments && comments.length > 0 && (
+          <span className="text-xs text-muted-foreground font-mono">
+            {comments.length} posted
+          </span>
+        )}
+      </div>
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 space-y-3.5">
         {comments === null ? (
-          <p className="text-sm text-muted-foreground">
+          <div className="rounded-2xl border border-border bg-card/40 p-6 text-center text-sm text-muted-foreground">
             {error || "Loading comments…"}
-          </p>
+          </div>
         ) : (
           <>
             {comments.length === 0 && (
-              <p className="text-sm text-muted-foreground">Be the first to comment.</p>
-            )}
-            {comments.map((c) => (
-              <div key={c.id} className="card-hover rounded-lg border border-border bg-card p-5">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="font-semibold">{c.name}</span>
-                  <span aria-hidden="true">·</span>
-                  <time className="text-muted-foreground text-xs" dateTime={c.createdAt}>
-                    {formatDate(new Date(c.createdAt))}
-                  </time>
-                </div>
-                <p className="mt-2 text-sm leading-relaxed">{c.content}</p>
+              <div className="rounded-2xl border border-dashed border-border bg-card/40 p-8 text-center">
+                <p className="text-sm font-semibold text-foreground">No comments yet</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Start the conversation below!
+                </p>
               </div>
-            ))}
+            )}
+            {comments.map((c) => {
+              const initial = (c.name || "A").trim().charAt(0).toUpperCase();
+              return (
+                <div
+                  key={c.id}
+                  className="rounded-2xl border border-border bg-card/60 p-4 sm:p-5 transition-all hover:border-border/80"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-display font-bold text-xs shrink-0">
+                      {initial}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
+                      <span className="font-semibold text-foreground text-sm">{c.name}</span>
+                      <span className="text-muted-foreground/60" aria-hidden="true">·</span>
+                      <time className="text-muted-foreground text-[11px]" dateTime={c.createdAt}>
+                        {formatDate(new Date(c.createdAt))}
+                      </time>
+                    </div>
+                  </div>
+                  <p className="mt-2.5 text-sm leading-relaxed text-foreground/90 pl-11">
+                    {c.content}
+                  </p>
+                </div>
+              );
+            })}
           </>
         )}
       </div>
 
       <CommentForm postSlug={postSlug} onPosted={afterPosted} />
-    </div>
+    </section>
   );
 }

@@ -122,50 +122,49 @@ export default function ContactPage() {
       />
       {/* ── Hero ─────────────────────────────────────────────── */}
       <header className="relative overflow-hidden border-b border-border bg-background">
-        {/* Very soft blue gradient — bottom-left, barely there */}
+        {/* Warm yellow glow — top-right, same as About section */}
         <div
-          className="absolute inset-0 z-0"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(13,33,161,0.03) 0%, rgba(13,33,161,0.06) 40%, transparent 70%)",
-          }}
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-32 right-0 h-[450px] w-[450px] rounded-full bg-accent/10 blur-[120px]"
         />
-        {/* Tiny warm accent near portrait */}
+        {/* Second glow — left side, subtle depth */}
         <div
-          className="absolute z-0"
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1/3 -left-20 h-[300px] w-[300px] rounded-full bg-accent/[0.06] blur-[100px] hero-glow"
+        />
+        {/* Subtle dot pattern */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-0 opacity-[0.25]"
           style={{
-            width: "400px",
-            height: "400px",
-            left: "5%",
-            top: "20%",
-            background:
-              "radial-gradient(circle, rgba(13,33,161,0.04) 0%, transparent 70%)",
-            filter: "blur(50px)",
+            backgroundImage:
+              "radial-gradient(circle, var(--foreground) 0.5px, transparent 0.5px)",
+            backgroundSize: "24px 24px",
           }}
         />
 
         <div className="relative z-20 mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-6 pt-8 pb-10 sm:pt-14 sm:pb-16">
           {/* Portrait */}
-          <div className="lg:col-span-5 relative flex justify-center" data-animate="left">
-            <div className="relative w-full max-w-[340px] mx-auto">
+          <div className="lg:col-span-5 relative flex justify-center" data-animate="left" data-reverse>
+            <div className="relative w-full max-w-[420px] mx-auto">
               <Image
                 src="/images/section.png"
                 alt="Sagar Lad"
-                width={800}
-                height={890}
+                width={900}
+                height={1000}
                 priority
                 className="relative z-10 h-auto w-full"
                 style={{
-                  transform: "scale(1.15) translate(-34px, -19px)",
-                  maskImage: "linear-gradient(to top, transparent 0%, black 18%, black 100%)",
-                  WebkitMaskImage: "linear-gradient(to top, transparent 0%, black 18%, black 100%)",
+                  transform: "scale(1.2) translate(-28px, -14px)",
+                  maskImage: "linear-gradient(to top, transparent 0%, black 15%, black 100%)",
+                  WebkitMaskImage: "linear-gradient(to top, transparent 0%, black 15%, black 100%)",
                 }}
               />
             </div>
           </div>
 
           {/* Copy */}
-          <div className="lg:col-span-7 lg:pl-6 text-center lg:text-left" data-animate="right">
+          <div className="lg:col-span-7 lg:pl-6 text-center lg:text-left" data-animate="right" data-reverse>
             <span className="inline-block rounded-full bg-muted px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Get in touch
             </span>

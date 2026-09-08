@@ -7,6 +7,7 @@ import { SITE, VISIBLE_POST_WHERE, stripHtml } from "@/lib/site";
 import { JsonLd } from "@/components/JsonLd";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { PostArticle } from "@/components/blog/PostArticle";
+import { ViewTracker } from "@/components/blog/ViewTracker";
 
 export const revalidate = 604800;
 
@@ -114,6 +115,7 @@ export default async function PostPage({ params }: Props) {
         }}
       />
       <ReadingProgress />
+      <ViewTracker postSlug={post.slug} />
       <PostArticle
         post={{
           ...post,

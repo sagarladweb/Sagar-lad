@@ -17,7 +17,7 @@ import {
   Monitor,
   Repeat,
 } from "lucide-react";
-import { getDashboardStats, getDashboardExtras } from "@/lib/content";
+import { getDashboardStats, getDashboardExtras, getSocialLinksForDashboard } from "@/lib/content";
 import { getGaAnalytics } from "@/lib/analytics";
 import { adminHeartbeat } from "@/lib/heartbeat";
 import { formatCompact } from "@/lib/charts";
@@ -39,6 +39,7 @@ export default async function DashboardPage() {
   let published = 0;
   let drafts = 0;
   let scheduled = 0;
+  let socialLinks: { label: string; href: string; icon: string | null }[] = [];
   let extras: {
     activeSubs: number;
     lastCampaign: { subject: string; createdAt: Date; _count: { deliveries: number } } | null;
@@ -77,10 +78,11 @@ export default async function DashboardPage() {
 
   try {
     adminHeartbeat();
-    const [statsResult, extrasResult, gaResult] = await Promise.all([
+    const [statsResult, extrasResult, gaResult, socialsResult] = await Promise.all([
       getDashboardStats(),
       getDashboardExtras(),
       getGaAnalytics(14).catch(() => fallbackGa),
+      getSocialLinksForDashboard(),
     ]);
 
     const [, , , subs, recent] = statsResult;
@@ -88,6 +90,7 @@ export default async function DashboardPage() {
     extras = extrasResult;
     extras.activeSubs = subs;
     ga = gaResult;
+    socialLinks = socialsResult;
   } catch (e) {
     console.error("Failed to load dashboard stats:", e);
   }
@@ -99,8 +102,8 @@ export default async function DashboardPage() {
 
   const maxSource = Math.max(...(gaData.topSources.map((s) => s.sessions) ?? [1]));
   const contentStats = [
-    { label: "Books", value: extras.books, href: "/admin/books", icon: BookOpen },
-    { label: "Videos", value: extras.videos, href: "/admin/videos", icon: Video },
+    { label: "Books", value: extras.books, href: "/admin/content?tab=books", icon: BookOpen },
+    { label: "Videos", value: extras.videos, href: "/admin/content?tab=videos", icon: Video },
     { label: "Quotes", value: extras.quotes, href: "/admin/content", icon: Quote },
     { label: "Comments", value: extras.pendingComments, href: "/admin/moderation", icon: MessagesSquare },
   ];
@@ -135,14 +138,13 @@ export default async function DashboardPage() {
         <TrafficChart initial={ga} />
       </section>
 
-      {/* Sources + Content + Newsletter side by side */}
+      {/* Top Sources + Content + Newsletter */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Top Sources — GA when available, social links as fallback */}
         <Card title="Top sources" icon={Radio}>
-          {gaData.topSources.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No traffic yet.</p>
-          ) : (
+          {gaData.topSources.length > 0 ? (
             <ul className="space-y-3">
-              {gaData.topSources.map((s) => (
+              {gaData.topSources.slice(0, 6).map((s) => (
                 <li key={s.source}>
                   <div className="flex items-center justify-between text-sm">
                     <span className="truncate font-medium">{s.source}</span>
@@ -154,6 +156,24 @@ export default async function DashboardPage() {
                 </li>
               ))}
             </ul>
+          ) : socialLinks.length > 0 ? (
+            <ul className="space-y-2">
+              {socialLinks.map((s) => (
+                <li key={s.label}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-muted/60 transition-colors"
+                  >
+                    <span className="font-medium">{s.label}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">No sources configured.</p>
           )}
           <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
             <span>
@@ -208,82 +228,21 @@ export default async function DashboardPage() {
         </Card>
       </section>
 
-      {/* Map + Devices + New vs Returning */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <div className="lg:col-span-2">
-          <Card title="Visitors by country" icon={Globe}>
-            <WorldMap data={gaData.topCountries} />
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card title="Devices" icon={Smartphone}>
-            {gaData.topDevices.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No data yet.</p>
-            ) : (
-              <ul className="space-y-3">
-                {gaData.topDevices.map((d) => {
-                  const total = gaData.topDevices.reduce((a, x) => a + x.users, 0) || 1;
-                  const pct = Math.round((d.users / total) * 100);
-                  return (
-                    <li key={d.device}>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="inline-flex items-center gap-2 font-medium">
-                          {d.device === "mobile" ? (
-                            <Smartphone className="w-3.5 h-3.5 text-accent" />
-                          ) : (
-                            <Monitor className="w-3.5 h-3.5 text-accent" />
-                          )}
-                          {d.device}
-                        </span>
-                        <span className="text-muted-foreground tabular-nums">{pct}%</span>
-                      </div>
-                      <div className="mt-1 h-1.5 rounded-full bg-muted">
-                        <div className="h-1.5 rounded-full bg-accent transition-all duration-500" style={{ width: `${pct}%` }} />
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </Card>
-
-          <Card title="New vs returning" icon={Repeat}>
-            {gaData.newVsReturning.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No data yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {gaData.newVsReturning.map((n, idx) => {
-                  const total = gaData.newVsReturning.reduce((a, x) => a + x.users, 0) || 1;
-                  const pct = Math.round((n.users / total) * 100);
-                  return (
-                    <div key={`${n.type}-${idx}`}>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium capitalize">{n.type}</span>
-                        <span className="tabular-nums text-muted-foreground">{n.users} ({pct}%)</span>
-                      </div>
-                      <div className="mt-1 h-1.5 rounded-full bg-muted">
-                        <div
-                          className={`h-1.5 rounded-full transition-all duration-500 ${n.type === "new" ? "bg-accent" : "bg-accent/40"}`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </Card>
-        </div>
-      </section>
-
       {/* System Health + Activity */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <Card title="System Health" icon={RefreshCw}>
           <SystemHealth />
         </Card>
 
-        <Card title="Recent activity" icon={RefreshCw}>
+        <Card
+          title="Recent activity"
+          icon={RefreshCw}
+          action={
+            <Link href="/admin/activity" className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+              View all <ArrowRight className="w-3 h-3" />
+            </Link>
+          }
+        >
           {extras.activity.length === 0 ? (
             <p className="text-sm text-muted-foreground">No activity yet.</p>
           ) : (
@@ -299,7 +258,7 @@ export default async function DashboardPage() {
         </Card>
       </section>
 
-      {/* Recent posts table */}
+      {/* Recent posts — 3 columns: Title, Status, Views */}
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Recent posts</h2>
@@ -318,9 +277,7 @@ export default async function DashboardPage() {
                 <tr>
                   <th className="px-4 py-3">Title</th>
                   <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Views</th>
-                  <th className="px-4 py-3">Likes</th>
-                  <th className="px-4 py-3">Edit</th>
+                  <th className="px-4 py-3 text-right">Views</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -328,13 +285,7 @@ export default async function DashboardPage() {
                   <tr key={p.slug} className="hover:bg-muted/30 transition-colors duration-150">
                     <td className="px-4 py-3 font-medium">{p.title}</td>
                     <td className="px-4 py-3"><PublishedBadge published={p.published} /></td>
-                    <td className="px-4 py-3 tabular-nums">{p.views}</td>
-                    <td className="px-4 py-3 tabular-nums">{p.likes}</td>
-                    <td className="px-4 py-3">
-                      <Link href={`/admin/posts/${encodeURIComponent(p.slug)}/edit`} className="text-accent font-medium hover:underline">
-                        Edit
-                      </Link>
-                    </td>
+                    <td className="px-4 py-3 tabular-nums text-right">{p.views}</td>
                   </tr>
                 ))}
               </tbody>
@@ -346,7 +297,7 @@ export default async function DashboardPage() {
       {/* Top pages table */}
       {gaData.topPages.length > 0 && (
         <section>
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">All pages</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Top pages</h2>
           <Card>
             <div className="overflow-x-auto -mx-5">
               <table className="w-full text-sm">

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
-import { FALLBACK_SOCIALS } from "@/lib/social-links";
 
 export const runtime = "nodejs";
 
@@ -21,7 +20,7 @@ export async function GET() {
     const socials = await getSocials();
     return NextResponse.json({ socials });
   } catch (err) {
-    console.warn("[api/socials] DB unavailable, using fallback socials:", (err as Error).message);
-    return NextResponse.json({ socials: FALLBACK_SOCIALS });
+    console.warn("[api/socials] DB unavailable, returning empty:", (err as Error).message);
+    return NextResponse.json({ socials: [] });
   }
 }

@@ -16,7 +16,7 @@ function getPurify(): ReturnType<typeof DOMPurify> {
       sanitize(html: string) {
         return html
           .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-          .replace(/<\/?(?:iframe|object|embed|form|input|textarea|button|select|svg|math|meta|template|slot|style)\b[^>]*>/gi, "")
+          .replace(/<\/?(?:iframe|object|embed|form|input|textarea|button|select|svg|math|meta|template|slot)\b[^>]*>/gi, "")
           .replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "");
       },
     } as ReturnType<typeof DOMPurify>;
@@ -55,7 +55,7 @@ export function sanitizeHtml(dirty: string): string {
   return getPurify().sanitize(dirty, {
     USE_PROFILES: { html: true },
     FORBID_TAGS: [
-      "script", "style", "iframe", "object", "embed",
+      "script", "iframe", "object", "embed",
       "form", "input", "textarea", "button", "select",
       "svg", "math", "meta", "template", "slot",
     ],

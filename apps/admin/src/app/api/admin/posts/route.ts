@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { adminPostSchema } from "@/lib/validations";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { injectHeadingIds } from "@/lib/heading-ids";
 import { revalidatePublic } from "@/lib/revalidate";
 import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 
@@ -70,7 +71,9 @@ export async function POST(request: Request) {
         title: parsed.data.title,
         slug: parsed.data.slug,
         excerpt: parsed.data.excerpt || null,
-        content: sanitizeHtml(parsed.data.content),
+        content: parsed.data.showTimeline
+          ? injectHeadingIds(sanitizeHtml(parsed.data.content))
+          : sanitizeHtml(parsed.data.content),
         coverImage: parsed.data.coverImage || null,
         featured: parsed.data.featured ?? false,
         published: isScheduled ? false : (parsed.data.published ?? true),
@@ -81,6 +84,7 @@ export async function POST(request: Request) {
         kicker: parsed.data.kicker || null,
         showCover: parsed.data.showCover ?? true,
         showAuthorBox: parsed.data.showAuthorBox ?? true,
+        showTimeline: parsed.data.showTimeline ?? false,
         footerNote: parsed.data.footerNote || null,
         sources: Array.isArray(parsed.data.sources) && parsed.data.sources.length > 0
           ? parsed.data.sources
@@ -135,7 +139,9 @@ export async function PUT(request: Request) {
         title: parsed.data.title,
         slug: parsed.data.slug,
         excerpt: parsed.data.excerpt || null,
-        content: sanitizeHtml(parsed.data.content),
+        content: parsed.data.showTimeline
+          ? injectHeadingIds(sanitizeHtml(parsed.data.content))
+          : sanitizeHtml(parsed.data.content),
         coverImage: parsed.data.coverImage || null,
         featured: parsed.data.featured ?? false,
         published: isScheduled ? false : (parsed.data.published ?? true),
@@ -145,6 +151,7 @@ export async function PUT(request: Request) {
         kicker: parsed.data.kicker || null,
         showCover: parsed.data.showCover ?? true,
         showAuthorBox: parsed.data.showAuthorBox ?? true,
+        showTimeline: parsed.data.showTimeline ?? false,
         footerNote: parsed.data.footerNote || null,
         sources: Array.isArray(parsed.data.sources) && parsed.data.sources.length > 0
           ? parsed.data.sources

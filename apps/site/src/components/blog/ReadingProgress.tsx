@@ -9,10 +9,21 @@ export function ReadingProgress() {
     let raf = 0;
 
     const measure = () => {
-      const doc = document.documentElement;
-      const maxScroll = doc.scrollHeight - window.innerHeight;
-      const pct = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-      setProgress(Math.min(1, Math.max(0, pct)));
+      const contentEl = document.getElementById("post-content");
+      if (contentEl) {
+        const rect = contentEl.getBoundingClientRect();
+        const startY = rect.top + window.scrollY - 120;
+        const totalH = contentEl.offsetHeight;
+        const scrollOffset = window.scrollY - startY;
+        const denominator = totalH - window.innerHeight * 0.35;
+        const pct = denominator > 0 ? scrollOffset / denominator : 0;
+        setProgress(Math.min(1, Math.max(0, pct)));
+      } else {
+        const doc = document.documentElement;
+        const maxScroll = doc.scrollHeight - window.innerHeight;
+        const pct = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+        setProgress(Math.min(1, Math.max(0, pct)));
+      }
     };
 
     const onScroll = () => {
@@ -35,7 +46,7 @@ export function ReadingProgress() {
 
   return (
     <div
-      className="fixed top-16 left-0 right-0 z-40 h-1"
+      className="fixed top-16 left-0 right-0 z-40 h-1 pointer-events-none"
       role="progressbar"
       aria-label="Reading progress"
       aria-valuemin={0}
@@ -43,7 +54,7 @@ export function ReadingProgress() {
       aria-valuenow={Math.round(progress * 100)}
     >
       <div
-        className="h-full bg-gradient-to-r from-brand-light to-brand-light/60 transition-[width] duration-150 ease-out"
+        className="h-full bg-gradient-to-r from-brand via-brand-light to-accent transition-[width] duration-100 ease-out shadow-[0_1px_4px_rgba(13,33,161,0.2)]"
         style={{ width: `${progress * 100}%` }}
       />
     </div>
