@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Cloud, Globe, GraduationCap, Award } from "lucide-react";
 
 const EVENTS = [
@@ -11,44 +11,31 @@ const EVENTS = [
 
 function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [scrollFill, setScrollFill] = useState(0);
+  const [inView, setInView] = useState(false);
   const [hovered, setHovered] = useState(false);
 
-  const calcFill = useCallback(() => {
+  // Mobile/tablet: simple in-view toggle (no scroll tracking)
+  useEffect(() => {
     if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const vh = window.innerHeight;
-    const raw = 1 - (rect.top / vh);
-    const pct = Math.max(0, Math.min(1, (raw - 0.2) / 0.6));
-    setScrollFill(pct);
+    const mq = window.matchMedia("(max-width: 1023px)");
+    if (!mq.matches) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.3 }
+    );
+    observer.observe(cardRef.current);
+    return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    let raf: number;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(calcFill);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    calcFill();
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [calcFill]);
-
   const Icon = event.icon;
-  // Desktop: hover wins. Mobile: scroll wins.
-  const fill = hovered ? 1 : scrollFill;
-  const strokeProgress = Math.min(1, fill * 1.5);
-  const placeOpacity = fill > 0.8 ? Math.min(1, (fill - 0.8) / 0.2) : 0;
+  // Desktop: hover. Mobile: inView.
+  const filled = hovered || inView;
 
   return (
     <div
       ref={cardRef}
-      className="spoken-card group relative py-6"
+      className={`spoken-card group relative py-6 ${filled ? "is-filled" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       data-index={index}
@@ -62,22 +49,13 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
           <span className="text-sm text-muted-foreground">{event.role}</span>
         </div>
 
-        {/* Title: outlined → filled */}
-        <h3
-          className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight"
-          style={{
-            backgroundSize: `${fill * 100}% 100%`,
-            WebkitTextStroke: `${1 - strokeProgress}px var(--muted-foreground, #94a3b8)`,
-          }}
-        >
+        {/* Title: outline always visible, fill transitions via CSS */}
+        <h3 className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight">
           {event.title}
         </h3>
 
-        {/* Place pill — fades in when text is filled */}
-        <div
-          className="spoken-place mt-3"
-          style={{ opacity: placeOpacity, transform: `translateY(${(1 - placeOpacity) * 8}px)` }}
-        >
+        {/* Place pill */}
+        <div className="spoken-place mt-3">
           <span className="inline-flex rounded-full bg-brand/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand">
             {event.place}
           </span>
@@ -103,17 +81,37 @@ export function SpokenAt() {
       </div>
 
       <style>{`
+        /* Base: outline always visible, no fill */
         .spoken-title {
+          -webkit-text-stroke: 1.5px var(--muted-foreground, #94a3b8);
           -webkit-text-fill-color: transparent;
           -webkit-background-clip: text;
           background-clip: text;
           background-image: linear-gradient(var(--brand, #3b82f6), var(--brand, #3b82f6));
+          background-size: 0% 100%;
           background-repeat: no-repeat;
-          transition: background-size 0.15s ease-out, -webkit-text-stroke 0.2s ease-out;
+          transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                      -webkit-text-stroke-color 0.4s ease;
+          -webkit-text-stroke-color: var(--muted-foreground, #94a3b8);
         }
+
+        /* Filled: full color, stroke matches fill */
+        .spoken-card.is-filled .spoken-title {
+          background-size: 100% 100%;
+          -webkit-text-stroke-color: var(--brand, #3b82f6);
+        }
+
+        /* Place pill */
         .spoken-place {
-          transition: opacity 0.3s ease, transform 0.3s ease;
+          opacity: 0;
+          transform: translateY(8px);
+          transition: opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s;
         }
+        .spoken-card.is-filled .spoken-place {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .spoken-title {
             transition: none !important;
