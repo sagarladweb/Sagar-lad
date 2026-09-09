@@ -5,7 +5,7 @@ export const SITE = {
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? "https://sagarlad.com").trim().replace(/\/$/, ""),
   title: "Sagar Lad Official Website",
   description:
-    "Practical frameworks on money, career, life and awareness — from author, investor and educator Sagar Lad. Blog, books and more.",
+    "Practical frameworks on money, career, life and awareness — from author and educator Sagar Lad. Blog, books and more.",
   ogImage: "/images/heroes/hero-home.webp",
   locale: "en_IN",
 } as const;

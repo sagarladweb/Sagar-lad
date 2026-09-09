@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { getPublishedBooks } from "@/lib/content";
 import { SITE, pageMetadata } from "@/lib/site";
 import { BookLibrary } from "@/components/books/BookLibrary";
-import { PublishedBookStats } from "@/components/books/PublishedBookStats";
+import { BookStats } from "@/components/books/BookStats";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
@@ -37,8 +37,8 @@ export default async function BooksPage() {
 
       {/* -------- The Library -------- */}
       <section className="border-b border-border bg-card/40">
-        <div className="mx-auto max-w-7xl px-4 pt-24 pb-20 sm:px-6 md:pt-28 md:pb-24">
-          <div className="flex flex-wrap items-end justify-between gap-4" data-animate>
+        <div className="mx-auto max-w-7xl px-4 pt-20 pb-20 sm:px-6 md:pt-24 md:pb-24">
+          <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
                 All books
@@ -53,7 +53,7 @@ export default async function BooksPage() {
           </div>
 
           <div className="mt-10">
-            <PublishedBookStats books={books} />
+            <BookStats books={books} variant="published" />
           </div>
 
           <div className="mt-10">
@@ -64,7 +64,7 @@ export default async function BooksPage() {
 
       {/* -------- Colophon -------- */}
       <section className="bg-background">
-        <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6 md:py-24" data-animate>
+        <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6 md:py-24">
           <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
             Details
           </p>

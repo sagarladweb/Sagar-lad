@@ -144,29 +144,8 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
         </h2>
       </div>
 
-      {/* Carousel area with side arrows — arrows at screen edges */}
+      {/* Carousel area */}
       <div className="relative">
-        {total > 1 && (
-          <button
-            type="button"
-            onClick={prev}
-            aria-label="Previous book"
-            className="btn-premium absolute left-0 md:-left-4 lg:-left-8 top-1/2 -translate-y-1/2 z-20 hidden md:grid h-12 w-12 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] shadow-sm hover:border-[#1e293b] hover:text-[#1e293b]"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-        )}
-        {total > 1 && (
-          <button
-            type="button"
-            onClick={next}
-            aria-label="Next book"
-            className="btn-premium absolute right-0 md:-right-4 lg:-right-8 top-1/2 -translate-y-1/2 z-20 hidden md:grid h-12 w-12 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] shadow-sm hover:border-[#1e293b] hover:text-[#1e293b]"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        )}
-
         <div
           className="touch-pan-y select-none px-0 md:px-20"
           onPointerDown={onPointerDown}
@@ -177,11 +156,30 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
           {/* Book slide */}
           <div key={book.id} className="book-slide-enter">
             <article className="flex flex-col md:flex-row items-center gap-10 md:gap-16 lg:gap-20">
-            {/* Book Cover */}
-            <div
-              className="w-full md:w-2/5 lg:w-2/5 shrink-0 flex justify-center"
-              style={{ perspective: "1200px" }}
-            >
+            {/* Book Cover with arrows */}
+            <div className="relative w-full md:w-2/5 lg:w-2/5 shrink-0 flex justify-center">
+              {/* Left arrow */}
+              {total > 1 && (
+                <button
+                  type="button"
+                  onClick={prev}
+                  aria-label="Previous book"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 md:h-11 md:w-11 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] shadow-sm hover:border-[#1e293b] hover:text-[#1e293b] transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
+              )}
+              {/* Right arrow */}
+              {total > 1 && (
+                <button
+                  type="button"
+                  onClick={next}
+                  aria-label="Next book"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 md:h-11 md:w-11 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] shadow-sm hover:border-[#1e293b] hover:text-[#1e293b] transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
+              )}
               <button
                 type="button"
                 onClick={(e) => {
@@ -192,6 +190,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
                 onPointerUp={(e) => e.stopPropagation()}
                 aria-label={`Open preview of ${book.title}`}
                 className="relative cursor-pointer z-30 pointer-events-auto group/book"
+                style={{ perspective: "1200px" }}
               >
                 {frontSrc ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
@@ -257,7 +256,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
               </p>
 
               {/* Signature */}
-              <div className="mt-8">
+              <div className="mt-8 flex justify-center">
                 <SiteLogo className="h-14 sm:h-16 md:h-18 w-auto logo-black" />
               </div>
 
@@ -283,28 +282,6 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
       {total > 1 && (
         <div className="mt-14 md:mt-16 flex justify-center">
           <DotPagination total={total} current={index} onChange={setIndex} />
-        </div>
-      )}
-
-      {/* Mobile arrows row */}
-      {total > 1 && (
-        <div className="mt-6 flex items-center justify-center gap-3 md:hidden">
-          <button
-            type="button"
-            onClick={prev}
-            aria-label="Previous book"
-            className="btn-premium grid h-10 w-10 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] hover:border-[#1e293b] hover:text-[#1e293b]"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={next}
-            aria-label="Next book"
-            className="btn-premium grid h-10 w-10 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] hover:border-[#1e293b] hover:text-[#1e293b]"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
         </div>
       )}
 

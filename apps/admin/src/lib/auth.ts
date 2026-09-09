@@ -130,11 +130,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               Boolean(user?.passwordHash) &&
               (await compare(password, user?.passwordHash ?? ""));
 
-            // Environment bootstrap:
-            // If DB auth fails and user doesn't exist, create from env credentials.
-            // No plaintext comparison — password is hashed via bcrypt before storage.
-            if (!valid && envAdminPass && email === envAdminEmail && !user) {
-              const passwordHash = await getEnvAdminHash();
+        // Environment bootstrap:
+        // If DB auth fails and user doesn't exist, create from env credentials.
+        // No plaintext comparison — password is hashed via bcrypt before storage.
+        if (!valid && envAdminPass && email === envAdminEmail && !user) {
+          const passwordHash = await getEnvAdminHash();
               user = await prisma.user.upsert({
                 where: { email },
                 update: { passwordHash, role: "ADMIN" },

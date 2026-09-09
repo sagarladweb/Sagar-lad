@@ -152,6 +152,7 @@ function buildProgress(upTo: number): string {
 
 export function Timeline() {
   const sectionRef = useRef<HTMLElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [pinnedCard, setPinnedCard] = useState<number | null>(0);
   const [flipping, setFlipping] = useState<number | null>(null);
@@ -168,6 +169,16 @@ export function Timeline() {
         setActiveCard(next);
         setFlipping(next);
         setTimeout(() => setFlipping(null), 600);
+        // Center the clicked dot in the scroll container
+        if (scrollRef.current) {
+          const container = scrollRef.current;
+          const buttons = container.querySelectorAll("button");
+          const btn = buttons[i];
+          if (btn) {
+            const scrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
+            container.scrollTo({ left: scrollLeft, behavior: "smooth" });
+          }
+        }
       } else {
         setActiveCard(null);
       }
@@ -241,15 +252,144 @@ export function Timeline() {
             Key moments along the way
           </h2>
           <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-sm sm:text-base">
-            Hover or tap any dot to read the chapter behind it.
+            <span className="hidden md:inline">Hover or tap any dot to read the chapter behind it.</span>
+            <span className="md:hidden">Tap any dot to read the chapter.</span>
           </p>
         </div>
       </div>
 
-      {/* ── Horizontal scroll track ── */}
+      {/* ── Mobile: horizontal scrollable timeline ── */}
+      <div className="md:hidden">
+        {/* Scrollable timeline track */}
+        <div
+          ref={scrollRef}
+          className="overflow-x-auto scrollbar-hide"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          <div className="relative min-w-max px-8 py-4">
+            {/* Background line */}
+            <div className="absolute top-1/2 left-8 right-8 h-[2px] -translate-y-1/2 bg-brand/10" />
+            {/* Progressive fill line */}
+            <div
+              className="absolute top-1/2 left-8 h-[2px] -translate-y-1/2 bg-brand transition-all duration-500 ease-out"
+              style={{
+                width: displayCard !== null
+                  ? `calc(${(displayCard / (nodes.length - 1)) * 100}% - 32px)`
+                  : "0%",
+              }}
+            />
+
+            {/* Dots with years */}
+            <div className="flex items-center" style={{ gap: "60px" }}>
+              {nodes.map((n, i) => {
+                const isOpen = displayCard === i;
+                const isPast = displayCard !== null && i < displayCard;
+                return (
+                  <button
+                    key={`mobile-dot-${n.title}`}
+                    onClick={() => handleClick(i)}
+                    className="relative flex flex-col items-center flex-shrink-0 group"
+                    aria-label={`${n.title} — ${n.year}`}
+                  >
+                    {/* Year label above */}
+                    <span
+                      className="text-[10px] font-bold uppercase tracking-wider mb-3 transition-colors duration-300 whitespace-nowrap"
+                      style={{ color: isOpen ? "var(--brand)" : isPast ? "var(--foreground)" : "hsl(var(--muted-foreground))" }}
+                    >
+                      {n.year}
+                    </span>
+                    {/* Dot */}
+                    <div
+                      className="rounded-full border-[2.5px] transition-all duration-300 ease-out"
+                      style={{
+                        width: isOpen ? 20 : 14,
+                        height: isOpen ? 20 : 14,
+                        backgroundColor: isOpen ? "var(--brand)" : isPast ? "var(--brand)" : "var(--background)",
+                        borderColor: "var(--brand)",
+                        boxShadow: isOpen ? "0 0 12px rgba(13,33,161,0.35)" : "0 1px 4px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                    {/* Title below */}
+                    <span
+                      className="mt-2 text-[8px] font-semibold uppercase tracking-wider transition-colors duration-300 whitespace-nowrap max-w-[70px] text-center leading-tight"
+                      style={{ color: isOpen ? "var(--foreground)" : "hsl(var(--muted-foreground))" }}
+                    >
+                      {n.title}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Card below timeline with animation */}
+        <div className="px-4 mt-4">
+          {displayCard !== null && (() => {
+            const n = nodes[displayCard];
+            const Icon = n.icon;
+            return (
+              <div
+                key={`mobile-card-${n.title}`}
+                className="rounded-xl border border-border bg-card shadow-lg overflow-hidden mx-auto max-w-sm"
+                style={{
+                  animation: "tlCardIn 0.4s ease-out",
+                }}
+              >
+                {/* Accent nub */}
+                <div className="absolute left-1/2 -translate-x-1/2 h-[3px] rounded-full bg-brand" style={{ width: "32px", top: "-1px" }} />
+
+                {/* Image */}
+                {n.image && (
+                  <div className="relative w-full overflow-hidden" style={{ height: "180px" }}>
+                    <Image
+                      src={n.image}
+                      alt={n.title}
+                      width={400}
+                      height={180}
+                      className="w-full h-full object-cover"
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                    <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 border border-white/35 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm bg-white/10">
+                      <Icon className="w-3 h-3" />
+                      {n.tag}
+                    </span>
+                  </div>
+                )}
+
+                {/* Text */}
+                <div className="p-4">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="text-[10px] font-bold text-brand/60 uppercase tracking-wider">{n.word}</span>
+                    <span className="w-0.5 h-0.5 rounded-full bg-brand/30" />
+                    <span className="text-[10px] font-semibold text-accent-strong uppercase tracking-wider">{n.year}</span>
+                  </div>
+                  <h3 className="font-display text-base font-bold text-foreground leading-snug">{n.title}</h3>
+                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{n.description}</p>
+                  {n.href && (
+                    <Link href={n.href} className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline">
+                      <BookOpen className="w-3.5 h-3.5" />{n.hrefLabel}
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes tlCardIn {
+          0% { opacity: 0; transform: translateY(12px) scale(0.97); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}} />
+
+      {/* ── Desktop: horizontal scroll track with SVG wave ── */}
       <div
         data-tl-track
-        className="overflow-x-auto overflow-y-hidden scrollbar-hide px-4 sm:px-6 pb-2"
+        className="hidden md:block overflow-x-auto overflow-y-hidden scrollbar-hide px-4 sm:px-6 pb-2"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         <div

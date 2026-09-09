@@ -6,10 +6,8 @@ import { emailShell } from "@/lib/newsletterTemplates";
 // works if they ever move to a paid tier.
 export const DAILY_LIMIT = Number(process.env.DAILY_EMAIL_LIMIT ?? 300);
 
-// Cap sends per invocation so a single serverless call finishes well under
-// the function timeout (Vercel Hobby = 10s). The scheduler runs often enough
-// to drain the full daily quota anyway.
-export const BATCH_SIZE = Number(process.env.NEWSLETTER_BATCH_SIZE ?? 20);
+// 300/day Brevo free tier, batch 50 per invocation (5 parallel × 10 chunks ≈ 8s).
+export const BATCH_SIZE = Number(process.env.NEWSLETTER_BATCH_SIZE ?? 50);
 
 export function buildEmailHtml(body: string, unsubscribeToken: string): string {
   const unsubscribeUrl = `${SITE.url}/api/newsletter/unsubscribe?token=${unsubscribeToken}`;

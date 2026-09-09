@@ -64,7 +64,7 @@ export function PostArticle({
   showShare?: boolean;
 }) {
   const authorName = post.author?.name ?? SITE.name;
-  const metrics = getEngagement(post.slug, new Date(post.publishedAt).toISOString());
+  const metrics = { views: getEngagement(post.slug, new Date(post.publishedAt).toISOString()).views, likes: post.likes ?? 0 };
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
@@ -214,7 +214,7 @@ function PostHeader({
           </div>
           <div className="text-sm leading-tight">
             <p className="font-semibold text-foreground">{authorName}</p>
-            <p className="text-[11px] text-muted-foreground">Author & Investor</p>
+            <p className="text-[11px] text-muted-foreground">Author</p>
           </div>
         </div>
 

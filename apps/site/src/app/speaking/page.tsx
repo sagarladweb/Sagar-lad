@@ -4,12 +4,8 @@ import Image from "next/image";
 import {
   ArrowRight,
   Mic,
-  Globe,
-  Award,
   Calendar,
   CheckCircle2,
-  Cloud,
-  GraduationCap,
   HeartHandshake,
 } from "lucide-react";
 import { SITE, pageMetadata } from "@/lib/site";
@@ -17,6 +13,7 @@ import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { GalleryCarousel } from "@/components/speaking/GalleryCarousel";
 import { SpeakingTestimonials } from "@/components/speaking/SpeakingTestimonials";
 import { AimFramework } from "@/components/speaking/AimFramework";
+import { SpokenAt } from "@/components/speaking/SpokenAt";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
@@ -240,49 +237,7 @@ export default function SpeakingPage() {
       <section className="border-b border-border bg-background py-20 md:py-24" aria-label="Stages and Credentials">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-16">
           {/* Events Hosted — visual cards */}
-          <div data-animate>
-            <div className="max-w-2xl mb-10 text-center sm:text-left mx-auto sm:mx-0">
-              <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Where I&apos;ve spoken</span>
-              <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">On stage, around the world</h2>
-              <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-                From local meetups to international summits — here are some of the rooms I&apos;ve had the privilege to speak in.
-              </p>
-            </div>
-            <div
-              data-animate-group
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-            >
-              {[
-                { title: "Scottish Summit", place: "Scotland", role: "Tech conference", icon: Cloud },
-                { title: "Azure Wales Group", place: "Wales", role: "Community meetup", icon: Globe },
-                { title: "Indian Institute of Chemical Engineers", place: "Centre of Excellence", role: "Academic", icon: GraduationCap },
-                { title: "Azure Summit", place: "Global", role: "International summit", icon: Award },
-              ].map((e, i) => {
-                const Icon = e.icon;
-                return (
-                  <div
-                    key={e.title}
-                    data-animate-item
-                    className="relative rounded-xl border border-border bg-card p-6"
-                  >
-                    <span className="absolute top-4 right-4 text-[10px] font-bold tabular-nums text-muted-foreground/30">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div className="w-12 h-12 rounded-lg bg-brand/10 text-brand grid place-items-center mb-4">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <h3 className="font-display text-base font-bold leading-snug text-foreground">
-                      {e.title}
-                    </h3>
-                    <p className="mt-1 text-xs text-muted-foreground">{e.role}</p>
-                    <span className="mt-3 inline-flex rounded-full bg-brand/8 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand">
-                      {e.place}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <SpokenAt />
 
           {/* Memberships & Certifications — visual cards */}
           <div data-animate>

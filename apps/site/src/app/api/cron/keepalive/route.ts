@@ -53,18 +53,21 @@ export async function GET(req: Request) {
   );
 
   // 3. Drain newsletter queue (safe to call when empty — no-ops instantly)
-  // Fire-and-forget: don't block the response on Brevo API calls.
-  // The 10s Vercel timeout is tight; newsletter sends are slow.
-  processNewsletterQueue()
-    .then((r) => {
-      if (r.sent > 0) console.log(`[cron] newsletter: sent ${r.sent}, remaining ${r.remaining}`);
-    })
-    .catch((err) => console.error("[cron] newsletter drain failed:", (err as Error).message));
+  let newsletterResult = null;
+  try {
+    newsletterResult = await processNewsletterQueue();
+    if (newsletterResult.sent > 0) {
+      console.log(`[cron] newsletter: sent ${newsletterResult.sent}, remaining ${newsletterResult.remaining}`);
+    }
+  } catch (err) {
+    console.error("[cron] newsletter drain failed:", (err as Error).message);
+  }
 
   return NextResponse.json({
     status: "ok",
     db: post ? "connected" : "unavailable",
     published,
+    newsletter: newsletterResult,
     ts: Date.now(),
   });
 }

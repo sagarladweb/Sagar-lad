@@ -157,7 +157,7 @@ export function AboutMe() {
                 <figcaption className="absolute bottom-0 inset-x-0 p-7 text-white">
                   <SiteLogo light className="h-12 w-auto" />
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/80">
-                    Author · Investor · Public Speaker
+                    Author · Public Speaker
                   </p>
                 </figcaption>
               </figure>

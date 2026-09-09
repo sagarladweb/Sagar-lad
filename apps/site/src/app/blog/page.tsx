@@ -114,7 +114,6 @@ export default async function BlogPage({
               fill
               sizes="144px"
               className="object-cover"
-              priority
             />
           </div>
 
@@ -125,7 +124,7 @@ export default async function BlogPage({
                 Sagar Lad
               </h1>
               <p className="mt-1 text-sm font-medium text-muted-foreground">
-                Author · Investor · Public Speaker
+                Author · Public Speaker
               </p>
             </div>
 

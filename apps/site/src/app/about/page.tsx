@@ -203,13 +203,13 @@ export default function AboutPage() {
           "@context": "https://schema.org",
           "@type": "AboutPage",
           name: "About Sagar Lad",
-          description: "Background, journey and timeline of Sagar Lad — author, investor and public speaker.",
+          description: "Background, journey and timeline of Sagar Lad — author and public speaker.",
           url: `${SITE.url}/about`,
           mainEntity: {
             "@type": "Person",
             name: "Sagar Lad",
             url: SITE.url,
-            jobTitle: "Author · Investor · Public Speaker",
+            jobTitle: "Author · Public Speaker",
           },
         }}
       />

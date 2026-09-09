@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BookOpen, Users, Lightbulb, TrendingUp } from "lucide-react";
+import { BookOpen, Users, Lightbulb, Pen, ExternalLink, Star, Tag } from "lucide-react";
 
 type Book = {
   id: string;
   title: string;
   author: string | null;
   learning: string | null;
+  tagline?: string | null;
+  description?: string | null;
+  imageUrl?: string | null;
+  buyUrl?: string | null;
+  free?: boolean;
 };
 
 function useCountUp(target: number, duration = 1200, enabled = false) {
@@ -31,17 +36,43 @@ function useCountUp(target: number, duration = 1200, enabled = false) {
   return count;
 }
 
-export function BookStats({ books }: { books: Book[] }) {
+type StatItem = {
+  icon: React.ComponentType<{ className?: string }>;
+  value: number;
+  label: string;
+  mobileOnly?: boolean;
+};
+
+export function BookStats({ books, variant }: { books: Book[]; variant: "read" | "published" }) {
   const [visible, setVisible] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const totalBooks = books.length;
-  const uniqueAuthors = new Set(books.map((b) => b.author).filter(Boolean)).size;
-  const withLearnings = books.filter((b) => b.learning).length;
-  const insightPct = totalBooks > 0 ? Math.round((withLearnings / Math.max(totalBooks, 1)) * 100) : 0;
+  const stats: StatItem[] = variant === "read"
+    ? (() => {
+        const total = books.length;
+        const uniqueAuthors = new Set(books.map((b) => b.author).filter(Boolean)).size;
+        const withLearnings = books.filter((b) => b.learning).length;
+        const withTagline = books.filter((b) => b.tagline).length;
+        return [
+          { icon: BookOpen, value: total, label: "Books Read" },
+          { icon: Users, value: uniqueAuthors, label: "Authors" },
+          { icon: Lightbulb, value: withLearnings, label: "Key Lessons" },
+          { icon: Tag, value: withTagline, label: "With Tagline" },
+        ];
+      })()
+    : (() => {
+        const total = books.length;
+        const withDescription = books.filter((b) => b.description).length;
+        const withBuyLink = books.filter((b) => b.buyUrl).length;
+        const withTagline = books.filter((b) => b.tagline).length;
+        return [
+          { icon: Pen, value: total, label: "Published" },
+          { icon: BookOpen, value: withDescription, label: "Detailed" },
+          { icon: ExternalLink, value: withBuyLink, label: "On Amazon" },
+          { icon: Tag, value: withTagline, label: "With Tagline" },
+        ];
+      })();
 
-  // Trigger count animation when bar scrolls into view
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -49,10 +80,7 @@ export function BookStats({ books }: { books: Book[] }) {
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
-          // Auto-hide after 10s
-          const t = setTimeout(() => setHidden(true), 10_000);
           io.disconnect();
-          return () => clearTimeout(t);
         }
       },
       { threshold: 0.3 }
@@ -61,49 +89,44 @@ export function BookStats({ books }: { books: Book[] }) {
     return () => io.disconnect();
   }, []);
 
-  const cCount = useCountUp(totalBooks, 1200, visible);
-  const aCount = useCountUp(uniqueAuthors, 1200, visible);
-  const lCount = useCountUp(withLearnings, 1200, visible);
-  const iPct = useCountUp(insightPct, 1200, visible);
-
-  if (hidden) return null;
-
   return (
     <div
       ref={ref}
-      className="sticky bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-md transition-all duration-500"
-      style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(8px)" }}
+      className="rounded-2xl border border-border bg-card/60 backdrop-blur-sm"
     >
-      <div className="mx-auto max-w-4xl px-4 sm:px-6">
-        <div className="flex items-center justify-center divide-x divide-border py-3 gap-2 sm:gap-6">
-          <Stat icon={BookOpen} value={cCount} label="Books" />
-          <Stat icon={Users} value={aCount} label="Authors" />
-          <Stat icon={Lightbulb} value={lCount} label="Lessons" />
-          <Stat icon={TrendingUp} value={iPct} suffix="%" label="Insights" />
-        </div>
+      <div className="grid grid-cols-3 md:grid-cols-4 divide-x divide-border">
+        {stats.map((s, i) => (
+          <div
+            key={s.label + i}
+            className={s.mobileOnly ? "hidden md:block" : ""}
+          >
+            <StatCard icon={s.icon} value={s.value} label={s.label} visible={visible} />
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-function Stat({
+function StatCard({
   icon: Icon,
   value,
   label,
-  suffix,
+  visible,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   value: number;
   label: string;
-  suffix?: string;
+  visible: boolean;
 }) {
+  const count = useCountUp(value, 1200, visible);
   return (
-    <div className="flex items-center gap-2 px-2 sm:px-4">
-      <Icon className="w-4 h-4 text-brand shrink-0" />
-      <span className="font-display text-lg sm:text-xl font-bold text-foreground tabular-nums">
-        {value}{suffix}
+    <div className="flex flex-col items-center gap-1 py-5 px-2 sm:px-3">
+      <Icon className="w-4 h-4 text-brand mb-1" />
+      <span className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-foreground tabular-nums">
+        {String(count).padStart(2, "0")}
       </span>
-      <span className="text-[10px] sm:text-xs font-medium text-muted-foreground hidden sm:inline">
+      <span className="text-[9px] sm:text-xs font-medium text-muted-foreground text-center">
         {label}
       </span>
     </div>

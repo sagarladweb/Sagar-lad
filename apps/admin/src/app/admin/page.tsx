@@ -7,8 +7,6 @@ import {
   AlertCircle,
   Shield,
   ChevronLeft,
-  CheckCircle2,
-  ArrowRight,
   Mail,
   Lock,
   Eye,
@@ -18,6 +16,7 @@ import {
 import { signIn, useSession } from "next-auth/react";
 import { SessionProvider } from "@/components/SessionProvider";
 import { PHASE_1 } from "@/lib/phase";
+import { AuthOverlay } from "@/components/AuthOverlay";
 
 const inputBase =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none transition-all duration-200 focus:border-accent focus:ring-2 focus:ring-accent";
@@ -123,6 +122,7 @@ function AdminLogin() {
   const [step, setStep] = useState<"credentials" | "otp">("credentials");
   const [loading, setLoading] = useState(false);
   const [greetingState, setGreetingState] = useState<"idle" | "greeting" | "success">("idle");
+  const [overlay, setOverlay] = useState<"success" | "error" | null>(null);
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
 
@@ -237,11 +237,10 @@ function AdminLogin() {
       setOtp("");
       setError("");
     } else if (r.ok) {
-      setTimeout(() => {
-        router.push(targetRoute);
-      }, 1100);
+      setOverlay("success");
     } else if (r.message) {
       setError(r.message);
+      setOverlay("error");
     }
   }
 
@@ -253,16 +252,42 @@ function AdminLogin() {
     }
     const r = await submit(otp.replace(/\s+/g, ""));
     if (r.ok) {
-      setTimeout(() => {
-        router.push(targetRoute);
-      }, 1100);
+      setOverlay("success");
     } else if (r.message) {
       setError(r.message);
+      setOverlay("error");
     }
   }
 
+  // Auto-show success overlay when session is already active
+  useEffect(() => {
+    if (status === "authenticated" && !overlay) {
+      const t = setTimeout(() => setOverlay("success"), 300);
+      return () => clearTimeout(t);
+    }
+  }, [status, overlay]);
+
   return (
     <div className="admin-panel min-h-screen">
+      {/* Full-screen auth overlays */}
+      {overlay === "success" && (
+        <AuthOverlay
+          type="success"
+          message={`Signed in as ${session?.user?.name || "Sagar Lad"}`}
+          onComplete={() => router.push(targetRoute)}
+        />
+      )}
+      {overlay === "error" && (
+        <AuthOverlay
+          type="error"
+          message={error}
+          onComplete={() => {
+            setOverlay(null);
+            setError("");
+          }}
+        />
+      )}
+
       <div className="grid min-h-screen lg:grid-cols-2">
         {/* ---- Left: brand panel with luxury animated vectors ---- */}
         <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[#060b26] via-[#0A1930] to-[#04081c] text-white lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
@@ -339,34 +364,15 @@ function AdminLogin() {
               </div>
 
               {status === "authenticated" ? (
-                <div className="mt-6 space-y-4 animate-fade-in">
-                  <div className="flex items-center gap-3 rounded-2xl border border-accent/30 bg-accent/10 p-4">
-                    <CheckCircle2 className="h-5 w-5 shrink-0 text-accent" />
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-accent">
-                        Signed in as {session?.user?.name || "Sagar Lad"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Your session is active.
-                      </p>
-                    </div>
+                <div className="mt-6 flex flex-col items-center gap-4 animate-fade-in">
+                  <div className="text-center">
+                    <p className="text-xs font-bold uppercase tracking-wider text-accent">
+                      Signed in as {session?.user?.name || "Sagar Lad"}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Redirecting to dashboard...
+                    </p>
                   </div>
-                  <button
-                    onClick={() => router.push(targetRoute)}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-accent-foreground transition-all duration-200 hover:opacity-90 active:scale-[0.99] shadow-md shadow-accent/20"
-                  >
-                    Continue to Admin Panel
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      localStorage.clear();
-                      import("next-auth/react").then(({ signOut }) => signOut({ callbackUrl: "/admin" }));
-                    }}
-                    className="inline-flex w-full items-center justify-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    Sign out and use a different account
-                  </button>
                 </div>
               ) : (
                 <>
@@ -378,16 +384,6 @@ function AdminLogin() {
                       ? "Enter your 6-digit authenticator code to proceed."
                       : "Welcome back — sign in to continue to your admin suite."}
                   </p>
-
-                  {greetingState === "success" && (
-                    <div className="mt-6 flex items-center gap-3 rounded-2xl border border-accent/30 bg-accent/10 p-4 text-accent animate-fade-in">
-                      <CheckCircle2 className="h-5 w-5 shrink-0 animate-bounce" />
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-wider">Welcome back</p>
-                        <p className="text-sm font-semibold">Admin Sagar Lad</p>
-                      </div>
-                    </div>
-                  )}
 
                   <div className="mt-6">
                     {step === "credentials" ? (

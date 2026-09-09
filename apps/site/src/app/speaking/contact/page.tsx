@@ -115,7 +115,7 @@ export default function SpeakingContactPage() {
             "@type": "Person",
             name: "Sagar Lad",
             url: SITE.url,
-            jobTitle: "Author · Investor · Public Speaker",
+            jobTitle: "Author · Public Speaker",
           },
         }}
       />

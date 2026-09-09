@@ -142,7 +142,7 @@ export function VerticalTimeline({ items }: { items: Item[] }) {
                   data-tl-card
                   className="opacity-0 translate-y-8 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] p-6 md:p-8 rounded-2xl bg-card/80 backdrop-blur border border-border/60 text-left cursor-default shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(13,33,161,0.1)]"
                 >
-                  <div className="inline-flex items-center w-10 h-10 rounded-xl bg-brand/8 border border-brand/10 mb-3 transition-all duration-400 group-hover:bg-brand group-hover:border-brand group-hover:shadow-[0_4px_20px_rgba(13,33,161,0.2)]">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-brand/8 border border-brand/10 mb-3 transition-all duration-400 group-hover:bg-brand group-hover:border-brand group-hover:shadow-[0_4px_20px_rgba(13,33,161,0.2)]">
                     <Icon className="w-5 h-5 text-brand transition-all duration-400 group-hover:text-white group-hover:scale-110" />
                   </div>
                   <h3 className="font-display text-xl md:text-2xl font-bold text-foreground mb-2">

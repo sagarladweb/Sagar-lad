@@ -258,11 +258,13 @@ model Book {
   published       Boolean  @default(true)
   sortOrder       Int      @default(0)
   currentlyReading Boolean @default(false) // READ: mark as currently reading
+  isReward         Boolean @default(false) // Show as reward on mindup-score page
   deletedAt       DateTime?
   createdAt       DateTime @default(now())
 
   @@index([deletedAt, published, type, featured, sortOrder])
   @@index([type, published, sortOrder])
+  @@index([isReward, published, deletedAt])
 }
 
 // Video testimonials shown in the site's video testimonials section.

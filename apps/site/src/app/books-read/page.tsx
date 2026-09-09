@@ -40,38 +40,55 @@ export default async function BooksReadPage() {
           author: { "@type": "Person", name: "Sagar Lad", url: SITE.url },
         }}
       />
-      <header className="border-b border-border bg-background">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14 md:py-20">
-          <p className="inline-block text-xs font-semibold uppercase tracking-[0.2em] text-brand bg-brand-light/10 rounded-full px-3.5 py-1">
-            Books I read
-          </p>
-          <h1 className="mt-3 font-display text-4xl md:text-5xl font-bold tracking-tight">
-            What&apos;s on my shelf
-          </h1>
-          <p className="mt-4 max-w-2xl text-muted-foreground leading-relaxed">
-            Books that changed how I think — and the one clear lesson each one left me with.
-          </p>
+
+      {/* -------- Books I Read -------- */}
+      <section className="border-b border-border bg-card/40">
+        <div className="mx-auto max-w-7xl px-4 pt-20 pb-20 sm:px-6 md:pt-24 md:pb-24">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+                Books I read
+              </p>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">
+                What&apos;s on my shelf
+              </h2>
+            </div>
+            <p className="text-sm text-muted-foreground tabular-nums">
+              {String(books.length).padStart(2, "0")} titles
+            </p>
+          </div>
+
+          <div className="mt-10">
+            <BookStats books={books} variant="read" />
+          </div>
+
+          <div className="mt-10">
+            {books.length === 0 ? (
+              <p className="text-center text-muted-foreground">No books yet.</p>
+            ) : (
+              <BookLibrary books={books} variant="read" />
+            )}
+          </div>
         </div>
-      </header>
+      </section>
 
-      <BookStats books={books} />
-
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
-        {books.length === 0 ? (
-          <p className="text-center text-muted-foreground">No books yet.</p>
-        ) : (
-          <BookLibrary books={books} variant="read" />
-        )}
-
-        <div className="mt-12 flex justify-center">
+      {/* -------- CTA -------- */}
+      <section className="bg-background">
+        <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6 md:py-24">
+          <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+            Want books I&apos;ve written?
+          </p>
+          <p className="mt-5 leading-relaxed text-muted-foreground">
+            Browse the complete catalogue of books I&apos;ve written on data, cloud, and modern architecture.
+          </p>
           <Link
             href="/books"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold hover:underline underline-offset-4"
+            className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-foreground underline decoration-brand-light decoration-2 underline-offset-4 transition-colors hover:text-brand"
           >
-            Want books I&apos;ve written? Browse them <ArrowUpRight className="w-4 h-4" />
+            View published books <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

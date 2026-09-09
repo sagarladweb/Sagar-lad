@@ -116,8 +116,10 @@ export function AdminSidebar({
               {active && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-accent shadow-[0_0_8px_rgba(13,33,161,0.3)]" />
               )}
-              <Icon className="w-5 h-5 shrink-0" />
-              {item.href === "/admin/moderation" && <CommunityBadge />}
+              <span className="relative shrink-0">
+                <Icon className="w-5 h-5" />
+                {item.href === "/admin/moderation" && <CommunityBadge />}
+              </span>
               <span className={labelCls}>{item.label}</span>
             </Link>
           );

@@ -52,6 +52,7 @@ export function SagarGallery() {
                 <img
                   src={p.src}
                   alt={p.alt}
+                  loading="lazy"
                   className={`absolute inset-0 w-full h-full object-cover ${p.className}`}
                 />
                 <div

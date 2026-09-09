@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Trash2, Download, Search } from "lucide-react";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button, IconButton } from "@/components/ui/Button";
 import { Badge, CountBadge } from "@/components/ui/Badge";
 import { SITE } from "@/lib/site";
 import { showToast } from "@/components/admin/Toast";
+
+const BADGE_KEY = "admin-moderation-last-viewed";
 
 type Subscriber = { id: string; email: string; createdAt: string };
 type Comment = {
@@ -135,9 +137,34 @@ function EnquiryList({
 
 export function ModerationPanel() {
   const [data, setData] = useState<Data | null>(null);
-  const [tab, setTab] = useState<Tab>(() => tabFromUrl());
+  const [tab, setTab] = useState<Tab>("Comments");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [subscriberFilter, setSubscriberFilter] = useState("");
+  const [newCounts, setNewCounts] = useState({ comments: 0, subscribers: 0, enquiries: 0 });
+
+  // Sync tab from URL after hydration to avoid mismatch
+  useEffect(() => {
+    const t = tabFromUrl();
+    setTab(t);
+  }, []);
+
+  const fetchNewCounts = useCallback(async () => {
+    try {
+      const saved = localStorage.getItem(BADGE_KEY);
+      const since = saved ?? new Date().toISOString();
+      const res = await fetch(`/api/admin/moderation/counts?since=${encodeURIComponent(since)}`);
+      if (!res.ok) return;
+      const d = await res.json();
+      setNewCounts({ comments: d.comments ?? 0, subscribers: d.subscribers ?? 0, enquiries: d.enquiries ?? 0 });
+    } catch {}
+  }, []);
+
+  // Fetch new counts on mount and every 30s
+  useEffect(() => {
+    fetchNewCounts();
+    const interval = setInterval(fetchNewCounts, 30_000);
+    return () => clearInterval(interval);
+  }, [fetchNewCounts]);
 
   async function load(): Promise<boolean> {
     try {
@@ -151,7 +178,6 @@ export function ModerationPanel() {
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setState happens after the await in load()
     void load();
   }, []);
 
@@ -159,6 +185,11 @@ export function ModerationPanel() {
     setTab(t);
     setSelected(new Set());
     setTabInUrl(t);
+    // Update last viewed timestamp so sidebar badge and tab dots clear
+    try {
+      localStorage.setItem(BADGE_KEY, new Date().toISOString());
+    } catch {}
+    setNewCounts({ comments: 0, subscribers: 0, enquiries: 0 });
   }
 
   async function act(kind: "subscriber" | "comment" | "enquiry", ids: string[]) {
@@ -257,21 +288,32 @@ export function ModerationPanel() {
       </header>
 
       <div className="flex gap-2 border-b border-border">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => switchTab(t)}
-            className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
-              tab === t
-                ? "border-accent text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t}
-            <CountBadge count={counts[t]} active={tab === t} />
-          </button>
-        ))}
+        {TABS.map((t) => {
+          const hasNew =
+            (t === "Comments" && newCounts.comments > 0) ||
+            (t === "Subscribers" && newCounts.subscribers > 0) ||
+            ((t === "Contact" || t === "Speaking") && newCounts.enquiries > 0);
+          return (
+            <button
+              key={t}
+              type="button"
+              onClick={() => switchTab(t)}
+              className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                tab === t
+                  ? "border-accent text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                {t}
+                {hasNew && (
+                  <span className="inline-block w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                )}
+                <CountBadge count={counts[t]} active={tab === t} />
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {!data ? (

@@ -115,7 +115,7 @@ export function Footer() {
               <SiteLogo light className="h-12 w-auto" />
             </Link>
             <p className="mt-4 text-sm text-background/70 max-w-xs leading-relaxed">
-              Author · Investor · Public Speaker. Building awareness,
+              Author · Public Speaker. Building awareness,
               one conversation at a time.
             </p>
 

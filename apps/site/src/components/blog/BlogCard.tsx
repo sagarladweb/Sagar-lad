@@ -23,7 +23,7 @@ export function BlogCard({
   post: Post;
   showStats?: boolean;
 }) {
-  const metrics = getEngagement(post.slug, new Date(post.publishedAt).toISOString());
+  const metrics = { views: getEngagement(post.slug, new Date(post.publishedAt).toISOString()).views, likes: post.likes ?? 0 };
 
   return (
     <Link

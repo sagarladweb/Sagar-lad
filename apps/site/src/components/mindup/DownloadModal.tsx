@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { X, Download, Loader2, CheckCircle2, AlertCircle, BookOpen } from "lucide-react";
-import type { EbookInfo } from "./types";
+import type { RewardBook } from "./types";
 
 export function DownloadModal({
-  ebook,
+  book,
   onClose,
 }: {
-  ebook: EbookInfo;
+  book: RewardBook;
   onClose: () => void;
 }) {
   const [name, setName] = useState("");
@@ -28,7 +28,7 @@ export function DownloadModal({
     setError(null);
 
     try {
-      const res = await fetch(`/api/ebooks/download/${ebook.id}`, {
+      const res = await fetch(`/api/ebooks/download/${book.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -47,7 +47,7 @@ export function DownloadModal({
       const blob = await res.blob();
       const disposition = res.headers.get("content-disposition") ?? "";
       const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
-      const fileName = fileNameMatch?.[1] ?? `${ebook.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+      const fileName = fileNameMatch?.[1] ?? `${book.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -104,13 +104,13 @@ export function DownloadModal({
         ) : (
           /* ── Form ── */
           <form onSubmit={handleSubmit} className="p-6 sm:p-8">
-            {/* Ebook preview */}
+            {/* Book preview */}
             <div className="flex items-center gap-4 mb-6 p-4 rounded-xl bg-muted border border-border">
-              {ebook.imageUrl ? (
+              {book.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={ebook.imageUrl}
-                  alt={ebook.title}
+                  src={book.imageUrl}
+                  alt={book.title}
                   className="w-12 h-16 object-cover rounded-lg"
                 />
               ) : (
@@ -119,11 +119,11 @@ export function DownloadModal({
                 </div>
               )}
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">{ebook.title}</p>
-                {ebook.tagline && (
-                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{ebook.tagline}</p>
+                <p className="text-sm font-semibold text-foreground truncate">{book.title}</p>
+                {book.tagline && (
+                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{book.tagline}</p>
                 )}
-                <p className="text-[11px] font-semibold text-brand mt-1 uppercase tracking-wider">Free Ebook</p>
+                <p className="text-[11px] font-semibold text-brand mt-1 uppercase tracking-wider">Free Reward</p>
               </div>
             </div>
 

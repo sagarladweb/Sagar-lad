@@ -3,10 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { QuizResult } from "@/lib/mindup-quiz";
-import type { EbookInfo } from "./types";
-import { DownloadModal } from "./DownloadModal";
+import { RewardBooks } from "./RewardBooks";
 import { Confetti } from "./Confetti";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { MINDUP_PILLARS } from "@/lib/mindup";
 
 function ScoreRing({ score }: { score: number }) {
@@ -106,16 +105,6 @@ export function ResultsView({
   result: QuizResult;
   onRestart: () => void;
 }) {
-  const [showDownload, setShowDownload] = useState(false);
-  const [ebook, setEbook] = useState<EbookInfo | null>(null);
-
-  useEffect(() => {
-    fetch("/api/mindup/ebook")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => setEbook(data))
-      .catch(() => {});
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
       <Confetti />
@@ -159,15 +148,6 @@ export function ResultsView({
             </div>
 
             <div className="result-animate result-delay-4 flex flex-col sm:flex-row lg:flex-col gap-3">
-              {ebook && (
-                <button
-                  onClick={() => setShowDownload(true)}
-                  className="btn-premium inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-8 py-3.5 text-sm font-semibold"
-                >
-                  <Download className="w-4 h-4" />
-                  Download Free Ebook
-                </button>
-              )}
               <button
                 onClick={onRestart}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-8 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
@@ -196,11 +176,10 @@ export function ResultsView({
             </div>
           </div>
         </div>
-      </div>
 
-      {showDownload && ebook && (
-        <DownloadModal ebook={ebook} onClose={() => setShowDownload(false)} />
-      )}
+        {/* Reward Books Grid */}
+        <RewardBooks />
+      </div>
     </div>
   );
 }

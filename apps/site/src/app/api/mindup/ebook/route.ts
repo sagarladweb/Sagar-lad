@@ -4,16 +4,15 @@ import { prisma, dbSafe } from "@/lib/db";
 export const runtime = "nodejs";
 
 /**
- * GET /api/mindup/ebook — returns the free MindUp ebook metadata.
- * Used by the quiz results page to show the download offer.
+ * GET /api/mindup/ebook — returns reward books for the quiz results page.
+ * Returns all books where isReward=true, published, not deleted, with a fileKey.
  */
 export async function GET() {
-  const book = await dbSafe(
+  const books = await dbSafe(
     () =>
-      prisma.book.findFirst({
+      prisma.book.findMany({
         where: {
-          type: "EBOOK",
-          free: true,
+          isReward: true,
           published: true,
           deletedAt: null,
           fileKey: { not: null },
@@ -27,12 +26,8 @@ export async function GET() {
         },
         orderBy: { sortOrder: "asc" },
       }),
-    null
+    []
   );
 
-  if (!book) {
-    return NextResponse.json({ error: "No free ebook available" }, { status: 404 });
-  }
-
-  return NextResponse.json(book);
+  return NextResponse.json(books);
 }

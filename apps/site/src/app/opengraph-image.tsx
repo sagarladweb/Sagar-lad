@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Sagar Lad — Author, Investor & Educator";
+export const alt = "Sagar Lad — Author & Public Speaker";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -50,7 +50,7 @@ export default function OgImage() {
               The question is not how to get rich — it&apos;s how to get aware.
             </div>
             <div style={{ fontSize: 26, color: "#9a998f", marginTop: 20 }}>
-              Author · Investor · Public Speaker
+              Author · Public Speaker
             </div>
           </div>
         </div>

@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 const BADGE_KEY = "admin-moderation-last-viewed";
 
 export function CommunityBadge({ className = "" }: { className?: string }) {
   const [count, setCount] = useState(0);
   const initialized = useRef(false);
+  const pathname = usePathname();
+  const isOnModeration = pathname === "/admin/moderation" || pathname.startsWith("/admin/moderation/");
 
   const fetchCount = useCallback(async () => {
     try {
@@ -35,8 +38,8 @@ export function CommunityBadge({ className = "" }: { className?: string }) {
     }
   }, []);
 
+  // Poll for new items every 30s
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- async fetch with setState in callback
     fetchCount();
     const interval = setInterval(fetchCount, 30_000);
     return () => clearInterval(interval);
@@ -44,20 +47,25 @@ export function CommunityBadge({ className = "" }: { className?: string }) {
 
   // Clear badge when on moderation page — stamp "last viewed" to now
   useEffect(() => {
-    const path = window.location.pathname;
-    if (path === "/admin/moderation" || path.startsWith("/admin/moderation/")) {
+    if (isOnModeration) {
       try {
         localStorage.setItem(BADGE_KEY, new Date().toISOString());
       } catch {}
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- clear badge on moderation page
       setCount(0);
     }
-  }, []);
+  }, [isOnModeration]);
+
+  // Re-fetch when leaving moderation page (so badge reappears if new items arrived)
+  useEffect(() => {
+    if (!isOnModeration) {
+      fetchCount();
+    }
+  }, [isOnModeration, fetchCount]);
 
   if (count === 0) return null;
 
   return (
-    <span className={`absolute -top-1 -right-1 min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold px-1 leading-none ${className}`}>
+    <span className={`absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold px-1 leading-none z-10 ${className}`}>
       {count > 99 ? "99+" : count}
     </span>
   );

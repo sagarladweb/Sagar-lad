@@ -35,6 +35,7 @@ type Book = {
   published: boolean;
   sortOrder: number;
   currentlyReading: boolean;
+  isReward: boolean;
 };
 
 type BookForm = {
@@ -53,6 +54,7 @@ type BookForm = {
   published: boolean;
   sortOrder: number;
   currentlyReading: boolean;
+  isReward: boolean;
 };
 
 const empty: BookForm = {
@@ -71,6 +73,7 @@ const empty: BookForm = {
   published: true,
   sortOrder: 0,
   currentlyReading: false,
+  isReward: false,
 };
 
 const TABS: { value: BookType | "ALL"; label: string }[] = [
@@ -203,6 +206,7 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
       published: b.published,
       sortOrder: b.sortOrder,
       currentlyReading: b.currentlyReading,
+      isReward: b.isReward,
     });
     setEditingId(b.id);
   }
@@ -237,6 +241,7 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
       published: editing.published,
       sortOrder: Number(editing.sortOrder || 0),
       currentlyReading: savedType === "READ" ? editing.currentlyReading : false,
+      isReward: editing.isReward,
     };
     const res = await fetch("/api/admin/books", {
       method: editingId ? "PUT" : "POST",
@@ -559,6 +564,17 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
                     Featured
                   </label>
                 )}
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={editing.isReward}
+                    onChange={(e) =>
+                      setEditing({ ...editing, isReward: e.target.checked })
+                    }
+                    className="accent-[var(--accent)]"
+                  />
+                  Reward (shows on MindUp Score page)
+                </label>
               </div>
             </div>
           </div>
@@ -623,6 +639,11 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
                   {b.type === "READ" && b.currentlyReading && (
                     <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5">
                       Currently Reading
+                    </span>
+                  )}
+                  {b.isReward && (
+                    <span className="rounded-full bg-purple-100 text-purple-700 px-2 py-0.5">
+                      Reward
                     </span>
                   )}
                 </div>

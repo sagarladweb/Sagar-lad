@@ -41,9 +41,13 @@ export function MobileNav({
             href={item.href}
             className="relative flex shrink-0 flex-col items-center justify-center gap-1 min-w-[64px] px-2 py-1.5 rounded-xl text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
           >
-            {Icon && <Icon className="w-5 h-5 shrink-0" />}
-            {item.href === "/admin/moderation" && (
-              <CommunityBadge className="!top-0 !right-0" />
+            {Icon && (
+              <span className="relative shrink-0">
+                <Icon className="w-5 h-5" />
+                {item.href === "/admin/moderation" && (
+                  <CommunityBadge className="!top-0 !right-0" />
+                )}
+              </span>
             )}
             <span className="whitespace-nowrap text-center leading-none text-[10px]">
               {item.label}

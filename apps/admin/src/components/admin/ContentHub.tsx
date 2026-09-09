@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Hash, BookOpen, Video, Quote, FileText, Share2 } from "lucide-react";
+import { Hash, BookOpen, Video, Quote, Share2 } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { BooksManager } from "@/components/admin/BooksManager";
 import { VideosManager } from "@/components/admin/VideosManager";
@@ -11,7 +11,6 @@ import { SocialManager } from "@/components/admin/SocialManager";
 const TABS = [
   { value: "topics", label: "Topics", icon: Hash },
   { value: "books", label: "Books", icon: BookOpen },
-  { value: "ebooks", label: "Ebooks", icon: FileText },
   { value: "videos", label: "Videos", icon: Video },
   { value: "quotes", label: "Quotes", icon: Quote },
   { value: "social", label: "Social", icon: Share2 },
@@ -59,7 +58,6 @@ export function ContentHub({ initialTab }: { initialTab?: string }) {
 
       {tab === "topics" && <ContentManager />}
       {tab === "books" && <BooksManager initialFilter="ALL" />}
-      {tab === "ebooks" && <BooksManager initialFilter="EBOOK" />}
       {tab === "videos" && <VideosManager />}
       {tab === "quotes" && <QuotesManager />}
       {tab === "social" && <SocialManager />}

@@ -41,15 +41,25 @@ export function LikeButton({
 }) {
   const [likes, setLikes] = useState(initialLikes);
   const [liked, setLiked] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLiked(getLikedPosts().has(slug));
-    setLoading(false);
-  }, [slug]);
+    const stored = getLikedPosts().has(slug);
+    // If localStorage says liked but server says 0, clear stale state
+    if (stored && initialLikes === 0) {
+      const likedPosts = getLikedPosts();
+      likedPosts.delete(slug);
+      saveLikedPosts(likedPosts);
+      setLiked(false);
+    } else {
+      setLiked(stored);
+    }
+    setHydrated(true);
+  }, [slug, initialLikes]);
 
   const toggle = useCallback(async () => {
-    if (loading) return;
+    if (loading || !hydrated) return;
 
     const wasLiked = liked;
     const newLiked = !wasLiked;
@@ -58,6 +68,7 @@ export function LikeButton({
     // Optimistic update
     setLiked(newLiked);
     setLikes(newLikes);
+    setLoading(true);
 
     const likedPosts = getLikedPosts();
     if (newLiked) {
@@ -100,11 +111,32 @@ export function LikeButton({
         likedPosts.delete(slug);
       }
       saveLikedPosts(likedPosts);
+    } finally {
+      setLoading(false);
     }
-  }, [slug, likes, liked, loading]);
+  }, [slug, likes, liked, loading, hydrated]);
 
   const isMedium = size === "md";
   const isLarge = size === "lg";
+
+  // Show skeleton while hydrating
+  if (!hydrated) {
+    return (
+      <div
+        className={`inline-flex items-center justify-center ${
+          isLarge
+            ? "gap-2.5 rounded-full border px-5 py-2.5 text-sm"
+            : isMedium
+            ? "gap-2 rounded-full border px-4 py-2 text-sm min-h-[40px]"
+            : "gap-1.5 rounded-full border px-2.5 py-1 text-[11px]"
+        } border-border bg-card/80 text-muted-foreground`}
+      >
+        <Heart className={`${isLarge || isMedium ? "w-4 h-4" : "w-3.5 h-3.5"}`} />
+        {showLabel && <span className="font-medium text-xs">Like</span>}
+        <span className="font-semibold">{initialLikes.toLocaleString()}</span>
+      </div>
+    );
+  }
 
   return (
     <button
@@ -114,7 +146,7 @@ export function LikeButton({
         toggle();
       }}
       disabled={loading}
-      className={`inline-flex items-center justify-center font-medium transition-all duration-200 active:scale-95 ${
+      className={`inline-flex items-center justify-center font-medium transition-all duration-200 active:scale-95 disabled:opacity-60 ${
         isLarge
           ? "gap-2.5 rounded-full border px-5 py-2.5 text-sm"
           : isMedium
