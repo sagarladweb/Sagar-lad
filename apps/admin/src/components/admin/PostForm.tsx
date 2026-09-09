@@ -23,7 +23,6 @@ import {
   Image,
   Plus,
 } from "lucide-react";
-import { TipTapEditor } from "@/components/admin/TipTapEditor";
 
 const LazyTipTapEditor = lazy(() =>
   import("@/components/admin/TipTapEditor").then((m) => ({ default: m.TipTapEditor }))

@@ -161,7 +161,7 @@ export async function POST(
     }
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 300_000);
+    const timer = setTimeout(() => controller.abort(), 8_000);
     try {
       const upstream = await fetch(book.buyUrl!, { signal: controller.signal });
       if (!upstream.ok) {

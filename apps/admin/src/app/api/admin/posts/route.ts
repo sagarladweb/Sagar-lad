@@ -34,6 +34,7 @@ export async function GET() {
       where: { deletedAt: null },
       select: LIST_SELECT,
       orderBy: { updatedAt: "desc" },
+      take: 200, // safety cap for admin panel
     });
     return NextResponse.json({ posts }, { headers: NO_STORE_HEADERS });
   } catch (err) {

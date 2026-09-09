@@ -9,11 +9,15 @@ export async function GET() {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const counts = await prisma.newsletterDelivery.groupBy({
-    by: ["campaignId", "status"],
-    _count: { _all: true },
-  });
-  return NextResponse.json({ counts });
+  try {
+    const counts = await prisma.newsletterDelivery.groupBy({
+      by: ["campaignId", "status"],
+      _count: { _all: true },
+    });
+    return NextResponse.json({ counts });
+  } catch {
+    return NextResponse.json({ counts: [] });
+  }
 }
 
 async function deleteSubscriber(id: string, request: Request) {

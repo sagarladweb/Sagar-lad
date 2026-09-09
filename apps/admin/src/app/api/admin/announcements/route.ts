@@ -33,10 +33,14 @@ export async function GET() {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const announcements = await prisma.announcement.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-  return NextResponse.json({ announcements });
+  try {
+    const announcements = await prisma.announcement.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json({ announcements });
+  } catch {
+    return NextResponse.json({ announcements: [] });
+  }
 }
 
 export async function POST(request: Request) {
@@ -94,11 +98,15 @@ export async function DELETE(request: Request) {
   const session = await requireAdmin(request);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
 
-  await prisma.announcement.delete({ where: { id } });
-  try { await revalidatePublic(); } catch {}
-  return NextResponse.json({ ok: true });
+    await prisma.announcement.delete({ where: { id } });
+    try { await revalidatePublic(); } catch {}
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
+  }
 }

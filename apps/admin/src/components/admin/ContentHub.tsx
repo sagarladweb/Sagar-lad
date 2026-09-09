@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Hash, BookOpen, Video, Quote, Share2 } from "lucide-react";
-import { ContentManager } from "@/components/admin/ContentManager";
-import { BooksManager } from "@/components/admin/BooksManager";
-import { VideosManager } from "@/components/admin/VideosManager";
-import { QuotesManager } from "@/components/admin/QuotesManager";
-import { SocialManager } from "@/components/admin/SocialManager";
+import { useState, Suspense } from "react";
+import dynamic from "next/dynamic";
+import { Hash, BookOpen, Video, Quote, Share2, Loader2 } from "lucide-react";
+
+const ContentManager = dynamic(() => import("@/components/admin/ContentManager").then(m => ({ default: m.ContentManager })), { ssr: false });
+const BooksManager = dynamic(() => import("@/components/admin/BooksManager").then(m => ({ default: m.BooksManager })), { ssr: false });
+const VideosManager = dynamic(() => import("@/components/admin/VideosManager").then(m => ({ default: m.VideosManager })), { ssr: false });
+const QuotesManager = dynamic(() => import("@/components/admin/QuotesManager").then(m => ({ default: m.QuotesManager })), { ssr: false });
+const SocialManager = dynamic(() => import("@/components/admin/SocialManager").then(m => ({ default: m.SocialManager })), { ssr: false });
 
 const TABS = [
   { value: "topics", label: "Topics", icon: Hash },
@@ -56,11 +58,13 @@ export function ContentHub({ initialTab }: { initialTab?: string }) {
         })}
       </div>
 
-      {tab === "topics" && <ContentManager />}
-      {tab === "books" && <BooksManager initialFilter="ALL" />}
-      {tab === "videos" && <VideosManager />}
-      {tab === "quotes" && <QuotesManager />}
-      {tab === "social" && <SocialManager />}
+      <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>}>
+        {tab === "topics" && <ContentManager />}
+        {tab === "books" && <BooksManager initialFilter="ALL" />}
+        {tab === "videos" && <VideosManager />}
+        {tab === "quotes" && <QuotesManager />}
+        {tab === "social" && <SocialManager />}
+      </Suspense>
     </div>
   );
 }

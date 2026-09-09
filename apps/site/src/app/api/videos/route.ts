@@ -29,6 +29,8 @@ export async function GET(request: Request) {
         prisma.video.findMany({
           where: { published: true, deletedAt: null, ...platformFilter },
           orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+          ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+          take: limit + 1, // fetch one extra to detect next page
           select: {
             id: true,
             title: true,
@@ -42,9 +44,9 @@ export async function GET(request: Request) {
       []
     );
 
-    const start = cursor ? all.findIndex((v) => v.id === cursor) + 1 : 0;
-    const page = all.slice(start, start + limit);
-    const nextCursor = start + limit < all.length ? page[page.length - 1].id : null;
+    const hasNext = all.length > limit;
+    const page = hasNext ? all.slice(0, limit) : all;
+    const nextCursor = hasNext ? page[page.length - 1].id : null;
 
     return NextResponse.json({ videos: page, nextCursor });
   } catch {

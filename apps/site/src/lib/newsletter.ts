@@ -27,7 +27,7 @@ async function sendBrevo({
     throw new Error("BREVO_API_KEY and BREVO_FROM_EMAIL must be set");
   }
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15_000);
+  const timeout = setTimeout(() => controller.abort(), 5_000);
   try {
     const res = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
@@ -121,9 +121,11 @@ export async function processNewsletterQueue() {
     data: { status: "SENDING" },
   });
 
-  const PARALLEL = 5;
+  const PARALLEL = 3;
+  const DEADLINE = Date.now() + 7_000; // 7s hard limit (Vercel free tier = 10s)
   let sent = 0;
   for (let i = 0; i < batch.length; i += PARALLEL) {
+    if (Date.now() > DEADLINE) break; // stop before Vercel timeout
     const chunk = batch.slice(i, i + PARALLEL);
     const results = await Promise.allSettled(
       chunk.map((d) =>

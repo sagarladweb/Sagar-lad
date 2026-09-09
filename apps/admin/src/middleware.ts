@@ -1,25 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+// All auth is handled by requireAdmin() in API routes and pages.
+// This middleware is intentionally minimal — no-op passthrough.
 
-  // Allow login page and auth API routes
-  if (pathname === "/admin" || pathname.startsWith("/api/auth")) {
-    return NextResponse.next();
-  }
-
-  // Allow static files and Next.js internals
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon") ||
-    pathname.includes(".")
-  ) {
-    return NextResponse.next();
-  }
-
-  // All API and page routes rely on requireAdmin() for real auth (JWT + role
-  // check). This middleware only gates static assets and the login page.
+export function middleware(_request: NextRequest) {
   return NextResponse.next();
 }
 

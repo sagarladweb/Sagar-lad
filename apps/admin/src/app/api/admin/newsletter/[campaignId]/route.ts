@@ -13,25 +13,29 @@ export async function GET(
   const session = await requireAdmin(_request);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { campaignId } = await params;
-  const deliveries = await prisma.newsletterDelivery.findMany({
-    where: { campaignId },
-    orderBy: { createdAt: "asc" },
-    take: 500,
-    include: {
-      subscriber: { select: { email: true, name: true, unsubscribed: true } },
-    },
-  });
+  try {
+    const { campaignId } = await params;
+    const deliveries = await prisma.newsletterDelivery.findMany({
+      where: { campaignId },
+      orderBy: { createdAt: "asc" },
+      take: 500,
+      include: {
+        subscriber: { select: { email: true, name: true, unsubscribed: true } },
+      },
+    });
 
-  return NextResponse.json({
-    deliveries: deliveries.map((d) => ({
-      id: d.id,
-      email: d.subscriber.email,
-      name: d.subscriber.name,
-      unsubscribed: d.subscriber.unsubscribed,
-      status: d.status,
-      sentAt: d.sentAt,
-      error: d.error,
-    })),
-  });
+    return NextResponse.json({
+      deliveries: deliveries.map((d) => ({
+        id: d.id,
+        email: d.subscriber.email,
+        name: d.subscriber.name,
+        unsubscribed: d.subscriber.unsubscribed,
+        status: d.status,
+        sentAt: d.sentAt,
+        error: d.error,
+      })),
+    });
+  } catch {
+    return NextResponse.json({ deliveries: [] });
+  }
 }

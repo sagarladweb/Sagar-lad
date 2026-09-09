@@ -141,27 +141,31 @@ export async function getQuotesWithFallback() {
   return cached ?? [];
 }
 
-export async function getPublishedBooks(type?: "PUBLISHED" | "READ" | "EBOOK") {
-  const books = await dbSafe(
-    () => prisma.book.findMany({
-      where: { published: true, deletedAt: null, ...(type ? { type } : {}) },
-      orderBy: [{ featured: "desc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
-      select: {
-        id: true, type: true, title: true, author: true, tagline: true,
-        description: true, learning: true, note: true, imageUrl: true,
-        buyUrl: true, free: true, featured: true, sortOrder: true,
-        currentlyReading: true,
-      },
-    }),
-    null,
-  );
-  if (books && books.length > 0) {
-    console.log(`[content] getPublishedBooks(${type ?? "all"}): ${books.length} books from DB`);
-    return books;
-  }
-  console.warn(`[content] getPublishedBooks: DB down, returning empty`);
-  return [];
-}
+export const getPublishedBooks = unstable_cache(
+  async (type?: "PUBLISHED" | "READ" | "EBOOK") => {
+    const books = await dbSafe(
+      () => prisma.book.findMany({
+        where: { published: true, deletedAt: null, ...(type ? { type } : {}) },
+        orderBy: [{ featured: "desc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
+        select: {
+          id: true, type: true, title: true, author: true, tagline: true,
+          description: true, learning: true, note: true, imageUrl: true,
+          buyUrl: true, free: true, featured: true, sortOrder: true,
+          currentlyReading: true,
+        },
+      }),
+      null,
+    );
+    if (books && books.length > 0) {
+      console.log(`[content] getPublishedBooks(${type ?? "all"}): ${books.length} books from DB`);
+      return books;
+    }
+    console.warn(`[content] getPublishedBooks: DB down, returning empty`);
+    return [];
+  },
+  ["books-v2"],
+  { revalidate: 300, tags: ["content"] }
+);
 
 // ── Blog listing helpers ──────────────────────────────────────────────
 
