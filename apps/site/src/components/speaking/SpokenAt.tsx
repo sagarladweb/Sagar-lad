@@ -12,94 +12,78 @@ const EVENTS = [
 function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [fillPercent, setFillPercent] = useState(0);
-  const ticking = useRef(false);
 
   const calcFill = useCallback(() => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const viewH = window.innerHeight;
     const start = viewH;
-    const end = viewH * 0.3;
+    const end = viewH * 0.35;
     const pct = Math.max(0, Math.min(1, (start - rect.top) / (start - end)));
     setFillPercent(pct);
   }, []);
 
+  // Scroll-driven fill for mobile/tablet
   useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    if (!mq.matches) return; // Desktop: CSS hover handles everything
+
     const onScroll = () => {
-      if (!ticking.current) {
-        ticking.current = true;
-        requestAnimationFrame(() => {
-          calcFill();
-          ticking.current = false;
-        });
-      }
+      requestAnimationFrame(calcFill);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     calcFill();
     return () => window.removeEventListener("scroll", onScroll);
   }, [calcFill]);
 
-  // IntersectionObserver for scroll-fill on mobile (works both directions)
+  // IntersectionObserver for mobile (resets on scroll out)
   useEffect(() => {
     if (!cardRef.current) return;
+    const mq = window.matchMedia("(max-width: 1023px)");
+    if (!mq.matches) return;
+
     const thresholds = Array.from({ length: 20 }, (_, i) => i / 19);
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setFillPercent(entry.intersectionRatio);
-          } else {
-            setFillPercent(0);
-          }
+          setFillPercent(entry.isIntersecting ? entry.intersectionRatio : 0);
         });
       },
-      { threshold: thresholds, rootMargin: "0px 0px 100px 0px" }
+      { threshold: thresholds, rootMargin: "0px 0px -50px 0px" }
     );
     observer.observe(cardRef.current);
     return () => observer.disconnect();
   }, []);
 
   const Icon = event.icon;
+  const isFilled = fillPercent > 0.85;
 
   return (
     <div
       ref={cardRef}
-      className="spoken-card relative rounded-xl border border-border bg-card overflow-hidden group"
+      className="spoken-card group relative py-6"
+      style={{ "--fill": `${fillPercent * 100}%` } as React.CSSProperties}
+      data-filled={isFilled}
       data-index={index}
     >
-      <div className="relative z-10 p-6">
-        <span className="absolute top-4 right-4 text-[10px] font-bold tabular-nums text-muted-foreground/30">
-          {String(index + 1).padStart(2, "0")}
-        </span>
-
-        {/* Icon */}
-        <div className="w-12 h-12 rounded-lg bg-brand/10 text-brand grid place-items-center mb-4">
-          <Icon className="w-5 h-5" />
+      <div className="relative">
+        {/* Icon + role text (no pill, just plain text) */}
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-lg bg-brand/10 text-brand grid place-items-center shrink-0">
+            <Icon className="w-5 h-5" />
+          </div>
+          <span className="text-sm text-muted-foreground">{event.role}</span>
         </div>
 
-        {/* Title: outlined text, fills on hover (desktop) or scroll (mobile) */}
-        <h3
-          className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight"
-          style={{
-            WebkitTextStroke: "1.5px var(--foreground)",
-            WebkitTextFillColor: "transparent",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            backgroundImage: "linear-gradient(var(--foreground), var(--foreground))",
-            backgroundSize: `${fillPercent * 100}% 100%`,
-            backgroundRepeat: "no-repeat",
-          }}
-        >
+        {/* Title: outlined text with hover/scroll fill */}
+        <h3 className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight">
           {event.title}
         </h3>
 
-        {/* Category pills — always visible */}
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span className="inline-flex rounded-full bg-brand/8 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand">
+        {/* Place pill — desktop: shows on hover via CSS; mobile: shows when filled via JS */}
+        <div className="spoken-place mt-3">
+          <span className="inline-flex rounded-full bg-brand/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand">
             {event.place}
-          </span>
-          <span className="inline-flex rounded-full bg-muted px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-            {event.role}
           </span>
         </div>
       </div>
@@ -123,38 +107,56 @@ export function SpokenAt() {
       </div>
 
       <style>{`
-        /* Desktop: outlined text, fills on hover */
+        /* ── All screens: base text style ── */
+        .spoken-title {
+          -webkit-text-stroke: 1px var(--muted-foreground, #94a3b8);
+          -webkit-text-fill-color: transparent;
+          -webkit-background-clip: text;
+          background-clip: text;
+          background-image: linear-gradient(var(--brand, #3b82f6), var(--brand, #3b82f6));
+          background-size: 0% 100%;
+          background-repeat: no-repeat;
+          transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                      -webkit-text-stroke 0.4s ease;
+        }
+
+        /* ── Desktop: hover fills + brightens stroke + shows place pill ── */
         @media (min-width: 1024px) {
-          .spoken-title {
-            -webkit-text-stroke: 1.5px var(--foreground);
-            -webkit-text-fill-color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            background-image: linear-gradient(var(--foreground), var(--foreground));
-            background-size: 0% 100%;
-            background-repeat: no-repeat;
-            transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-          }
           .spoken-card:hover .spoken-title {
             background-size: 100% 100%;
+            -webkit-text-stroke: 1px var(--brand, #3b82f6);
           }
-          .spoken-card {
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+          .spoken-place {
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s;
           }
-          .spoken-card:hover {
-            background-color: var(--card);
-            box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.08);
+          .spoken-card:hover .spoken-place {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
-        /* Mobile/tablet: JS controls backgroundSize via inline style */
+
+        /* ── Mobile/tablet: JS sets --fill via inline style ── */
         @media (max-width: 1023px) {
           .spoken-title {
-            -webkit-text-stroke: 1.5px var(--foreground);
-            -webkit-text-fill-color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
+            background-size: var(--fill, 0%) 100%;
+          }
+          .spoken-place {
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+          }
+          /* When JS sets fill > 85%, the parent SpokenCard gets data-filled */
+          .spoken-card[data-filled="true"] .spoken-title {
+            -webkit-text-stroke: 1px var(--brand, #3b82f6);
+          }
+          .spoken-card[data-filled="true"] .spoken-place {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
+
         @media (prefers-reduced-motion: reduce) {
           .spoken-title {
             transition: none !important;
@@ -162,10 +164,15 @@ export function SpokenAt() {
             -webkit-text-fill-color: var(--foreground) !important;
             -webkit-text-stroke: 0 !important;
           }
+          .spoken-place {
+            transition: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+          }
         }
       `}</style>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-2">
         {EVENTS.map((event, i) => (
           <SpokenCard key={event.title} event={event} index={i} />
         ))}
