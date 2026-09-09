@@ -10,51 +10,51 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 365,
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "m.media-amazon.com",
-      },
-      {
-        protocol: "https",
-        hostname: "covers.openlibrary.org",
-      },
-      {
-        protocol: "https",
-        hostname: "*.archive.org",
-      },
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-      },
-      {
-        protocol: "https",
-        hostname: "i.ytimg.com",
-      },
+      { protocol: "https", hostname: "m.media-amazon.com" },
+      { protocol: "https", hostname: "covers.openlibrary.org" },
+      { protocol: "https", hostname: "*.archive.org" },
+      { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "i.ytimg.com" },
     ],
   },
   async headers() {
+    // Dev: no CSP, no HSTS — avoids chunk 500 errors from webpack dev server
+    if (isDev) {
+      return [
+        {
+          source: "/(.*)",
+          headers: [
+            { key: "X-Content-Type-Options", value: "nosniff" },
+            { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          ],
+        },
+      ];
+    }
+
+    // Production: full security headers, but NOT on /_next/static (chunks)
     return [
       {
         source: "/images/(.*)",
         headers: [
-          { key: "Cache-Control", value: isDev ? "no-cache" : "public, max-age=31536000, immutable" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
       {
         source: "/_next/static/(.*)",
         headers: [
-          { key: "Cache-Control", value: isDev ? "no-cache" : "public, max-age=31536000, immutable" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
       {
         source: "/fonts/(.*)",
         headers: [
-          { key: "Cache-Control", value: isDev ? "no-cache" : "public, max-age=31536000, immutable" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
           { key: "Access-Control-Allow-Origin", value: "*" },
         ],
       },
       {
-        source: "/(.*)",
+        // All pages EXCEPT /_next/static (chunks must be CSP-free)
+        source: "/((?!_next/static).*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -67,7 +67,7 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://www.google-analytics.com`,
+              "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://*.supabase.co https://m.media-amazon.com https://covers.openlibrary.org https://*.archive.org https://i.ytimg.com",
               "font-src 'self'",
