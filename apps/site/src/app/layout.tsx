@@ -6,7 +6,6 @@ import { SiteFrame } from "@/components/SiteFrame";
 import { SITE } from "@/lib/site";
 import { heartbeat } from "@/lib/heartbeat";
 import { getActiveAnnouncement } from "@/lib/content";
-import { Analytics } from "@vercel/analytics/next";
 
 // Self-hosted fonts — never depend on Google Fonts being reachable at build
 // or serve time, so CSS always loads. Files in src/app/fonts/.
@@ -121,7 +120,6 @@ export default async function RootLayout({
         <Suspense>
           <SiteFrame announcement={announcement}>{children}</SiteFrame>
         </Suspense>
-        <Analytics />
       </body>
     </html>
   );
