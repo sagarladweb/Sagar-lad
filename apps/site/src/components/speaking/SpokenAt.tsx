@@ -12,15 +12,10 @@ const EVENTS = [
 function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [fillPercent, setFillPercent] = useState(0);
-  const isMobile = useRef(false);
   const ticking = useRef(false);
 
-  useEffect(() => {
-    isMobile.current = window.matchMedia("(max-width: 1023px)").matches;
-  }, []);
-
   const calcFill = useCallback(() => {
-    if (!cardRef.current || isMobile.current) return;
+    if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const viewH = window.innerHeight;
     const start = viewH;
@@ -39,31 +34,22 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
         });
       }
     };
-
-    if (!isMobile.current) {
-      window.addEventListener("scroll", onScroll, { passive: true });
-      calcFill();
-      return () => window.removeEventListener("scroll", onScroll);
-    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    calcFill();
+    return () => window.removeEventListener("scroll", onScroll);
   }, [calcFill]);
 
+  // IntersectionObserver for scroll-fill on mobile (works both directions)
   useEffect(() => {
     if (!cardRef.current) return;
-    const mq = window.matchMedia("(max-width: 1023px)");
-
-    if (!mq.matches) {
-      // Desktop: just show filled on hover via CSS, no JS needed
-      setFillPercent(0);
-      return;
-    }
-
-    // Mobile/tablet: IntersectionObserver scroll-to-fill
     const thresholds = Array.from({ length: 20 }, (_, i) => i / 19);
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setFillPercent(entry.intersectionRatio);
+          } else {
+            setFillPercent(0);
           }
         });
       },
@@ -78,49 +64,42 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
   return (
     <div
       ref={cardRef}
-      className="spoken-card relative rounded-xl border border-border bg-card overflow-hidden group lg:border-transparent lg:bg-transparent"
+      className="spoken-card relative rounded-xl border border-border bg-card overflow-hidden group"
       data-index={index}
     >
-      {/* Card content — visible on mobile/tablet as a bordered card */}
-      <div className="relative z-10 p-6 lg:p-0">
+      <div className="relative z-10 p-6">
         <span className="absolute top-4 right-4 text-[10px] font-bold tabular-nums text-muted-foreground/30">
           {String(index + 1).padStart(2, "0")}
         </span>
-        {/* Icon — visible on mobile, hidden on desktop */}
-        <div className="lg:hidden w-12 h-12 rounded-lg bg-brand/10 text-brand grid place-items-center mb-4">
+
+        {/* Icon */}
+        <div className="w-12 h-12 rounded-lg bg-brand/10 text-brand grid place-items-center mb-4">
           <Icon className="w-5 h-5" />
         </div>
 
-        {/* Title: hollow → filled on desktop hover, scroll-fill on mobile */}
+        {/* Title: outlined text, fills on hover (desktop) or scroll (mobile) */}
         <h3
-          className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight text-foreground"
+          className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight"
           style={{
-            WebkitBackgroundClip: "text",
+            WebkitTextStroke: "1.5px var(--foreground)",
             WebkitTextFillColor: "transparent",
+            WebkitBackgroundClip: "text",
             backgroundClip: "text",
-            backgroundImage: "linear-gradient(var(--accent), var(--accent))",
-            backgroundSize: isMobile.current ? `${fillPercent * 100}% 100%` : undefined,
+            backgroundImage: "linear-gradient(var(--foreground), var(--foreground))",
+            backgroundSize: `${fillPercent * 100}% 100%`,
             backgroundRepeat: "no-repeat",
           }}
         >
           {event.title}
         </h3>
 
-        {/* Mobile/tablet: role + place pills below text */}
-        <div className="lg:hidden mt-3 flex flex-wrap gap-2">
+        {/* Category pills — always visible */}
+        <div className="mt-3 flex flex-wrap gap-2">
           <span className="inline-flex rounded-full bg-brand/8 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand">
             {event.place}
           </span>
           <span className="inline-flex rounded-full bg-muted px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             {event.role}
-          </span>
-        </div>
-
-        {/* Desktop: role + place below title */}
-        <div className="hidden lg:block mt-3">
-          <p className="text-sm text-muted-foreground">{event.role}</p>
-          <span className="mt-2 inline-flex rounded-full bg-brand/8 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand">
-            {event.place}
           </span>
         </div>
       </div>
@@ -144,20 +123,20 @@ export function SpokenAt() {
       </div>
 
       <style>{`
-        /* Desktop: hollow text by default, fills on hover */
+        /* Desktop: outlined text, fills on hover */
         @media (min-width: 1024px) {
           .spoken-title {
+            -webkit-text-stroke: 1.5px var(--foreground);
             -webkit-text-fill-color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
-            background-image: linear-gradient(currentColor, currentColor);
+            background-image: linear-gradient(var(--foreground), var(--foreground));
             background-size: 0% 100%;
             background-repeat: no-repeat;
             transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           }
           .spoken-card:hover .spoken-title {
             background-size: 100% 100%;
-            -webkit-text-fill-color: transparent;
           }
           .spoken-card {
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
@@ -170,6 +149,7 @@ export function SpokenAt() {
         /* Mobile/tablet: JS controls backgroundSize via inline style */
         @media (max-width: 1023px) {
           .spoken-title {
+            -webkit-text-stroke: 1.5px var(--foreground);
             -webkit-text-fill-color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
@@ -180,11 +160,12 @@ export function SpokenAt() {
             transition: none !important;
             background-size: 100% 100% !important;
             -webkit-text-fill-color: var(--foreground) !important;
+            -webkit-text-stroke: 0 !important;
           }
         }
       `}</style>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {EVENTS.map((event, i) => (
           <SpokenCard key={event.title} event={event} index={i} />
         ))}
