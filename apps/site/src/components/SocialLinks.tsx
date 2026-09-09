@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { socialIcon, type IconType } from "@/lib/social-icons";
 import { Globe } from "lucide-react";
 
@@ -28,8 +29,7 @@ function SocialItem({ s }: { s: Social }) {
         style={{ color: s.color }}
       >
         {s.logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={s.logoUrl} alt="" className="h-full w-full object-cover" />
+          <Image src={s.logoUrl} alt="" width={32} height={32} className="h-full w-full object-cover" unoptimized />
         ) : Icon ? (
           <Icon className="w-4 h-4 transition-colors group-hover:text-brand" />
         ) : (

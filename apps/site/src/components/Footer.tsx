@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 
 import { useEffect, useState } from "react";
 import {
@@ -130,8 +131,7 @@ export function Footer() {
                     className="p-2.5 rounded-full border border-background/25 text-background/70 hover:bg-accent hover:text-accent-foreground hover:border-accent transition-colors overflow-hidden"
                   >
                     {s.logoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.logoUrl} alt="" className="h-4 w-4 object-contain" />
+                      <Image src={s.logoUrl} alt="" width={16} height={16} className="h-4 w-4 object-contain" unoptimized />
                     ) : s.icon ? (
                       <s.icon className="w-4 h-4" />
                     ) : null}
@@ -229,8 +229,7 @@ export function Footer() {
                   className="p-2.5 rounded-full border border-background/25 text-background/70 hover:bg-accent hover:text-accent-foreground hover:border-accent transition-colors overflow-hidden"
                 >
                   {s.logoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={s.logoUrl} alt="" className="h-4 w-4 object-contain" />
+                    <Image src={s.logoUrl} alt="" width={16} height={16} className="h-4 w-4 object-contain" unoptimized />
                   ) : s.icon ? (
                     <s.icon className="w-4 h-4" />
                   ) : null}

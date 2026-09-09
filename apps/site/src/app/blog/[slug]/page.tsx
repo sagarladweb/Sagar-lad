@@ -79,8 +79,8 @@ export default async function PostPage({ params }: Props) {
           description: post.excerpt ?? undefined,
           image: post.coverImage ?? undefined,
           url: `${SITE.url}/blog/${post.slug}`,
-          datePublished: post.publishedAt.toISOString(),
-          dateModified: post.updatedAt.toISOString(),
+          datePublished: post.publishedAt?.toISOString(),
+          dateModified: post.updatedAt?.toISOString(),
           author: {
             "@type": "Person",
             name: post.author?.name ?? SITE.name,

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { socialIcon } from "@/lib/social-icons";
 import { Globe } from "lucide-react";
 
@@ -36,8 +37,7 @@ export function SocialsGrid({ socials }: { socials: Social[] }) {
               style={{ color }}
             >
               {s.logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={s.logoUrl} alt="" className="h-full w-full object-cover" />
+                <Image src={s.logoUrl} alt="" width={44} height={44} className="h-full w-full object-cover" unoptimized />
               ) : (
                 <Icon className="w-5 h-5" />
               )}
