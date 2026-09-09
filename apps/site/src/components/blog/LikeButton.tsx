@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Heart } from "lucide-react";
 
 function getClientToken(): string {
@@ -42,11 +42,10 @@ export function LikeButton({
   const [likes, setLikes] = useState(initialLikes);
   const [liked, setLiked] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const reqId = useRef(0);
 
   useEffect(() => {
     const stored = getLikedPosts().has(slug);
-    // If localStorage says liked but server says 0, clear stale state
     if (stored && initialLikes === 0) {
       const likedPosts = getLikedPosts();
       likedPosts.delete(slug);
@@ -59,16 +58,15 @@ export function LikeButton({
   }, [slug, initialLikes]);
 
   const toggle = useCallback(async () => {
-    if (loading || !hydrated) return;
+    if (!hydrated) return;
 
-    const wasLiked = liked;
-    const newLiked = !wasLiked;
+    const newLiked = !liked;
     const newLikes = newLiked ? likes + 1 : Math.max(0, likes - 1);
+    const id = ++reqId.current;
 
     // Optimistic update
     setLiked(newLiked);
     setLikes(newLikes);
-    setLoading(true);
 
     const likedPosts = getLikedPosts();
     if (newLiked) {
@@ -88,11 +86,11 @@ export function LikeButton({
           action: newLiked ? "like" : "unlike",
         }),
       });
-      if (res.ok) {
+      // Only apply if this is the latest request
+      if (id === reqId.current && res.ok) {
         const data = await res.json();
         setLikes(data.likes);
         setLiked(data.liked);
-        // Sync localStorage with server truth
         const current = getLikedPosts();
         if (data.liked) {
           current.add(slug);
@@ -102,24 +100,17 @@ export function LikeButton({
         saveLikedPosts(current);
       }
     } catch {
-      // Revert on network error
-      setLiked(wasLiked);
-      setLikes(likes);
-      if (wasLiked) {
-        likedPosts.add(slug);
-      } else {
-        likedPosts.delete(slug);
+      // Revert on network error (only if still latest)
+      if (id === reqId.current) {
+        setLiked(!newLiked);
+        setLikes(liked ? likes : newLikes);
       }
-      saveLikedPosts(likedPosts);
-    } finally {
-      setLoading(false);
     }
-  }, [slug, likes, liked, loading, hydrated]);
+  }, [slug, likes, liked, hydrated]);
 
   const isMedium = size === "md";
   const isLarge = size === "lg";
 
-  // Show skeleton while hydrating
   if (!hydrated) {
     return (
       <div
@@ -145,8 +136,7 @@ export function LikeButton({
         e.stopPropagation();
         toggle();
       }}
-      disabled={loading}
-      className={`inline-flex items-center justify-center font-medium transition-all duration-200 active:scale-95 disabled:opacity-60 ${
+      className={`inline-flex items-center justify-center font-medium transition-all duration-200 active:scale-95 ${
         isLarge
           ? "gap-2.5 rounded-full border px-5 py-2.5 text-sm"
           : isMedium
