@@ -11,63 +11,50 @@ const EVENTS = [
 
 function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [fillPercent, setFillPercent] = useState(0);
+  const [scrollFill, setScrollFill] = useState(0);
+  const [hovered, setHovered] = useState(false);
 
   const calcFill = useCallback(() => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
-    const viewH = window.innerHeight;
-    const start = viewH;
-    const end = viewH * 0.35;
-    const pct = Math.max(0, Math.min(1, (start - rect.top) / (start - end)));
-    setFillPercent(pct);
+    const vh = window.innerHeight;
+    const raw = 1 - (rect.top / vh);
+    const pct = Math.max(0, Math.min(1, (raw - 0.2) / 0.6));
+    setScrollFill(pct);
   }, []);
 
-  // Scroll-driven fill for mobile/tablet
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
-    if (!mq.matches) return; // Desktop: CSS hover handles everything
-
+    let raf: number;
     const onScroll = () => {
-      requestAnimationFrame(calcFill);
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(calcFill);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
     calcFill();
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, [calcFill]);
 
-  // IntersectionObserver for mobile (resets on scroll out)
-  useEffect(() => {
-    if (!cardRef.current) return;
-    const mq = window.matchMedia("(max-width: 1023px)");
-    if (!mq.matches) return;
-
-    const thresholds = Array.from({ length: 20 }, (_, i) => i / 19);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setFillPercent(entry.isIntersecting ? entry.intersectionRatio : 0);
-        });
-      },
-      { threshold: thresholds, rootMargin: "0px 0px -50px 0px" }
-    );
-    observer.observe(cardRef.current);
-    return () => observer.disconnect();
-  }, []);
-
   const Icon = event.icon;
-  const isFilled = fillPercent > 0.85;
+  // Desktop: hover wins. Mobile: scroll wins.
+  const fill = hovered ? 1 : scrollFill;
+  const strokeProgress = Math.min(1, fill * 1.5);
+  const placeOpacity = fill > 0.8 ? Math.min(1, (fill - 0.8) / 0.2) : 0;
 
   return (
     <div
       ref={cardRef}
       className="spoken-card group relative py-6"
-      style={{ "--fill": `${fillPercent * 100}%` } as React.CSSProperties}
-      data-filled={isFilled}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       data-index={index}
     >
       <div className="relative">
-        {/* Icon + role text (no pill, just plain text) */}
+        {/* Icon + role text */}
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-lg bg-brand/10 text-brand grid place-items-center shrink-0">
             <Icon className="w-5 h-5" />
@@ -75,13 +62,22 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
           <span className="text-sm text-muted-foreground">{event.role}</span>
         </div>
 
-        {/* Title: outlined text with hover/scroll fill */}
-        <h3 className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight">
+        {/* Title: outlined → filled */}
+        <h3
+          className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight"
+          style={{
+            backgroundSize: `${fill * 100}% 100%`,
+            WebkitTextStroke: `${1 - strokeProgress}px var(--muted-foreground, #94a3b8)`,
+          }}
+        >
           {event.title}
         </h3>
 
-        {/* Place pill — desktop: shows on hover via CSS; mobile: shows when filled via JS */}
-        <div className="spoken-place mt-3">
+        {/* Place pill — fades in when text is filled */}
+        <div
+          className="spoken-place mt-3"
+          style={{ opacity: placeOpacity, transform: `translateY(${(1 - placeOpacity) * 8}px)` }}
+        >
           <span className="inline-flex rounded-full bg-brand/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand">
             {event.place}
           </span>
@@ -107,56 +103,17 @@ export function SpokenAt() {
       </div>
 
       <style>{`
-        /* ── All screens: base text style ── */
         .spoken-title {
-          -webkit-text-stroke: 1px var(--muted-foreground, #94a3b8);
           -webkit-text-fill-color: transparent;
           -webkit-background-clip: text;
           background-clip: text;
           background-image: linear-gradient(var(--brand, #3b82f6), var(--brand, #3b82f6));
-          background-size: 0% 100%;
           background-repeat: no-repeat;
-          transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                      -webkit-text-stroke 0.4s ease;
+          transition: background-size 0.15s ease-out, -webkit-text-stroke 0.2s ease-out;
         }
-
-        /* ── Desktop: hover fills + brightens stroke + shows place pill ── */
-        @media (min-width: 1024px) {
-          .spoken-card:hover .spoken-title {
-            background-size: 100% 100%;
-            -webkit-text-stroke: 1px var(--brand, #3b82f6);
-          }
-          .spoken-place {
-            opacity: 0;
-            transform: translateY(8px);
-            transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s;
-          }
-          .spoken-card:hover .spoken-place {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .spoken-place {
+          transition: opacity 0.3s ease, transform 0.3s ease;
         }
-
-        /* ── Mobile/tablet: JS sets --fill via inline style ── */
-        @media (max-width: 1023px) {
-          .spoken-title {
-            background-size: var(--fill, 0%) 100%;
-          }
-          .spoken-place {
-            opacity: 0;
-            transform: translateY(8px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
-          }
-          /* When JS sets fill > 85%, the parent SpokenCard gets data-filled */
-          .spoken-card[data-filled="true"] .spoken-title {
-            -webkit-text-stroke: 1px var(--brand, #3b82f6);
-          }
-          .spoken-card[data-filled="true"] .spoken-place {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
         @media (prefers-reduced-motion: reduce) {
           .spoken-title {
             transition: none !important;
