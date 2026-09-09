@@ -18,7 +18,7 @@ function getRateLimit(ip: string, limit: number, windowMs: number): boolean {
   return true;
 }
 
-// Lazy cleanup: only runs when map grows large, avoids setInterval leak in edge runtime
+// Lazy cleanup: only runs when map grows large
 function maybeCleanup() {
   if (rateLimitMap.size > 200) {
     const now = Date.now();
@@ -61,28 +61,6 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
 
-  // Security headers
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("X-Frame-Options", "SAMEORIGIN");
-  response.headers.set("X-XSS-Protection", "1; mode=block");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  response.headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=()"
-  );
-  response.headers.set(
-    "Strict-Transport-Security",
-    "max-age=31536000; includeSubDomains; preload"
-  );
-
-  // Prevent MIME sniffing and add CSP for API routes
-  if (pathname.startsWith("/api/")) {
-    response.headers.set(
-      "Content-Security-Policy",
-      "default-src 'none'; frame-ancestors 'none'"
-    );
-  }
-
   // Block common bot scanners on API routes
   if (pathname.startsWith("/api/")) {
     const ua = request.headers.get("user-agent") || "";
@@ -95,7 +73,6 @@ export function middleware(request: NextRequest) {
 
   // Block direct access to admin routes from non-admin
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    // Admin should be separate app, block any unexpected access
     return NextResponse.redirect(new URL("/", request.url));
   }
 
@@ -106,6 +83,5 @@ export const config = {
   matcher: [
     "/api/:path*",
     "/admin/:path*",
-    "/((?!_next/static|_next/image|favicon.ico|images/).*)",
   ],
 };
