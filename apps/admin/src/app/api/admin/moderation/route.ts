@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 export const runtime = "nodejs";
 
 export async function GET() {
@@ -25,7 +26,7 @@ export async function GET() {
       prisma.contactRequest.findMany({ orderBy: { createdAt: "desc" }, take: 500 }),
     ]);
 
-    return NextResponse.json({ subscribers, comments, enquiries });
+    return NextResponse.json({ subscribers, comments, enquiries }, { headers: NO_STORE_HEADERS });
   } catch (err) {
     console.error("[moderation] GET failed:", (err as Error).message);
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 import { normalizeVideoUrl } from "@/lib/video";
 export const runtime = "nodejs";
 
@@ -32,7 +33,7 @@ export async function GET() {
       include: { category: { select: { id: true, name: true, slug: true } } },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
     });
-    return NextResponse.json({ videos });
+    return NextResponse.json({ videos }, { headers: NO_STORE_HEADERS });
   } catch (err) {
     console.error("[videos] GET failed:", (err as Error).message);
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });

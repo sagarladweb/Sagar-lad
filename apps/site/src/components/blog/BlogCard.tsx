@@ -83,7 +83,7 @@ export function BlogCard({
           </div>
 
           {showStats && (
-            <div>
+            <div className="relative z-10 -mr-1 py-1">
               <LikeButton slug={post.slug} initialLikes={metrics.likes} />
             </div>
           )}

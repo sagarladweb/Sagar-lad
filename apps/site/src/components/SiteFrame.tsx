@@ -9,6 +9,7 @@ import { ScrollTopButton } from "@/components/ui/ScrollTopButton";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { RssBanner } from "@/components/RssBanner";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
+import { SocialsProvider } from "@/components/SocialLinksContext";
 
 const ScrollAnimations = dynamic(
   () => import("@/components/home/ScrollAnimations").then((m) => m.ScrollAnimations),
@@ -124,7 +125,9 @@ export function SiteFrame({
 }) {
   return (
     <Suspense>
-      <SiteFrameInner children={children} announcement={announcement} />
+      <SocialsProvider>
+        <SiteFrameInner children={children} announcement={announcement} />
+      </SocialsProvider>
     </Suspense>
   );
 }

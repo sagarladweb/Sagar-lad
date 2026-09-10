@@ -22,6 +22,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { FaInstagram, FaLinkedinIn } from "@/lib/icons";
+import { useSocials } from "@/components/SocialLinksContext";
 
 const HEADER_SOCIALS = ["instagram", "linkedin"];
 
@@ -58,30 +59,15 @@ type HeaderSocialsProps = {
 };
 
 function HeaderSocials({ light = false }: HeaderSocialsProps) {
-  const [socials, setSocials] = useState<
-    { key: string; href: string; icon: typeof FaInstagram }[]
-  >([]);
+  const allSocials = useSocials();
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/socials")
-      .then((r) => r.json())
-      .then((data) => {
-        if (cancelled) return;
-        const found = (data.socials ?? [])
-          .filter((s: { icon: string }) => HEADER_SOCIALS.includes(s.icon.toLowerCase()))
-          .map((s: { icon: string; href: string }) => ({
-            key: s.icon,
-            href: s.href,
-            icon: SOCIAL_ICONS[s.icon.toLowerCase()].icon,
-          }));
-        setSocials(found);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const socials = allSocials
+    .filter((s) => HEADER_SOCIALS.includes(s.key))
+    .map((s) => ({
+      key: s.key,
+      href: s.href,
+      icon: (s.key === "instagram" ? FaInstagram : FaLinkedinIn),
+    }));
 
   if (!socials.length) return null;
   return (

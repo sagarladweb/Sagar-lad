@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 
 export const runtime = "nodejs";
 
@@ -37,7 +38,7 @@ export async function GET() {
     const announcements = await prisma.announcement.findMany({
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json({ announcements });
+    return NextResponse.json({ announcements }, { headers: NO_STORE_HEADERS });
   } catch {
     return NextResponse.json({ announcements: [] });
   }

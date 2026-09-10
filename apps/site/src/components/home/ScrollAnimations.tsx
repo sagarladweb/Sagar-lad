@@ -65,22 +65,9 @@ export function ScrollAnimations() {
               const delay = parseFloat(item.dataset.delay ?? "0");
               const reverse = item.hasAttribute("data-reverse");
 
-              const from: gsap.TweenVars = (() => {
-                switch (variant) {
-                  case "left":
-                    return { opacity: 0, x: -60, filter: "blur(4px)" };
-                  case "right":
-                    return { opacity: 0, x: 60, filter: "blur(4px)" };
-                  case "zoom":
-                    return { opacity: 0, scale: 0.92, filter: "blur(4px)" };
-                  case "blur":
-                    return { opacity: 0, filter: "blur(12px)" };
-                  case "image":
-                    return { opacity: 0, scale: 1.08 };
-                  default:
-                    return { opacity: 0, y: 50, filter: "blur(4px)" };
-                }
-              })();
+              // Skip elements already visible (set by CSS fallback or reduced-motion)
+              const cs = getComputedStyle(item);
+              if (cs.opacity === "1" && cs.filter === "none") return;
 
               const to: gsap.TweenVars = (() => {
                 switch (variant) {
@@ -99,7 +86,8 @@ export function ScrollAnimations() {
               if (alreadyVisible && delay === 0 && !reverse) {
                 gsap.set(item, { opacity: 1, x: 0, y: 0, scale: 1, filter: "none" });
               } else {
-                gsap.fromTo(item, from, {
+                // Use .to() instead of .fromTo() — initial state is set via CSS
+                gsap.to(item, {
                   ...to,
                   delay,
                   scrollTrigger: {
@@ -126,9 +114,9 @@ export function ScrollAnimations() {
                   el.style.transform = "none";
                 });
               } else {
-                gsap.fromTo(
+                // Use .to() — initial state is set via CSS
+                gsap.to(
                   items,
-                  { opacity: 0, y: 40, filter: "blur(3px)" },
                   {
                     opacity: 1,
                     y: 0,

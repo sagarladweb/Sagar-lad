@@ -448,7 +448,7 @@ function ReviewModal({ open, onClose }: { open: boolean; onClose: () => void }) 
   );
 }
 
-export function MentorshipClient() {
+export function MentorshipClient({ profileImage }: { profileImage?: string | null }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -527,7 +527,7 @@ export function MentorshipClient() {
             <div data-m-hero className="relative shrink-0 pb-3">
               <div className="relative h-36 w-36 sm:h-48 sm:w-48 rounded-full overflow-hidden border-2 border-border shadow-lg">
                 <Image
-                  src="/images/profile/about.webp"
+                  src={profileImage ?? "/images/profile/about.webp"}
                   alt="Sagar Lad"
                   fill
                   sizes="192px"

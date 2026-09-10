@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
 
-export async function GET() {
-  try {
-    const announcements = await prisma.announcement.findMany({
+const getActiveAnnouncements = unstable_cache(
+  async () =>
+    prisma.announcement.findMany({
       where: { active: true },
       orderBy: { createdAt: "desc" },
       select: {
@@ -23,8 +24,18 @@ export async function GET() {
         barColor: true,
         eventDate: true,
       },
-    });
-    return NextResponse.json({ announcements });
+    }),
+  ["api-announcements-v1"],
+  { revalidate: 300, tags: ["announcements"] }
+);
+
+export async function GET() {
+  try {
+    const announcements = await getActiveAnnouncements();
+    return NextResponse.json(
+      { announcements },
+      { headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=600" } }
+    );
   } catch {
     return NextResponse.json({ announcements: [] });
   }

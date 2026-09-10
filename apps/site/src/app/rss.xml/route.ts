@@ -1,7 +1,6 @@
+import { unstable_cache } from "next/cache";
 import { prisma, dbSafe } from "@/lib/db";
 import { SITE, VISIBLE_POST_WHERE } from "@/lib/site";
-
-export const dynamic = "force-dynamic";
 
 const MAX_POSTS = 50;
 
@@ -14,26 +13,33 @@ function escapeXml(str: string) {
     .replace(/'/g, "&apos;");
 }
 
+const getRssPosts = unstable_cache(
+  async () =>
+    dbSafe(
+      () =>
+        prisma.post.findMany({
+          where: VISIBLE_POST_WHERE,
+          orderBy: { publishedAt: "desc" },
+          take: MAX_POSTS,
+          select: {
+            title: true,
+            slug: true,
+            excerpt: true,
+            publishedAt: true,
+            updatedAt: true,
+            coverImage: true,
+            category: { select: { name: true } },
+            author: { select: { name: true } },
+          },
+        }),
+      []
+    ),
+  ["rss-posts-v1"],
+  { revalidate: 3600, tags: ["content"] }
+);
+
 export async function GET() {
-  const posts = await dbSafe(
-    () =>
-      prisma.post.findMany({
-        where: VISIBLE_POST_WHERE,
-        orderBy: { publishedAt: "desc" },
-        take: MAX_POSTS,
-        select: {
-          title: true,
-          slug: true,
-          excerpt: true,
-          publishedAt: true,
-          updatedAt: true,
-          coverImage: true,
-          category: { select: { name: true } },
-          author: { select: { name: true } },
-        },
-      }),
-    []
-  );
+  const posts = await getRssPosts();
 
   const items = posts
     .map((post) => {

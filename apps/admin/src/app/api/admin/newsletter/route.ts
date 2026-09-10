@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 import { enqueueCampaign, processNewsletterQueue } from "@/lib/newsletter";
 import { logAudit } from "@/lib/audit";
 import { sanitizeHtml } from "@/lib/sanitize";
@@ -73,7 +74,7 @@ export async function GET() {
           failed,
         };
       }),
-    });
+    }, { headers: NO_STORE_HEADERS });
   } catch (err) {
     console.error("[newsletter] GET failed:", (err as Error).message);
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });

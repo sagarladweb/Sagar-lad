@@ -4,6 +4,9 @@ const isDev = process.env.NODE_ENV !== "production";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["sharp", "jsdom", "pg", "@prisma/adapter-pg", "@google-analytics/data"],
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
   images: {
     remotePatterns: [
       {

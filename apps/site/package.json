@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "rm -rf .next && next dev",
+    "dev": "rm -rf .next && next dev --webpack",
     "prebuild": "rm -rf .next && npm run db:generate -w @sagarlad/db",
     "build": "next build --webpack",
     "start": "next start",

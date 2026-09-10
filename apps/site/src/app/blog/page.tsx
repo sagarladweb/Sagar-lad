@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { getCategoriesWithFallback, getPublishedVideosWithFallback, getPostCountWithFallback, getVideoCountWithFallback, getPostListWithFallback } from "@/lib/content";
 import { SITE, VISIBLE_POST_WHERE, pageMetadata } from "@/lib/site";
+import { getProfileAvatar } from "@/lib/profile";
 import { BlogVideoGrid } from "@/components/blog/BlogVideoGrid";
 import { JsonLd } from "@/components/JsonLd";
 import { SubscribeModal } from "@/components/blog/SubscribeModal";
@@ -51,7 +52,7 @@ export default async function BlogPage({
   const isFiltered = Boolean(categorySlug || q);
 
   // Parallelize ALL data fetching concurrently in a single round-trip
-  const [categories, totalPosts, totalVideos, posts, filteredCount, videos] = await Promise.all([
+  const [categories, totalPosts, totalVideos, posts, filteredCount, videos, profile] = await Promise.all([
     getCategoriesWithFallback(),
     getPostCountWithFallback(VISIBLE_POST_WHERE),
     getVideoCountWithFallback(),
@@ -64,6 +65,7 @@ export default async function BlogPage({
     tab === "videos"
       ? getPublishedVideosWithFallback(PAGE_SIZE, undefined, (vpage - 1) * PAGE_SIZE)
       : Promise.resolve([]),
+    getProfileAvatar(),
   ]);
 
   const total = isFiltered ? (filteredCount ?? 0) : totalPosts;
@@ -109,7 +111,7 @@ export default async function BlogPage({
           {/* Avatar Left */}
           <div className="relative h-28 w-28 sm:h-36 sm:w-36 rounded-full overflow-hidden border-2 border-border shadow-md shrink-0 bg-muted">
             <Image
-              src="/images/profile/about.webp"
+              src={profile.image}
               alt="Sagar Lad"
               fill
               sizes="144px"

@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Cloud, Globe, GraduationCap, Award } from "lucide-react";
 
 const EVENTS = [
@@ -13,31 +13,37 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
   const cardRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [tapped, setTapped] = useState(false);
+  const seenRef = useRef(false);
 
-  // Mobile/tablet: simple in-view toggle (no scroll tracking)
   useEffect(() => {
-    if (!cardRef.current) return;
-    const mq = window.matchMedia("(max-width: 1023px)");
-    if (!mq.matches) return;
+    const el = cardRef.current;
+    if (!el) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.3 }
+      ([entry]) => {
+        if (!seenRef.current) {
+          seenRef.current = true;
+          if (entry.isIntersecting) return;
+        }
+        setInView(entry.isIntersecting);
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" }
     );
-    observer.observe(cardRef.current);
+    observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
   const Icon = event.icon;
-  // Desktop: hover. Mobile: inView.
-  const filled = hovered || inView;
+  const filled = hovered || inView || tapped;
 
   return (
     <div
       ref={cardRef}
-      className={`spoken-card group relative py-6 ${filled ? "is-filled" : ""}`}
+      className={`spoken-card group relative py-6 px-4 sm:px-6 rounded-xl border border-border/60 bg-card/30 cursor-pointer select-none ${filled ? "is-filled" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => setTapped((t) => !t)}
       data-index={index}
     >
       <div className="relative">
@@ -50,7 +56,7 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
         </div>
 
         {/* Title: outline always visible, fill transitions via CSS */}
-        <h3 className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight">
+        <h3 className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05]">
           {event.title}
         </h3>
 
@@ -67,7 +73,7 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
 
 export function SpokenAt() {
   return (
-    <div data-animate>
+    <div data-animate suppressHydrationWarning>
       <div className="max-w-2xl mb-10 text-center sm:text-left mx-auto sm:mx-0">
         <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
           Where I&apos;ve spoken
@@ -81,7 +87,6 @@ export function SpokenAt() {
       </div>
 
       <style>{`
-        /* Base: outline always visible, no fill */
         .spoken-title {
           -webkit-text-stroke: 1.5px var(--muted-foreground, #94a3b8);
           -webkit-text-fill-color: transparent;
@@ -90,22 +95,26 @@ export function SpokenAt() {
           background-image: linear-gradient(var(--brand, #3b82f6), var(--brand, #3b82f6));
           background-size: 0% 100%;
           background-repeat: no-repeat;
-          transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                      -webkit-text-stroke-color 0.4s ease;
+          transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                      -webkit-text-stroke-color 0.4s ease,
+                      letter-spacing 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                      opacity 0.4s ease;
           -webkit-text-stroke-color: var(--muted-foreground, #94a3b8);
+          letter-spacing: -0.02em;
+          opacity: 0.5;
         }
 
-        /* Filled: full color, stroke matches fill */
         .spoken-card.is-filled .spoken-title {
           background-size: 100% 100%;
           -webkit-text-stroke-color: var(--brand, #3b82f6);
+          letter-spacing: 0.02em;
+          opacity: 1;
         }
 
-        /* Place pill */
         .spoken-place {
           opacity: 0;
           transform: translateY(8px);
-          transition: opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s;
+          transition: opacity 0.3s ease 0.15s, transform 0.3s ease 0.15s;
         }
         .spoken-card.is-filled .spoken-place {
           opacity: 1;
@@ -118,6 +127,8 @@ export function SpokenAt() {
             background-size: 100% 100% !important;
             -webkit-text-fill-color: var(--foreground) !important;
             -webkit-text-stroke: 0 !important;
+            letter-spacing: 0.02em !important;
+            opacity: 1 !important;
           }
           .spoken-place {
             transition: none !important;
@@ -127,7 +138,7 @@ export function SpokenAt() {
         }
       `}</style>
 
-      <div className="grid grid-cols-1 gap-2">
+      <div className="grid grid-cols-1 gap-3">
         {EVENTS.map((event, i) => (
           <SpokenCard key={event.title} event={event} index={i} />
         ))}

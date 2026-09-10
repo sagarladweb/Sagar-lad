@@ -2,12 +2,13 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ChevronDown,
 } from "lucide-react";
 import { SOCIAL_ICONS, type IconType } from "@/lib/social-icons";
 import { SiteLogo } from "@/components/SiteLogo";
+import { useSocials } from "@/components/SocialLinksContext";
 
 const footerCols: {
   title: string;
@@ -75,26 +76,15 @@ function sortSocials(
 }
 
 export function Footer() {
-  const [socials, setSocials] = useState<
-    { label: string; href: string; icon: IconType | null; logoUrl: string | null }[]
-  >([]);
+  const allSocials = useSocials();
   const [openCol, setOpenCol] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch("/api/socials")
-      .then((r) => r.json())
-      .then((data) => {
-        const all = (data.socials ?? [])
-          .map((s: { label: string; href: string; icon: string; logoUrl?: string | null }) => ({
-            label: s.label,
-            href: s.href,
-            logoUrl: s.logoUrl ?? null,
-            icon: SOCIAL_ICONS[s.icon]?.icon ?? null,
-          }));
-        setSocials(all);
-      })
-      .catch(() => {});
-  }, []);
+  const socials = allSocials.map((s) => ({
+    label: s.label,
+    href: s.href,
+    logoUrl: s.logoUrl,
+    icon: s.icon,
+  }));
 
   const toggleCol = (title: string) => {
     setOpenCol((prev) => (prev === title ? null : title));

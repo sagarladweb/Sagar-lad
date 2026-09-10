@@ -8,6 +8,7 @@ import {
   generateRecoveryCodes,
 } from "@/lib/totp";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 import { logAudit } from "@/lib/audit";
 import { z } from "zod";
 
@@ -31,7 +32,7 @@ export async function GET() {
     }
     return NextResponse.json({
       enabled: Boolean(user?.twoFactorEnabled),
-    });
+    }, { headers: NO_STORE_HEADERS });
   } catch (err) {
     console.error("[security] GET failed:", (err as Error).message);
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });

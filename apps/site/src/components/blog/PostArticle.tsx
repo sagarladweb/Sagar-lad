@@ -58,10 +58,12 @@ export function PostArticle({
   post,
   related = [],
   showShare = true,
+  authorImage,
 }: {
   post: PostWithRelations;
   related?: RelatedPost[];
   showShare?: boolean;
+  authorImage?: string | null;
 }) {
   const authorName = post.author?.name ?? SITE.name;
   const metrics = { views: getEngagement(post.slug, new Date(post.publishedAt).toISOString()).views, likes: post.likes ?? 0 };
@@ -103,6 +105,7 @@ export function PostArticle({
             <PostHeader
               post={post}
               authorName={authorName}
+              authorImage={authorImage}
               metrics={metrics}
             />
 
@@ -117,6 +120,7 @@ export function PostArticle({
             <PostFooter
               post={post}
               authorName={authorName}
+              authorImage={authorImage}
               metrics={metrics}
               related={related}
               showShare={showShare}
@@ -132,6 +136,7 @@ export function PostArticle({
           <PostHeader
             post={post}
             authorName={authorName}
+            authorImage={authorImage}
             metrics={metrics}
           />
 
@@ -146,6 +151,7 @@ export function PostArticle({
           <PostFooter
             post={post}
             authorName={authorName}
+            authorImage={authorImage}
             metrics={metrics}
             related={related}
             showShare={showShare}
@@ -161,10 +167,12 @@ export function PostArticle({
 function PostHeader({
   post,
   authorName,
+  authorImage,
   metrics,
 }: {
   post: PostWithRelations;
   authorName: string;
+  authorImage?: string | null;
   metrics: { views: number; likes: number };
 }) {
   return (
@@ -205,7 +213,7 @@ function PostHeader({
         <div className="flex items-center gap-3">
           <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden bg-muted ring-1 ring-border">
             <Image
-              src="/images/profile/about.webp"
+              src={authorImage ?? "/images/profile/about.webp"}
               alt={authorName}
               fill
               sizes="40px"
@@ -268,12 +276,14 @@ function CoverImage({ src, alt }: { src: string; alt: string }) {
 function PostFooter({
   post,
   authorName,
+  authorImage,
   metrics,
   related,
   showShare,
 }: {
   post: PostWithRelations;
   authorName: string;
+  authorImage?: string | null;
   metrics: { views: number; likes: number };
   related: RelatedPost[];
   showShare: boolean;
@@ -368,10 +378,10 @@ function PostFooter({
       {post.showAuthorBox && (
         <div className="mt-10 rounded-2xl border border-border bg-card/60 p-5 sm:p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
-            <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-full overflow-hidden bg-muted ring-2 ring-border">
-              <Image
-                src="/images/profile/about.webp"
-                alt={authorName}
+              <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-full overflow-hidden bg-muted ring-2 ring-border">
+                <Image
+                  src={authorImage ?? "/images/profile/about.webp"}
+                  alt={authorName}
                 fill
                 sizes="64px"
                 className="object-cover"

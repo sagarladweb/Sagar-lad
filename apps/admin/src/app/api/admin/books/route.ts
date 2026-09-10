@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 export const runtime = "nodejs";
 
 const bookSchema = z.object({
@@ -33,7 +34,7 @@ export async function GET() {
     const books = await prisma.book.findMany({
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
     });
-    return NextResponse.json({ books });
+    return NextResponse.json({ books }, { headers: NO_STORE_HEADERS });
   } catch (err) {
     console.error("[books] GET failed:", (err as Error).message);
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });

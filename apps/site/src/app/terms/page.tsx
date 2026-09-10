@@ -9,7 +9,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/terms",
 });
 
-export const revalidate = 604800;
+export const dynamic = "force-static";
 
 export default function TermsPage() {
   return (

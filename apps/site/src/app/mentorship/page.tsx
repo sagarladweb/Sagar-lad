@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { SITE, pageMetadata } from "@/lib/site";
+import { getProfileAvatar } from "@/lib/profile";
 import { JsonLd } from "@/components/JsonLd";
 import { MentorshipClient } from "./MentorshipClient";
 
@@ -13,7 +14,8 @@ export const metadata: Metadata = pageMetadata({
 
 export const revalidate = 604800;
 
-export default function MentorshipPage() {
+export default async function MentorshipPage() {
+  const profile = await getProfileAvatar();
   return (
     <div className="bg-background overflow-x-clip">
       <JsonLd
@@ -26,7 +28,7 @@ export default function MentorshipPage() {
           ],
         }}
       />
-      <MentorshipClient />
+      <MentorshipClient profileImage={profile.image} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 export const runtime = "nodejs";
 
 const quoteSchema = z.object({
@@ -19,7 +20,7 @@ export async function GET() {
     const quotes = await prisma.quote.findMany({
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json({ quotes });
+    return NextResponse.json({ quotes }, { headers: NO_STORE_HEADERS });
   } catch (err) {
     console.error("[quotes] GET failed:", (err as Error).message);
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });

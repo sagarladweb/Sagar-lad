@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 export const runtime = "nodejs";
 
 const socialSchema = z.object({
@@ -26,7 +27,7 @@ export async function GET() {
     const socials = await prisma.socialLink.findMany({
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
-    return NextResponse.json({ socials });
+    return NextResponse.json({ socials }, { headers: NO_STORE_HEADERS });
   } catch (err) {
     console.error("[socials] GET failed:", (err as Error).message);
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });

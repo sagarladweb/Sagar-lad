@@ -42,7 +42,8 @@ export function LikeButton({
   const [likes, setLikes] = useState(initialLikes);
   const [liked, setLiked] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const reqId = useRef(0);
+  // Use ref for latest state to avoid stale closure issues on rapid clicks
+  const stateRef = useRef({ liked: false, likes: initialLikes });
 
   useEffect(() => {
     const stored = getLikedPosts().has(slug);
@@ -51,20 +52,28 @@ export function LikeButton({
       likedPosts.delete(slug);
       saveLikedPosts(likedPosts);
       setLiked(false);
+      stateRef.current = { liked: false, likes: initialLikes };
     } else {
       setLiked(stored);
+      stateRef.current = { liked: stored, likes: initialLikes };
     }
     setHydrated(true);
   }, [slug, initialLikes]);
 
+  // Keep ref in sync with state
+  useEffect(() => {
+    stateRef.current = { liked, likes };
+  }, [liked, likes]);
+
   const toggle = useCallback(async () => {
     if (!hydrated) return;
 
-    const newLiked = !liked;
-    const newLikes = newLiked ? likes + 1 : Math.max(0, likes - 1);
-    const id = ++reqId.current;
+    const wasLiked = stateRef.current.liked;
+    const wasLikes = stateRef.current.likes;
+    const newLiked = !wasLiked;
+    const newLikes = newLiked ? wasLikes + 1 : Math.max(0, wasLikes - 1);
 
-    // Optimistic update
+    // Optimistic update — immediate, no loading gate
     setLiked(newLiked);
     setLikes(newLikes);
 
@@ -86,8 +95,7 @@ export function LikeButton({
           action: newLiked ? "like" : "unlike",
         }),
       });
-      // Only apply if this is the latest request
-      if (id === reqId.current && res.ok) {
+      if (res.ok) {
         const data = await res.json();
         setLikes(data.likes);
         setLiked(data.liked);
@@ -100,13 +108,17 @@ export function LikeButton({
         saveLikedPosts(current);
       }
     } catch {
-      // Revert on network error (only if still latest)
-      if (id === reqId.current) {
-        setLiked(!newLiked);
-        setLikes(liked ? likes : newLikes);
+      // Revert on network error
+      setLiked(wasLiked);
+      setLikes(wasLikes);
+      if (wasLiked) {
+        likedPosts.add(slug);
+      } else {
+        likedPosts.delete(slug);
       }
+      saveLikedPosts(likedPosts);
     }
-  }, [slug, likes, liked, hydrated]);
+  }, [slug, hydrated]);
 
   const isMedium = size === "md";
   const isLarge = size === "lg";

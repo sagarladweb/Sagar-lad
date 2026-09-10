@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 import { slugify } from "@/lib/site";
 export const runtime = "nodejs";
 
@@ -31,7 +32,7 @@ export async function GET() {
       },
       orderBy: { name: "asc" },
     });
-    return NextResponse.json({ categories });
+    return NextResponse.json({ categories }, { headers: NO_STORE_HEADERS });
   } catch (err) {
     console.error("[categories] GET failed:", (err as Error).message);
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });

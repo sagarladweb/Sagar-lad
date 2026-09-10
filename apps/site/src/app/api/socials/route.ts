@@ -18,7 +18,10 @@ const getSocials = unstable_cache(
 export async function GET() {
   try {
     const socials = await getSocials();
-    return NextResponse.json({ socials });
+    return NextResponse.json(
+      { socials },
+      { headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=600" } }
+    );
   } catch (err) {
     console.warn("[api/socials] DB unavailable, returning empty:", (err as Error).message);
     return NextResponse.json({ socials: [] });

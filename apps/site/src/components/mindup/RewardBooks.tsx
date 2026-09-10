@@ -6,12 +6,22 @@ import { DownloadModal } from "./DownloadModal";
 import { Gift, ChevronLeft, ChevronRight, BookOpen, Download } from "lucide-react";
 
 const MOBILE_PER_PAGE = 6; // 3 rows × 2 columns
+const DESKTOP_PER_PAGE = 9; // 3 rows × 3 columns
 
 export function RewardBooks() {
   const [books, setBooks] = useState<RewardBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [selectedBook, setSelectedBook] = useState<RewardBook | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     fetch("/api/mindup/ebook")
@@ -22,6 +32,10 @@ export function RewardBooks() {
   }, []);
 
   if (loading || books.length === 0) return null;
+
+  const perPage = isDesktop ? DESKTOP_PER_PAGE : MOBILE_PER_PAGE;
+  const visible = books.slice(page * perPage, (page + 1) * perPage);
+  const totalPages = Math.ceil(books.length / perPage);
 
   return (
     <div className="mt-10 sm:mt-14">
@@ -34,20 +48,18 @@ export function RewardBooks() {
 
       {/* Mobile: 2 columns, Desktop: 3 columns */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        {books
-          .slice(page * MOBILE_PER_PAGE, (page + 1) * MOBILE_PER_PAGE)
-          .map((book) => (
+        {visible.map((book) => (
             <RewardCard key={book.id} book={book} onSelect={setSelectedBook} />
           ))}
       </div>
 
       {/* Pagination */}
-      {books.length > MOBILE_PER_PAGE && (
+      {totalPages > 1 && (
         <Pagination
           page={page}
-          totalPages={Math.ceil(books.length / MOBILE_PER_PAGE)}
+          totalPages={totalPages}
           onPrev={() => setPage((p) => Math.max(0, p - 1))}
-          onNext={() => setPage((p) => Math.min(Math.ceil(books.length / MOBILE_PER_PAGE) - 1, p + 1))}
+          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
         />
       )}
 

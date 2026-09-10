@@ -88,7 +88,7 @@ export async function POST(
     } catch {
       return NextResponse.json({ error: "DB error" }, { status: 500 });
     }
-    if (!book || !book.published || book.type !== "EBOOK") {
+    if (!book || !book.published) {
       return NextResponse.json({ error: "This eBook is not available for download." }, { status: 404 });
     }
     if (!book.fileKey && !book.buyUrl) {
@@ -164,25 +164,29 @@ export async function POST(
     const timer = setTimeout(() => controller.abort(), 8_000);
     try {
       const upstream = await fetch(book.buyUrl!, { signal: controller.signal });
-      if (!upstream.ok) {
-        return NextResponse.json({ error: "The eBook file is currently unavailable." }, { status: 502 });
+      clearTimeout(timer);
+      const upstreamType = upstream.headers.get("content-type") ?? "";
+
+      if (!upstream.ok || !upstreamType.includes("application/pdf") && !upstreamType.includes("epub") && !upstreamType.includes("mobi") && !upstreamType.includes("azw") && !upstreamType.includes("octet-stream")) {
+        return NextResponse.json({ url: book.buyUrl! });
       }
-      const contentType = upstream.headers.get("content-type") ?? "application/octet-stream";
-      const ext = EXT_BY_TYPE[contentType] ?? "pdf";
+
+      const ext = EXT_BY_TYPE[upstreamType] ?? "pdf";
       const safe = book.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
       const fileName = `${safe || "ebook"}.${ext}`;
 
       return new NextResponse(iteratorToStream(upstreamToIterator(upstream)), {
         status: 200,
         headers: {
-          "Content-Type": contentType,
+          "Content-Type": upstreamType,
           "Content-Disposition": `attachment; filename="${fileName}"`,
           "Cache-Control": "private, no-store",
           "X-Content-Type-Options": "nosniff",
         },
       });
-    } finally {
+    } catch {
       clearTimeout(timer);
+      return NextResponse.json({ url: book.buyUrl! });
     }
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

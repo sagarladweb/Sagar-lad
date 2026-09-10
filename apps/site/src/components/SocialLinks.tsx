@@ -1,21 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import Image from "next/image";
-import { socialIcon, type IconType } from "@/lib/social-icons";
 import { Globe } from "lucide-react";
+import { useSocials, type EnrichedSocial } from "@/components/SocialLinksContext";
 
-type Social = {
-  key: string;
-  label: string;
-  handle: string | null;
-  href: string;
-  icon: IconType | null;
-  logoUrl: string | null;
-  color: string;
-};
-
-function SocialItem({ s }: { s: Social }) {
+function SocialItem({ s }: { s: EnrichedSocial }) {
   const Icon = s.icon;
   return (
     <a
@@ -49,30 +39,8 @@ function SocialItem({ s }: { s: Social }) {
 }
 
 export function SocialLinks({ order }: { order?: string[] }) {
-  const [socials, setSocials] = useState<Social[]>([]);
+  const allSocials = useSocials();
   const trackRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    fetch("/api/socials")
-      .then((r) => r.json())
-      .then((data: { socials?: { key: string; label: string; handle: string | null; href: string; icon: string; logoUrl?: string | null; color: string | null }[] }) => {
-        const list: Social[] = [];
-        for (const s of data.socials ?? []) {
-          const meta = socialIcon(s.icon);
-          list.push({
-            key: s.key,
-            label: s.label,
-            handle: s.handle,
-            href: s.href,
-            icon: meta?.icon ?? null,
-            logoUrl: s.logoUrl ?? null,
-            color: s.color ?? meta?.color ?? "#000000",
-          });
-        }
-        setSocials(list);
-      })
-      .catch(() => {});
-  }, []);
 
   // Pause/resume via inline style so hover-stop works regardless of CSS load.
   const setPaused = (paused: boolean) => {
@@ -80,14 +48,14 @@ export function SocialLinks({ order }: { order?: string[] }) {
     if (el) el.style.animationPlayState = paused ? "paused" : "running";
   };
 
-  if (socials.length === 0) return null;
+  if (allSocials.length === 0) return null;
 
   // Optional explicit ordering, e.g. for a curated marquee on a specific page.
   const list = order
     ? order
-        .map((k) => socials.find((s) => s.key === k))
-        .filter((s): s is Social => !!s)
-    : socials;
+        .map((k) => allSocials.find((s) => s.key === k))
+        .filter((s): s is EnrichedSocial => !!s)
+    : allSocials;
 
   // Duplicate the list so the -50% translate loops seamlessly.
   const loop = [...list, ...list];

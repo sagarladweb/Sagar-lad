@@ -44,21 +44,34 @@ export function DownloadModal({
         return;
       }
 
-      const blob = await res.blob();
-      const disposition = res.headers.get("content-disposition") ?? "";
-      const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
-      const fileName = fileNameMatch?.[1] ?? `${book.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+      const contentType = res.headers.get("content-type") ?? "";
 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      if (contentType.includes("application/json")) {
+        // Link-only book: API returns { url } for redirect
+        const data = await res.json().catch(() => ({}));
+        if (data.url) {
+          window.open(data.url, "_blank", "noopener,noreferrer");
+          setDone(true);
+        } else {
+          setError("No download link available.");
+        }
+      } else {
+        // File download: stream the blob
+        const blob = await res.blob();
+        const disposition = res.headers.get("content-disposition") ?? "";
+        const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
+        const fileName = fileNameMatch?.[1] ?? `${book.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
 
-      setDone(true);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setDone(true);
+      }
     } catch {
       setError("Network error. Please check your connection and try again.");
     } finally {

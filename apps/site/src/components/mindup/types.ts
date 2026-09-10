@@ -12,4 +12,5 @@ export type RewardBook = {
   tagline: string | null;
   description: string | null;
   imageUrl: string | null;
+  fileKey: string | null;
 };

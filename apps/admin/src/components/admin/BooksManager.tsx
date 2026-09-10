@@ -222,7 +222,7 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
       return;
     }
     setBusy(true);
-    const savedType = editing.type;
+    const savedType = editing.isReward ? "EBOOK" : editing.type;
     const payload = {
       ...(editingId ? { id: editingId } : {}),
       type: savedType,
@@ -235,8 +235,8 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
       imageUrl: editing.imageUrl,
       buyUrl: editing.buyUrl || null,
       fileKey:
-        savedType === "EBOOK" && editing.free ? editing.fileKey || null : null,
-      free: savedType === "EBOOK" ? editing.free : false,
+        savedType === "EBOOK" && (editing.free || editing.isReward) ? editing.fileKey || null : null,
+      free: savedType === "EBOOK" ? (editing.free || editing.isReward) : false,
       featured: savedType !== "READ" ? editing.featured : false,
       published: editing.published,
       sortOrder: Number(editing.sortOrder || 0),
@@ -460,7 +460,7 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
                     Import from link
                   </button>
                 )}
-                {editing.type === "EBOOK" && editing.free && (
+                {((editing.type === "EBOOK" && editing.free) || editing.isReward) && (
                   <div className="mt-3 rounded-xl border border-dashed border-border p-3">
                     <p className="text-xs font-medium text-muted-foreground mb-2">
                       E-book file {editing.fileKey ? "✓ uploaded" : "(not uploaded)"}
@@ -538,7 +538,7 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
                   />
                   Published (visible)
                 </label>
-                {editing.type === "EBOOK" && (
+                {(editing.type === "EBOOK" || editing.isReward) && (
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
@@ -568,9 +568,15 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
                   <input
                     type="checkbox"
                     checked={editing.isReward}
-                    onChange={(e) =>
-                      setEditing({ ...editing, isReward: e.target.checked })
-                    }
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setEditing({
+                        ...editing,
+                        isReward: checked,
+                        type: checked ? "EBOOK" : editing.type,
+                        free: checked ? true : editing.free,
+                      });
+                    }}
                     className="accent-[var(--accent)]"
                   />
                   Reward (shows on MindUp Score page)

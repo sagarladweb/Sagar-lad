@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 
 /**
  * GET /api/mindup/ebook — returns reward books for the quiz results page.
- * Returns all books where isReward=true, published, not deleted, with a fileKey.
+ * Returns all books where isReward=true, published, not deleted, with a fileKey or buyUrl.
  */
 export async function GET() {
   const books = await dbSafe(
@@ -15,7 +15,7 @@ export async function GET() {
           isReward: true,
           published: true,
           deletedAt: null,
-          fileKey: { not: null },
+          OR: [{ fileKey: { not: null } }, { buyUrl: { not: null } }],
         },
         select: {
           id: true,
@@ -23,6 +23,7 @@ export async function GET() {
           tagline: true,
           description: true,
           imageUrl: true,
+          fileKey: true,
         },
         orderBy: { sortOrder: "asc" },
       }),

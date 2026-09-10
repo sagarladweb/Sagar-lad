@@ -17,7 +17,10 @@ const getCategories = unstable_cache(
 export async function GET() {
   try {
     const categories = await getCategories();
-    return NextResponse.json({ categories });
+    return NextResponse.json(
+      { categories },
+      { headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=600" } }
+    );
   } catch (err) {
     console.warn("[api/categories] DB unavailable, returning empty:", (err as Error).message);
     return NextResponse.json({ categories: [] });

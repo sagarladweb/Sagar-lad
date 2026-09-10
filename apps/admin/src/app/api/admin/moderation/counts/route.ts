@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 
 export const runtime = "nodejs";
 
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
       prisma.contactRequest.count({ where: { createdAt: { gt: since } } }),
     ]);
 
-    return NextResponse.json({ comments, subscribers, enquiries, total: comments + subscribers + enquiries });
+    return NextResponse.json({ comments, subscribers, enquiries, total: comments + subscribers + enquiries }, { headers: NO_STORE_HEADERS });
   } catch {
     return NextResponse.json({ comments: 0, subscribers: 0, enquiries: 0, total: 0 });
   }
