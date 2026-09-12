@@ -201,6 +201,13 @@ export function TraveledMap() {
     setIsPanning(false);
   };
 
+  // Always reset panning on global mouseup so header clicks aren't blocked
+  useEffect(() => {
+    const onUp = () => setIsPanning(false);
+    document.addEventListener("mouseup", onUp);
+    return () => document.removeEventListener("mouseup", onUp);
+  }, []);
+
   // Wheel zoom: Only with Ctrl/Cmd key pressed so regular scroll is never hijacked
   const handleWheel = (e: React.WheelEvent) => {
     if (e.ctrlKey || e.metaKey) {
