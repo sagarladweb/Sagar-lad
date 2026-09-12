@@ -24,7 +24,6 @@ export function TraveledMap() {
   // Hovered / Selected country
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0, flipY: false });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   // Stats count animation
@@ -39,6 +38,26 @@ export function TraveledMap() {
   const activeCountry =
     (hoveredCode ? WORLD_COUNTRIES[hoveredCode] : null) ||
     (selectedCode ? WORLD_COUNTRIES[selectedCode] : null);
+
+  // Dot centers for visited countries (SVG coordinates)
+  const [dotCenters, setDotCenters] = useState<
+    { code: string; x: number; y: number }[]
+  >([]);
+
+  useEffect(() => {
+    if (!hasEnteredViewport) return;
+    const svg = svgRef.current;
+    if (!svg) return;
+    const centers = visitedCountries
+      .map((c) => {
+        const el = svg.querySelector(`#map-country-${c.code}`) as SVGGeometryElement | null;
+        if (!el) return null;
+        const bbox = el.getBBox();
+        return { code: c.code, x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+      })
+      .filter(Boolean) as { code: string; x: number; y: number }[];
+    setDotCenters(centers);
+  }, [hasEnteredViewport, visitedCountries]);
 
   // Detect touch device
   useEffect(() => {
@@ -160,24 +179,6 @@ export function TraveledMap() {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    const viewport = mapViewportRef.current;
-    if (viewport) {
-      const rect = viewport.getBoundingClientRect();
-      const rawX = e.clientX - rect.left;
-      const rawY = e.clientY - rect.top;
-
-      // Smart clamping: tooltip is ~220px wide
-      const tooltipW = 220;
-      const margin = 16;
-      const clampedX = Math.max(
-        margin + tooltipW / 2,
-        Math.min(rect.width - margin - tooltipW / 2, rawX)
-      );
-      const flipY = rawY < 95;
-
-      setTooltipPos({ x: clampedX, y: rawY, flipY });
-    }
-
     if (!isPanning || zoom <= 1.05) return;
     setHasMovedDuringClick(true);
     const maxBound = 520 * (zoom - 1);
@@ -273,29 +274,12 @@ export function TraveledMap() {
 
     setZoom(targetZoom);
     setPan({ x: clampedX, y: clampedY });
-
-    // Position tooltip nicely at the center above the country
-    setTooltipPos({
-      x: vpRect.width / 2,
-      y: Math.max(50, vpRect.height / 2 - 30),
-      flipY: false,
-    });
   };
 
   return (
     <div ref={containerRef} className="w-full space-y-6">
-      {/* ── Top Bar: Countries count + zoom controls ── */}
-      <div className="flex items-center justify-between gap-4">
-        {/* Countries Card */}
-        <div className="flex items-center justify-start gap-2 px-4 py-2.5 rounded-xl bg-card border border-border/80 shadow-xs h-11">
-          <span className="font-display font-bold text-base sm:text-lg text-foreground tabular-nums">
-            {countryCount}
-          </span>
-          <span className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">
-            Countries
-          </span>
-        </div>
-
+      {/* ── Top Bar: zoom controls only ── */}
+      <div className="flex items-center justify-end gap-2">
         {/* Desktop-only Simple Pills (Without Icon) */}
         <div className="hidden sm:flex items-center gap-2">
           <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-muted/60 text-muted-foreground border border-border/60">
@@ -407,41 +391,108 @@ export function TraveledMap() {
                   />
                 );
               })}
+              {/* ── Travel Lines (dotted, connecting visited countries in order) ── */}
+              {dotCenters.length > 1 &&
+                dotCenters.slice(0, -1).map((from, i) => {
+                  const to = dotCenters[i + 1];
+                  return (
+                    <line
+                      key={`route-${from.code}-${to.code}`}
+                      x1={from.x}
+                      y1={from.y}
+                      x2={to.x}
+                      y2={to.y}
+                      stroke="#ef4444"
+                      strokeWidth={0.6 / zoom}
+                      strokeDasharray={`${2 / zoom} ${1.5 / zoom}`}
+                      strokeLinecap="round"
+                      opacity={0.45}
+                    />
+                  );
+                })}
+              {/* ── Red Dots on visited countries ── */}
+              {dotCenters.map((d) => {
+                const isActive = hoveredCode === d.code || selectedCode === d.code;
+                return (
+                  <g key={`dot-${d.code}`}>
+                    {isActive && (
+                      <circle
+                        cx={d.x}
+                        cy={d.y}
+                        r={5 / zoom}
+                        fill="#ef4444"
+                        opacity={0.25}
+                      >
+                        <animate
+                          attributeName="r"
+                          values={`${3 / zoom};${7 / zoom};${3 / zoom}`}
+                          dur="1.5s"
+                          repeatCount="indefinite"
+                        />
+                        <animate
+                          attributeName="opacity"
+                          values="0.3;0.1;0.3"
+                          dur="1.5s"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                    )}
+                    <circle
+                      cx={d.x}
+                      cy={d.y}
+                      r={(isActive ? 3.5 : 2.5) / zoom}
+                      fill="#ef4444"
+                      stroke="#ffffff"
+                      strokeWidth={1.2 / zoom}
+                      className="pointer-events-none"
+                    />
+                  </g>
+                );
+              })}
             </svg>
           </div>
 
-          {/* ── Red Dot Hover Indicator ── */}
-          {activeCountry && (
-            <div
-              className="absolute z-40 pointer-events-none transition-all duration-150 ease-out"
-              style={{
-                left: `${tooltipPos.x}px`,
-                top: `${tooltipPos.y}px`,
-                transform: "translate(-50%, -50%)",
-              }}
-            >
-              {/* Pulsing red dot */}
-              <div className="relative flex items-center justify-center">
-                <span className="absolute w-4 h-4 rounded-full bg-red-500/30 animate-ping" />
-                <span className="relative w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white shadow-md" />
-              </div>
-              {/* Minimal label below dot */}
+          {/* ── Country Count Text on Map ── */}
+          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 pointer-events-none select-none">
+            <span className="font-display text-4xl sm:text-5xl font-black text-foreground/90 tabular-nums">
+              {countryCount}
+            </span>
+            <span className="block text-xs sm:text-sm font-medium text-muted-foreground -mt-1">
+              Countries
+            </span>
+          </div>
+
+          {/* ── Hover White Pill (flag + name) ── */}
+          {activeCountry && (() => {
+            const dot = dotCenters.find((d) => d.code === activeCountry.code);
+            if (!dot) return null;
+            // Convert SVG coords to viewport % (SVG viewBox is 1040x520)
+            const vpX = (dot.x / 1040) * 100;
+            const vpY = (dot.y / 520) * 100;
+            return (
               <div
-                className="absolute left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/95 dark:bg-zinc-900/95 border border-border/60 shadow-sm"
+                className="absolute z-40 pointer-events-none transition-all duration-150 ease-out"
+                style={{
+                  left: `${vpX}%`,
+                  top: `${vpY}%`,
+                  transform: "translate(-50%, calc(-100% - 10px))",
+                }}
               >
-                <span className="text-sm shrink-0" role="img" aria-label={activeCountry.name}>
-                  {activeCountry.flag || "📍"}
-                </span>
-                <span className="text-xs font-semibold text-foreground">
-                  {activeCountry.code === "HU"
-                    ? "Hungary"
-                    : activeCountry.code === "AE"
-                    ? "UAE"
-                    : activeCountry.name}
-                </span>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-border/60 shadow-md whitespace-nowrap">
+                  <span className="text-sm shrink-0" role="img" aria-label={activeCountry.name}>
+                    {activeCountry.flag || "📍"}
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">
+                    {activeCountry.code === "HU"
+                      ? "Hungary"
+                      : activeCountry.code === "AE"
+                      ? "UAE"
+                      : activeCountry.name}
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       </div>
 

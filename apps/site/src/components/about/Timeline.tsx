@@ -469,19 +469,6 @@ export function Timeline() {
           </div>
         </div>
 
-        {/* ── Auto-scroll Progress Bar ── */}
-        <div className="mb-8 sm:mb-12 max-w-2xl mx-auto">
-          <div className="h-1 rounded-full bg-border/50 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-accent transition-all duration-500 ease-linear"
-              style={{ width: `${((activeIdx + 1) / nodes.length) * 100}%` }}
-            />
-          </div>
-          <p className="mt-2 text-center text-[10px] text-muted-foreground/50">
-            {activeIdx + 1} / {nodes.length}
-          </p>
-        </div>
-
         {/* ── Premium Milestone Showcase Card (Very Light Shadow, No Top Line, No Sparkles) ── */}
         <div data-tl-card className="relative">
           <div className="relative rounded-3xl border border-border/70 bg-card/60 backdrop-blur-md shadow-[0_2px_14px_rgba(0,0,0,0.04)] overflow-hidden transition-all duration-300">
