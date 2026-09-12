@@ -73,7 +73,7 @@ export function Hero() {
       aria-label="Introduction"
     >
       {/* Full-bleed landscape hero */}
-      <div className="absolute inset-0" aria-hidden="true">
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <Image
           data-hero-bg
           src="/images/heroes/hero-home.webp"
@@ -111,11 +111,10 @@ export function Hero() {
           {/* Tagline */}
           <div data-hero-tag className="mb-8">
             <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              MIND UP.{" "}
-              <span className="relative inline-block">
-                <span className="relative z-10">Change your mind. Change your life.</span>
-                <span className="absolute bottom-1 left-0 w-full h-3 bg-[#ffd51d]/40 -z-0 rounded-sm" />
-              </span>
+              MIND UP.
+            </p>
+            <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-black inline-block bg-[#ffd51d] px-3 py-0.5 rounded">
+              Change your mind. Change your life.
             </p>
           </div>
         </div>

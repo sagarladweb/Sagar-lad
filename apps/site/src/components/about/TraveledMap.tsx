@@ -56,8 +56,8 @@ export function TraveledMap() {
         const bbox = el.getBBox();
         let x = bbox.x + bbox.width / 2;
         let y = bbox.y + bbox.height / 2;
-        // Reposition India dot to Gujarat (western India)
-        if (c.code === "IN") { x = 597; y = 506; }
+        // Reposition India dot to Gujarat (Kutch region - western India)
+        if (c.code === "IN") { x = 588; y = 498; }
         return { code: c.code, x, y };
       })
       .filter(Boolean) as { code: string; x: number; y: number }[];
@@ -401,25 +401,6 @@ export function TraveledMap() {
                   />
                 );
               })}
-              {/* ── Travel Lines (dotted, connecting visited countries in order) ── */}
-              {dotCenters.length > 1 &&
-                dotCenters.slice(0, -1).map((from, i) => {
-                  const to = dotCenters[i + 1];
-                  return (
-                    <line
-                      key={`route-${from.code}-${to.code}`}
-                      x1={from.x}
-                      y1={from.y}
-                      x2={to.x}
-                      y2={to.y}
-                      stroke="#ef4444"
-                      strokeWidth={0.6 / zoom}
-                      strokeDasharray={`${2 / zoom} ${1.5 / zoom}`}
-                      strokeLinecap="round"
-                      opacity={0.45}
-                    />
-                  );
-                })}
               {/* ── Red Dots on visited countries ── */}
               {dotCenters.map((d) => {
                 const isActive = hoveredCode === d.code || selectedCode === d.code;
@@ -475,11 +456,10 @@ export function TraveledMap() {
           {/* ── Hover White Pill (cursor-following, flag + name) ── */}
           {activeCountry && (
             <div
-              className="absolute z-40 pointer-events-none"
+              className="absolute z-50 pointer-events-none"
               style={{
-                left: `${mousePos.x}px`,
-                top: `${mousePos.y}px`,
-                transform: "translate(-50%, calc(-100% - 14px))",
+                left: `${mousePos.x + 16}px`,
+                top: `${mousePos.y - 16}px`,
               }}
             >
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-lg border border-black/10 whitespace-nowrap">
