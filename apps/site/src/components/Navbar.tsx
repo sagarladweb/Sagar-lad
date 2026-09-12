@@ -24,7 +24,7 @@ import {
 import { FaInstagram, FaLinkedinIn, FaYoutube } from "@/lib/icons";
 import { useSocials } from "@/components/SocialLinksContext";
 
-const HEADER_SOCIALS = ["instagram", "youtube", "linkedin"];
+const HEADER_SOCIALS = ["instagram", "linkedin", "youtube"];
 
 type NavBook = {
   id: string;

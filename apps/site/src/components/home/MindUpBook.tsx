@@ -30,10 +30,10 @@ export async function MindUpBook() {
 
   return (
     <section
-      className="relative overflow-hidden border-b border-border bg-background"
+      className="relative overflow-hidden border-b border-border bg-background py-16 md:py-24"
       aria-label="Featured books"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <BookCarousel books={slides} />
       </div>
     </section>

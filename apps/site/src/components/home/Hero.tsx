@@ -98,7 +98,7 @@ export function Hero() {
 
           {/* Name */}
           <h1 className="mb-2">
-            <span data-hero-word className="font-display text-6xl sm:text-7xl md:text-8xl font-bold leading-[1.1] text-white">
+            <span data-hero-word className="font-display text-6xl sm:text-7xl md:text-8xl font-bold leading-[1.1] text-[#ffd51d]">
               Sagar Lad
             </span>
           </h1>
@@ -109,12 +109,14 @@ export function Hero() {
           </p>
 
           {/* Tagline */}
-          <p
-            data-hero-tag
-            className="mb-8 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white"
-          >
-            MIND UP. Change your mind. Change your life.
-          </p>
+          <div data-hero-tag className="mb-8">
+            <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+              MIND UP.
+            </p>
+            <span className="inline-block mt-2 bg-[#ffd51d] text-black px-4 py-1.5 rounded-full text-sm sm:text-base font-semibold">
+              Change your mind. Change your life.
+            </span>
+          </div>
         </div>
       </div>
     </section>

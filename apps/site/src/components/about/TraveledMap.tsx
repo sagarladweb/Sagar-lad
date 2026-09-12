@@ -25,6 +25,7 @@ export function TraveledMap() {
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   // Stats count animation
   const [countryCount, setCountryCount] = useState(0);
@@ -53,7 +54,11 @@ export function TraveledMap() {
         const el = svg.querySelector(`#map-country-${c.code}`) as SVGGeometryElement | null;
         if (!el) return null;
         const bbox = el.getBBox();
-        return { code: c.code, x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+        let x = bbox.x + bbox.width / 2;
+        let y = bbox.y + bbox.height / 2;
+        // Reposition India dot to Gujarat (western India)
+        if (c.code === "IN") { x = 605; y = 495; }
+        return { code: c.code, x, y };
       })
       .filter(Boolean) as { code: string; x: number; y: number }[];
     setDotCenters(centers);
@@ -179,6 +184,11 @@ export function TraveledMap() {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    const viewport = mapViewportRef.current;
+    if (viewport) {
+      const rect = viewport.getBoundingClientRect();
+      setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    }
     if (!isPanning || zoom <= 1.05) return;
     setHasMovedDuringClick(true);
     const maxBound = 520 * (zoom - 1);
@@ -462,37 +472,32 @@ export function TraveledMap() {
             </span>
           </div>
 
-          {/* ── Hover White Pill (flag + name) ── */}
-          {activeCountry && (() => {
-            const dot = dotCenters.find((d) => d.code === activeCountry.code);
-            if (!dot) return null;
-            // Convert SVG coords to viewport % (SVG viewBox is 1040x520)
-            const vpX = (dot.x / 1040) * 100;
-            const vpY = (dot.y / 520) * 100;
-            return (
-              <div
-                className="absolute z-40 pointer-events-none transition-all duration-150 ease-out"
-                style={{
-                  left: `${vpX}%`,
-                  top: `${vpY}%`,
-                  transform: "translate(-50%, calc(-100% - 10px))",
-                }}
-              >
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-border/60 shadow-md whitespace-nowrap">
-                  <span className="text-sm shrink-0" role="img" aria-label={activeCountry.name}>
-                    {activeCountry.flag || "📍"}
-                  </span>
-                  <span className="text-xs font-semibold text-foreground">
-                    {activeCountry.code === "HU"
-                      ? "Hungary"
-                      : activeCountry.code === "AE"
-                      ? "UAE"
-                      : activeCountry.name}
-                  </span>
-                </div>
+          {/* ── Hover White Pill (cursor-following, flag + name) ── */}
+          {activeCountry && (
+            <div
+              className="absolute z-40 pointer-events-none transition-opacity duration-150"
+              style={{
+                left: `${mousePos.x}px`,
+                top: `${mousePos.y}px`,
+                transform: "translate(-50%, calc(-100% - 12px))",
+              }}
+            >
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-border/60 shadow-md whitespace-nowrap">
+                <span className="text-sm shrink-0" role="img" aria-label={activeCountry.name}>
+                  {activeCountry.flag || "📍"}
+                </span>
+                <span className="text-xs font-semibold text-foreground">
+                  {activeCountry.code === "IN"
+                    ? "Gujarat, India"
+                    : activeCountry.code === "HU"
+                    ? "Hungary"
+                    : activeCountry.code === "AE"
+                    ? "UAE"
+                    : activeCountry.name}
+                </span>
               </div>
-            );
-          })()}
+            </div>
+          )}
         </div>
       </div>
 
