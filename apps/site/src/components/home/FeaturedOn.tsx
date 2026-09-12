@@ -18,7 +18,7 @@ const PRESS = [
 
 function Logo({ name, src }: { name: string; src: string }) {
   return (
-    <span className="flex h-10 w-24 items-center justify-center sm:h-12 sm:w-28 shrink-0">
+    <span className="flex h-12 w-28 items-center justify-center sm:h-14 sm:w-32 shrink-0">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}

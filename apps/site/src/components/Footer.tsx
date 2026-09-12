@@ -106,8 +106,7 @@ export function Footer() {
               <SiteLogo light className="h-12 w-auto" />
             </Link>
             <p className="mt-4 text-sm text-background/70 max-w-xs leading-relaxed">
-              Author · Public Speaker. Building awareness,
-              one conversation at a time.
+              A friend, mentor and Guide
             </p>
 
             {/* Desktop social icons — 3 static */}
@@ -246,7 +245,7 @@ export function Footer() {
         <div className="mt-6 pt-6 border-t border-background/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-background/60">
           <p>© {new Date().getFullYear()} Sagar Lad. All rights reserved.</p>
           <p className="flex items-center gap-1">
-            MindUp.RiseWithin.
+            MIND UP. Change your mind. Change your life.
             <span className="text-accent">✦</span>
           </p>
         </div>

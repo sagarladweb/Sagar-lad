@@ -15,6 +15,7 @@ export async function revalidatePublic(): Promise<boolean> {
   revalidateTag("socials", "max");
   revalidateTag("content", "max");
   revalidateTag("announcements", "max");
+  revalidateTag("liferazor", "max");
 
   const candidateUrls: string[] = [];
   if (process.env.NODE_ENV === "development") {

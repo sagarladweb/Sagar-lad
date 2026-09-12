@@ -71,8 +71,8 @@ export default async function HomePage({
         <Hero />
         <FeaturedOn />
         <AboutMe />
-        <TopicsGrid topics={topicsWithViews} />
         <MindUp />
+        <TopicsGrid topics={topicsWithViews} />
         <MindUpBook />
       <BlogPreview posts={posts} showStats />
         <Testimonials />
@@ -116,8 +116,8 @@ export default async function HomePage({
       <Hero />
       <FeaturedOn />
       <AboutMe />
-      <TopicsGrid topics={topicsWithViews} />
       <MindUp />
+      <TopicsGrid topics={topicsWithViews} />
       <MindUpBook />
       <BlogPreview posts={posts} showStats />
       <Testimonials />

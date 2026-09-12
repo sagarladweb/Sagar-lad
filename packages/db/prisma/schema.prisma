@@ -352,3 +352,13 @@ model Announcement {
 
   @@index([active])
 }
+
+// Single-row settings for the "Current Life Razor" homepage section.
+model LifeRazor {
+  id          String   @id @default(cuid())
+  pill        String   @default("Current Life Razor")
+  heading     String   @default("Be Dumb.")
+  accent      String   @default("Don't worry about what others think.")
+  description String   @default("A razor is a rule you cut your life with. Mine is a reminder to stay curious, keep asking the \"dumb\" questions, and never let the noise of other people's opinions decide my next step.")
+  updatedAt   DateTime @updatedAt
+}

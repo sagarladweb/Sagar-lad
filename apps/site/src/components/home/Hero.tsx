@@ -2,9 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { gsap } from "@/lib/gsap";
-import { BookOpen } from "lucide-react";
 import { DESIGNATION } from "@/lib/site";
 
 export function Hero() {
@@ -56,26 +54,12 @@ export function Hero() {
         1.0
       );
 
-      // Description: fade up
+      // Subtitle: fade up
       tl.fromTo(
-        "[data-hero-desc]",
-        { opacity: 0, y: 20 },
+        "[data-hero-sub]",
+        { opacity: 0, y: 16 },
         { opacity: 1, y: 0, duration: 0.8 },
         1.2
-      );
-
-      // CTAs: staggered fade up with slight scale
-      tl.fromTo(
-        "[data-hero-cta]",
-        { opacity: 0, y: 16, scale: 0.96 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.7,
-          stagger: 0.1,
-        },
-        1.4
       );
     }, el);
 
@@ -113,40 +97,24 @@ export function Hero() {
           </div>
 
           {/* Name */}
-          <h1 className="mb-6">
+          <h1 className="mb-2">
             <span data-hero-word className="font-display text-6xl sm:text-7xl md:text-8xl font-bold leading-[1.1] text-white">
               Sagar Lad
             </span>
           </h1>
+
+          {/* Subtitle */}
+          <p data-hero-sub className="mb-6 text-lg sm:text-xl text-white/60 font-medium">
+            A friend, mentor and Guide
+          </p>
 
           {/* Tagline */}
           <p
             data-hero-tag
             className="mb-8 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white"
           >
-            Mind <span className="text-accent">Up.</span> Rise Within.
+            MIND UP. Change your mind. Change your life.
           </p>
-
-          {/* Description */}
-          <p
-            data-hero-desc
-            className="mb-10 max-w-xl text-base sm:text-lg text-white/75 leading-relaxed"
-          >
-            Strengthen your mind, rise beyond your limits, succeed with
-            purpose, and lift others.
-          </p>
-
-          {/* CTA */}
-          <div>
-            <Link
-              href="/books"
-              data-hero-cta
-              className="btn-premium inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-8 py-3 text-sm font-semibold"
-            >
-              <BookOpen className="w-4 h-4" />
-              Get the MIND UP Theory
-            </Link>
-          </div>
         </div>
       </div>
     </section>

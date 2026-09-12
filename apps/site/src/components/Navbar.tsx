@@ -21,10 +21,10 @@ import {
   Mail,
   ChevronDown,
 } from "lucide-react";
-import { FaInstagram, FaLinkedinIn } from "@/lib/icons";
+import { FaInstagram, FaLinkedinIn, FaYoutube } from "@/lib/icons";
 import { useSocials } from "@/components/SocialLinksContext";
 
-const HEADER_SOCIALS = ["instagram", "linkedin"];
+const HEADER_SOCIALS = ["instagram", "youtube", "linkedin"];
 
 type NavBook = {
   id: string;
@@ -51,6 +51,7 @@ type ApiBook = {
 
 const SOCIAL_ICONS: Record<string, { icon: typeof FaInstagram; label: string }> = {
   instagram: { icon: FaInstagram, label: "Instagram" },
+  youtube: { icon: FaYoutube, label: "YouTube" },
   linkedin: { icon: FaLinkedinIn, label: "LinkedIn" },
 };
 
@@ -66,7 +67,7 @@ function HeaderSocials({ light = false }: HeaderSocialsProps) {
     .map((s) => ({
       key: s.key,
       href: s.href,
-      icon: (s.key === "instagram" ? FaInstagram : FaLinkedinIn),
+      icon: (s.key === "instagram" ? FaInstagram : s.key === "youtube" ? FaYoutube : FaLinkedinIn),
     }));
 
   if (!socials.length) return null;
