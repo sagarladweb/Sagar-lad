@@ -58,7 +58,7 @@ export default async function RootLayout({
       className={`${beVietnamPro.variable} ${rethinkSans.variable} ${greatVibes.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
         <div className="hidden lg:block h-full flex-1">
           {children}
         </div>

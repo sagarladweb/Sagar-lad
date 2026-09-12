@@ -155,11 +155,7 @@ export function BackgroundSection() {
                 }`}
               >
                 <span
-                  className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-full shadow-lg w-fit mb-6 ${
-                    i === 0
-                      ? "bg-foreground text-background"
-                      : "bg-accent text-accent-foreground"
-                  }`}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-full shadow-lg w-fit mb-6 bg-accent text-accent-foreground`}
                 >
                   <CheckCircle2 className="w-4 h-4" /> Verified{" "}
                   {i === 0 ? "Training" : "Member"}

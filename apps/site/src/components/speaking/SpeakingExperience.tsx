@@ -24,7 +24,7 @@ const STEPS = [
   },
 ];
 
-export function SpeakingExperience() {
+export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactNode }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
@@ -140,14 +140,12 @@ export function SpeakingExperience() {
         </div>
       </div>
 
-      {/* ── Desktop: existing card layout ────────────────────────── */}
-      <div className="hidden lg:grid grid-cols-12 gap-6">
+      {/* ── Desktop: 4-card bento grid (3 steps + contact CTA) ────── */}
+      <div className="hidden lg:grid grid-cols-4 gap-6">
         {STEPS.map((step, i) => (
           <div
             key={step.n}
-            className={`card-hover group rounded-lg border border-border bg-card p-7 sm:p-8 ${
-              i === 0 ? "col-span-7" : "col-span-5"
-            }`}
+            className="card-hover group rounded-lg border border-border bg-card p-7 sm:p-8"
           >
             <span className="inline-grid place-items-center w-12 h-12 rounded-md bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
               {step.n}
@@ -166,6 +164,11 @@ export function SpeakingExperience() {
             </ul>
           </div>
         ))}
+        {contactCard && (
+          <div className="card-hover rounded-lg border border-border bg-card p-7 sm:p-8 flex flex-col">
+            {contactCard}
+          </div>
+        )}
       </div>
     </>
   );

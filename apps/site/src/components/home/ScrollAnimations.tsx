@@ -30,13 +30,13 @@ export function ScrollAnimations() {
     let cancelled = false;
     let gsapInitialized = false;
 
-    // Safety: if GSAP doesn't initialize within 1.5s, force .gsap-ready
+    // Safety: if GSAP doesn't initialize within 1s, force .gsap-ready
     // so the CSS fallback animation kicks in immediately.
     const gsapTimeout = setTimeout(() => {
       if (!gsapInitialized && !cancelled) {
         document.body.classList.add("gsap-ready");
       }
-    }, 1500);
+    }, 1000);
 
     // Force all animated elements visible — used as safety net if GSAP fails
     function forceAllVisible() {
@@ -47,11 +47,13 @@ export function ScrollAnimations() {
       });
     }
 
-    // Double rAF: ensures GSAP runs after React hydration + browser paint
+    // Triple rAF: ensures CSS fallback completes (0.4s) before GSAP takes over
     let raf1 = 0;
     let raf2 = 0;
+    let raf3 = 0;
     raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
+        raf3 = requestAnimationFrame(() => {
         if (cancelled) return;
 
         try {
@@ -156,12 +158,14 @@ export function ScrollAnimations() {
         }
       });
     });
+    });
 
     return () => {
       cancelled = true;
       clearTimeout(gsapTimeout);
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
+      cancelAnimationFrame(raf3);
       document.body.classList.remove("gsap-ready");
       ctx?.revert();
     };

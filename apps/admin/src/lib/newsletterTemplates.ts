@@ -79,96 +79,28 @@ export const defaultNewsletter: NewsletterContent = {
   socials: [],
 };
 
-// ── Pre-built layout: Weekly Digest ─────────────────────
-// Warm yellow branding, blog-centric layout with featured article,
-// curated links, and a quote. Best for regular newsletters.
-export const LAYOUT_WEEKLY_DIGEST: NewsletterContent = {
-  template: "letter",
-  accent: "#ffd51d",
-  preheader: "Your weekly dose of ideas on building, creating, and shipping.",
-  greeting: "Hey there,",
-  intro: "Welcome to another week of The Sagar Lad Letter. I've been deep in the weeds building something exciting — here's what's been on my mind and what I think you'll find useful.",
-  sections: [
-    {
-      heading: "Featured This Week",
-      body: "I've been thinking a lot about what separates products that ship from products that ship *well*. It's not velocity — it's **taste**.\n\nThe best builders I know don't move faster. They move with more clarity. They know what to cut, what to polish, and when to stop.\n\nHere's my framework for building with taste: start with the smallest version that tells the full story. Every pixel, every word, every interaction should earn its place.",
-    },
-    {
-      heading: "__BLOG__",
-      body: JSON.stringify({ title: "The Art of Shipping Clean Code", url: "https://sagarlad.com/blog/shipping-clean-code", excerpt: "Why the best code is the code you never had to write — and how to get there.", image: "" }),
-    },
-    {
-      heading: "__BLOG__",
-      body: JSON.stringify({ title: "From Side Project to Product", url: "https://sagarlad.com/blog/side-project-to-product", excerpt: "Lessons learned turning weekend hacks into real products that people use.", image: "" }),
-    },
-    { heading: "", body: "---" },
-    {
-      heading: "__QUOTE__",
-      body: JSON.stringify({ text: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" }),
-    },
-    { heading: "", body: "\n\n" },
-    {
-      heading: "Quick Links",
-      body: "• **My latest blog post** — on building products that people actually want to use\n→ **Tools I'm using** — the stack I reach for when starting something new\n✓ **A recommendation** — if you're building in public, this is worth your time",
-    },
-  ],
-  quote: null,
-  cta: { label: "Read the full blog", url: "https://sagarlad.com/blog" },
-  signoff: "Cheers,\nSagar",
-  socials: [],
-};
-
 // ── Pre-built layout: Deep Dive ─────────────────────────
-// Bold blue branding, long-form format with columns, code blocks,
-// tables, and visual cards. Best for in-depth technical newsletters.
+// Clean, focused format with columns and long-form content.
 export const LAYOUT_DEEP_DIVE: NewsletterContent = {
   template: "editorial",
   accent: "#0d21a1",
-  preheader: "A deep dive into building systems that scale — from architecture to execution.",
+  preheader: "A deep dive into building systems that scale.",
   greeting: "Hi,",
-  intro: "This edition is a deep dive into something I've been wrestling with at work: how to build systems that don't just work today, but still make sense in six months. Let's get into it.",
+  intro: "This edition is a deep dive into something I've been wrestling with at work. Let's get into it.",
   sections: [
     {
       heading: "The Problem",
-      body: "Every codebase starts clean. The first commit is pure intent — every function does exactly one thing, every module has a clear purpose. Then reality hits.\n\nFeatures get bolted on. Edge cases multiply. The team grows. And one day you look at the code and think: *how did we get here?*\n\nThe answer is always the same: **we optimized for speed instead of clarity**. And the fix isn't a refactor — it's a change in habits.",
+      body: "Every codebase starts clean. Then reality hits.\n\nFeatures get bolted on. Edge cases multiply. And one day you look at the code and think: *how did we get here?*\n\nThe answer is always the same: **we optimized for speed instead of clarity**.",
     },
     {
       heading: "__COL_LEFT__",
-      body: JSON.stringify({ left: "## Principles I Follow\n\n• **Read before you write** — understand the system before adding to it\n• **Small diffs, small PRs** — if a PR is bigger than 300 lines, it's too big\n• **One way to do things** — consistency beats cleverness every time\n• **Delete aggressively** — dead code is a liability, not a safety net", right: "" }),
+      body: JSON.stringify({ left: "• **Read before you write** — understand the system\n• **Small diffs** — if a PR is bigger than 300 lines, it's too big\n• **One way to do things** — consistency beats cleverness\n• **Delete aggressively** — dead code is a liability", right: "", leftTitle: "Principles I Follow", rightTitle: "", bulletStyle: "dot" }),
     },
     {
       heading: "__COL_RIGHT__",
       body: JSON.stringify({ left: "", right: "" }),
     },
     { heading: "", body: "---" },
-    {
-      heading: "By the Numbers",
-      body: "",
-    },
-    {
-      heading: "__TABLE__",
-      body: JSON.stringify({
-        headerRow: true,
-        rows: [
-          ["Metric", "Before", "After", "Change"],
-          ["PR Size (avg)", "520 lines", "180 lines", "-65%"],
-          ["Review Time", "3.2 days", "0.8 days", "-75%"],
-          ["Bug Rate", "12/quarter", "4/quarter", "-67%"],
-          ["Deploy Frequency", "Weekly", "Daily", "+7x"],
-        ],
-      }),
-    },
-    { heading: "", body: "\n\n" },
-    {
-      heading: "__CODE__",
-      body: "// The simplest version of this principle:\n// Every function should be small enough to fit in your head.\n\nfunction processOrder(order: Order): Result {\n  const validated = validateOrder(order);\n  if (!validated.ok) return validated;\n  \n  const priced = calculateTotal(validated.value);\n  const saved = persistOrder(priced);\n  \n  return { ok: true, value: saved };\n}",
-    },
-    { heading: "", body: "\n\n" },
-    {
-      heading: "__QUOTE__",
-      body: JSON.stringify({ text: "First, solve the problem. Then, write the code.", author: "John Johnson" }),
-    },
-    { heading: "", body: "\n\n" },
     {
       heading: "What I'm Reading",
       body: "• *The Pragmatic Programmer* — still the best book on software craft\n• *Staff Engineer* — if you're thinking about the senior+ path\n• *A Philosophy of Software Design* — on managing complexity",
@@ -181,7 +113,7 @@ export const LAYOUT_DEEP_DIVE: NewsletterContent = {
 };
 
 // Layout registry — used by the layout picker in the composer
-export type LayoutId = "blank" | "weekly-digest" | "deep-dive";
+export type LayoutId = "blank" | "deep-dive";
 
 export const PREBUILT_LAYOUTS: {
   id: LayoutId;
@@ -210,17 +142,9 @@ export const PREBUILT_LAYOUTS: {
     },
   },
   {
-    id: "weekly-digest",
-    name: "Weekly Digest",
-    description: "Warm, blog-focused layout with featured article, curated links, and a quote.",
-    accent: "#ffd51d",
-    template: "letter",
-    content: LAYOUT_WEEKLY_DIGEST,
-  },
-  {
     id: "deep-dive",
     name: "Deep Dive",
-    description: "Bold, technical format with columns, tables, code blocks, and long-form content.",
+    description: "Bold, focused format with columns and long-form content.",
     accent: "#0d21a1",
     template: "editorial",
     content: LAYOUT_DEEP_DIVE,
@@ -270,7 +194,7 @@ function listHtml(body: string, ordered: boolean): string {
 }
 
 // Detect section kind from heading/body markers.
-export type SectionKind = "heading" | "text" | "image" | "divider" | "spacer" | "columns" | "list" | "ordered-list" | "code" | "quote" | "social" | "blog" | "video" | "book" | "table";
+export type SectionKind = "heading" | "text" | "image" | "divider" | "spacer" | "columns" | "list" | "code" | "quote" | "social" | "blog" | "video" | "book" | "table" | "link" | "button";
 
 function sectionKind(s: { heading: string; body: string }): SectionKind {
   if (s.body === "---") return "divider";
@@ -282,10 +206,11 @@ function sectionKind(s: { heading: string; body: string }): SectionKind {
   if (s.heading === "__VIDEO__") return "video";
   if (s.heading === "__BOOK__") return "book";
   if (s.heading === "__TABLE__") return "table";
+  if (s.heading === "__LINK__") return "link";
+  if (s.heading === "__BUTTON__") return "button";
   if (s.heading.startsWith("__COL_LEFT__") || s.heading.startsWith("__COL_RIGHT__")) return "columns";
   if (s.body.startsWith("https://") || s.body.startsWith("http://")) return "image";
-  if (s.heading === "" && (s.body.startsWith("- ") || /^[•→✓]\s/.test(s.body))) return "list";
-  if (s.heading === "" && s.body.startsWith("1. ")) return "ordered-list";
+  if (s.heading === "" && (s.body.startsWith("- ") || /^[•→✓]\s/.test(s.body) || /^\d+\.\s/.test(s.body))) return "list";
   return "text";
 }
 
@@ -309,32 +234,38 @@ function sectionHtml(s: { heading: string; body: string }, accent: string, socia
       if (s.heading.startsWith("__COL_RIGHT__")) return "";
       let left = ""; let right = ""; let leftTitle = ""; let rightTitle = ""; let bulletStyle = "dot";
       try { const d = JSON.parse(s.body); left = d.left || ""; right = d.right || ""; leftTitle = d.leftTitle || ""; rightTitle = d.rightTitle || ""; bulletStyle = d.bulletStyle || "dot"; } catch { left = s.body; }
-      const bulletPrefix = { dot: "•", square: "■", number: "", roman: "" }[bulletStyle] ?? "•";
-      const isNumbered = bulletStyle === "number" || bulletStyle === "roman";
-      const listTag = isNumbered ? (bulletStyle === "roman" ? "lower-roman" : "decimal") : (bulletStyle === "square" ? "square" : "disc");
-      function colListHtml(text: string) {
+      function colContentHtml(text: string) {
         if (!text.trim()) return "";
-        const tag = isNumbered ? "ol" : "ul";
+        // Content is HTML from contentEditable — render directly
+        if (text.startsWith("<")) return text;
+        // Fallback: plain text list
+        const bulletPrefix = { dot: "•", square: "■", number: "", roman: "" }[bulletStyle] ?? "•";
+        const isNumbered = bulletStyle === "number" || bulletStyle === "roman";
+        const listTag = isNumbered ? "ol" : "ul";
+        const listStyle = isNumbered ? (bulletStyle === "roman" ? "lower-roman" : "decimal") : (bulletStyle === "square" ? "square" : "disc");
         const items = text.split("\n").filter((l) => l.trim()).map((l) => {
           const t = l.replace(/^[-*•→✓\d.]+\s*/, "").trim();
           return `<li style="margin:0 0 6px 0;line-height:1.6">${formatInline(esc(t))}</li>`;
         }).join("");
-        return `<${tag} style="margin:0;padding-left:20px;list-style-type:${listTag}">${items}</${tag}>`;
+        return `<${listTag} style="margin:0;padding-left:20px;list-style-type:${listStyle}">${items}</${listTag}>`;
       }
       const leftTitleHtml = leftTitle ? `<p style="margin:0 0 10px 0;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${MUTED}">${esc(leftTitle)}</p>` : "";
       const rightTitleHtml = rightTitle ? `<p style="margin:0 0 10px 0;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${MUTED}">${esc(rightTitle)}</p>` : "";
       return `<tr><td style="padding:8px 40px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-        <td width="48%" valign="top" style="font-size:15px;color:#2a2926;line-height:1.65">${leftTitleHtml}${colListHtml(left)}</td>
+        <td width="48%" valign="top" style="font-size:15px;color:#2a2926;line-height:1.65">${leftTitleHtml}${colContentHtml(left)}</td>
         <td width="4%"></td>
-        <td width="48%" valign="top" style="font-size:15px;color:#2a2926;line-height:1.65">${rightTitleHtml}${colListHtml(right)}</td>
+        <td width="48%" valign="top" style="font-size:15px;color:#2a2926;line-height:1.65">${rightTitleHtml}${colContentHtml(right)}</td>
       </tr></table></td></tr>`;
     }
 
-    case "list":
-      return `<tr><td style="padding:8px 40px;font-size:15px;color:#2a2926">${listHtml(s.body, false)}</td></tr>`;
-
-    case "ordered-list":
-      return `<tr><td style="padding:8px 40px;font-size:15px;color:#2a2926">${listHtml(s.body, true)}</td></tr>`;
+    case "list": {
+      // Body is now HTML from contentEditable — render directly if HTML
+      if (s.body.startsWith("<")) {
+        return `<tr><td style="padding:8px 40px;font-size:15px;color:#2a2926;line-height:1.65">${s.body}</td></tr>`;
+      }
+      const isOrdered = /^\d+\.\s/.test(s.body.split("\n").find((l) => l.trim()) ?? "");
+      return `<tr><td style="padding:8px 40px;font-size:15px;color:#2a2926">${listHtml(s.body, isOrdered)}</td></tr>`;
+    }
 
     case "code": {
       let html = s.body;
@@ -425,12 +356,26 @@ function sectionHtml(s: { heading: string; body: string }, accent: string, socia
       return `<tr><td style="padding:8px 40px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8e6e1;border-radius:8px;overflow:hidden;border-collapse:collapse">${rows}</table></td></tr>`;
     }
 
+    case "link": {
+      let d = { text: "", url: "" };
+      try { d = JSON.parse(s.body); } catch { d = { text: s.heading || s.body, url: s.body }; }
+      return `<tr><td style="padding:8px 40px"><a href="${esc(d.url)}" style="color:${accent};text-decoration:underline;text-underline-offset:2px;font-weight:600;font-size:15px">${esc(d.text || d.url)}</a></td></tr>`;
+    }
+
+    case "button": {
+      let d = { label: "", url: "" };
+      try { d = JSON.parse(s.body); } catch { d = { label: s.heading || "Click here", url: s.body }; }
+      return `<tr><td align="center" style="padding:12px 40px"><a href="${esc(d.url)}" style="background:${accent};color:${accentForeground(accent)};text-decoration:none;font-weight:700;font-size:15px;padding:13px 34px;border-radius:999px;display:inline-block">${esc(d.label || "Click here")}</a></td></tr>`;
+    }
+
     case "heading":
     case "text":
     default: {
       if (!s.heading && !s.body) return "";
       const headingHtml = s.heading ? `<p style="margin:0 0 10px 0;font-family:Georgia,'Times New Roman',serif;font-size:21px;font-weight:700;color:${INK}">${esc(s.heading)}</p><table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="height:3px;width:42px;background:${accent};font-size:0;line-height:0">&nbsp;</td></tr></table>` : "";
-      return `<tr><td style="padding:8px 40px;font-size:15px;color:#2a2926">${headingHtml}${paras(s.body)}</td></tr>`;
+      // Body is now HTML from contentEditable — render directly
+      const bodyHtml = s.body.startsWith("<") ? s.body : paras(s.body);
+      return `<tr><td style="padding:8px 40px;font-size:15px;color:#2a2926;line-height:1.65">${headingHtml}${bodyHtml}</td></tr>`;
     }
   }
 }

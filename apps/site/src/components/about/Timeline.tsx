@@ -10,6 +10,8 @@ import {
   Mic,
   PenTool,
   BookOpen,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 type Node = {
@@ -99,223 +101,312 @@ const nodes: Node[] = [
   },
 ];
 
-/* ── Geometry ── */
-const TRACK_W = 1200;
-const PAD = 110;
-const WAVE_AMP = 55;
-const CARD_W = 300;
-const CARD_IMG_H = 160;
-const CARD_GAP = 20;
-
-/* Wave center drifts upward */
-const WAVE_CY_L = 220;
-const WAVE_CY_R = 140;
-const waveCenter = (i: number) => WAVE_CY_L + (i / (nodes.length - 1)) * (WAVE_CY_R - WAVE_CY_L);
-
-/* Organic dot placement: 0↓ 1↑ 2↓ 3↑ 4↑ 5↓ 6↑ */
-const dotAbove = [false, true, false, true, true, false, true];
-
-const dotX = (i: number) => PAD + (i / (nodes.length - 1)) * (TRACK_W - PAD * 2);
-const dotY = (i: number) => waveCenter(i) + (dotAbove[i] ? -WAVE_AMP : WAVE_AMP);
-const cardTop = (i: number) => dotY(i) + CARD_GAP;
-
-/* Max card bottom for dynamic section height — estimate ~290px per card */
-const CARD_H_EST = CARD_IMG_H + 140;
-const MAX_CARD_BOTTOM = Math.max(...nodes.map((_, i) => cardTop(i) + CARD_H_EST));
-
-/* ── Smooth wave path ── */
-function buildWave(): string {
-  const pts = nodes.map((_, i) => ({ x: dotX(i), y: dotY(i) }));
-  let d = `M ${pts[0].x} ${pts[0].y}`;
-  for (let i = 1; i < pts.length; i++) {
-    const p = pts[i - 1];
-    const c = pts[i];
-    const cx1 = p.x + (c.x - p.x) * 0.4;
-    const cx2 = p.x + (c.x - p.x) * 0.6;
-    d += ` C ${cx1} ${p.y}, ${cx2} ${c.y}, ${c.x} ${c.y}`;
-  }
-  return d;
-}
-
-function buildProgress(upTo: number): string {
-  const pts = nodes.map((_, i) => ({ x: dotX(i), y: dotY(i) }));
-  let d = `M ${pts[0].x} ${pts[0].y}`;
-  for (let j = 1; j <= upTo; j++) {
-    const p = pts[j - 1];
-    const c = pts[j];
-    const cx1 = p.x + (c.x - p.x) * 0.4;
-    const cx2 = p.x + (c.x - p.x) * 0.6;
-    d += ` C ${cx1} ${p.y}, ${cx2} ${c.y}, ${c.x} ${c.y}`;
-  }
-  return d;
-}
-
 export function Timeline() {
   const sectionRef = useRef<HTMLElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [activeCard, setActiveCard] = useState<number | null>(null);
-  const [pinnedCard, setPinnedCard] = useState<number | null>(0);
-  const [flipping, setFlipping] = useState<number | null>(null);
+  const trackScrollRef = useRef<HTMLDivElement>(null);
+  const dotRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const displayCard = pinnedCard ?? activeCard;
+  const [activeIdx, setActiveIdx] = useState<number>(0);
+  const [lineCoords, setLineCoords] = useState<{
+    startX: number;
+    totalW: number;
+    activeW: number;
+    topY: number;
+  }>({
+    startX: 0,
+    totalW: 0,
+    activeW: 0,
+    topY: 44,
+  });
 
-  const hoverIn = useCallback((i: number) => setActiveCard(i), []);
-  const hoverOut = useCallback(() => setActiveCard(null), []);
+  // Calculate pixel-perfect alignment of the background line and active progressive line
+  const updateLinePositions = useCallback(() => {
+    const dots = dotRefs.current;
+    const firstBtn = dots[0];
+    const lastBtn = dots[nodes.length - 1];
+    const currentBtn = dots[activeIdx];
+    if (!firstBtn || !lastBtn || !currentBtn) return;
 
-  const handleClick = useCallback((i: number) => {
-    setPinnedCard((prev) => {
-      const next = prev === i ? null : i;
-      if (next !== null) {
-        setActiveCard(next);
-        setFlipping(next);
-        setTimeout(() => setFlipping(null), 600);
-        // Center the clicked dot in the scroll container
-        if (scrollRef.current) {
-          const container = scrollRef.current;
-          const buttons = container.querySelectorAll("button");
-          const btn = buttons[i];
-          if (btn) {
-            const scrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
-            container.scrollTo({ left: scrollLeft, behavior: "smooth" });
-          }
-        }
-      } else {
-        setActiveCard(null);
-      }
-      return next;
+    // Use exact geometric offsetLeft + offsetWidth/2 relative to the track parent
+    const firstCenter = firstBtn.offsetLeft + firstBtn.offsetWidth / 2;
+    const lastCenter = lastBtn.offsetLeft + lastBtn.offsetWidth / 2;
+    const currentCenter = currentBtn.offsetLeft + currentBtn.offsetWidth / 2;
+
+    const totalW = Math.max(0, lastCenter - firstCenter);
+    const activeW = Math.max(0, currentCenter - firstCenter);
+
+    setLineCoords({
+      startX: firstCenter,
+      totalW,
+      activeW,
+      topY: 44,
     });
+  }, [activeIdx]);
+
+  // Center selected dot in horizontal scroll container
+  const centerDotInView = useCallback((index: number) => {
+    const dot = dotRefs.current[index];
+    const container = trackScrollRef.current;
+    if (dot && container) {
+      const target = dot.offsetLeft - container.offsetWidth / 2 + dot.offsetWidth / 2;
+      container.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
+    }
   }, []);
 
+  const selectMilestone = useCallback(
+    (index: number) => {
+      setActiveIdx(index);
+      centerDotInView(index);
+    },
+    [centerDotInView]
+  );
+
+  const handlePrev = useCallback(() => {
+    setActiveIdx((prev) => {
+      const next = prev > 0 ? prev - 1 : nodes.length - 1;
+      centerDotInView(next);
+      return next;
+    });
+  }, [centerDotInView]);
+
+  const handleNext = useCallback(() => {
+    setActiveIdx((prev) => {
+      const next = prev < nodes.length - 1 ? prev + 1 : 0;
+      centerDotInView(next);
+      return next;
+    });
+  }, [centerDotInView]);
+
+  // Update line positions on mount, active index change, and resize
+  useEffect(() => {
+    updateLinePositions();
+    const handleResize = () => updateLinePositions();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [updateLinePositions]);
+
+  // Keyboard navigation (Left / Right arrow keys)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setPinnedCard(null); setActiveCard(null); }
+      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "ArrowRight") handleNext();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [handlePrev, handleNext]);
 
-  /* Flip first card after GSAP entrance finishes (~2.2s) */
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setFlipping(0);
-      setTimeout(() => setFlipping(null), 600);
-    }, 2200);
-    return () => clearTimeout(t);
-  }, []);
-
-  /* GSAP */
+  // GSAP Entrance Scroll Animation
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const ctx = gsap.context(() => {
-      gsap.fromTo("[data-tl-head]",
-        { opacity: 0, y: 30, filter: "blur(3px)" },
-        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 82%" } }
+      gsap.fromTo(
+        "[data-tl-header]",
+        { opacity: 0, y: 32, filter: "blur(4px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 82%" },
+        }
       );
-      gsap.fromTo("[data-tl-track]",
-        { opacity: 0, x: 80 },
-        { opacity: 1, x: 0, duration: 1, ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 75%", toggleActions: "play reverse play reset" } }
+
+      gsap.fromTo(
+        "[data-tl-rail]",
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: "power3.out",
+          delay: 0.15,
+          scrollTrigger: { trigger: el, start: "top 80%" },
+        }
       );
-      gsap.fromTo("[data-tl-dot]",
-        { scale: 0 },
-        { scale: 1, duration: 0.35, stagger: 0.07, ease: "back.out(3)", delay: 0.3,
-          scrollTrigger: { trigger: el, start: "top 75%", toggleActions: "play reverse play reset" } }
+
+      gsap.fromTo(
+        "[data-tl-dot-node]",
+        { scale: 0, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 0.45,
+          stagger: 0.08,
+          ease: "back.out(2)",
+          delay: 0.25,
+          scrollTrigger: { trigger: el, start: "top 80%" },
+        }
       );
-      gsap.fromTo("[data-tl-wave]",
-        { strokeDashoffset: 2000 },
-        { strokeDashoffset: 0, duration: 1.8, ease: "power2.inOut", delay: 0.1,
-          scrollTrigger: { trigger: el, start: "top 75%", toggleActions: "play reverse play reset" } }
+
+      gsap.fromTo(
+        "[data-tl-card]",
+        { opacity: 0, y: 30, scale: 0.98 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          delay: 0.35,
+          scrollTrigger: { trigger: el, start: "top 80%" },
+        }
       );
     }, el);
+
     return () => ctx.revert();
   }, []);
 
-  const wavePath = buildWave();
+  const activeNode = nodes[activeIdx];
+  const Icon = activeNode.icon;
 
   return (
     <section
       ref={sectionRef}
-      className="relative py-12 md:py-20 border-b border-border bg-background"
+      className="relative py-16 md:py-24 border-b border-border bg-background overflow-hidden"
       aria-label="Journey timeline"
     >
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6 md:mb-10">
-        <div className="text-center" data-tl-head>
-          <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.2em] text-brand border border-brand/20 rounded-full px-4 py-1.5 bg-transparent">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        {/* ── Section Header ── */}
+        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14" data-tl-header>
+          <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
             Where it started
           </span>
-          <h2 className="mt-4 font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight">
+          <h2 className="mt-3 font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.15]">
             Key moments along the way
           </h2>
-          <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-sm sm:text-base">
-            <span className="hidden md:inline">Hover or tap any dot to read the chapter behind it.</span>
-            <span className="md:hidden">Tap any dot to read the chapter.</span>
+          <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
+            Click or tap any milestone to explore each chapter of the journey.
           </p>
         </div>
-      </div>
 
-      {/* ── Mobile: horizontal scrollable timeline ── */}
-      <div className="md:hidden">
-        {/* Scrollable timeline track */}
-        <div
-          ref={scrollRef}
-          className="overflow-x-auto scrollbar-hide"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          <div className="relative min-w-max px-8 py-4">
-            {/* Background line */}
-            <div className="absolute top-1/2 left-8 right-8 h-[2px] -translate-y-1/2 bg-brand/10" />
-            {/* Progressive fill line */}
-            <div
-              className="absolute top-1/2 left-8 h-[2px] -translate-y-1/2 bg-brand transition-all duration-500 ease-out"
-              style={{
-                width: displayCard !== null
-                  ? `calc(${(displayCard / (nodes.length - 1)) * 100}% - 32px)`
-                  : "0%",
-              }}
-            />
+        {/* ── Unified Interactive Timeline Rail ── */}
+        <div data-tl-rail className="relative mb-8 sm:mb-12">
+          {/* Horizontally Scrollable Rail */}
+          <div
+            ref={trackScrollRef}
+            className="overflow-x-auto no-scrollbar py-6 -mx-4 px-4 sm:mx-0 sm:px-0"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            <div className="relative min-w-max flex items-center justify-between gap-8 sm:gap-12 md:gap-16 px-6">
+              {/* 1. Background Dotted Track Line (crossing the points) */}
+              <svg
+                className="absolute pointer-events-none"
+                style={{
+                  left: `${lineCoords.startX}px`,
+                  width: `${lineCoords.totalW}px`,
+                  top: `${lineCoords.topY - 3}px`,
+                  height: "6px",
+                  overflow: "visible",
+                }}
+              >
+                <line
+                  x1="0"
+                  y1="3"
+                  x2={lineCoords.totalW}
+                  y2="3"
+                  stroke="currentColor"
+                  className="text-border/80"
+                  strokeWidth="2"
+                  strokeDasharray="4 6"
+                  strokeLinecap="round"
+                />
+                {/* 2. Yellow Progressive Dotted Animated Line */}
+                <line
+                  x1="0"
+                  y1="3"
+                  x2={lineCoords.activeW}
+                  y2="3"
+                  stroke="#ffd51d"
+                  strokeWidth="3"
+                  strokeDasharray="6 6"
+                  strokeLinecap="round"
+                  style={{
+                    transition: "x2 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                    animation: "tlDottedMove 1.2s linear infinite",
+                    filter: "drop-shadow(0 0 4px rgba(255, 213, 29, 0.6))",
+                  }}
+                />
+              </svg>
 
-            {/* Dots with years */}
-            <div className="flex items-center" style={{ gap: "60px" }}>
+              {/* Milestone Dots (Points in Blue Colour) */}
               {nodes.map((n, i) => {
-                const isOpen = displayCard === i;
-                const isPast = displayCard !== null && i < displayCard;
+                const isActive = activeIdx === i;
+                const isPast = i < activeIdx;
+
                 return (
                   <button
-                    key={`mobile-dot-${n.title}`}
-                    onClick={() => handleClick(i)}
-                    className="relative flex flex-col items-center flex-shrink-0 group"
-                    aria-label={`${n.title} — ${n.year}`}
+                    key={`timeline-node-${n.title}`}
+                    ref={(el) => {
+                      dotRefs.current[i] = el;
+                    }}
+                    type="button"
+                    onClick={() => selectMilestone(i)}
+                    className="relative flex flex-col items-center group cursor-pointer focus:outline-none shrink-0"
+                    aria-label={`${n.title} (${n.year})`}
                   >
-                    {/* Year label above */}
-                    <span
-                      className="text-[10px] font-bold uppercase tracking-wider mb-3 transition-colors duration-300 whitespace-nowrap"
-                      style={{ color: isOpen ? "var(--brand)" : isPast ? "var(--foreground)" : "hsl(var(--muted-foreground))" }}
-                    >
-                      {n.year}
-                    </span>
-                    {/* Dot */}
+                    {/* Row 1: Year Label Above */}
+                    <div className="h-6 flex items-center justify-center mb-1">
+                      <span
+                        className={`text-xs font-bold tracking-wider uppercase transition-colors duration-300 ${
+                          isActive
+                            ? "text-[#0d21a1] font-extrabold scale-105"
+                            : isPast
+                            ? "text-foreground"
+                            : "text-muted-foreground/75 group-hover:text-foreground"
+                        }`}
+                      >
+                        {n.year}
+                      </span>
+                    </div>
+
+                    {/* Row 2: Dot Node Container (Aligned with Line) */}
                     <div
-                      className="rounded-full border-[2.5px] transition-all duration-300 ease-out"
-                      style={{
-                        width: isOpen ? 20 : 14,
-                        height: isOpen ? 20 : 14,
-                        backgroundColor: isOpen ? "var(--brand)" : isPast ? "var(--brand)" : "var(--background)",
-                        borderColor: "var(--brand)",
-                        boxShadow: isOpen ? "0 0 12px rgba(13,33,161,0.35)" : "0 1px 4px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                    {/* Title below */}
-                    <span
-                      className="mt-2 text-[8px] font-semibold uppercase tracking-wider transition-colors duration-300 whitespace-nowrap max-w-[70px] text-center leading-tight"
-                      style={{ color: isOpen ? "var(--foreground)" : "hsl(var(--muted-foreground))" }}
+                      data-tl-dot-node
+                      className="relative w-8 h-8 flex items-center justify-center"
                     >
-                      {n.title}
-                    </span>
+                      {/* Active Outer Glow Pulse */}
+                      {isActive && (
+                        <div className="absolute inset-0 rounded-full bg-[#0d21a1]/20 animate-ping pointer-events-none" />
+                      )}
+
+                      {/* Dot Button (All in Blue Colour #0d21a1) */}
+                      <div
+                        data-dot-circle
+                        className={`rounded-full border-[2.5px] transition-all duration-300 ease-out flex items-center justify-center ${
+                          isActive
+                            ? "w-6 h-6 bg-[#0d21a1] border-white dark:border-background shadow-md shadow-[#0d21a1]/40 scale-110"
+                            : isPast
+                            ? "w-4 h-4 bg-[#0d21a1] border-[#0d21a1]"
+                            : "w-4 h-4 bg-white dark:bg-[#0d21a1]/20 border-[#0d21a1] group-hover:scale-110"
+                        }`}
+                      >
+                        {isActive && (
+                          <div className="w-2 h-2 rounded-full bg-[#ffd51d]" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Row 3: Keyword & Title Below */}
+                    <div className="mt-2 flex flex-col items-center text-center max-w-[100px]">
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-200 ${
+                          isActive ? "text-[#0d21a1]" : "text-muted-foreground"
+                        }`}
+                      >
+                        {n.word}
+                      </span>
+                      <span
+                        className={`text-xs font-semibold mt-0.5 line-clamp-1 transition-colors duration-200 ${
+                          isActive ? "text-foreground" : "text-muted-foreground/80"
+                        }`}
+                      >
+                        {n.title}
+                      </span>
+                    </div>
                   </button>
                 );
               })}
@@ -323,273 +414,116 @@ export function Timeline() {
           </div>
         </div>
 
-        {/* Card below timeline with animation */}
-        <div className="px-4 mt-4">
-          {displayCard !== null && (() => {
-            const n = nodes[displayCard];
-            const Icon = n.icon;
-            return (
-              <div
-                key={`mobile-card-${n.title}`}
-                className="rounded-xl border border-border bg-card shadow-lg overflow-hidden mx-auto max-w-sm"
-                style={{
-                  animation: "tlCardIn 0.4s ease-out",
-                }}
-              >
-                {/* Accent nub */}
-                <div className="absolute left-1/2 -translate-x-1/2 h-[3px] rounded-full bg-brand" style={{ width: "32px", top: "-1px" }} />
-
-                {/* Image */}
-                {n.image && (
-                  <div className="relative w-full overflow-hidden" style={{ height: "180px" }}>
-                    <Image
-                      src={n.image}
-                      alt={n.title}
-                      width={400}
-                      height={180}
-                      className="w-full h-full object-cover"
-                      priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-                    <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 border border-white/35 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm bg-white/10">
-                      <Icon className="w-3 h-3" />
-                      {n.tag}
-                    </span>
+        {/* ── Premium Milestone Showcase Card (Very Light Shadow, No Top Line, No Sparkles) ── */}
+        <div data-tl-card className="relative">
+          <div className="relative rounded-3xl border border-border/70 bg-card/60 backdrop-blur-md shadow-[0_2px_14px_rgba(0,0,0,0.04)] overflow-hidden transition-all duration-300">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
+              {/* Left Column: Image with Visual Badges */}
+              <div className="lg:col-span-5 relative min-h-[240px] sm:min-h-[280px] lg:min-h-[380px] bg-muted/40 overflow-hidden">
+                {activeNode.image ? (
+                  <Image
+                    key={`img-${activeNode.title}`}
+                    src={activeNode.image}
+                    alt={activeNode.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 42vw"
+                    className="object-cover transition-transform duration-700 hover:scale-105"
+                    priority
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-muted">
+                    <Icon className="w-16 h-16 text-muted-foreground/40" />
                   </div>
                 )}
 
-                {/* Text */}
-                <div className="p-4">
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <span className="text-[10px] font-bold text-brand/60 uppercase tracking-wider">{n.word}</span>
-                    <span className="w-0.5 h-0.5 rounded-full bg-brand/30" />
-                    <span className="text-[10px] font-semibold text-accent-strong uppercase tracking-wider">{n.year}</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
+
+                {/* Tag & Year Floating Badges */}
+                <div className="absolute top-4 left-4 flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/60 text-white backdrop-blur-md border border-white/20">
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{activeNode.tag}</span>
+                  </span>
+                </div>
+
+                <div className="absolute bottom-4 left-4 right-4 text-white">
+                  <div className="text-xs font-bold uppercase tracking-wider text-white/80">
+                    {activeNode.word}
                   </div>
-                  <h3 className="font-display text-base font-bold text-foreground leading-snug">{n.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{n.description}</p>
-                  {n.href && (
-                    <Link href={n.href} className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline">
-                      <BookOpen className="w-3.5 h-3.5" />{n.hrefLabel}
+                  <div className="font-display text-xl sm:text-2xl font-bold leading-tight">
+                    {activeNode.title}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Narrative Story & Chapter Details */}
+              <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-4 flex-wrap pb-3 border-b border-border/60">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-brand/10 text-[#0d21a1] text-xs font-bold uppercase tracking-wider">
+                      <span>{activeNode.year}</span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-display text-2xl sm:text-3xl font-bold text-foreground leading-snug">
+                    {activeNode.title}: {activeNode.word}
+                  </h3>
+
+                  <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+                    {activeNode.description}
+                  </p>
+                </div>
+
+                {/* Bottom Action / Link & Arrows on Card */}
+                <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-border/60">
+                  {activeNode.href ? (
+                    <Link
+                      href={activeNode.href}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-white text-xs sm:text-sm font-bold shadow-sm hover:bg-brand/90 transition-colors"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      <span>{activeNode.hrefLabel || "Learn More"}</span>
                     </Link>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes tlCardIn {
-          0% { opacity: 0; transform: translateY(12px) scale(0.97); }
-          100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}} />
-
-      {/* ── Desktop: horizontal scroll track with SVG wave ── */}
-      <div
-        data-tl-track
-        className="hidden md:block overflow-x-auto overflow-y-hidden scrollbar-hide px-4 sm:px-6 pb-2"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        <div
-          className="relative mx-auto"
-          style={{ width: `${TRACK_W}px`, height: `${MAX_CARD_BOTTOM + 20}px`, minWidth: "680px" }}
-        >
-          {/* SVG wave */}
-          <svg
-            className="absolute inset-0 pointer-events-none"
-            width={TRACK_W}
-            height={MAX_CARD_BOTTOM + 20}
-            viewBox={`0 0 ${TRACK_W} ${MAX_CARD_BOTTOM + 20}`}
-            fill="none"
-          >
-            <path d={wavePath} stroke="rgba(13,33,161,0.04)" strokeWidth="10" strokeLinecap="round" fill="none" />
-            <path data-tl-wave d={wavePath} stroke="rgba(13,33,161,0.15)" strokeWidth="2" strokeLinecap="round" fill="none" strokeDasharray="2000" strokeDashoffset="2000" />
-            <path d={wavePath} stroke="rgba(13,33,161,0.2)" strokeWidth="1.5" strokeLinecap="round" fill="none" strokeDasharray="4 8" className="animate-wave-dots" />
-            {displayCard !== null && (
-              <path d={buildProgress(displayCard)} stroke="var(--brand)" strokeWidth="2.5" strokeLinecap="round" fill="none" style={{ transition: "all 0.4s ease-out" }} />
-            )}
-          </svg>
-
-          {/* Dot buttons */}
-          {nodes.map((n, i) => {
-            const x = dotX(i);
-            const y = dotY(i);
-            const isOpen = displayCard === i;
-            const isTop = dotAbove[i];
-
-            return (
-              <div
-                key={`dot-${n.title}`}
-                style={{ position: "absolute", left: `${x}px`, top: `${y}px`, transform: "translate(-50%, -50%)", zIndex: 20 }}
-              >
-                {/* Pulse */}
-                {isOpen && (
-                  <div
-                    className="absolute rounded-full bg-brand/10 pointer-events-none"
-                    style={{ width: 40, height: 40, left: -20, top: -20, animation: "tlPulse 2s ease-in-out infinite" }}
-                  />
-                )}
-
-                {/* Dot button */}
-                <button
-                  data-tl-dot
-                  onMouseEnter={() => hoverIn(i)}
-                  onMouseLeave={hoverOut}
-                  onClick={() => handleClick(i)}
-                  className="relative block rounded-full border-[2.5px] transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
-                  style={{
-                    width: isOpen ? 22 : 16,
-                    height: isOpen ? 22 : 16,
-                    backgroundColor: isOpen ? "var(--brand)" : "var(--background)",
-                    borderColor: "var(--brand)",
-                    boxShadow: isOpen ? "0 0 10px rgba(13,33,161,0.3)" : "0 1px 4px rgba(0,0,0,0.1)",
-                    cursor: "pointer",
-                  }}
-                  aria-label={`${n.title} — ${n.year}`}
-                />
-
-                {/* Word label — opposite side from card */}
-                <span
-                  className="absolute whitespace-nowrap pointer-events-none"
-                  style={{
-                    fontSize: "10px",
-                    fontWeight: 800,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    color: isOpen ? "var(--brand)" : "hsl(var(--muted-foreground))",
-                    transition: "color 0.3s ease-out",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    ...(isTop ? { top: "auto", bottom: -24 } : { bottom: "auto", top: -24 }),
-                  }}
-                >
-                  {n.word}
-                </span>
-              </div>
-            );
-          })}
-
-          {/* Connector lines: dot → card */}
-          {nodes.map((n, i) => {
-            const x = dotX(i);
-            const dy = dotY(i);
-            const ct = cardTop(i);
-            const isOpen = displayCard === i;
-            const connTop = dy + 9;
-            const connBottom = ct;
-            const connH = Math.max(0, connBottom - connTop);
-
-            return (
-              <div
-                key={`conn-${n.title}`}
-                aria-hidden="true"
-                className="absolute"
-                style={{
-                  left: `${x}px`,
-                  top: `${connTop}px`,
-                  width: "1px",
-                  height: `${connH}px`,
-                  transform: "translateX(-50%)",
-                  background: isOpen
-                    ? "repeating-linear-gradient(to bottom, var(--brand) 0, var(--brand) 3px, transparent 3px, transparent 7px)"
-                    : "repeating-linear-gradient(to bottom, rgba(13,33,161,0.1) 0, rgba(13,33,161,0.1) 3px, transparent 3px, transparent 7px)",
-                  transition: "background 0.3s ease-out",
-                }}
-              />
-            );
-          })}
-
-          {/* Cards */}
-          {nodes.map((n, i) => {
-            const x = dotX(i);
-            const isOpen = displayCard === i;
-            const Icon = n.icon;
-
-            return (
-              <div
-                key={`card-${n.title}`}
-                className="absolute"
-                style={{
-                  left: `${x - CARD_W / 2}px`,
-                  top: `${cardTop(i)}px`,
-                  width: `${CARD_W}px`,
-                  opacity: isOpen ? 1 : 0,
-                  pointerEvents: isOpen ? "auto" : "none",
-                  transition: "opacity 0.3s ease-out",
-                  zIndex: isOpen ? 30 : 1,
-                  perspective: "800px",
-                }}
-              >
-                <div
-                  className="rounded-xl border border-border bg-card shadow-lg overflow-hidden"
-                  style={{
-                    transformStyle: "preserve-3d",
-                    animation: isOpen && flipping === i ? "tlFlip3D 0.6s ease-out" : isOpen ? "tlFadeIn 0.3s ease-out" : "none",
-                  }}
-                >
-                  {/* Accent nub */}
-                  <div
-                    className="absolute left-1/2 -translate-x-1/2 h-[3px] rounded-full bg-brand transition-all duration-300"
-                    style={{ width: isOpen ? "32px" : "0px", top: "-1px" }}
-                  />
-
-                  {/* Image — explicit width/height for Next.js */}
-                  {n.image && (
-                    <div className="relative w-full overflow-hidden" style={{ height: `${CARD_IMG_H}px` }}>
-                      <Image
-                        src={n.image}
-                        alt={n.title}
-                        width={CARD_W}
-                        height={CARD_IMG_H}
-                        className="w-full h-full object-cover"
-                        priority={isOpen}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-                      <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 border border-white/35 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm bg-white/10">
-                        <Icon className="w-3 h-3" />
-                        {n.tag}
-                      </span>
-                    </div>
+                  ) : (
+                    <div className="hidden lg:block" />
                   )}
 
-                  {/* Text */}
-                  <div className="p-4">
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      <span className="text-[10px] font-bold text-brand/60 uppercase tracking-wider">{n.year}</span>
-                      <span className="w-0.5 h-0.5 rounded-full bg-brand/30" />
-                      <span className="text-[10px] font-semibold text-accent-strong uppercase tracking-wider">{n.word}</span>
-                    </div>
-                    <h3 className="font-display text-sm font-bold text-foreground leading-snug">{n.title}</h3>
-                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed line-clamp-3">{n.description}</p>
-                    {n.href && (
-                      <Link href={n.href} className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-brand hover:underline">
-                        <BookOpen className="w-3 h-3" />{n.hrefLabel}
-                      </Link>
-                    )}
+                  {/* Previous and Next Navigation Arrows on Card (Mobile & Tablet: Prev on left, Next on right) */}
+                  <div className="w-full lg:w-auto flex items-center justify-between lg:justify-end gap-3 lg:ml-auto">
+                    <button
+                      type="button"
+                      onClick={handlePrev}
+                      aria-label="Previous chapter"
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-border bg-card/80 text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer min-w-[100px]"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      <span>Previous</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      aria-label="Next chapter"
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-border bg-card/80 text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer min-w-[100px]"
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          </div>
         </div>
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes tlFlip3D {
-          0%   { opacity:0; transform: rotateX(-90deg) scale(0.9); }
-          50%  { opacity:1; transform: rotateX(8deg) scale(1.02); }
-          70%  { transform: rotateX(-3deg) scale(0.99); }
-          100% { transform: rotateX(0deg) scale(1); }
-        }
-        @keyframes tlFadeIn {
-          0%   { opacity:0; transform: translateY(8px) scale(0.97); }
-          100% { opacity:1; transform: translateY(0) scale(1); }
-        }
-        @keyframes tlPulse {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50%      { opacity: 0.15; transform: scale(1.4); }
+        @keyframes tlDottedMove {
+          from {
+            stroke-dashoffset: 24;
+          }
+          to {
+            stroke-dashoffset: 0;
+          }
         }
       `}} />
     </section>

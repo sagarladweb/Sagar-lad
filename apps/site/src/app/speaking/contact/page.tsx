@@ -126,12 +126,12 @@ export default function SpeakingContactPage() {
             <div className="relative mx-auto w-full max-w-[380px]">
               <div aria-hidden="true" className="absolute left-1/2 top-1/2 aspect-square w-[75%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-brand-light/45 via-brand-light/20 to-transparent blur-2xl" />
               <Image
-                src="/images/sagar-author.webp"
+                src="/images/profile/about.webp"
                 alt="Sagar Lad"
                 width={477}
                 height={523}
                 priority
-                className="relative z-10 h-auto w-full drop-shadow-2xl"
+                className="relative z-10 h-auto w-full rounded-3xl drop-shadow-2xl"
               />
             </div>
           </div>
@@ -142,7 +142,7 @@ export default function SpeakingContactPage() {
               Speaking &amp; Keynotes
             </span>
             <h1 className="mt-4 font-display text-4xl font-bold leading-tight sm:text-5xl tracking-tight">
-              Book Sagar for your next <span className="text-brand">event</span>
+              Book Sagar for your next <span className="text-accent">event</span>
             </h1>
             <p className="mt-4 max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed">
               Story-driven keynotes, interactive workshops, and executive panels on AI leadership, financial freedom, and career momentum.

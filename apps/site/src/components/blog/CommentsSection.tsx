@@ -11,10 +11,13 @@ type Comment = {
   createdAt: string;
 };
 
+const INITIAL_COUNT = 4;
+
 export function CommentsSection({ postSlug }: { postSlug: string }) {
   const [comments, setComments] = useState<Comment[] | null>(null);
   const [reload, setReload] = useState(0);
   const [error, setError] = useState("");
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -31,7 +34,15 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
     };
   }, [postSlug, reload]);
 
-  const afterPosted = useCallback(() => setReload((n) => n + 1), []);
+  const afterPosted = useCallback(() => {
+    setReload((n) => n + 1);
+    setShowAll(true);
+  }, []);
+
+  const visibleComments = showAll
+    ? comments
+    : comments?.slice(0, INITIAL_COUNT);
+  const hiddenCount = comments ? comments.length - INITIAL_COUNT : 0;
 
   return (
     <section className="mt-14" aria-label="Comments section">
@@ -63,7 +74,7 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
                 </p>
               </div>
             )}
-            {comments.map((c) => {
+            {visibleComments?.map((c) => {
               const initial = (c.name || "A").trim().charAt(0).toUpperCase();
               return (
                 <div
@@ -88,6 +99,15 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
                 </div>
               );
             })}
+            {!showAll && hiddenCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowAll(true)}
+                className="w-full rounded-2xl border border-dashed border-border bg-card/40 py-3 text-sm font-semibold text-muted-foreground hover:text-foreground hover:border-brand/30 hover:bg-brand/5 transition-all"
+              >
+                View all {comments.length} comments
+              </button>
+            )}
           </>
         )}
       </div>

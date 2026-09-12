@@ -376,8 +376,11 @@ export function MindUpPillars() {
             One Unshakable Life.
           </h2>
           <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-[#64748b] sm:text-lg">
-            Master your mind and build a life that stays strong no matter what
-            comes your way.
+            Your life is more than work and achievement. Mindset, health,
+            relationships, skills, potential, and progress — all matter.
+          </p>
+          <p className="mt-3 text-sm font-semibold text-[#94a3b8]">
+            12 questions · 3 minutes · One powerful snapshot
           </p>
           <p className="mt-3 text-sm text-[#94a3b8]">By: Sagar Lad</p>
         </div>
@@ -402,15 +405,16 @@ export function MindUpPillars() {
               ) : (
                 <>
                   <h2 className="font-display text-4xl xl:text-[3.25rem] font-bold leading-[1.05] tracking-tight text-[#1e293b]">
-                    Six Pillars.
-                    <br />
-                    One Unshakable Life.
+                    How MIND UP Are You?
                   </h2>
                   <p className="mt-5 max-w-md text-base leading-relaxed text-[#64748b]">
-                    Master your mind and build a life that stays strong no
-                    matter what comes your way.
+                    Your life is made up of more than work and achievement.
+                    Mindset, health, relationships, skills, potential, and
+                    progress all matter.
                   </p>
-                  <p className="mt-3 text-sm text-[#94a3b8]">By: Sagar Lad</p>
+                  <p className="mt-3 text-sm font-semibold text-[#94a3b8]">
+                    12 questions · 3 minutes · One powerful snapshot
+                  </p>
                 </>
               )}
             </div>

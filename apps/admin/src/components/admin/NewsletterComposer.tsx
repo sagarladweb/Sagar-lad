@@ -5,9 +5,9 @@ import {
   Send, Loader2, Trash2, Save, MailCheck, X, ArrowLeft,
   PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
   Plus, GripVertical,
-  Type, Heading2, AlignLeft, List, ListOrdered, ImageIcon,
+  Type, Heading2, AlignLeft, List, ImageIcon,
   Code, Minus, Columns2, MousePointerClick, Quote, Share2,
-  ChevronUp, ChevronDown, Pencil, Table2,
+  ChevronUp, ChevronDown, Pencil, Table2, Link2,
 } from "lucide-react";
 import {
   BRAND_ACCENTS, buildTemplateBody, emailShell, defaultNewsletter,
@@ -59,8 +59,9 @@ const BLOCKS = [
   { id: "divider",      label: "Divider",       icon: Minus,      hint: "Horizontal line" },
   { id: "spacer",       label: "Spacer",        icon: Minus,      hint: "Empty space" },
   { id: "columns",      label: "2 Columns",     icon: Columns2,   hint: "Side by side" },
-  { id: "list",         label: "List",          icon: List,       hint: "Bullet points" },
-  { id: "ordered-list", label: "Ordered List",  icon: ListOrdered, hint: "Numbered items" },
+  { id: "list",         label: "List",          icon: List,       hint: "Bullets or numbers" },
+  { id: "link",         label: "Link",          icon: Link2,      hint: "Hyperlink text" },
+  { id: "button",       label: "Button",        icon: MousePointerClick, hint: "CTA button" },
   { id: "code",         label: "Code",          icon: Code,       hint: "HTML/CSS/JS block" },
   { id: "blog",         label: "Blog Post",     icon: AlignLeft,  hint: "Link a blog post" },
   { id: "video",        label: "Video",         icon: ImageIcon,  hint: "Embed a video" },
@@ -69,7 +70,7 @@ const BLOCKS = [
 ] as const;
 
 /* ── Section types ───────────────────────────────────── */
-type SectionKind = "heading" | "text" | "image" | "button" | "quote" | "divider" | "spacer" | "columns" | "list" | "ordered-list" | "code" | "blog" | "video" | "book" | "social" | "table";
+type SectionKind = "heading" | "text" | "image" | "button" | "quote" | "divider" | "spacer" | "columns" | "list" | "code" | "blog" | "video" | "book" | "social" | "table" | "link";
 
 function sectionKind(s: { heading: string; body: string }): SectionKind {
   if (s.body === "---") return "divider";
@@ -81,11 +82,12 @@ function sectionKind(s: { heading: string; body: string }): SectionKind {
   if (s.heading === "__VIDEO__") return "video";
   if (s.heading === "__BOOK__") return "book";
   if (s.heading === "__TABLE__") return "table";
+  if (s.heading === "__LINK__") return "link";
+  if (s.heading === "__BUTTON__") return "button";
   if (s.heading.startsWith("__COL_LEFT__")) return "columns";
   if (s.heading.startsWith("__COL_RIGHT__")) return "columns";
   if (s.body.includes("[Image") || s.body.startsWith("https://images.unsplash.com") || s.body.startsWith("http")) return "image";
-  if (s.heading === "" && (s.body.startsWith("- ") || /^[•→✓]\s/.test(s.body))) return "list";
-  if (s.heading === "" && s.body.startsWith("1. ")) return "ordered-list";
+  if (s.heading === "" && (s.body.startsWith("- ") || /^[•→✓]\s/.test(s.body) || /^\d+\.\s/.test(s.body))) return "list";
   if (s.heading === "" && s.body === "") return "heading";
   if (s.heading) return "heading";
   return "text";
@@ -96,8 +98,9 @@ const SECTION_ICONS: Record<SectionKind, typeof Heading2> = {
   heading: Heading2, text: AlignLeft, image: ImageIcon,
   button: MousePointerClick, quote: Quote, divider: Minus,
   spacer: Minus, columns: Columns2, list: List,
-  "ordered-list": ListOrdered, code: Code, blog: AlignLeft,
+  code: Code, blog: AlignLeft,
   video: ImageIcon, book: AlignLeft, social: Share2, table: Table2,
+  link: Link2,
 };
 function SectionIcon({ kind, className }: { kind: SectionKind; className?: string }) {
   const Icon = SECTION_ICONS[kind];
@@ -138,6 +141,7 @@ export function NewsletterComposer({ subscriberCount, onSent, onBack, onDirtyCha
   const dragIdxRef = useRef<number | null>(null);
   const [selectedLayout, setSelectedLayout] = useState<LayoutId | null>(null);
   const [leftTab, setLeftTab] = useState<"blocks" | "layouts">("blocks");
+  const previewIframeRef = useRef<HTMLIFrameElement>(null);
 
   const dirtyRef = useRef(false);
   const markClean = useCallback(() => { dirtyRef.current = false; onDirtyChange?.(false); }, [onDirtyChange]);
@@ -268,7 +272,6 @@ export function NewsletterComposer({ subscriberCount, onSent, onBack, onDirtyCha
         case "spacer":       return { heading: "", body: "\n\n" };
         case "columns":      { insertSection(at, { heading: "__COL_RIGHT__", body: JSON.stringify({ left: "", right: "", leftTitle: "", rightTitle: "", bulletStyle: "dot" }) }); return { heading: "__COL_LEFT__", body: JSON.stringify({ left: "", right: "", leftTitle: "", rightTitle: "", bulletStyle: "dot" }) }; }
         case "list":         return { heading: "", body: "- Item 1\n- Item 2\n- Item 3" };
-        case "ordered-list": return { heading: "", body: "1. First\n2. Second\n3. Third" };
         case "code":         return { heading: "__CODE__", body: "<h2>Hello World</h2>\n<p style=\"color: #6366f1;\">This is a live preview</p>" };
         case "blog":         return { heading: "__BLOG__", body: JSON.stringify({ title: "", url: "", excerpt: "" }) };
         case "video":        return { heading: "__VIDEO__", body: JSON.stringify({ title: "", url: "", thumbnail: "" }) };
@@ -276,6 +279,8 @@ export function NewsletterComposer({ subscriberCount, onSent, onBack, onDirtyCha
         case "quote":        return { heading: "__QUOTE__", body: JSON.stringify({ text: "Your quote here", author: "Author Name" }) };
         case "social":       return { heading: "__SOCIAL__", body: JSON.stringify({ selected: dbSocials.length > 0 ? dbSocials.slice(0, 3).map((s) => s.key) : ["twitter", "linkedin"] }) };
         case "table":        return { heading: "__TABLE__", body: JSON.stringify({ headerRow: true, rows: [["Header 1", "Header 2", "Header 3"], ["Cell 1", "Cell 2", "Cell 3"], ["Cell 4", "Cell 5", "Cell 6"]] }) };
+        case "link":         return { heading: "__LINK__", body: JSON.stringify({ text: "Click here", url: "https://example.com" }) };
+        case "button":       return { heading: "__BUTTON__", body: JSON.stringify({ label: "Click here", url: "https://example.com" }) };
         default: return null;
       }
     })();
@@ -351,6 +356,19 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
       .replace(/<style>@media\(prefers-color-scheme:dark\)\{[\s\S]*?\}<\/style>/, '<style></style>');
   }, [bodyHtml]);
   const ready = subject.trim().length >= 3;
+
+  // Auto-resize preview iframe to fit content
+  useEffect(() => {
+    if (viewMode !== "preview" || !previewIframeRef.current) return;
+    const iframe = previewIframeRef.current;
+    const timer = setTimeout(() => {
+      try {
+        const h = iframe.contentDocument?.documentElement?.scrollHeight;
+        if (h && h > 100) iframe.style.height = h + "px";
+      } catch { /* cross-origin */ }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [viewMode, previewHtml]);
 
   /* ── Actions ────────────────────────────────────────── */
   async function saveDraft() {
@@ -495,8 +513,8 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
 
             {/* ── Blocks tab ──────────────────────────── */}
             {leftTab === "blocks" && (
-              <div className="flex-1 overflow-y-auto px-2.5 pb-3 space-y-3 pt-1">
-                <BlockGroup title="Content" ids={["section", "heading", "text", "list", "ordered-list"]} onInsert={insertBlock} onDragStart={handleDragStart} />
+              <div className="flex-1 overflow-y-auto px-2.5 pb-3 space-y-3 pt-1 no-scrollbar">
+                <BlockGroup title="Content" ids={["section", "heading", "text", "list"]} onInsert={insertBlock} onDragStart={handleDragStart} />
                 <BlockGroup title="Media" ids={["image", "code"]} onInsert={insertBlock} onDragStart={handleDragStart} />
                 <BlockGroup title="Layout" ids={["divider", "spacer", "columns", "table"]} onInsert={insertBlock} onDragStart={handleDragStart} />
                 <BlockGroup title="Actions" ids={["quote", "social"]} onInsert={insertBlock} onDragStart={handleDragStart} />
@@ -511,7 +529,7 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
 
             {/* ── Layouts tab (pre-built + saved) ──────── */}
             {leftTab === "layouts" && (
-              <div className="flex-1 overflow-y-auto px-2.5 pb-3 space-y-3 pt-1">
+              <div className="flex-1 overflow-y-auto px-2.5 pb-3 space-y-3 pt-1 no-scrollbar">
                 {/* Pre-built layouts */}
                 <div>
                   <p className={sectionHeaderCls}>Pre-built</p>
@@ -580,7 +598,7 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden bg-muted/5">
           {/* Section navigator (edit mode) */}
           {viewMode === "edit" && content.sections.length > 0 && (
-            <div className="shrink-0 border-b border-border/30 bg-card/20 px-3 py-1.5 flex items-center gap-1 overflow-x-auto">
+            <div className="shrink-0 border-b border-border/30 bg-card/20 px-3 py-1.5 flex items-center gap-1 overflow-x-auto no-scrollbar">
               <button type="button" onClick={clearSelection}
                 className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-all ${selectedIdx === null ? "bg-accent text-accent-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
                 General
@@ -725,13 +743,28 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                                 style={{ width: "100%", fontSize: "12px", color: "#6b6a66", background: "transparent", border: "none", outline: "none", padding: "8px 0", borderBottom: "1px solid #ecebe6" }} />
                             </div>
                           )}
-                          {kind === "button" && (
-                            <div style={{ textAlign: "center", padding: "8px 0" }}>
-                              <a href={content.cta?.url || "#"} style={{ background: content.accent, color: accentFg(content.accent), textDecoration: "none", fontWeight: 700, fontSize: "15px", padding: "13px 34px", borderRadius: "999px", display: "inline-block" }}>
-                                {content.cta?.label || "Button"} →
-                              </a>
-                            </div>
-                          )}
+                          {kind === "button" && (() => {
+                            let d = { label: "", url: "" };
+                            try { d = JSON.parse(s.body); } catch { d = { label: s.heading || "Button", url: s.body }; }
+                            return (
+                              <div style={{ textAlign: "center", padding: "8px 0" }}>
+                                <a href={d.url || "#"} style={{ background: content.accent, color: accentFg(content.accent), textDecoration: "none", fontWeight: 700, fontSize: "15px", padding: "13px 34px", borderRadius: "999px", display: "inline-block" }}>
+                                  {d.label || "Button"}
+                                </a>
+                              </div>
+                            );
+                          })()}
+                          {kind === "link" && (() => {
+                            let d = { text: "", url: "" };
+                            try { d = JSON.parse(s.body); } catch { d = { text: s.heading || s.body, url: s.body }; }
+                            return (
+                              <div style={{ padding: "4px 0" }}>
+                                <a href={d.url || "#"} style={{ color: content.accent, textDecoration: "underline", textUnderlineOffset: "2px", fontWeight: 600, fontSize: "15px" }}>
+                                  {d.text || d.url || "Link text"}
+                                </a>
+                              </div>
+                            );
+                          })()}
                           {kind === "quote" && (() => {
                             let qData: { text: string; author: string } = { text: "", author: "" };
                             try { qData = JSON.parse(s.body); } catch { qData = { text: s.body, author: "" }; }
@@ -751,6 +784,10 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                             const isNumbered = colData.bulletStyle === "number" || colData.bulletStyle === "roman";
                             function renderList(text: string) {
                               if (!text.trim()) return <p style={{ fontSize: "14px", color: "#6b6a66", opacity: 0.4, fontStyle: "italic" }}>Empty</p>;
+                              // Content is HTML from contentEditable — render directly
+                              if (text.startsWith("<")) {
+                                return <div dangerouslySetInnerHTML={{ __html: text }} style={{ fontSize: "15px", color: "#2a2926", lineHeight: 1.65 }} />;
+                              }
                               const lines = text.split("\n").filter((l) => l.trim());
                               if (isNumbered) {
                                 return (
@@ -781,16 +818,22 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                               </div>
                             );
                           })()}
-                          {kind === "list" && (
-                            <ul style={{ margin: 0, paddingLeft: "24px", fontSize: "15px", color: "#2a2926" }}>
-                              {s.body.split("\n").filter((l) => l.startsWith("- ") || /^[•→✓]\s/.test(l)).map((l, j) => <li key={j} style={{ margin: "0 0 6px 0", lineHeight: 1.6 }}>{l.replace(/^[-•→✓]\s*/, "")}</li>)}
-                            </ul>
-                          )}
-                          {kind === "ordered-list" && (
-                            <ol style={{ margin: 0, paddingLeft: "24px", fontSize: "15px", color: "#2a2926" }}>
-                              {s.body.split("\n").filter((l) => /^\d+\./.test(l)).map((l, j) => <li key={j} style={{ margin: "0 0 6px 0", lineHeight: 1.6 }}>{l.replace(/^\d+\.\s*/, "")}</li>)}
-                            </ol>
-                          )}
+                          {kind === "list" && (() => {
+                            const isOrdered = /^\d+\.\s/.test(s.body.split("\n").find((l) => l.trim()) ?? "");
+                            const lines = s.body.split("\n").filter((l) => l.trim());
+                            if (isOrdered) {
+                              return (
+                                <ol style={{ margin: 0, paddingLeft: "24px", fontSize: "15px", color: "#2a2926" }}>
+                                  {lines.map((l, j) => <li key={j} style={{ margin: "0 0 6px 0", lineHeight: 1.6 }}>{l.replace(/^\d+\.\s*/, "")}</li>)}
+                                </ol>
+                              );
+                            }
+                            return (
+                              <ul style={{ margin: 0, paddingLeft: "24px", fontSize: "15px", color: "#2a2926" }}>
+                                {lines.map((l, j) => <li key={j} style={{ margin: "0 0 6px 0", lineHeight: 1.6 }}>{l.replace(/^[-•→✓]\s*/, "")}</li>)}
+                              </ul>
+                            );
+                          })()}
                           {kind === "code" && (
                             <div style={{ background: "#f8f7f4", border: "1px solid #e8e6e1", borderRadius: "8px", padding: "20px", fontSize: "14px", color: "#2a2926", overflow: "hidden", maxWidth: "100%", boxSizing: "border-box", wordBreak: "break-word" }}>
                               <CodePreview body={s.body} />
@@ -932,7 +975,7 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                 <div className={`rounded-xl shadow-lg overflow-hidden transition-all ${dropActive ? "ring-4 ring-accent/10" : ""}`}
                   style={{ border: "1px solid #e5e3dd" }}>
                   <div className="overflow-hidden w-full" style={{ background: "#fafafa" }}>
-                    <iframe title="Email preview" srcDoc={previewHtml} sandbox="allow-same-origin" loading="lazy" className="block border-0" style={{ width: "100%", height: "900px", maxWidth: "100%", border: "none" }} />
+                    <iframe ref={previewIframeRef} title="Email preview" srcDoc={previewHtml} sandbox="allow-same-origin" loading="lazy" className="block border-0" style={{ width: "100%", height: "900px", maxWidth: "100%", border: "none" }} />
                   </div>
                 </div>
               )}
@@ -997,6 +1040,7 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
                   onDuplicate={() => duplicateSection(selectedIdx)}
                   dbQuotes={dbQuotes}
                   dbSocials={dbSocials}
+                  accent={content.accent}
                 />
               )}
 
@@ -1094,60 +1138,122 @@ function handleSectionDrop(e: React.DragEvent, toIdx: number) {
   );
 }
 
-/* ── Text Block with Formatting ─────────────────────── */
-function TextBlockWithFormat({ value, onChange }: { value: string; onChange: (val: string) => void }) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+/* ── Universal Rich Textarea (visual formatting, no raw codes) ─────── */
+function RichTextarea({ value, onChange, rows = 4, placeholder, className = "", hideToolbar = false }: {
+  value: string;
+  onChange: (val: string) => void;
+  rows?: number;
+  placeholder?: string;
+  className?: string;
+  hideToolbar?: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const internal = useRef(false);
 
-  function handleFormat(before: string, after: string) {
-    const ta = textareaRef.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const selected = value.substring(start, end);
-    const replacement = `${before}${selected || "text"}${after}`;
-    const newValue = value.substring(0, start) + replacement + value.substring(end);
-    onChange(newValue);
-    // Restore cursor position after the formatting
-    requestAnimationFrame(() => {
-      ta.focus();
-      const cursorPos = start + before.length + (selected ? selected.length : 4);
-      ta.setSelectionRange(cursorPos, cursorPos);
-    });
+  useEffect(() => {
+    if (!ref.current || internal.current) return;
+    if (ref.current.innerHTML !== value) ref.current.innerHTML = value;
+  }, [value]);
+
+  function sync() {
+    if (!ref.current) return;
+    internal.current = true;
+    onChange(ref.current.innerHTML);
+    requestAnimationFrame(() => { internal.current = false; });
   }
 
+  const minH = rows * 24;
+
   return (
-    <div className="border border-border rounded-lg overflow-hidden">
-      <div className="flex items-center gap-0.5 px-2 py-1.5 bg-muted/50 border-b border-border/50">
-        <FormatToolbar onFormat={handleFormat} />
-      </div>
-      <textarea ref={textareaRef} value={value} onChange={(e) => onChange(e.target.value)}
-        placeholder="Write content…"
-        rows={1}
-        onInput={(e) => { const ta = e.currentTarget; ta.style.height = "auto"; ta.style.height = ta.scrollHeight + "px"; }}
-        className="w-full text-[16px] leading-relaxed text-foreground outline-none resize-none placeholder:text-muted-foreground/40 bg-transparent px-3 py-2.5 overflow-hidden" />
+    <div className={className}>
+      {!hideToolbar && <RichToolbar targetRef={ref} sync={sync} />}
+      <div ref={ref} contentEditable suppressContentEditableWarning onInput={sync}
+        data-placeholder={placeholder}
+        className="w-full text-sm leading-relaxed text-foreground outline-none border border-border/60 rounded-lg px-3 py-2 empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground/40"
+        style={{ minHeight: `${minH}px` }} />
     </div>
   );
 }
 
-/* ── Text Formatting Toolbar ─────────────────────────── */
-function FormatToolbar({ onFormat }: { onFormat: (before: string, after: string) => void }) {
+/* ── Shared Formatting Toolbar ────────────────────────────────────── */
+function RichToolbar({ targetRef, sync }: { targetRef: React.RefObject<HTMLDivElement | null>; sync: () => void }) {
+  function focus() { targetRef?.current?.focus(); }
+  function cmd(c: string, a?: string) { focus(); document.execCommand(c, false, a); }
+
+  function toggleHighlight() {
+    const sel = window.getSelection();
+    const root = targetRef?.current;
+    if (!root) return;
+
+    // Check 1: cursor inside a <mark> — remove it
+    if (sel && sel.rangeCount > 0) {
+      let node: HTMLElement | null = sel.anchorNode as HTMLElement;
+      while (node && node !== root) {
+        if (node.tagName === "MARK") {
+          const parent = node.parentNode!;
+          while (node.firstChild) parent.insertBefore(node.firstChild, node);
+          parent.removeChild(node);
+          sync();
+          return;
+        }
+        node = node.parentElement;
+      }
+    }
+
+    // Check 2: selection spans a <mark> — remove it
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      const marks = root.querySelectorAll("mark");
+      for (const mark of marks) {
+        if (range.intersectsNode(mark)) {
+          const parent = mark.parentNode!;
+          while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+          parent.removeChild(mark);
+          sync();
+          return;
+        }
+      }
+    }
+
+    // Check 3: no <mark> found — add highlight
+    if (!sel || sel.rangeCount === 0) { focus(); return; }
+    const r = sel.getRangeAt(0);
+    const t = r.toString();
+    const s = document.createElement("mark");
+    s.textContent = t || "text";
+    r.deleteContents(); r.insertNode(s);
+    sel.removeAllRanges();
+    const nr = document.createRange(); nr.setStartAfter(s); nr.collapse(true); sel.addRange(nr);
+    sync();
+  }
+
   return (
-    <div className="flex items-center gap-1">
-      <button type="button" title="Bold (**text**)" onClick={() => onFormat("**", "**")}
-        className="px-2 py-1 text-[11px] font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors">B</button>
-      <button type="button" title="Italic (*text*)" onClick={() => onFormat("*", "*")}
-        className="px-2 py-1 text-[11px] italic text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors">I</button>
-      <button type="button" title="Highlight (==text==)" onClick={() => onFormat("==", "==")}
-        className="px-2 py-1 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors">
-        <span className="bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 px-1 rounded">H</span>
-      </button>
-      <div className="w-px h-3.5 bg-border mx-0.5" />
-      <button type="button" title="Red text" onClick={() => onFormat("[color:red]", "[/color]")}
-        className="px-2 py-1 text-[11px] font-bold text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded transition-colors">A</button>
-      <button type="button" title="Blue text" onClick={() => onFormat("[color:blue]", "[/color]")}
-        className="px-2 py-1 text-[11px] font-bold text-blue-500 hover:text-blue-600 hover:bg-blue-500/10 rounded transition-colors">A</button>
-      <button type="button" title="Green text" onClick={() => onFormat("[color:green]", "[/color]")}
-        className="px-2 py-1 text-[11px] font-bold text-green-500 hover:text-green-600 hover:bg-green-500/10 rounded transition-colors">A</button>
+    <div className="flex items-center gap-0.5 pb-1.5 mb-1 border-b border-border/30">
+      <button type="button" title="Bold" onClick={() => cmd("bold")} className="w-6 h-6 flex items-center justify-center text-[11px] font-bold text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded transition-colors">B</button>
+      <button type="button" title="Italic" onClick={() => cmd("italic")} className="w-6 h-6 flex items-center justify-center text-[11px] italic text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded transition-colors">I</button>
+      <button type="button" title="Underline" onClick={() => cmd("underline")} className="w-6 h-6 flex items-center justify-center text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded transition-colors underline">U</button>
+      <button type="button" title="Strikethrough" onClick={() => cmd("strikeThrough")} className="w-6 h-6 flex items-center justify-center text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded transition-colors line-through">S</button>
+      <div className="w-px h-3.5 bg-border/60 mx-1" />
+      <button type="button" title="Highlight (click again to remove)" onClick={toggleHighlight} className="w-6 h-6 flex items-center justify-center text-[11px] text-muted-foreground hover:text-foreground hover:bg-yellow-500/10 rounded transition-colors"><span className="bg-yellow-400/40 px-0.5 rounded leading-none">H</span></button>
+      <div className="w-px h-3.5 bg-border/60 mx-1" />
+      {[
+        { s: "2", l: "S" }, { s: "3", l: "M" }, { s: "5", l: "L" },
+      ].map(({ s, l }) => (
+        <button key={s} type="button" title={`Size ${l}`} onClick={() => cmd("fontSize", s)} className="min-w-[22px] h-6 flex items-center justify-center text-[9px] font-bold text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded transition-colors">{l}</button>
+      ))}
+      <div className="w-px h-3.5 bg-border/60 mx-1" />
+      <button type="button" title="Red" onClick={() => cmd("foreColor", "#dc2626")} className="w-6 h-6 flex items-center justify-center text-[11px] font-bold text-red-500 hover:bg-red-500/10 rounded transition-colors">A</button>
+      <button type="button" title="Blue" onClick={() => cmd("foreColor", "#2563eb")} className="w-6 h-6 flex items-center justify-center text-[11px] font-bold text-blue-500 hover:bg-blue-500/10 rounded transition-colors">A</button>
+      <button type="button" title="Green" onClick={() => cmd("foreColor", "#16a34a")} className="w-6 h-6 flex items-center justify-center text-[11px] font-bold text-green-500 hover:bg-green-500/10 rounded transition-colors">A</button>
+    </div>
+  );
+}
+
+/* ── Rich Text Block (canvas inline — uses RichTextarea) ──────────── */
+function TextBlockWithFormat({ value, onChange }: { value: string; onChange: (val: string) => void }) {
+  return (
+    <div className="border border-border rounded-lg overflow-hidden">
+      <RichTextarea value={value} onChange={onChange} rows={3} placeholder="Write content…" />
     </div>
   );
 }
@@ -1219,7 +1325,7 @@ function TableEditor({ section, onChange }: { section: { heading: string; body: 
 }
 
 /* ── Section Editor (Right Panel) ────────────────────── */
-function SectionEditor({ index, section, kind, total, onChange, onRemove, onMove, onDuplicate, dbQuotes, dbSocials }: {
+function SectionEditor({ index, section, kind, total, onChange, onRemove, onMove, onDuplicate, dbQuotes, dbSocials, accent }: {
   index: number;
   section: { heading: string; body: string };
   kind: SectionKind;
@@ -1230,6 +1336,7 @@ function SectionEditor({ index, section, kind, total, onChange, onRemove, onMove
   onDuplicate: () => void;
   dbQuotes: { id: string; text: string; tag: string | null }[];
   dbSocials: { id: string; key: string; label: string; href: string; handle: string | null; color: string | null; logoUrl?: string | null }[];
+  accent: string;
 }) {
   return (
     <div className="space-y-3">
@@ -1260,56 +1367,37 @@ function SectionEditor({ index, section, kind, total, onChange, onRemove, onMove
       )}
 
       {/* Body */}
-      {(kind === "heading" || kind === "text" || kind === "list" || kind === "ordered-list") && (
+      {(kind === "heading" || kind === "text" || kind === "list") && (
         <div>
           <label className={labelCls}>Body</label>
           {kind === "text" && (
-            <div className="mb-1.5 p-1.5 rounded-md bg-muted/30 border border-border/30">
-              <FormatToolbar onFormat={(before, after) => {
-                const ta = document.querySelector(`textarea[data-section-body="${section.heading}"]`) as HTMLTextAreaElement | null;
-                if (ta) {
-                  const start = ta.selectionStart;
-                  const end = ta.selectionEnd;
-                  const selected = section.body.substring(start, end);
-                  const replacement = `${before}${selected || "text"}${after}`;
-                  onChange({ body: section.body.substring(0, start) + replacement + section.body.substring(end) });
-                } else {
-                  onChange({ body: `${before}${section.body}${after}` });
-                }
-              }} />
+            <p className="text-[10px] text-muted-foreground/60 mb-1.5">Edit directly on the canvas above. Select text and use the toolbar to format.</p>
+          )}
+          {kind === "list" && (
+            <div className="mb-1.5 flex gap-1">
+              {[
+                { label: "• Bullet", isOrdered: false },
+                { label: "1. Number", isOrdered: true },
+              ].map(({ label, isOrdered }) => {
+                const current = section.body.split("\n").find((l) => l.trim()) ?? "";
+                const isActive = isOrdered ? /^\d+\./.test(current) : !/^\d+\./.test(current);
+                return (
+                  <button key={label} type="button" onClick={() => {
+                    const lines = section.body.split("\n").filter((l) => l.trim());
+                    const newBody = lines.map((l) => {
+                      const text = l.replace(/^[-•→✓\d.]+\s*/, "");
+                      return isOrdered ? `${lines.indexOf(l) + 1}. ${text}` : `- ${text}`;
+                    }).join("\n");
+                    onChange({ body: newBody });
+                  }} className={`rounded-md border px-2 py-1 text-[10px] font-semibold transition-all ${isActive ? "border-accent bg-accent/10 text-accent" : "border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           )}
-          <textarea data-section-body={section.heading} value={section.body} onChange={(e) => onChange({ body: e.target.value })} rows={8} placeholder={kind === "list" ? "• Item 1\n→ Item 2\n✓ Item 3\n\nOr use: - Item 1" : "Write content…\n\nBlank lines = new paragraph."} className={`${inputCls} resize-none font-mono text-xs leading-relaxed`} />
-        </div>
-      )}
-
-      {/* Bullet style picker — only for list kind */}
-      {kind === "list" && (
-        <div>
-          <label className={labelCls}>Bullet Style</label>
-          <div className="flex gap-1.5">
-            {[
-              { label: "• Dot", marker: "•" },
-              { label: "→ Arrow", marker: "→" },
-              { label: "✓ Check", marker: "✓" },
-              { label: "- Dash", marker: "-" },
-            ].map(({ label, marker }) => {
-              const current = section.body.split("\n")[0]?.charAt(0);
-              const isActive = current === marker || (marker === "-" && (current === "-" || current === "•" || current === "→" || current === "✓"));
-              return (
-                <button key={marker} type="button" onClick={() => {
-                  const lines = section.body.split("\n").filter((l) => l.trim());
-                  const newBody = lines.map((l) => {
-                    const text = l.replace(/^[-•→✓]\s*/, "");
-                    return `${marker} ${text}`;
-                  }).join("\n");
-                  onChange({ body: newBody });
-                }} className={`rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-colors ${isActive ? "border-accent bg-accent/10 text-accent" : "border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+          <RichTextarea value={section.body} onChange={(val) => onChange({ body: val })} rows={8}
+            placeholder={kind === "list" ? "- Item 1\n- Item 2\n- Item 3\n\nOr use 1. for numbers" : "Write content…"} />
         </div>
       )}
 
@@ -1375,6 +1463,16 @@ function SectionEditor({ index, section, kind, total, onChange, onRemove, onMove
       {/* Table editor */}
       {kind === "table" && (
         <TableEditor section={section} onChange={onChange} />
+      )}
+
+      {/* Link editor */}
+      {kind === "link" && (
+        <LinkEditor section={section} onChange={onChange} />
+      )}
+
+      {/* Button editor */}
+      {kind === "button" && (
+        <ButtonEditor section={section} onChange={onChange} accent={accent} />
       )}
     </div>
   );
@@ -1513,43 +1611,48 @@ function ColumnsEditor({ section, onChange }: {
     onChange({ body: JSON.stringify({ ...colData, ...patch }) });
   }
 
-  const bulletStyles = [
-    { id: "dot", label: "• Dot", prefix: "•" },
-    { id: "square", label: "■ Square", prefix: "■" },
-    { id: "number", label: "1. Number", prefix: "" },
-    { id: "roman", label: "i. Roman", prefix: "" },
-  ];
+  const leftRef = useRef<HTMLDivElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
+  const [activeRef, setActiveRef] = useState<React.RefObject<HTMLDivElement | null>>(leftRef);
+  const [activeSync, setActiveSync] = useState<() => void>(() => () => updateCol({ left: leftRef.current?.innerHTML ?? "" }));
 
-  const activeBullet = bulletStyles.find((b) => b.id === colData.bulletStyle) ?? bulletStyles[0];
+  function focusLeft() {
+    setActiveRef(leftRef);
+    setActiveSync(() => () => updateCol({ left: leftRef.current?.innerHTML ?? "" }));
+  }
+  function focusRight() {
+    setActiveRef(rightRef);
+    setActiveSync(() => () => updateCol({ right: rightRef.current?.innerHTML ?? "" }));
+  }
 
   return (
     <div className="space-y-3">
+      <p className="text-[10px] text-muted-foreground/60">Two side-by-side text columns.</p>
+      {/* Shared toolbar */}
+      <RichToolbar targetRef={activeRef} sync={activeSync} />
       <div>
-        <label className={labelCls}>Bullet Style</label>
-        <div className="flex gap-1 flex-wrap">
-          {bulletStyles.map((b) => (
-            <button key={b.id} type="button" onClick={() => updateCol({ bulletStyle: b.id })}
-              className={`rounded-md border px-2 py-1 text-[10px] font-medium transition-colors ${colData.bulletStyle === b.id ? "border-accent bg-accent/10 text-accent" : "border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
-              {b.label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div>
-        <label className={labelCls}>Left Column Title</label>
+        <label className={labelCls}>Left Title</label>
         <input value={colData.leftTitle} onChange={(e) => updateCol({ leftTitle: e.target.value })} placeholder="e.g. Principles" className={inputCls} />
       </div>
       <div>
         <label className={labelCls}>Left Column</label>
-        <textarea value={colData.left} onChange={(e) => updateCol({ left: e.target.value })} rows={5} placeholder={"• Item 1\n• Item 2\n• Item 3"} className={`${inputCls} resize-none text-xs font-mono`} />
+        <div ref={leftRef} contentEditable suppressContentEditableWarning
+          onInput={() => updateCol({ left: leftRef.current?.innerHTML ?? "" })}
+          onFocus={focusLeft}
+          data-placeholder="• Item 1"
+          className="w-full text-sm leading-relaxed text-foreground outline-none border border-border/60 rounded-lg px-3 py-2 min-h-[80px] empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground/40" />
       </div>
       <div>
-        <label className={labelCls}>Right Column Title</label>
+        <label className={labelCls}>Right Title</label>
         <input value={colData.rightTitle} onChange={(e) => updateCol({ rightTitle: e.target.value })} placeholder="e.g. Resources" className={inputCls} />
       </div>
       <div>
         <label className={labelCls}>Right Column</label>
-        <textarea value={colData.right} onChange={(e) => updateCol({ right: e.target.value })} rows={5} placeholder={"• Item 1\n• Item 2\n• Item 3"} className={`${inputCls} resize-none text-xs font-mono`} />
+        <div ref={rightRef} contentEditable suppressContentEditableWarning
+          onInput={() => updateCol({ right: rightRef.current?.innerHTML ?? "" })}
+          onFocus={focusRight}
+          data-placeholder="• Item 1"
+          className="w-full text-sm leading-relaxed text-foreground outline-none border border-border/60 rounded-lg px-3 py-2 min-h-[80px] empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground/40" />
       </div>
     </div>
   );
@@ -1644,6 +1747,66 @@ function BookEditor({ section, onChange }: {
   );
 }
 
+/* ── Link Editor ────────────────────────────────────── */
+function LinkEditor({ section, onChange }: {
+  section: { heading: string; body: string };
+  onChange: (patch: Partial<{ heading: string; body: string }>) => void;
+}) {
+  let d = { text: "", url: "" };
+  try { d = JSON.parse(section.body); } catch { d = { text: section.heading, url: section.body }; }
+  function update(p: Partial<typeof d>) { onChange({ body: JSON.stringify({ ...d, ...p }) }); }
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className={labelCls}>Display Text</label>
+        <p className="text-[10px] text-muted-foreground/60 mb-1">This is the clickable text readers will see.</p>
+        <input value={d.text} onChange={(e) => update({ text: e.target.value })} placeholder="e.g. Read the full post" className={inputCls} />
+      </div>
+      <div>
+        <label className={labelCls}>URL</label>
+        <input value={d.url} onChange={(e) => update({ url: e.target.value })} placeholder="https://..." className={inputCls} />
+      </div>
+      {d.text && d.url && (
+        <div className="rounded-lg border border-border/50 bg-muted/20 p-3 text-center">
+          <a href={d.url} style={{ color: "#0d21a1", textDecoration: "underline", textUnderlineOffset: "2px", fontWeight: 600, fontSize: "14px" }}>
+            {d.text}
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Button Editor ──────────────────────────────────── */
+function ButtonEditor({ section, onChange, accent }: {
+  section: { heading: string; body: string };
+  onChange: (patch: Partial<{ heading: string; body: string }>) => void;
+  accent: string;
+}) {
+  let d = { label: "", url: "" };
+  try { d = JSON.parse(section.body); } catch { d = { label: section.heading || "Button", url: section.body }; }
+  function update(p: Partial<typeof d>) { onChange({ body: JSON.stringify({ ...d, ...p }) }); }
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className={labelCls}>Button Text</label>
+        <input value={d.label} onChange={(e) => update({ label: e.target.value })} placeholder="Click here" className={inputCls} />
+      </div>
+      <div>
+        <label className={labelCls}>URL</label>
+        <input value={d.url} onChange={(e) => update({ url: e.target.value })} placeholder="https://..." className={inputCls} />
+      </div>
+      <div className="rounded-lg border border-border/50 bg-muted/20 p-3 text-center">
+        <a href={d.url || "#"} style={{ background: accent, color: accentFg(accent), textDecoration: "none", fontWeight: 700, fontSize: "14px", padding: "10px 28px", borderRadius: "999px", display: "inline-block" }}>
+          {d.label || "Button"}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 /* ── Code Preview (debounced iframe) ─────────────────── */
 const CODE_RESET = `<style>html,body{margin:0;padding:0;overflow-x:hidden;width:100%;max-width:100%}*{box-sizing:border-box;max-width:100%!important;overflow-wrap:break-word;word-wrap:break-word}pre,code{white-space:pre-wrap;word-break:break-word}</style>`;
 
@@ -1699,26 +1862,14 @@ function LayoutThumbnail({ sections, accent, layoutId }: { sections: { heading: 
       });
     }
     // Pre-built layout defaults
-    if (layoutId === "weekly-digest") {
-      return [
-        { kind: "heading", h: "h-2" },
-        { kind: "text", h: "h-1" },
-        { kind: "blog", h: "h-5" },
-        { kind: "blog", h: "h-5" },
-        { kind: "blog", h: "h-5" },
-        { kind: "divider", h: "h-0.5" },
-        { kind: "social", h: "h-2" },
-      ];
-    }
     if (layoutId === "deep-dive") {
       return [
         { kind: "heading", h: "h-2" },
         { kind: "text", h: "h-1" },
         { kind: "columns", h: "h-4" },
         { kind: "text", h: "h-1" },
-        { kind: "code", h: "h-5" },
         { kind: "divider", h: "h-0.5" },
-        { kind: "button", h: "h-2" },
+        { kind: "text", h: "h-1" },
       ];
     }
     return [

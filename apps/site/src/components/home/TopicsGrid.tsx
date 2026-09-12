@@ -107,7 +107,7 @@ export function TopicsGrid({ topics }: { topics: Topic[] }) {
           Simple ideas. Real results.
         </h2>
         <p className="mt-4 text-base text-[#94a3b8] leading-relaxed max-w-xl mx-auto">
-          Practical wisdom for mindset, habits, confidence, and career growth.
+          Topics That Helps You MINDUP
         </p>
       </div>
 

@@ -160,12 +160,12 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
 
       {/* ═══════ TABLET/MOBILE: Compact floating pill (Zero collision with ScrollTopButton) ═══════ */}
       <div
-        className="fixed bottom-5 left-4 z-40 lg:hidden max-w-[calc(100vw-5.5rem)]"
+        className="fixed bottom-6 left-4 right-16 z-40 lg:hidden"
         ref={panelRef}
       >
         {/* Expanded sheet */}
         {mobileOpen && (
-          <div className="mb-3 w-[calc(100vw-2rem)] max-w-sm rounded-2xl border border-border bg-card/98 backdrop-blur-2xl shadow-2xl overflow-hidden max-h-[55vh] flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="mb-3 w-full max-w-sm rounded-2xl border border-border bg-card/98 backdrop-blur-2xl shadow-2xl overflow-hidden max-h-[55vh] flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-200">
             <div className="px-4 py-3 border-b border-border flex items-center justify-between shrink-0 bg-muted/40">
               <div className="flex items-center gap-2">
                 <List className="w-4 h-4 text-brand" />
@@ -211,19 +211,19 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
           </div>
         )}
 
-        {/* Pill trigger — positioned neatly on left side, free of right scroll button */}
+        {/* Pill trigger — floating at bottom, always visible */}
         <button
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
-          className="flex items-center gap-2 rounded-full border border-border bg-card/95 backdrop-blur-xl shadow-lg px-3.5 py-2 transition-all active:scale-[0.97] hover:border-brand/40 text-foreground"
+          className="flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 backdrop-blur-xl shadow-lg px-4 py-2.5 transition-all active:scale-[0.97] hover:border-brand/50 text-brand"
           aria-expanded={mobileOpen}
           aria-label="Table of contents"
         >
-          <List className="w-3.5 h-3.5 text-brand shrink-0" />
-          <span className="text-xs font-medium truncate max-w-[130px] sm:max-w-[180px]">
+          <List className="w-4 h-4 shrink-0" />
+          <span className="text-xs font-semibold truncate max-w-[140px] sm:max-w-[180px]">
             {activeIdx >= 0 ? headings[activeIdx]?.title : "Contents"}
           </span>
-          <span className="text-[10px] font-mono text-muted-foreground bg-muted/80 px-1.5 py-0.5 rounded-full shrink-0">
+          <span className="text-[10px] font-mono bg-brand/20 text-brand px-1.5 py-0.5 rounded-full shrink-0">
             {activeIdx >= 0 ? `${activeIdx + 1}/${headings.length}` : headings.length}
           </span>
         </button>

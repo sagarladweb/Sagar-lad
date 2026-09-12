@@ -121,7 +121,7 @@ export function CommentForm({
         <button
           type="submit"
           disabled={state === "loading"}
-          className="btn-premium inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-2.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-95 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-full bg-brand text-white px-6 py-2.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-95 disabled:opacity-60"
         >
           {state === "loading" && <Loader2 className="w-4 h-4 animate-spin" />}
           Post comment

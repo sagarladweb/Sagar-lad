@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { ArrowRight, Trophy, Medal, Footprints } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Timeline } from "@/components/about/Timeline";
+import { TraveledMap } from "@/components/about/TraveledMap";
 import { JsonLd } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 
@@ -20,14 +21,17 @@ const stats = [
 ];
 
 const pageNav = [
-  ["belief", "The Belief"],
+  ["belief", "Professional Bio"],
   ["journey", "My Journey"],
+  ["travel", "Travel"],
   ["running", "Runner for Life"],
   ["connect", "Connect"],
 ];
 
 export default function AboutPage() {
   const root = useRef<HTMLDivElement>(null);
+  const navContainerRef = useRef<HTMLDivElement>(null);
+  const [activeSection, setActiveSection] = useState<string>("belief");
 
   useEffect(() => {
     const el = root.current;
@@ -115,30 +119,36 @@ export default function AboutPage() {
     return () => ctx.revert();
   }, []);
 
-  // Sub-nav scrollspy: highlight the section currently under the sticky bar.
+  // Sub-nav scrollspy: highlight the section currently under the sticky bar across all devices.
   useEffect(() => {
-    const el = root.current;
-    const links = Array.from(el?.querySelectorAll<HTMLElement>("[data-subnav]") ?? []);
-    const ids = links.map((l) => l.dataset.target as string);
-    const sections = ids
-      .map((id) => document.getElementById(id))
-      .filter((s): s is HTMLElement => !!s);
-
-    const setActive = (id: string) =>
-      links.forEach((l) =>
-        l.setAttribute("data-active", l.dataset.target === id ? "true" : "false")
-      );
+    const ids = pageNav.map(([id]) => id);
 
     const onScroll = () => {
+      // Threshold takes into account sticky main navbar (64px) + sticky subnav (~48px) + offset
+      const threshold = 140;
       let current = ids[0];
-      for (const s of sections) {
-        if (s.getBoundingClientRect().top <= 160) current = s.id;
+
+      for (const id of ids) {
+        const s = document.getElementById(id);
+        if (s) {
+          const top = s.getBoundingClientRect().top;
+          if (top <= threshold) {
+            current = id;
+          }
+        }
       }
-      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+
+      // If scrolled near bottom of page, activate last item
+      if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 60
+      ) {
         current = ids[ids.length - 1];
       }
-      setActive(current);
+
+      setActiveSection(current);
     };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
@@ -147,6 +157,38 @@ export default function AboutPage() {
       window.removeEventListener("resize", onScroll);
     };
   }, []);
+
+  // When activeSection changes, auto-scroll active pill into view on mobile
+  useEffect(() => {
+    if (!navContainerRef.current) return;
+    const activeEl = navContainerRef.current.querySelector<HTMLElement>(
+      `[data-nav-pill="${activeSection}"]`
+    );
+    if (activeEl) {
+      activeEl.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+  }, [activeSection]);
+
+  const handleNavClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    setActiveSection(id);
+    const target = document.getElementById(id);
+    if (target) {
+      // 64px site navbar + 50px sub-nav + 6px breathing room
+      const navOffset = 120;
+      const targetTop =
+        target.getBoundingClientRect().top + window.pageYOffset - navOffset;
+      window.scrollTo({
+        top: targetTop,
+        behavior: "smooth",
+      });
+      window.history.replaceState(null, "", `#${id}`);
+    }
+  };
 
   // Counting animation for stat numbers
   useEffect(() => {
@@ -259,24 +301,78 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* ---------- Personal Story ---------- */}
+      <section className="py-16 md:py-24 border-b border-border bg-background">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <div data-reveal className="space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
+            <p>
+              I know what it feels like to lose yourself. At 31, I hit rock
+              bottom. I had lost someone closest to me, my confidence, my
+              direction, and my sense of what life could look like. I was
+              living with fear, doubt, sleepless nights, and a future I
+              couldn&apos;t see.
+            </p>
+            <p>
+              Then I discovered something that changed my life: The biggest
+              transformation had to begin in my mind.
+            </p>
+            <p>
+              That realization led me to create MIND UP Theory™ — a simple
+              approach to making small shifts in the mind that can create a
+              bigger impact in life.
+            </p>
+            <p>
+              Today, my mission is simple: Help people understand their minds,
+              discover their natural potential, and build a life they are
+              proud of.
+            </p>
+            <p>
+              I believe you don&apos;t have to be fearless. You don&apos;t need
+              a perfect plan. You simply need to decide that where you are is
+              not where you want to stay. Because when you change the way you
+              use your mind, you can change what is possible for your life.
+            </p>
+            <div className="pt-3">
+              <span className="inline-block bg-[#ffd51d] text-black px-3 py-1 rounded font-display text-lg sm:text-xl md:text-2xl font-bold tracking-tight shadow-xs">
+                MIND UP. Change your mind. Change your life.
+              </span>
+            </div>
+          </div>
+          <div data-reveal className="mt-8 pt-6 border-t border-border">
+            <p className="text-sm text-muted-foreground">Love,</p>
+            <SiteLogo className="h-12 w-auto mt-3" />
+          </div>
+        </div>
+      </section>
+
       {/* ---------- In-page navigation ---------- */}
       <nav
         aria-label="On this page"
         className="sticky top-16 z-40 border-b border-border bg-background/90 backdrop-blur-md"
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="no-scrollbar flex items-center justify-start gap-2 overflow-x-auto px-1 py-3 md:justify-center">
-            {pageNav.map(([id, label]) => (
-              <a
-                key={id}
-                href={`#${id}`}
-                data-subnav
-                data-target={id}
-                className="shrink-0 rounded-full px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground transition-colors hover:bg-muted hover:text-foreground data-[active=true]:bg-brand data-[active=true]:text-white"
-              >
-                {label}
-              </a>
-            ))}
+          <div
+            ref={navContainerRef}
+            className="no-scrollbar flex items-center justify-start gap-2 overflow-x-auto px-1 py-3 md:justify-center"
+          >
+            {pageNav.map(([id, label]) => {
+              const isActive = activeSection === id;
+              return (
+                <a
+                  key={id}
+                  href={`#${id}`}
+                  onClick={(e) => handleNavClick(e, id)}
+                  data-nav-pill={id}
+                  className={`shrink-0 rounded-full px-3.5 py-1 text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? "bg-brand text-white shadow-xs"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  {label}
+                </a>
+              );
+            })}
           </div>
         </div>
       </nav>
@@ -308,59 +404,66 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ---------- The Belief / Philosophy ---------- */}
+      {/* ---------- Professional Bio ---------- */}
       <section id="belief" className="scroll-mt-32 py-20 md:py-28 border-b border-border">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <p data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-            What drives me
+            Professional Bio
           </p>
-          <h2
-            data-reveal
-            className="mt-4 font-display text-2xl sm:text-3xl md:text-4xl font-bold leading-snug"
-          >
-            People don&apos;t make poor choices — they make the best choices
-            they can with the information they have.
-          </h2>
-          <p data-reveal className="mt-6 max-w-2xl mx-auto text-muted-foreground leading-relaxed text-sm sm:text-base">
-            My ambition is to expand that information and broaden perspective.
-            I create content at the intersection of AI, finance, self-growth,
-            and real-life decision-making — translating insights from books,
-            data, and everyday experience into practical guidance. So that
-            people can make life choices from a place of{" "}
-            <span className="text-foreground font-semibold">awareness, not autopilot.</span>
-          </p>
-          <p data-reveal className="mt-8 font-display text-2xl sm:text-3xl font-bold">
-            Mindset shapes reality.{" "}
-            <span className="btn-premium inline-block bg-accent text-black px-3 py-0.5">
+          <div data-reveal className="mt-6 space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
+            <p>
+              Sagar Lad is a Data &amp; AI Architect, TEDx Speaker, and author
+              of 6+ books. But his story started long before technology, books,
+              or the TEDx stage.
+            </p>
+            <p>
+              Growing up with very little, Sagar learned early that circumstances
+              may shape your starting point — but your thinking can shape where
+              you go next.
+            </p>
+            <p>
+              He studied Computer Engineering, built a career in technology, moved
+              to Europe, worked in Data &amp; AI, travelled across countries, and
+              spent years learning from people, books, experiences, and life
+              itself.
+            </p>
+            <p>
+              But somewhere along the journey, his questions became bigger than
+              technology.
+            </p>
+            <ol className="list-decimal list-inside space-y-1 text-foreground font-semibold text-base sm:text-lg pl-2">
+              <li>How do we make better decisions?</li>
+              <li>Why do we think the way we think?</li>
+              <li>And what becomes possible when we truly understand our own minds?</li>
+            </ol>
+            <p>
+              Those questions eventually led him to create MIND UP Theory™ — his
+              framework for helping people understand their minds, discover their
+              potential, and make better choices in life and work.
+            </p>
+            <p>
+              Today, Sagar works at the intersection of AI, technology,
+              self-growth, and human potential, sharing ideas through his books,
+              speaking, and content.
+            </p>
+            <p className="font-semibold text-foreground">
+              His belief is simple: People don&apos;t need to become someone else
+              to succeed. They need to understand themselves better, use their
+              natural strengths, and make more conscious choices.
+            </p>
+            <p>
+              His mission is to help individuals and organizations move from
+              autopilot to awareness, from awareness to action, and from
+              potential to possibility.
+            </p>
+            <p className="font-display text-xl sm:text-2xl font-bold text-foreground pt-2">
+              Because when you change the way you use your mind, you can change
+              what is possible.
+            </p>
+            <p className="btn-premium inline-block bg-accent text-black px-3 py-0.5 font-display text-xl sm:text-2xl font-bold">
               MIND UP.
-            </span>
-          </p>
-        </div>
-      </section>
-
-      {/* ---------- Rules I live by ---------- */}
-      <section className="py-16 md:py-24 border-b border-border bg-background">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-          <p data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-            Current Life Razor
-          </p>
-          <h2
-            data-reveal
-            className="mt-8 font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.08] tracking-tight"
-          >
-            Be Dumb.{" "}
-            <span className="text-accent-strong">
-              Don&apos;t worry about what others think.
-            </span>
-          </h2>
-          <p
-            data-reveal
-            className="mt-7 mx-auto max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed"
-          >
-            A razor is a rule you cut your life with. Mine is a reminder to stay
-            curious, keep asking the &ldquo;dumb&rdquo; questions, and never let
-            the noise of other people&apos;s opinions decide my next step.
-          </p>
+            </p>
+          </div>
         </div>
       </section>
 
@@ -368,6 +471,21 @@ export default function AboutPage() {
       <div id="journey" className="scroll-mt-32">
         <Timeline />
       </div>
+
+      {/* ---------- Traveled Countries (Global Explorations) ---------- */}
+      <section id="travel" className="scroll-mt-32 py-16 md:py-24 border-b border-border bg-background">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mb-6 sm:mb-8 text-center sm:text-left">
+            <span data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+              Global Journey
+            </span>
+            <h2 data-reveal className="mt-3 font-display text-3xl sm:text-4xl font-bold text-foreground">
+              Countries I&apos;ve Traveled
+            </h2>
+          </div>
+          <TraveledMap />
+        </div>
+      </section>
 
       {/* ---------- Runner for Life ---------- */}
       <section id="running" className="card-hover scroll-mt-32 py-16 md:py-28 border-b border-border bg-card/30">
@@ -455,7 +573,7 @@ export default function AboutPage() {
             Come say hi &amp; connect.
           </h2>
           <p data-reveal className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">
-            I&apos;m active on YouTube, LinkedIn, and C# Corner. Reach out for
+            I&apos;m active on Instagram, LinkedIn. Reach out for
             speaking, book discussions, or tech advice.
           </p>
           <div data-reveal className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-2">

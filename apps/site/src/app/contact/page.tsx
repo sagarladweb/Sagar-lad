@@ -397,7 +397,7 @@ export default function ContactPage() {
                     Response time
                   </p>
                   <p className="text-sm font-medium text-foreground">
-                    3–5 business days
+                    On Weekends
                   </p>
                 </div>
               </div>

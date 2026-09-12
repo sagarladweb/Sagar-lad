@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import localFont from "next/font/local";
 import "./globals.css";
 import { SiteFrame } from "@/components/SiteFrame";
@@ -117,10 +116,8 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://*.supabase.co" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
-      <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Suspense>
-          <SiteFrame announcement={announcement}>{children}</SiteFrame>
-        </Suspense>
+      <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
+        <SiteFrame announcement={announcement}>{children}</SiteFrame>
       </body>
     </html>
   );

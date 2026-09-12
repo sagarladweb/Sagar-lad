@@ -5,8 +5,13 @@ import Link from "next/link";
 import type { QuizResult } from "@/lib/mindup-quiz";
 import { RewardBooks } from "./RewardBooks";
 import { Confetti } from "./Confetti";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, User } from "lucide-react";
 import { MINDUP_PILLARS } from "@/lib/mindup";
+import dynamic from "next/dynamic";
+
+const MindUpShareButtons = dynamic(() =>
+  import("./MindUpShareButtons").then((m) => m.MindUpShareButtons)
+);
 
 function ScoreRing({ score }: { score: number }) {
   const [mounted, setMounted] = useState(false);
@@ -105,6 +110,14 @@ export function ResultsView({
   result: QuizResult;
   onRestart: () => void;
 }) {
+  const [userName, setUserName] = useState("");
+  const [pillarsData, setPillarsData] = useState<{ id: string; score: number }[]>([]);
+
+  useEffect(() => {
+    setPillarsData(
+      result.pillars.map((p) => ({ id: p.pillar.id, score: p.score }))
+    );
+  }, [result]);
   return (
     <div className="min-h-screen bg-background">
       <Confetti />
@@ -148,6 +161,34 @@ export function ResultsView({
             </div>
 
             <div className="result-animate result-delay-4 flex flex-col sm:flex-row lg:flex-col gap-3">
+              {/* Name input for share certificate */}
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <input
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder="Your name (for certificate)"
+                  className="w-full rounded-full border border-border bg-card/80 pl-9 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all"
+                  maxLength={28}
+                />
+              </div>
+
+              {/* Share buttons */}
+              {pillarsData.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Share your score
+                  </span>
+                  <MindUpShareButtons
+                    score={result.totalScore}
+                    userName={userName || "Explorer"}
+                    pillars={pillarsData}
+                    status={result.strongest.label}
+                  />
+                </div>
+              )}
+
               <button
                 onClick={onRestart}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-8 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"

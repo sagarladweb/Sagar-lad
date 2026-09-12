@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function ReadingProgress() {
   const [progress, setProgress] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef(0);
 
   useEffect(() => {
-    let raf = 0;
-
     const measure = () => {
       const contentEl = document.getElementById("post-content");
       if (contentEl) {
@@ -27,9 +27,9 @@ export function ReadingProgress() {
     };
 
     const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = 0;
         measure();
       });
     };
@@ -40,9 +40,16 @@ export function ReadingProgress() {
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
-      if (raf) cancelAnimationFrame(raf);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
+
+  // Use direct DOM update to avoid React render overhead on every frame
+  useEffect(() => {
+    if (barRef.current) {
+      barRef.current.style.transform = `scaleX(${progress})`;
+    }
+  }, [progress]);
 
   return (
     <div
@@ -54,8 +61,9 @@ export function ReadingProgress() {
       aria-valuenow={Math.round(progress * 100)}
     >
       <div
-        className="h-full bg-gradient-to-r from-brand via-brand-light to-accent transition-[width] duration-100 ease-out shadow-[0_1px_4px_rgba(13,33,161,0.2)]"
-        style={{ width: `${progress * 100}%` }}
+        ref={barRef}
+        className="h-full origin-left bg-gradient-to-r from-brand via-brand-light to-accent will-change-[transform] shadow-[0_1px_4px_rgba(13,33,161,0.2)]"
+        style={{ transform: `scaleX(${progress})` }}
       />
     </div>
   );

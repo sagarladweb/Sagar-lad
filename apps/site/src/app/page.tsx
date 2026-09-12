@@ -15,6 +15,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { MentorshipCta } from "@/components/home/MentorshipCta";
 import { NewsletterCta } from "@/components/home/NewsletterCta";
 import { SagarGallery } from "@/components/home/SagarGallery";
+import { LifeRazor } from "@/components/home/LifeRazor";
 import { AnnouncementSection } from "@/components/home/AnnouncementSection";
 import { AnnouncementPopup } from "@/components/home/AnnouncementPopup";
 
@@ -78,6 +79,7 @@ export default async function HomePage({
         <MentorshipCta />
         <NewsletterCta />
         <SagarGallery />
+        <LifeRazor />
         {announcement && <AnnouncementSection announcement={announcement} />}
       </>
     );
@@ -122,6 +124,7 @@ export default async function HomePage({
       <MentorshipCta />
       <NewsletterCta />
       <SagarGallery />
+      <LifeRazor />
       {announcement && <AnnouncementSection announcement={announcement} />}
       {announcement && <AnnouncementPopup announcement={announcement} />}
     </>

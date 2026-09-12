@@ -45,7 +45,7 @@ export default async function NewsletterComposePage({ searchParams }: { searchPa
   }
 
   return (
-    <div className="-mx-4 sm:-mx-8 -my-6 sm:-my-8 h-[calc(100vh-3.5rem)] md:h-screen">
+    <div className="-mx-4 sm:-mx-8 -my-6 sm:-my-8 h-[calc(100vh-3.5rem)] md:h-screen overflow-hidden">
       <NewsletterComposeClient
         subscriberCount={subscriberCount}
         insert={insert}

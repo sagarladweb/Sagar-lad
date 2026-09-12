@@ -172,19 +172,21 @@ export function AboutMe() {
                 A story of almost nothing, and everything.
               </h2>
               <p className="mt-6 text-base sm:text-lg text-[#64748b] leading-loose max-w-xl mx-auto lg:mx-0">
-                From a small town in Gujarat to leading Data &amp; AI
-                transformations across Europe. I left a comfortable life with no
-                savings and no plan — then built it back through awareness,
-                habit and early investing. Today I share everything I know
-                through books, videos and a global community.
+                Sagar Lad is someone who explores the power of the
+                human mind and its role in success, leadership, and
+                personal growth. As the founder of MIND UP Theory™,
+                he is on a mission to help people understand their
+                minds, discover their natural gifts, and unlock
+                their potential.
               </p>
             </div>
             <p className="mt-6 text-base sm:text-lg text-[#64748b] leading-loose max-w-xl mx-auto lg:mx-0 lg:hidden">
-              From a small town in Gujarat to leading Data &amp; AI
-              transformations across Europe. I left a comfortable life with no
-              savings and no plan — then built it back through awareness,
-              habit and early investing. Today I share everything I know
-              through books, videos and a global community.
+              Sagar Lad is someone who explores the power of the
+              human mind and its role in success, leadership, and
+              personal growth. As the founder of MIND UP Theory™,
+              he is on a mission to help people understand their
+              minds, discover their natural gifts, and unlock
+              their potential.
             </p>
 
             {/* Stats matrix */}

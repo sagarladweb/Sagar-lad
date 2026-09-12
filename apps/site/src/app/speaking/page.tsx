@@ -215,31 +215,29 @@ export default function SpeakingPage() {
           </div>
 
           <div className="mt-12" data-animate-group suppressHydrationWarning>
-            <SpeakingExperience />
-          </div>
-
-          {/* Desktop-only booking CTA card */}
-          <div className="hidden lg:block mt-6">
-            <div className="card-hover relative overflow-hidden rounded-lg border border-border bg-card p-8 sm:p-10 shadow-xl flex flex-row items-center gap-8" data-animate-item suppressHydrationWarning>
-              <span aria-hidden="true" className="pointer-events-none absolute -top-24 -left-10 h-48 w-72 rounded-full bg-accent/15 blur-3xl" />
-              <div className="relative shrink-0">
-                <div className="w-16 h-16 rounded-md bg-accent grid place-items-center text-accent-foreground">
-                  <Calendar className="w-8 h-8" />
-                </div>
-              </div>
-              <div className="relative flex-1 text-left space-y-3">
-                <h3 className="font-display text-xl sm:text-2xl font-bold">Want Sagar at your next event?</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Whether it&apos;s a conference, team offsite, university talk, or podcast — let&apos;s make it happen.
-                </p>
-                <Link
-                  href="/speaking/contact"
-                  className="btn-premium mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-6 py-3.5 text-sm font-semibold hover:opacity-95 shadow-md"
-                >
-                  Contact For Speaking <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
+            <SpeakingExperience
+              contactCard={
+                <>
+                  <div className="shrink-0">
+                    <div className="w-14 h-14 rounded-md bg-accent grid place-items-center text-accent-foreground">
+                      <Calendar className="w-7 h-7" />
+                    </div>
+                  </div>
+                  <div className="flex-1 text-left space-y-2 mt-4">
+                    <h3 className="font-display text-lg sm:text-xl font-bold">Want Sagar at your next event?</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Whether it&apos;s a conference, team offsite, university talk, or podcast — let&apos;s make it happen.
+                    </p>
+                    <Link
+                      href="/speaking/contact"
+                      className="btn-premium mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-5 py-3 text-sm font-semibold hover:opacity-95 shadow-md"
+                    >
+                      Contact For Speaking <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </>
+              }
+            />
           </div>
         </div>
       </section>
