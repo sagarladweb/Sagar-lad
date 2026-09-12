@@ -111,11 +111,12 @@ export function Hero() {
           {/* Tagline */}
           <div data-hero-tag className="mb-8">
             <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              MIND UP.
+              MIND UP.{" "}
+              <span className="relative inline-block">
+                <span className="relative z-10">Change your mind. Change your life.</span>
+                <span className="absolute bottom-1 left-0 w-full h-3 bg-[#ffd51d]/40 -z-0 rounded-sm" />
+              </span>
             </p>
-            <span className="inline-block mt-2 bg-[#ffd51d] text-black px-4 py-1.5 rounded-full text-sm sm:text-base font-semibold">
-              Change your mind. Change your life.
-            </span>
           </div>
         </div>
       </div>

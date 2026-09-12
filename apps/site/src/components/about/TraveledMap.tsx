@@ -57,7 +57,7 @@ export function TraveledMap() {
         let x = bbox.x + bbox.width / 2;
         let y = bbox.y + bbox.height / 2;
         // Reposition India dot to Gujarat (western India)
-        if (c.code === "IN") { x = 605; y = 495; }
+        if (c.code === "IN") { x = 597; y = 506; }
         return { code: c.code, x, y };
       })
       .filter(Boolean) as { code: string; x: number; y: number }[];
@@ -475,18 +475,18 @@ export function TraveledMap() {
           {/* ── Hover White Pill (cursor-following, flag + name) ── */}
           {activeCountry && (
             <div
-              className="absolute z-40 pointer-events-none transition-opacity duration-150"
+              className="absolute z-40 pointer-events-none"
               style={{
                 left: `${mousePos.x}px`,
                 top: `${mousePos.y}px`,
-                transform: "translate(-50%, calc(-100% - 12px))",
+                transform: "translate(-50%, calc(-100% - 14px))",
               }}
             >
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-border/60 shadow-md whitespace-nowrap">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-lg border border-black/10 whitespace-nowrap">
                 <span className="text-sm shrink-0" role="img" aria-label={activeCountry.name}>
                   {activeCountry.flag || "📍"}
                 </span>
-                <span className="text-xs font-semibold text-foreground">
+                <span className="text-xs font-bold text-black">
                   {activeCountry.code === "IN"
                     ? "Gujarat, India"
                     : activeCountry.code === "HU"
