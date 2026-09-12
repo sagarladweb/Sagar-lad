@@ -278,11 +278,6 @@ export default function AboutPage() {
               </span>
             </div>
             
-            <h1 data-reveal className="mb-6 font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight text-white">
-              A story of almost nothing,{" "}
-              <span className="text-accent">and everything.</span>
-            </h1>
-
             <p data-reveal className="mb-8 text-base sm:text-lg text-white/75 leading-relaxed max-w-xl">
               Data &amp; AI Architect by profession, TEDx Speaker, and
               published author of 6+ books. Founder of the MIND UP Framework —

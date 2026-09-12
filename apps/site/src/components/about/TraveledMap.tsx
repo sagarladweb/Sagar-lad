@@ -284,39 +284,16 @@ export function TraveledMap() {
 
   return (
     <div ref={containerRef} className="w-full space-y-6">
-      {/* ── Top Bar: Stat Cards (Mobile: 2 perfectly aligned symmetrical cards | Desktop: all 3 cards + right pills) ── */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        {/* Stat Cards */}
-        <div className="grid grid-cols-2 gap-3 w-full sm:w-auto sm:flex sm:items-center sm:gap-3">
-          {/* Card 1: Countries (Mobile & Desktop) */}
-          <div className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2.5 rounded-xl bg-card border border-border/80 shadow-xs h-11">
-            <span className="font-display font-bold text-base sm:text-lg text-foreground tabular-nums">
-              {countryCount}
-            </span>
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">
-              Countries
-            </span>
-          </div>
-
-          {/* Card 2: Continents (Mobile & Desktop) */}
-          <div className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2.5 rounded-xl bg-card border border-border/80 shadow-xs h-11">
-            <span className="font-display font-bold text-base sm:text-lg text-foreground tabular-nums">
-              3
-            </span>
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">
-              Continents
-            </span>
-          </div>
-
-          {/* Card 3: Cities (Desktop/Tablet ONLY, Hidden on Mobile) */}
-          <div className="hidden sm:flex items-center justify-start gap-2 px-4 py-2.5 rounded-xl bg-card border border-border/80 shadow-xs h-11">
-            <span className="font-display font-bold text-base sm:text-lg text-foreground tabular-nums">
-              25+
-            </span>
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">
-              Cities
-            </span>
-          </div>
+      {/* ── Top Bar: Countries count + zoom controls ── */}
+      <div className="flex items-center justify-between gap-4">
+        {/* Countries Card */}
+        <div className="flex items-center justify-start gap-2 px-4 py-2.5 rounded-xl bg-card border border-border/80 shadow-xs h-11">
+          <span className="font-display font-bold text-base sm:text-lg text-foreground tabular-nums">
+            {countryCount}
+          </span>
+          <span className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">
+            Countries
+          </span>
         </div>
 
         {/* Desktop-only Simple Pills (Without Icon) */}
@@ -433,49 +410,35 @@ export function TraveledMap() {
             </svg>
           </div>
 
-          {/* ── Hover Card Tooltip (Solid White, Country Name Blue, City Black, Flags) ── */}
+          {/* ── Red Dot Hover Indicator ── */}
           {activeCountry && (
             <div
               className="absolute z-40 pointer-events-none transition-all duration-150 ease-out"
               style={{
                 left: `${tooltipPos.x}px`,
                 top: `${tooltipPos.y}px`,
-                transform: tooltipPos.flipY
-                  ? "translate(-50%, 16px)"
-                  : "translate(-50%, calc(-100% - 14px))",
+                transform: "translate(-50%, -50%)",
               }}
             >
+              {/* Pulsing red dot */}
+              <div className="relative flex items-center justify-center">
+                <span className="absolute w-4 h-4 rounded-full bg-red-500/30 animate-ping" />
+                <span className="relative w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white shadow-md" />
+              </div>
+              {/* Minimal label below dot */}
               <div
-                className="w-52 p-3 rounded-xl border border-zinc-200 bg-white shadow-xl text-left space-y-1 animate-in fade-in zoom-in-95 duration-150"
-                style={{
-                  backgroundColor: "#ffffff",
-                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
-                }}
+                className="absolute left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/95 dark:bg-zinc-900/95 border border-border/60 shadow-sm"
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-xl shrink-0" role="img" aria-label={activeCountry.name}>
-                    {activeCountry.flag || "📍"}
-                  </span>
-                  <div
-                    className="font-display font-bold text-sm leading-tight"
-                    style={{ color: "#0d21a1" }}
-                  >
-                    {activeCountry.code === "HU"
-                      ? "Hungary (Budapest)"
-                      : activeCountry.code === "AE"
-                      ? "UAE (Dubai)"
-                      : activeCountry.name}
-                  </div>
-                </div>
-
-                {activeCountry.cities && activeCountry.cities.length > 0 && (
-                  <div
-                    className="text-xs font-medium leading-snug pt-0.5"
-                    style={{ color: "#000000" }}
-                  >
-                    {activeCountry.cities.join(" · ")}
-                  </div>
-                )}
+                <span className="text-sm shrink-0" role="img" aria-label={activeCountry.name}>
+                  {activeCountry.flag || "📍"}
+                </span>
+                <span className="text-xs font-semibold text-foreground">
+                  {activeCountry.code === "HU"
+                    ? "Hungary"
+                    : activeCountry.code === "AE"
+                    ? "UAE"
+                    : activeCountry.name}
+                </span>
               </div>
             </div>
           )}

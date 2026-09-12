@@ -153,29 +153,84 @@ export function Timeline() {
     }
   }, []);
 
+  // ── Auto-scroll: advance every 5s only when section is in viewport ──
+  const isInViewRef = useRef(false);
+  const manualPauseRef = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startAutoScroll = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      if (!isInViewRef.current || manualPauseRef.current) return;
+      setActiveIdx((prev) => {
+        const next = prev < nodes.length - 1 ? prev + 1 : 0;
+        centerDotInView(next);
+        return next;
+      });
+    }, 5000);
+  }, [centerDotInView]);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isInViewRef.current = entry.isIntersecting;
+        if (entry.isIntersecting) {
+          manualPauseRef.current = false;
+          startAutoScroll();
+        } else if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [startAutoScroll]);
+
+  // Pause auto-scroll on manual interaction, resume after 10s
+  const pauseAutoScroll = useCallback(() => {
+    manualPauseRef.current = true;
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+    setTimeout(() => {
+      manualPauseRef.current = false;
+      if (isInViewRef.current) startAutoScroll();
+    }, 10000);
+  }, [startAutoScroll]);
+
   const selectMilestone = useCallback(
     (index: number) => {
+      pauseAutoScroll();
       setActiveIdx(index);
       centerDotInView(index);
     },
-    [centerDotInView]
+    [centerDotInView, pauseAutoScroll]
   );
 
   const handlePrev = useCallback(() => {
+    pauseAutoScroll();
     setActiveIdx((prev) => {
       const next = prev > 0 ? prev - 1 : nodes.length - 1;
       centerDotInView(next);
       return next;
     });
-  }, [centerDotInView]);
+  }, [centerDotInView, pauseAutoScroll]);
 
   const handleNext = useCallback(() => {
+    pauseAutoScroll();
     setActiveIdx((prev) => {
       const next = prev < nodes.length - 1 ? prev + 1 : 0;
       centerDotInView(next);
       return next;
     });
-  }, [centerDotInView]);
+  }, [centerDotInView, pauseAutoScroll]);
 
   // Update line positions on mount, active index change, and resize
   useEffect(() => {
@@ -412,6 +467,19 @@ export function Timeline() {
               })}
             </div>
           </div>
+        </div>
+
+        {/* ── Auto-scroll Progress Bar ── */}
+        <div className="mb-8 sm:mb-12 max-w-2xl mx-auto">
+          <div className="h-1 rounded-full bg-border/50 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-accent transition-all duration-500 ease-linear"
+              style={{ width: `${((activeIdx + 1) / nodes.length) * 100}%` }}
+            />
+          </div>
+          <p className="mt-2 text-center text-[10px] text-muted-foreground/50">
+            {activeIdx + 1} / {nodes.length}
+          </p>
         </div>
 
         {/* ── Premium Milestone Showcase Card (Very Light Shadow, No Top Line, No Sparkles) ── */}
