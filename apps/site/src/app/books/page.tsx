@@ -64,9 +64,7 @@ export default async function BooksPage() {
             Details
           </p>
           <p className="mt-5 leading-relaxed text-muted-foreground">
-            All titles are available worldwide in paperback and Kindle from
-            Amazon. For the complete catalogue — including earlier and
-            out-of-print works — visit the author page.
+            All titles are available on Amazon in paperback and Kindle.
           </p>
           <a
             href={AMAZON_AUTHOR_URL}

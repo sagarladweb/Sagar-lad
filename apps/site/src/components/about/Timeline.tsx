@@ -32,17 +32,17 @@ const nodes: Node[] = [
     title: "School",
     word: "Dream Begins",
     description:
-      "D.E Italia High School — where it all started.",
+      "D.E Italia High School. A small town, a second-hand computer, and a kid who believed technology could change the world.",
     tag: "Education",
     icon: GraduationCap,
     image: "/images/profile/about.webp",
   },
   {
     year: "2009 – 2013",
-    title: "College",
+    title: "Engineering",
     word: "Hustle",
     description:
-      "BVM College of Engineering — Computer Science. Four years of building, breaking, and learning.",
+      "BVM College of Engineering — Computer Science. Four years in the lab, not the classroom. Building things that broke, fixing them, and building again.",
     tag: "Education",
     icon: GraduationCap,
     image: "/images/profile/about-2.webp",
@@ -52,7 +52,7 @@ const nodes: Node[] = [
     title: "First Step",
     word: "Professional",
     description:
-      "First Professional Step — TCS. From Gujarat to the world.",
+      "First Professional Step — TCS. From Gujarat to the world. First job, first flight, first taste of what was possible.",
     tag: "Career",
     icon: Briefcase,
     image: "/images/profile/about-4.webp",
@@ -62,7 +62,7 @@ const nodes: Node[] = [
     title: "Data Science",
     word: "Reinvent",
     description:
-      "Reinvent: IIIT Bangalore, Data Science. When the world stopped, I started learning.",
+      "Reinvent — IIIT Bangalore, Data Science. When the world stopped, I started learning. IIIT Bangalore opened a door I never knew existed.",
     tag: "Education",
     icon: GraduationCap,
     image: "/images/profile/about-5.webp",
@@ -84,7 +84,7 @@ const nodes: Node[] = [
     title: "Gen AI",
     word: "Stay Curious",
     description:
-      "Stay Curious: Purdue University, Masters in Gen AI. Back to being a student.",
+      "Stay Curious — Purdue University, Masters in Gen AI. Back to being a student. Because the best leaders never stop learning.",
     tag: "Education",
     icon: GraduationCap,
     image: "/images/speaking/candid-presentation.webp",

@@ -11,9 +11,9 @@ import { SiteLogo } from "@/components/SiteLogo";
 import { Pill } from "@/components/ui/Pill";
 
 const stats = [
-  { value: Number(METRICS.yearsExperience), suffix: "+", label: "Years in tech & data" },
-  { value: Number(METRICS.countriesTravelled), suffix: "+", label: "Countries travelled" },
-  { value: Number(METRICS.booksPublished), suffix: "+", label: "Published books" },
+  { value: Number(METRICS.yearsExperience.replace(/[^0-9]/g, "")), suffix: "+", label: "Years in tech & data" },
+  { value: Number(METRICS.countriesTravelled.replace(/[^0-9]/g, "")), suffix: "+", label: "Countries travelled" },
+  { value: Number(METRICS.booksPublished.replace(/[^0-9]/g, "")), suffix: "+", label: "Published books" },
   { value: Number(METRICS.communityReached.replace(/[^0-9]/g, "")), suffix: "K+", label: "Community reached" },
 ];
 
