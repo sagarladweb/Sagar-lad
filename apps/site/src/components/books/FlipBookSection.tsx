@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, ShoppingBag } from "lucide-react";
 import { FlipBook } from "@/components/FlipBook";
@@ -63,17 +64,23 @@ export function FlipBookSection({
   const data = FLIPBOOKS[bookKey];
   if (!data || typeof document === "undefined") return null;
 
+  // Lock body scroll
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
   return createPortal(
     <div className="fixed inset-0 z-[60] flex flex-col bg-[#090909]">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 shrink-0">
-        <div>
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 shrink-0 border-b border-white/5">
+        <div className="min-w-0">
           <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#FACC15]">
             Preview Edition
           </p>
-          <p className="text-sm font-bold text-white">{data.title}</p>
+          <p className="text-sm font-bold text-white truncate">{data.title}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0 ml-4">
           {data.buyLink && (
             <a
               href={data.buyLink}
@@ -82,7 +89,7 @@ export function FlipBookSection({
               className="inline-flex items-center gap-1.5 rounded-full bg-[#FACC15] text-black px-4 py-2 text-xs font-bold hover:opacity-90 transition-opacity"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
-              Buy Now
+              <span className="hidden sm:inline">Buy Now</span>
             </a>
           )}
           <button
@@ -96,8 +103,8 @@ export function FlipBookSection({
         </div>
       </div>
 
-      {/* Book — centered, no scroll */}
-      <div className="flex-1 flex items-center justify-center min-h-0 px-4">
+      {/* Book — centered in remaining space */}
+      <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-2 sm:px-4">
         <FlipBook {...data} />
       </div>
     </div>,
