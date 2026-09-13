@@ -1,7 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { X, ShoppingBag } from "lucide-react";
 import { FlipBook } from "@/components/FlipBook";
 
 export type FlipBookData = {
@@ -31,6 +31,7 @@ export const FLIPBOOKS: Record<string, FlipBookData> = {
       "/images/books/Book-MINDUP/10.webp",
     ],
     backCoverImage: "/images/books/Book-MINDUP/mindup-back.webp",
+    buyLink: "https://www.amazon.com/stores/author/B0B5R12SHN/allbooks",
   },
   "AI Foundry": {
     title: "AI Foundry",
@@ -47,6 +48,8 @@ export const FLIPBOOKS: Record<string, FlipBookData> = {
       "/images/books/Book-AI foundry/A 8.webp",
       "/images/books/Book-AI foundry/A 9.webp",
     ],
+    backCoverImage: "/images/books/Book-AI foundry/azure-back.svg",
+    buyLink: "https://www.amazon.com/stores/author/B0B5R12SHN/allbooks",
   },
 };
 
@@ -61,17 +64,40 @@ export function FlipBookSection({
   if (!data || typeof document === "undefined") return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#090909]">
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close preview"
-        className="absolute right-4 top-4 z-10 rounded-full border border-white/10 bg-white/5 p-2.5 text-neutral-400 transition-colors hover:text-white backdrop-blur-sm"
-      >
-        <X className="h-5 w-5" />
-      </button>
+    <div className="fixed inset-0 z-[60] flex flex-col bg-[#090909]">
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 py-3 shrink-0">
+        <div>
+          <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#FACC15]">
+            Preview Edition
+          </p>
+          <p className="text-sm font-bold text-white">{data.title}</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {data.buyLink && (
+            <a
+              href={data.buyLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#FACC15] text-black px-4 py-2 text-xs font-bold hover:opacity-90 transition-opacity"
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              Buy Now
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close preview"
+            className="rounded-full border border-white/10 bg-white/5 p-2 text-neutral-400 transition-colors hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
-      <div className="w-full h-full overflow-y-auto">
+      {/* Book — centered, no scroll */}
+      <div className="flex-1 flex items-center justify-center min-h-0 px-4">
         <FlipBook {...data} />
       </div>
     </div>,

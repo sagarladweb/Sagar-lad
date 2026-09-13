@@ -150,10 +150,10 @@ export default function ContactPage() {
               <Image
                 src="/images/section.png"
                 alt="Sagar Lad"
-                width={900}
-                height={1000}
+                width={1402}
+                height={1122}
                 priority
-                className="relative z-10 h-auto w-full object-cover"
+                className="relative z-10 h-auto w-full"
                 style={{
                   maskImage: "linear-gradient(to top, transparent 0%, black 15%, black 100%)",
                   WebkitMaskImage: "linear-gradient(to top, transparent 0%, black 15%, black 100%)",
