@@ -13,6 +13,7 @@ import {
   Clock,
 } from "lucide-react";
 import { validateContact, sanitizeText } from "@/lib/client-validators";
+import { ContactHeroSandbox } from "@/components/ContactHeroSandbox";
 
 const initial = {
   firstName: "",
@@ -106,6 +107,7 @@ export default function ContactPage() {
 
   return (
     <div className="overflow-x-clip">
+      <ContactHeroSandbox />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -143,46 +145,47 @@ export default function ContactPage() {
           }}
         />
 
-        <div className="relative z-20 mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-6 pt-8 pb-10 sm:pt-14 sm:pb-16">
-          {/* Portrait */}
-          <div className="lg:col-span-5 relative flex justify-center" data-animate="left" data-reverse>
-            <div className="relative w-full max-w-[420px] mx-auto overflow-hidden rounded-xl">
+        <div className="relative z-20 mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 sm:gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 pt-6 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20">
+          {/* Portrait: First on mobile, Left on desktop */}
+          <div className="order-1 lg:order-1 lg:col-span-5 relative flex justify-center" data-animate="left" data-reverse>
+            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto overflow-hidden rounded-2xl">
               <Image
                 src="/images/section.png"
                 alt="Sagar Lad"
-                width={1402}
-                height={1122}
+                width={2400}
+                height={1600}
                 priority
-                className="relative z-10 h-auto w-full"
+                sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 420px"
+                className="relative z-10 h-auto w-full object-contain"
                 style={{
-                  maskImage: "linear-gradient(to top, transparent 0%, black 15%, black 100%)",
-                  WebkitMaskImage: "linear-gradient(to top, transparent 0%, black 15%, black 100%)",
+                  maskImage: "linear-gradient(to top, transparent 0%, black 12%, black 100%)",
+                  WebkitMaskImage: "linear-gradient(to top, transparent 0%, black 12%, black 100%)",
                 }}
               />
             </div>
           </div>
 
-          {/* Copy */}
-          <div className="lg:col-span-7 lg:pl-6 text-center lg:text-left" data-animate="right" data-reverse>
+          {/* Copy: Below image on mobile, Right on desktop */}
+          <div className="order-2 lg:order-2 lg:col-span-7 text-center lg:text-left" data-animate="right" data-reverse>
             <span className="inline-block rounded-full bg-muted px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Get in touch
             </span>
-            <h1 className="mt-6 font-display text-[2.75rem] sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-foreground">
+            <h1 className="mt-4 sm:mt-6 font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-foreground">
               Let&apos;s{" "}
               <span className="text-accent">connect.</span>
             </h1>
-            <p className="mt-6 max-w-md text-[15px] sm:text-base text-muted-foreground leading-[1.8]">
+            <p className="mt-4 sm:mt-6 max-w-md mx-auto lg:mx-0 text-[15px] sm:text-base text-muted-foreground leading-[1.8]">
               Have a question, feedback on a book, or a thought to share?
               I read every message.
             </p>
-            <ul className="mt-8 space-y-3.5">
+            <ul className="mt-6 sm:mt-8 space-y-3 max-w-md mx-auto lg:mx-0 text-left">
               {bullets.map((item) => (
                 <li
                   key={item}
                   className="flex items-start gap-3 text-sm font-medium text-foreground/70"
                 >
                   <CheckCircle2
-                    className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                    className="mt-0.5 h-4 w-4 shrink-0 text-accent"
                     aria-hidden="true"
                   />
                   {item}
