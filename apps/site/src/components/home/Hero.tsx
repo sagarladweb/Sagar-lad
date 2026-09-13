@@ -80,17 +80,17 @@ export function Hero() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-32">
         <div className="max-w-3xl text-center sm:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
+          {/* Subtitle */}
+          <p data-hero-sub className="mb-4 text-lg sm:text-xl text-white/60 font-medium">
+            Your friend, mentor and Guide
+          </p>
+
           {/* Name */}
-          <h1 className="mb-2">
+          <h1 className="mb-4">
             <span data-hero-word className="font-display text-6xl sm:text-7xl md:text-8xl font-bold leading-[1.1] text-[#ffd51d]">
               Sagar Lad
             </span>
           </h1>
-
-          {/* Subtitle */}
-          <p data-hero-sub className="mb-6 text-lg sm:text-xl text-white/60 font-medium">
-            A friend, mentor and Guide
-          </p>
 
           {/* Tagline */}
           <div data-hero-tag className="mb-8">
@@ -98,9 +98,10 @@ export function Hero() {
               MIND UP.
             </p>
             <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              Change your{" "}
-              <span className="bg-[#ffd51d] text-black px-1.5 rounded">MIND</span>. Change your{" "}
-              <span className="bg-[#ffd51d] text-black px-1.5 rounded">life</span>.
+              Change your <span className="text-[#ffd51d]">MIND</span>.
+            </p>
+            <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+              Change your <span className="text-[#ffd51d]">life</span>.
             </p>
           </div>
         </div>

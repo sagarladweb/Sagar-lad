@@ -105,9 +105,6 @@ export function Footer() {
             <Link href="/" className="inline-flex items-center gap-2">
               <SiteLogo light className="h-12 w-auto" />
             </Link>
-            <p className="mt-4 text-sm text-background/70 max-w-xs leading-relaxed">
-              A friend, mentor and Guide
-            </p>
 
             {/* Desktop social icons — 3 static */}
             <div className="mt-5 hidden md:flex items-center gap-2 flex-wrap">
