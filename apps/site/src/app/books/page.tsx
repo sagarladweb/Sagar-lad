@@ -3,7 +3,6 @@ import { ArrowUpRight } from "lucide-react";
 import { getPublishedBooks } from "@/lib/content";
 import { SITE, pageMetadata } from "@/lib/site";
 import { BookLibrary } from "@/components/books/BookLibrary";
-import { FlipBook } from "@/components/FlipBook";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
@@ -77,43 +76,6 @@ export default async function BooksPage() {
           </a>
         </div>
       </section>
-
-      {/* -------- Live Book Previews -------- */}
-      <FlipBook
-        title="MindUp"
-        author="Sagar Lad"
-        coverImage="/images/books/Book-MINDUP/mindup-front.webp"
-        pages={[
-          "/images/books/Book-MINDUP/1.webp",
-          "/images/books/Book-MINDUP/2.webp",
-          "/images/books/Book-MINDUP/3.webp",
-          "/images/books/Book-MINDUP/4.webp",
-          "/images/books/Book-MINDUP/5.webp",
-          "/images/books/Book-MINDUP/6.webp",
-          "/images/books/Book-MINDUP/7.webp",
-          "/images/books/Book-MINDUP/8.webp",
-          "/images/books/Book-MINDUP/9.webp",
-          "/images/books/Book-MINDUP/10.webp",
-        ]}
-        backCoverImage="/images/books/Book-MINDUP/mindup-back.webp"
-      />
-
-      <FlipBook
-        title="AI Foundry"
-        author="Sagar Lad"
-        coverImage="/images/books/Book-AI foundry/azure-front.webp"
-        pages={[
-          "/images/books/Book-AI foundry/A 1.webp",
-          "/images/books/Book-AI foundry/A 2.webp",
-          "/images/books/Book-AI foundry/A 3.webp",
-          "/images/books/Book-AI foundry/A 4.webp",
-          "/images/books/Book-AI foundry/A 5.webp",
-          "/images/books/Book-AI foundry/A 6.webp",
-          "/images/books/Book-AI foundry/A 7.webp",
-          "/images/books/Book-AI foundry/A 8.webp",
-          "/images/books/Book-AI foundry/A 9.webp",
-        ]}
-      />
     </div>
   );
 }

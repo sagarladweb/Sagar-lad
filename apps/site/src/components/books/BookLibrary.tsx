@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { ShoppingBag, X, Download, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingBag, X, Download, Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { validateEmail, validateName } from "@/lib/client-validators";
+import { FlipBookSection, FLIPBOOKS } from "@/components/books/FlipBookSection";
 
 type BookItem = {
   id: string;
@@ -43,6 +44,7 @@ export function BookLibrary({ books, variant }: { books: BookItem[]; variant: Va
   const [page, setPage] = useState(1);
   const [active, setActive] = useState<BookItem | null>(null);
   const [target, setTarget] = useState<DownloadTarget | null>(null);
+  const [previewKey, setPreviewKey] = useState<string | null>(null);
 
   // Download form state
   const [name, setName] = useState("");
@@ -56,15 +58,21 @@ export function BookLibrary({ books, variant }: { books: BookItem[]; variant: Va
   const paged = books.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   useEffect(() => {
-    if (!active && !target) return;
+    if (!active && !target && !previewKey) return;
     document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && (setActive(null), setTarget(null));
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActive(null);
+        setTarget(null);
+        setPreviewKey(null);
+      }
+    };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKey);
     };
-  }, [active, target]);
+  }, [active, target, previewKey]);
 
   const ctaLabel = () =>
     variant === "published" ? "Get Copy" : variant === "ebook" ? "Download" : "Buy this Book";
@@ -173,7 +181,18 @@ export function BookLibrary({ books, variant }: { books: BookItem[]; variant: Va
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent-strong">
                     {variant === "read" ? book.author : book.tagline}
                   </p>
-                ) : null}
+              ) : null}
+
+              {active && FLIPBOOKS[active.title] && (
+                <button
+                  type="button"
+                  onClick={() => { setPreviewKey(active!.title); setActive(null); }}
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  Preview Book
+                </button>
+              )}
                 <h3 className="font-display text-lg font-bold leading-snug transition-colors group-hover:text-accent-strong">
                   {book.title}
                 </h3>
@@ -493,6 +512,11 @@ export function BookLibrary({ books, variant }: { books: BookItem[]; variant: Va
           </div>
         </div>,
         document.body
+      )}
+
+      {/* FlipBook preview modal */}
+      {previewKey && (
+        <FlipBookSection bookKey={previewKey} onClose={() => setPreviewKey(null)} />
       )}
     </>
   );

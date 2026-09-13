@@ -1,66 +1,80 @@
 "use client";
 
+import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 import { FlipBook } from "@/components/FlipBook";
 
-const MINDUP = {
-  title: "MindUp",
-  author: "Parralex Studio",
-  coverImage: "/images/books/Book-MINDUP/mindup-front.webp",
-  backCoverImage: "/images/books/Book-MINDUP/mindup-back.webp",
-  pages: [
-    "/images/books/Book-MINDUP/1.webp",
-    "/images/books/Book-MINDUP/2.webp",
-    "/images/books/Book-MINDUP/3.webp",
-    "/images/books/Book-MINDUP/4.webp",
-    "/images/books/Book-MINDUP/5.webp",
-    "/images/books/Book-MINDUP/6.webp",
-    "/images/books/Book-MINDUP/7.webp",
-    "/images/books/Book-MINDUP/8.webp",
-    "/images/books/Book-MINDUP/9.webp",
-    "/images/books/Book-MINDUP/10.webp",
-  ],
-  buyLink: "https://www.amazon.com/stores/author/B0B5R12SHN",
+export type FlipBookData = {
+  title: string;
+  author: string;
+  coverImage: string;
+  pages: string[];
+  backCoverImage?: string;
+  buyLink?: string;
 };
 
-const AI_FOUNDRY = {
-  title: "AI Foundry",
-  author: "Parralex Studio",
-  coverImage: "/images/books/Book-AI foundry/azure-front.webp",
-  pages: [
-    "/images/books/Book-AI foundry/A 1.webp",
-    "/images/books/Book-AI foundry/A 2.webp",
-    "/images/books/Book-AI foundry/A 3.webp",
-    "/images/books/Book-AI foundry/A 4.webp",
-    "/images/books/Book-AI foundry/A 5.webp",
-    "/images/books/Book-AI foundry/A 6.webp",
-    "/images/books/Book-AI foundry/A 7.webp",
-    "/images/books/Book-AI foundry/A 8.webp",
-    "/images/books/Book-AI foundry/A 9.webp",
-  ],
-  buyLink: "https://www.amazon.com/stores/author/B0B5R12SHN",
+export const FLIPBOOKS: Record<string, FlipBookData> = {
+  MindUp: {
+    title: "MindUp",
+    author: "Sagar Lad",
+    coverImage: "/images/books/Book-MINDUP/mindup-front.webp",
+    pages: [
+      "/images/books/Book-MINDUP/1.webp",
+      "/images/books/Book-MINDUP/2.webp",
+      "/images/books/Book-MINDUP/3.webp",
+      "/images/books/Book-MINDUP/4.webp",
+      "/images/books/Book-MINDUP/5.webp",
+      "/images/books/Book-MINDUP/6.webp",
+      "/images/books/Book-MINDUP/7.webp",
+      "/images/books/Book-MINDUP/8.webp",
+      "/images/books/Book-MINDUP/9.webp",
+      "/images/books/Book-MINDUP/10.webp",
+    ],
+    backCoverImage: "/images/books/Book-MINDUP/mindup-back.webp",
+  },
+  "AI Foundry": {
+    title: "AI Foundry",
+    author: "Sagar Lad",
+    coverImage: "/images/books/Book-AI foundry/azure-front.webp",
+    pages: [
+      "/images/books/Book-AI foundry/A 1.webp",
+      "/images/books/Book-AI foundry/A 2.webp",
+      "/images/books/Book-AI foundry/A 3.webp",
+      "/images/books/Book-AI foundry/A 4.webp",
+      "/images/books/Book-AI foundry/A 5.webp",
+      "/images/books/Book-AI foundry/A 6.webp",
+      "/images/books/Book-AI foundry/A 7.webp",
+      "/images/books/Book-AI foundry/A 8.webp",
+      "/images/books/Book-AI foundry/A 9.webp",
+    ],
+  },
 };
 
-export function FlipBookSection() {
-  return (
-    <section className="bg-[#090909] py-20 md:py-28">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="mb-16 text-center">
-          <p className="inline-block text-xs font-semibold tracking-wide text-[#FACC15] bg-[#FACC15]/10 rounded-full px-4 py-1.5">
-            Preview
-          </p>
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-white md:text-4xl">
-            Flip through the pages.
-          </h2>
-          <p className="mt-3 text-sm text-neutral-400">
-            Drag, swipe, or use arrow keys to preview each book.
-          </p>
-        </div>
+export function FlipBookSection({
+  bookKey,
+  onClose,
+}: {
+  bookKey: string;
+  onClose: () => void;
+}) {
+  const data = FLIPBOOKS[bookKey];
+  if (!data || typeof document === "undefined") return null;
 
-        <div className="space-y-24">
-          <FlipBook {...MINDUP} />
-          <FlipBook {...AI_FOUNDRY} />
-        </div>
+  return createPortal(
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#090909]">
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close preview"
+        className="absolute right-4 top-4 z-10 rounded-full border border-white/10 bg-white/5 p-2.5 text-neutral-400 transition-colors hover:text-white backdrop-blur-sm"
+      >
+        <X className="h-5 w-5" />
+      </button>
+
+      <div className="w-full h-full overflow-y-auto">
+        <FlipBook {...data} />
       </div>
-    </section>
+    </div>,
+    document.body
   );
 }
