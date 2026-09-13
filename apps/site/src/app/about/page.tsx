@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
@@ -67,22 +67,37 @@ export default function AboutPage() {
   const [imgSettings, setImgSettings] = useState({
     objectPosition: "50% 30%",
     objectFit: "cover" as "cover" | "contain" | "fill",
+    zoom: 1,
+    panX: 0,
+    panY: 0,
+    rotate: 0,
   });
 
-  // Derive active settings from breakpoint
-  const handleSettingsChange = useCallback((all: { mobile: { objectPosition: string; objectFit: "cover" | "contain" | "fill" }; tablet: { objectPosition: string; objectFit: "cover" | "contain" | "fill" }; desktop: { objectPosition: string; objectFit: "cover" | "contain" | "fill" } }) => {
-    setImgSettings(all[bp]);
-  }, [bp]);
-
-  // React to breakpoint changes
+  // Read settings from localStorage on mount and when breakpoint changes
   useEffect(() => {
-    const raw = typeof window !== "undefined" ? localStorage.getItem("marathon-image-settings") : null;
-    if (raw) {
+    function readSettings() {
       try {
-        const all = JSON.parse(raw);
-        setImgSettings(all[bp]);
+        const raw = localStorage.getItem("marathon-image-settings");
+        if (raw) {
+          const all = JSON.parse(raw);
+          const bpSettings = all[bp];
+          if (bpSettings) {
+            setImgSettings({
+              objectPosition: bpSettings.objectPosition ?? "50% 30%",
+              objectFit: bpSettings.objectFit ?? "cover",
+              zoom: bpSettings.zoom ?? 1,
+              panX: bpSettings.panX ?? 0,
+              panY: bpSettings.panY ?? 0,
+              rotate: bpSettings.rotate ?? 0,
+            });
+          }
+        }
       } catch {}
     }
+    readSettings();
+    const onChange = () => readSettings();
+    window.addEventListener("marathon-settings-changed", onChange);
+    return () => window.removeEventListener("marathon-settings-changed", onChange);
   }, [bp]);
 
   useEffect(() => {
@@ -617,31 +632,32 @@ export default function AboutPage() {
                       key={r.race}
                       data-runner-card
                       data-count={r.count}
-                      className="card-hover rounded-xl border border-border bg-background overflow-hidden snap-center shrink-0 w-[75vw] sm:w-auto flex flex-col group"
+                      className="card-hover rounded-xl border border-border bg-background overflow-hidden snap-center shrink-0 w-[80vw] sm:w-auto flex flex-col group"
                     >
-                      {/* Image — takes ~60% of card */}
-                      <div className="relative h-52 sm:h-48 overflow-hidden">
+                      {/* Image — 80% of card */}
+                      <div className="relative overflow-hidden flex-[4] min-h-[220px]">
                         <Image
                           src={r.src}
                           alt={r.alt}
                           fill
-                          sizes="(max-width: 640px) 75vw, 25vw"
-                          className="transition-all duration-500 group-hover:scale-105"
+                          sizes="(max-width: 640px) 80vw, 25vw"
+                          className="transition-all duration-500"
                           style={{
                             objectFit: imgSettings.objectFit,
                             objectPosition: imgSettings.objectPosition,
+                            transform: `scale(${imgSettings.zoom}) translate(${imgSettings.panX}%, ${imgSettings.panY}%) rotate(${imgSettings.rotate}deg)`,
                           }}
                         />
                       </div>
-                      {/* Content — separated from image with solid bg */}
-                      <div className="relative px-4 py-3 text-center bg-background">
-                        <div className="mx-auto w-9 h-9 rounded-lg bg-brand-light/15 grid place-items-center text-brand mb-1.5">
+                      {/* Content — 20% of card */}
+                      <div className="flex-[1] px-4 py-3 text-center bg-background flex flex-col items-center justify-center min-h-[100px]">
+                        <div className="w-8 h-8 rounded-lg bg-brand-light/15 grid place-items-center text-brand mb-1">
                           <Icon className="w-4 h-4" />
                         </div>
-                        <p className="font-display text-xl font-extrabold text-accent-strong leading-tight">
+                        <p className="font-display text-lg font-extrabold text-accent-strong leading-tight">
                           {r.label}
                         </p>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground leading-tight mt-1">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground leading-tight mt-0.5">
                           {r.race}
                         </p>
                         <p className="text-sm font-bold mt-0.5 text-foreground">{r.distance}</p>
@@ -655,7 +671,6 @@ export default function AboutPage() {
               <MarathonImageSandbox
                 images={MARATHON_IMAGES.map((r) => ({ src: r.src, alt: r.alt, label: r.label }))}
                 activeBreakpoint={bp}
-                onSettingsChange={handleSettingsChange}
               />
             </div>
           </div>
