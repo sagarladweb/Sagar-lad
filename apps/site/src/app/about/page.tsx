@@ -11,13 +11,13 @@ import { TraveledMap } from "@/components/about/TraveledMap";
 import { JsonLd } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 
-import { METRICS } from "@/lib/metrics";
+import { METRICS, metricNum } from "@/lib/metrics";
 
 const stats = [
-  { value: Number(METRICS.yearsExperience), suffix: "+", label: "Years in tech & data" },
-  { value: Number(METRICS.countriesTravelled), suffix: "+", label: "Countries lived & worked" },
-  { value: Number(METRICS.booksPublished), suffix: "+", label: "Books published" },
-  { value: Number(METRICS.communityReached.replace(/[^0-9]/g, "")), suffix: "K+", label: "Community reached" },
+  { value: metricNum(METRICS.yearsExperience), suffix: "+", label: "Years in tech & data" },
+  { value: metricNum(METRICS.countriesTravelled), suffix: "+", label: "Countries travelled" },
+  { value: metricNum(METRICS.booksPublished), suffix: "+", label: "Books published" },
+  { value: metricNum(METRICS.communityReached), suffix: "K+", label: "Community reached" },
 ];
 
 const pageNav = [
@@ -289,6 +289,18 @@ export default function AboutPage() {
               they can with the information they have.
             </p>
 
+            <div data-reveal className="mb-8">
+              <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                MIND UP.
+              </p>
+              <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                Change your <span className="text-[#ffd51d]">MIND</span>.
+              </p>
+              <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                Change your <span className="text-[#ffd51d]">life</span>.
+              </p>
+            </div>
+
             <div data-reveal className="mt-2">
               <SiteLogo light className="h-12 w-auto mx-auto sm:mx-0" />
             </div>
@@ -300,6 +312,14 @@ export default function AboutPage() {
       <section className="py-16 md:py-24 border-b border-border bg-background">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div data-reveal className="space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
+            <p>
+              You are probably on this page because you want to know more about
+              me. I&apos;m not going to lie, changing my life wasn&apos;t
+              glamorous.
+            </p>
+            <p>
+              It was grueling.
+            </p>
             <p>
               I know what it feels like to lose yourself. At 31, I hit rock
               bottom. I had lost someone closest to me, my confidence, my
@@ -407,20 +427,21 @@ export default function AboutPage() {
           </p>
           <div data-reveal className="mt-6 space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
             <p>
-              Sagar Lad is a Data &amp; AI Architect, TEDx Speaker, and author
-              of 6+ books. But his story started long before technology, books,
-              or the TEDx stage.
+              Sagar Lad works as a Data &amp; AI Architect with a software
+              company. He is also a TEDx Speaker and author of 6+ books. But
+              his story started long before technology, books, or the TEDx
+              stage.
             </p>
             <p>
-              Growing up with very little, Sagar learned early that circumstances
-              may shape your starting point — but your thinking can shape where
-              you go next.
+              Growing up with very little, Sagar learned early that
+              circumstances may shape your starting point — but your thinking
+              can shape where you go next.
             </p>
             <p>
-              He studied Computer Engineering, built a career in technology, moved
-              to Europe, worked in Data &amp; AI, travelled across countries, and
-              spent years learning from people, books, experiences, and life
-              itself.
+              He studied Computer Engineering, built a career in technology,
+              moved to Europe, worked in Data &amp; AI, travelled across
+              countries, and spent years learning from people, books,
+              experiences, and life itself.
             </p>
             <p>
               But somewhere along the journey, his questions became bigger than
@@ -441,15 +462,14 @@ export default function AboutPage() {
               self-growth, and human potential, sharing ideas through his books,
               speaking, and content.
             </p>
-            <p className="font-semibold text-foreground">
-              His belief is simple: People don&apos;t need to become someone else
-              to succeed. They need to understand themselves better, use their
-              natural strengths, and make more conscious choices.
-            </p>
             <p>
-              His mission is to help individuals and organizations move from
-              autopilot to awareness, from awareness to action, and from
-              potential to possibility.
+              He believes that real growth begins with understanding yourself.
+              When you understand your mind, your strengths, and your choices,
+              you can take greater responsibility for the life you create.
+            </p>
+            <p className="font-semibold text-foreground">
+              His mission is simple: help people become more aware, make better
+              choices, and turn their potential into possibility.
             </p>
             <p className="font-display text-xl sm:text-2xl font-bold text-foreground pt-2">
               Because when you change the way you use your mind, you can change

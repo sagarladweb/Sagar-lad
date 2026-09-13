@@ -6,15 +6,15 @@ import Link from "next/link";
 import { gsap } from "@/lib/gsap";
 import { ArrowUpRight } from "lucide-react";
 
-import { METRICS } from "@/lib/metrics";
+import { METRICS, metricNum } from "@/lib/metrics";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Pill } from "@/components/ui/Pill";
 
 const stats = [
-  { value: Number(METRICS.yearsExperience.replace(/[^0-9]/g, "")), suffix: "+", label: "Years in tech & data" },
-  { value: Number(METRICS.countriesTravelled.replace(/[^0-9]/g, "")), suffix: "+", label: "Countries travelled" },
-  { value: Number(METRICS.booksPublished.replace(/[^0-9]/g, "")), suffix: "+", label: "Published books" },
-  { value: Number(METRICS.communityReached.replace(/[^0-9]/g, "")), suffix: "K+", label: "Community reached" },
+  { value: metricNum(METRICS.yearsExperience), suffix: "+", label: "Years in tech & data" },
+  { value: metricNum(METRICS.countriesTravelled), suffix: "+", label: "Countries travelled" },
+  { value: metricNum(METRICS.booksPublished), suffix: "+", label: "Published books" },
+  { value: metricNum(METRICS.communityReached), suffix: "K+", label: "Community reached" },
 ];
 
 export function AboutMe() {

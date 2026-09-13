@@ -17,3 +17,6 @@ export const METRICS = {
   booksSold: "10,000+",
   bookReaders: "1M+",
 } as const;
+
+/** Strip non-numeric chars so "25+" → 25, "10K+" → 10, etc. */
+export const metricNum = (v: string) => Number(v.replace(/[^0-9]/g, ""));
