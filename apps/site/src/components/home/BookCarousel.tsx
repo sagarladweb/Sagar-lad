@@ -1,19 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
-import { ShoppingBag, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
+import { ShoppingBag, ChevronLeft, ChevronRight, ChevronUp, BookOpen } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
-import { type BookId } from "@/components/books/BookPages";
 import { DotPagination } from "@/components/ui/CarouselNav";
 import { BookStats } from "./BookStats";
 import { Pill } from "@/components/ui/Pill";
-
-const BookViewer = dynamic(
-  () => import("@/components/books/BookViewer").then((m) => m.BookViewer),
-  { ssr: false }
-);
+import { FlipBookSection, FLIPBOOKS } from "@/components/books/FlipBookSection";
 
 export type BookCarouselBook = {
   id: string;
@@ -47,8 +41,11 @@ function getLocalCover(title: string): { front: string; back?: string } | null {
   return null;
 }
 
-function getBookId(title: string): BookId {
-  return /foundry|azure/i.test(title) ? "azure" : "mindup";
+function getFlipbookKey(title: string): string | null {
+  const lower = title.toLowerCase();
+  if (lower.includes("mind up") || lower.includes("mindup")) return "MindUp";
+  if (lower.includes("foundry") || lower.includes("azure")) return "AI Foundry";
+  return null;
 }
 
 export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
@@ -63,7 +60,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [fullyVisible, setFullyVisible] = useState(false);
-  const [viewerOpen, setViewerOpen] = useState(false);
+  const [previewKey, setPreviewKey] = useState<string | null>(null);
   const [drag, setDrag] = useState(0);
   const [dragging, setDragging] = useState(false);
   const startX = useRef(0);
@@ -118,7 +115,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
 
   const cover = getLocalCover(book.title);
   const frontSrc = cover?.front ?? book.imageUrl ?? "";
-  const bookId = getBookId(book.title);
+  const fbKey = getFlipbookKey(book.title);
 
   return (
     <div
@@ -129,12 +126,9 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
       aria-roledescription="carousel"
       aria-label="Featured books"
     >
-      <BookViewer
-        bookId={bookId}
-        buyUrl={book.buyUrl}
-        open={viewerOpen}
-        onClose={() => setViewerOpen(false)}
-      />
+      {previewKey && (
+        <FlipBookSection bookKey={previewKey} onClose={() => setPreviewKey(null)} />
+      )}
 
       {/* Section Header */}
       <div className="mb-12 md:mb-16 text-center">
@@ -184,7 +178,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setViewerOpen(true);
+                  if (fbKey) setPreviewKey(fbKey);
                 }}
                 onPointerDown={(e) => e.stopPropagation()}
                 onPointerUp={(e) => e.stopPropagation()}
