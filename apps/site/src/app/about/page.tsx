@@ -527,55 +527,78 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Right: race cards */}
-            <div
-              data-runner-cards
-              className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4"
-            >
-              {[
-                {
-                  icon: Medal,
-                  race: "TCS Amsterdam Half Marathon",
-                  distance: "21 km",
-                  count: 3,
-                  label: "×3",
-                },
-                {
-                  icon: Trophy,
-                  race: "TCS Amsterdam Marathon",
-                  distance: "8 km",
-                  count: 2,
-                  label: "×2",
-                },
-                {
-                  icon: Trophy,
-                  race: "Amsterdam DAM to DAM",
-                  distance: "16 km",
-                  count: 2,
-                  label: "×2",
-                },
-              ].map((r) => {
-                const Icon = r.icon;
-                return (
-                  <div
-                    key={r.race}
-                    data-runner-card
-                    data-count={r.count}
-                    className="card-hover rounded-xl border border-border bg-background p-5 text-center"
-                  >
-                    <div className="mx-auto w-10 h-10 rounded-lg bg-brand-light/15 grid place-items-center text-brand">
-                      <Icon className="w-5 h-5" />
+            {/* Right: race cards + marathon images */}
+            <div className="lg:col-span-7 space-y-4">
+              {/* Race Cards */}
+              <div
+                data-runner-cards
+                className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+              >
+                {[
+                  {
+                    icon: Medal,
+                    race: "TCS Amsterdam Half Marathon",
+                    distance: "21 km",
+                    count: 3,
+                    label: "×3",
+                  },
+                  {
+                    icon: Trophy,
+                    race: "TCS Amsterdam Marathon",
+                    distance: "8 km",
+                    count: 2,
+                    label: "×2",
+                  },
+                  {
+                    icon: Trophy,
+                    race: "Amsterdam DAM to DAM",
+                    distance: "16 km",
+                    count: 2,
+                    label: "×2",
+                  },
+                ].map((r) => {
+                  const Icon = r.icon;
+                  return (
+                    <div
+                      key={r.race}
+                      data-runner-card
+                      data-count={r.count}
+                      className="card-hover rounded-xl border border-border bg-background p-5 text-center"
+                    >
+                      <div className="mx-auto w-10 h-10 rounded-lg bg-brand-light/15 grid place-items-center text-brand">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <p className="mt-3 font-display text-2xl font-extrabold text-accent-strong runner-count">
+                        {r.label}
+                      </p>
+                      <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground leading-tight">
+                        {r.race}
+                      </p>
+                      <p className="mt-1 text-sm font-bold">{r.distance}</p>
                     </div>
-                    <p className="mt-3 font-display text-2xl font-extrabold text-accent-strong runner-count">
-                      {r.label}
-                    </p>
-                    <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground leading-tight">
-                      {r.race}
-                    </p>
-                    <p className="mt-1 text-sm font-bold">{r.distance}</p>
+                  );
+                })}
+              </div>
+
+              {/* Marathon Images */}
+              <div data-reveal className="grid grid-cols-3 gap-3">
+                {[
+                  { src: "/about me merathon/Sagar Lad Marathon 2017.webp", alt: "Sagar Lad Marathon 2017" },
+                  { src: "/about me merathon/Sagar Lad Marathon 2021 .webp", alt: "Sagar Lad Marathon 2021" },
+                  { src: "/about me merathon/Sagar Lad Marathon 2022.webp", alt: "Sagar Lad Marathon 2022" },
+                ].map((img) => (
+                  <div key={img.src} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-border group">
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      sizes="(max-width: 640px) 33vw, 25vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
           </div>
         </div>
