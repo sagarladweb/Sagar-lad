@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
@@ -8,6 +8,7 @@ import { ArrowRight, Trophy, Medal, Footprints } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Timeline } from "@/components/about/Timeline";
 import { TraveledMap } from "@/components/about/TraveledMap";
+import { MarathonImageSandbox, useBreakpoint } from "@/components/about/MarathonImageSandbox";
 import { JsonLd } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 
@@ -28,10 +29,61 @@ const pageNav = [
   ["connect", "Connect"],
 ];
 
+const MARATHON_IMAGES = [
+  {
+    src: "/about me merathon/Sagar Lad Marathon 2017.webp",
+    alt: "Sagar Lad Marathon 2017",
+    icon: Medal,
+    race: "TCS Amsterdam Half Marathon",
+    distance: "21 km",
+    count: 3,
+    label: "×3",
+  },
+  {
+    src: "/about me merathon/Sagar Lad Marathon 2021 .webp",
+    alt: "Sagar Lad Marathon 2021",
+    icon: Trophy,
+    race: "TCS Amsterdam Marathon",
+    distance: "8 km",
+    count: 2,
+    label: "×2",
+  },
+  {
+    src: "/about me merathon/Sagar Lad Marathon 2022.webp",
+    alt: "Sagar Lad Marathon 2022",
+    icon: Trophy,
+    race: "Amsterdam DAM to DAM",
+    distance: "16 km",
+    count: 2,
+    label: "×2",
+  },
+];
+
 export default function AboutPage() {
   const root = useRef<HTMLDivElement>(null);
   const navContainerRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState<string>("belief");
+  const bp = useBreakpoint();
+  const [imgSettings, setImgSettings] = useState({
+    objectPosition: "50% 30%",
+    objectFit: "cover" as "cover" | "contain" | "fill",
+  });
+
+  // Derive active settings from breakpoint
+  const handleSettingsChange = useCallback((all: { mobile: { objectPosition: string; objectFit: "cover" | "contain" | "fill" }; tablet: { objectPosition: string; objectFit: "cover" | "contain" | "fill" }; desktop: { objectPosition: string; objectFit: "cover" | "contain" | "fill" } }) => {
+    setImgSettings(all[bp]);
+  }, [bp]);
+
+  // React to breakpoint changes
+  useEffect(() => {
+    const raw = typeof window !== "undefined" ? localStorage.getItem("marathon-image-settings") : null;
+    if (raw) {
+      try {
+        const all = JSON.parse(raw);
+        setImgSettings(all[bp]);
+      } catch {}
+    }
+  }, [bp]);
 
   useEffect(() => {
     const el = root.current;
@@ -558,71 +610,53 @@ export default function AboutPage() {
                 data-runner-cards
                 className="no-scrollbar flex sm:grid sm:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth px-1 -mx-1"
               >
-                {[
-                  {
-                    src: "/about me merathon/Sagar Lad Marathon 2017.webp",
-                    alt: "Sagar Lad Marathon 2017",
-                    icon: Medal,
-                    race: "TCS Amsterdam Half Marathon",
-                    distance: "21 km",
-                    count: 3,
-                    label: "×3",
-                  },
-                  {
-                    src: "/about me merathon/Sagar Lad Marathon 2021 .webp",
-                    alt: "Sagar Lad Marathon 2021",
-                    icon: Trophy,
-                    race: "TCS Amsterdam Marathon",
-                    distance: "8 km",
-                    count: 2,
-                    label: "×2",
-                  },
-                  {
-                    src: "/about me merathon/Sagar Lad Marathon 2022.webp",
-                    alt: "Sagar Lad Marathon 2022",
-                    icon: Trophy,
-                    race: "Amsterdam DAM to DAM",
-                    distance: "16 km",
-                    count: 2,
-                    label: "×2",
-                  },
-                ].map((r) => {
+                {MARATHON_IMAGES.map((r) => {
                   const Icon = r.icon;
                   return (
                     <div
                       key={r.race}
                       data-runner-card
                       data-count={r.count}
-                      className="card-hover rounded-xl border border-border bg-background overflow-hidden flex flex-col group snap-center shrink-0 w-[70vw] sm:w-auto"
+                      className="card-hover rounded-xl border border-border bg-background overflow-hidden snap-center shrink-0 w-[75vw] sm:w-auto flex flex-col group"
                     >
-                      {/* Image */}
-                      <div className="relative aspect-[3/4] overflow-hidden">
+                      {/* Image — takes ~60% of card */}
+                      <div className="relative h-52 sm:h-48 overflow-hidden">
                         <Image
                           src={r.src}
                           alt={r.alt}
                           fill
-                          sizes="(max-width: 640px) 100vw, 25vw"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          sizes="(max-width: 640px) 75vw, 25vw"
+                          className="transition-all duration-500 group-hover:scale-105"
+                          style={{
+                            objectFit: imgSettings.objectFit,
+                            objectPosition: imgSettings.objectPosition,
+                          }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       </div>
-                      {/* Race info at bottom */}
-                      <div className="relative px-4 py-3 text-center -mt-16 z-10">
-                        <div className="mx-auto w-9 h-9 rounded-lg bg-brand-light/20 grid place-items-center text-brand mb-2">
+                      {/* Content — separated from image with solid bg */}
+                      <div className="relative px-4 py-3 text-center bg-background">
+                        <div className="mx-auto w-9 h-9 rounded-lg bg-brand-light/15 grid place-items-center text-brand mb-1.5">
                           <Icon className="w-4 h-4" />
                         </div>
-                        <p className="font-display text-xl font-extrabold text-accent-strong">
+                        <p className="font-display text-xl font-extrabold text-accent-strong leading-tight">
                           {r.label}
                         </p>
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground leading-tight mt-1">
                           {r.race}
                         </p>
-                        <p className="text-sm font-bold mt-0.5">{r.distance}</p>
+                        <p className="text-sm font-bold mt-0.5 text-foreground">{r.distance}</p>
                       </div>
                     </div>
                   );
                 })}
               </div>
+
+              {/* Sandbox controls */}
+              <MarathonImageSandbox
+                images={MARATHON_IMAGES.map((r) => ({ src: r.src, alt: r.alt, label: r.label }))}
+                activeBreakpoint={bp}
+                onSettingsChange={handleSettingsChange}
+              />
             </div>
           </div>
         </div>
