@@ -5,10 +5,8 @@ import { createPortal } from "react-dom";
 import {
   ChevronLeft,
   ChevronRight,
-  RotateCcw,
   Download,
   Settings2,
-  X,
 } from "lucide-react";
 
 const STORAGE_KEY = "contact-hero-sandbox-v3";
@@ -32,7 +30,7 @@ function loadAll(): All {
 
 function saveAll(a: All) { localStorage.setItem(STORAGE_KEY, JSON.stringify(a)); }
 
-export function ContactHeroSandbox({ children }: { children: React.ReactNode }) {
+export function ContactHeroSandbox() {
   const [all, setAll] = useState<All>({});
   const [dk, setDk] = useState("mobile");
   const [open, setOpen] = useState(false);
@@ -71,9 +69,10 @@ export function ContactHeroSandbox({ children }: { children: React.ReactNode }) 
     alert("Copied!");
   };
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <>
-      {/* Live apply via class override */}
       <style>{`
         .contact-hero-img {
           transform: scale(${cur.z / 100}) translate(${cur.tx}px, ${cur.ty}px) !important;
@@ -83,66 +82,57 @@ export function ContactHeroSandbox({ children }: { children: React.ReactNode }) 
         }
       `}</style>
 
-      {children}
+      <button type="button" onClick={() => setOpen((v) => !v)}
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-1.5 rounded-full bg-amber-500 text-black px-4 py-2 text-[11px] font-bold uppercase tracking-wider shadow-xl hover:bg-amber-400 transition-colors">
+        <Settings2 className="w-3.5 h-3.5" />
+        {open ? "Close" : "Adjust Image"}
+      </button>
 
-      {/* Portal controls out of overflow-hidden parents */}
-      {mounted && createPortal(
-        <>
-          {/* Toggle button — fixed bottom-center */}
-          <button type="button" onClick={() => setOpen((v) => !v)}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-1.5 rounded-full bg-amber-500 text-black px-4 py-2 text-[11px] font-bold uppercase tracking-wider shadow-xl hover:bg-amber-400 transition-colors">
-            <Settings2 className="w-3.5 h-3.5" />
-            {open ? "Close" : "Adjust Image"}
-          </button>
-
-          {/* Control panel */}
-          {open && (
-            <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] bg-[#111] border border-amber-500/30 rounded-2xl p-4 shadow-2xl w-[300px]">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">{dk}</span>
-                <div className="flex items-center gap-2">
-                  <button type="button" onClick={reset} className="text-[9px] text-neutral-500 hover:text-white transition-colors">Reset</button>
-                  <span className="text-neutral-700">|</span>
-                  <button type="button" onClick={exportAll} className="text-[9px] text-amber-500 hover:text-amber-400 transition-colors flex items-center gap-1"><Download className="w-2.5 h-2.5" />Copy All</button>
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <Row label="Zoom" value={`${cur.z}%`}>
-                  <Btn onClick={() => set({ z: Math.max(50, cur.z - 5) })}><ChevronLeft className="w-3 h-3" /></Btn>
-                  <Btn onClick={() => set({ z: Math.min(200, cur.z + 5) })}><ChevronRight className="w-3 h-3" /></Btn>
-                </Row>
-                <Row label="Move X" value={`${cur.tx}px`}>
-                  <Btn onClick={() => set({ tx: cur.tx - 5 })}><ChevronLeft className="w-3 h-3" /></Btn>
-                  <Btn onClick={() => set({ tx: cur.tx + 5 })}><ChevronRight className="w-3 h-3" /></Btn>
-                </Row>
-                <Row label="Move Y" value={`${cur.ty}px`}>
-                  <Btn onClick={() => set({ ty: cur.ty - 5 })}><ChevronLeft className="w-3 h-3" /></Btn>
-                  <Btn onClick={() => set({ ty: cur.ty + 5 })}><ChevronRight className="w-3 h-3" /></Btn>
-                </Row>
-                <Row label="Focus X" value={`${cur.ox}%`}>
-                  <Btn onClick={() => set({ ox: Math.max(0, cur.ox - 5) })}><ChevronLeft className="w-3 h-3" /></Btn>
-                  <Btn onClick={() => set({ ox: Math.min(100, cur.ox + 5) })}><ChevronRight className="w-3 h-3" /></Btn>
-                </Row>
-                <Row label="Focus Y" value={`${cur.oy}%`}>
-                  <Btn onClick={() => set({ oy: Math.max(0, cur.oy - 5) })}><ChevronLeft className="w-3 h-3" /></Btn>
-                  <Btn onClick={() => set({ oy: Math.min(100, cur.oy + 5) })}><ChevronRight className="w-3 h-3" /></Btn>
-                </Row>
-                <Row label="Fade Start" value={`${cur.ms}%`}>
-                  <Btn onClick={() => set({ ms: Math.max(0, cur.ms - 1) })}><ChevronLeft className="w-3 h-3" /></Btn>
-                  <Btn onClick={() => set({ ms: Math.min(50, cur.ms + 1) })}><ChevronRight className="w-3 h-3" /></Btn>
-                </Row>
-                <Row label="Fade End" value={`${cur.me}%`}>
-                  <Btn onClick={() => set({ me: Math.max(1, cur.me - 1) })}><ChevronLeft className="w-3 h-3" /></Btn>
-                  <Btn onClick={() => set({ me: Math.min(50, cur.me + 1) })}><ChevronRight className="w-3 h-3" /></Btn>
-                </Row>
-              </div>
+      {open && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] bg-[#111] border border-amber-500/30 rounded-2xl p-4 shadow-2xl w-[300px]">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">{dk}</span>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={reset} className="text-[9px] text-neutral-500 hover:text-white transition-colors">Reset</button>
+              <span className="text-neutral-700">|</span>
+              <button type="button" onClick={exportAll} className="text-[9px] text-amber-500 hover:text-amber-400 transition-colors flex items-center gap-1"><Download className="w-2.5 h-2.5" />Copy All</button>
             </div>
-          )}
-        </>,
-        document.body
+          </div>
+
+          <div className="space-y-2.5">
+            <Row label="Zoom" value={`${cur.z}%`}>
+              <Btn onClick={() => set({ z: Math.max(50, cur.z - 5) })}><ChevronLeft className="w-3 h-3" /></Btn>
+              <Btn onClick={() => set({ z: Math.min(200, cur.z + 5) })}><ChevronRight className="w-3 h-3" /></Btn>
+            </Row>
+            <Row label="Move X" value={`${cur.tx}px`}>
+              <Btn onClick={() => set({ tx: cur.tx - 5 })}><ChevronLeft className="w-3 h-3" /></Btn>
+              <Btn onClick={() => set({ tx: cur.tx + 5 })}><ChevronRight className="w-3 h-3" /></Btn>
+            </Row>
+            <Row label="Move Y" value={`${cur.ty}px`}>
+              <Btn onClick={() => set({ ty: cur.ty - 5 })}><ChevronLeft className="w-3 h-3" /></Btn>
+              <Btn onClick={() => set({ ty: cur.ty + 5 })}><ChevronRight className="w-3 h-3" /></Btn>
+            </Row>
+            <Row label="Focus X" value={`${cur.ox}%`}>
+              <Btn onClick={() => set({ ox: Math.max(0, cur.ox - 5) })}><ChevronLeft className="w-3 h-3" /></Btn>
+              <Btn onClick={() => set({ ox: Math.min(100, cur.ox + 5) })}><ChevronRight className="w-3 h-3" /></Btn>
+            </Row>
+            <Row label="Focus Y" value={`${cur.oy}%`}>
+              <Btn onClick={() => set({ oy: Math.max(0, cur.oy - 5) })}><ChevronLeft className="w-3 h-3" /></Btn>
+              <Btn onClick={() => set({ oy: Math.min(100, cur.oy + 5) })}><ChevronRight className="w-3 h-3" /></Btn>
+            </Row>
+            <Row label="Fade Start" value={`${cur.ms}%`}>
+              <Btn onClick={() => set({ ms: Math.max(0, cur.ms - 1) })}><ChevronLeft className="w-3 h-3" /></Btn>
+              <Btn onClick={() => set({ ms: Math.min(50, cur.ms + 1) })}><ChevronRight className="w-3 h-3" /></Btn>
+            </Row>
+            <Row label="Fade End" value={`${cur.me}%`}>
+              <Btn onClick={() => set({ me: Math.max(1, cur.me - 1) })}><ChevronLeft className="w-3 h-3" /></Btn>
+              <Btn onClick={() => set({ me: Math.min(50, cur.me + 1) })}><ChevronRight className="w-3 h-3" /></Btn>
+            </Row>
+          </div>
+        </div>
       )}
-    </>
+    </>,
+    document.body
   );
 }
 
