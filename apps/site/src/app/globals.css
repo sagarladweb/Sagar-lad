@@ -1049,6 +1049,18 @@ video {
    PREMIUM ANIMATION & TRANSITION SYSTEM
    ═══════════════════════════════════════════════════════════════════ */
 
+/* ── data-reveal: ensure elements are visible even if GSAP doesn't fire ── */
+[data-reveal] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
 /* ── Card hover: border accent + minimal lift ────────────────────── */
 .card-hover,
 [data-card-hover] {

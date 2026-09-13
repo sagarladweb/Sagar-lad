@@ -503,7 +503,7 @@ export function Timeline() {
 
                 <div className="absolute bottom-4 left-4 right-4 text-white">
                   <div className="text-xs font-bold uppercase tracking-wider text-white/80">
-                    {activeNode.word}
+                    {activeNode.year}
                   </div>
                   <div className="font-display text-xl sm:text-2xl font-bold leading-tight">
                     {activeNode.title}
@@ -512,16 +512,19 @@ export function Timeline() {
               </div>
 
               {/* Right Column: Narrative Story & Chapter Details */}
-              <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between gap-4 flex-wrap pb-3 border-b border-border/60">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-brand/10 text-[#0d21a1] text-xs font-bold uppercase tracking-wider">
-                      <span>{activeNode.year}</span>
-                    </div>
+              <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between">
+                <div className="space-y-5">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center px-3 py-1 rounded-lg bg-brand/10 text-[#0d21a1] text-xs font-bold uppercase tracking-wider">
+                      {activeNode.year}
+                    </span>
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      {activeNode.tag}
+                    </span>
                   </div>
 
                   <h3 className="font-display text-2xl sm:text-3xl font-bold text-foreground leading-snug">
-                    {activeNode.title}: {activeNode.word}
+                    {activeNode.title}: <span className="text-[#0d21a1]">{activeNode.word}</span>
                   </h3>
 
                   <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
