@@ -106,7 +106,7 @@ export default async function BlogPage({
         }}
       />
       {/* Profile Header — Sagar's exact content with bottom aligned buttons */}
-      <header className="pb-8">
+      <header className="pb-4">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-10">
           {/* Avatar Left */}
           <div className="relative h-28 w-28 sm:h-36 sm:w-36 rounded-full overflow-hidden border-2 border-border shadow-md shrink-0 bg-muted">
@@ -185,7 +185,7 @@ export default async function BlogPage({
 
       {/* Tabs */}
       <nav
-        className="mt-10 border-t border-border flex items-stretch"
+        className="mt-6 border-t border-border flex items-stretch"
         aria-label="Blog content"
       >
         {(["posts", "videos"] as Tab[]).map((t) => (
