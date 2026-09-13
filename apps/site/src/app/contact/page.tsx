@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { JsonLd } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
@@ -29,6 +29,27 @@ type Errors = {
   message?: string;
 };
 
+const STORAGE_KEY = "contact-hero-sandbox-v2";
+const DEVICE_DEFAULTS = { zoom: 100, posX: 0, posY: 0, objX: 50, objY: 50, maskStart: 0, maskEnd: 12 };
+const ALL_DEFAULTS = { mobile: { ...DEVICE_DEFAULTS }, tablet: { ...DEVICE_DEFAULTS }, desktop: { ...DEVICE_DEFAULTS }, wide: { ...DEVICE_DEFAULTS } };
+
+function getDeviceKey(w: number): "mobile" | "tablet" | "desktop" | "wide" {
+  if (w < 640) return "mobile";
+  if (w < 1024) return "tablet";
+  if (w < 1440) return "desktop";
+  return "wide";
+}
+
+function loadHeroSettings() {
+  if (typeof window === "undefined") return DEVICE_DEFAULTS;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEVICE_DEFAULTS;
+    const all = { ...ALL_DEFAULTS, ...JSON.parse(raw) };
+    return all[getDeviceKey(window.innerWidth)] ?? DEVICE_DEFAULTS;
+  } catch { return DEVICE_DEFAULTS; }
+}
+
 const bullets = [
   "Direct access — no gatekeepers",
   "Replies within 3–5 business days",
@@ -42,6 +63,15 @@ export default function ContactPage() {
     "idle" | "loading" | "success" | "error"
   >("idle");
   const [message, setMessage] = useState("");
+  const [hero, setHero] = useState(DEVICE_DEFAULTS);
+
+  // Load hero settings on mount + on resize
+  useEffect(() => {
+    const apply = () => setHero(loadHeroSettings());
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
+  }, []);
 
   function update<K extends keyof typeof initial>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -148,31 +178,6 @@ export default function ContactPage() {
         <div className="relative z-20 mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 sm:gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 pt-6 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20">
           {/* Portrait: First on mobile, Left on desktop */}
           <div className="order-1 lg:order-1 lg:col-span-5 relative flex justify-center" data-animate="left" data-reverse suppressHydrationWarning>
-            <style>{`
-              .contact-hero-img {
-                object-position: 50% 50%;
-                mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
-                -webkit-mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
-              }
-              @media (max-width: 639px) {
-                .contact-hero-img {
-                  transform: scale(1.2) translateX(30px);
-                  object-position: 50% 50%;
-                }
-              }
-              @media (min-width: 640px) and (max-width: 1023px) {
-                .contact-hero-img {
-                  transform: scale(1.35) translateX(30px);
-                  object-position: 50% 50%;
-                }
-              }
-              @media (min-width: 1024px) {
-                .contact-hero-img {
-                  transform: scale(1.15) translate(-60px, -10px);
-                  object-position: 50% 50%;
-                }
-              }
-            `}</style>
             <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto overflow-hidden rounded-2xl">
               <Image
                 src="/images/section.png"
@@ -181,7 +186,13 @@ export default function ContactPage() {
                 height={1600}
                 priority
                 sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 420px"
-                className="relative z-10 h-auto w-full object-cover contact-hero-img"
+                className="relative z-10 h-auto w-full object-cover"
+                style={{
+                  transform: `scale(${hero.zoom / 100}) translate(${hero.posX}px, ${hero.posY}px)`,
+                  objectPosition: `${hero.objX}% ${hero.objY}%`,
+                  maskImage: `linear-gradient(to top, transparent ${hero.maskStart}%, black ${hero.maskEnd}%, black 100%)`,
+                  WebkitMaskImage: `linear-gradient(to top, transparent ${hero.maskStart}%, black ${hero.maskEnd}%, black 100%)`,
+                }}
               />
             </div>
           </div>
