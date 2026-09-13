@@ -9,7 +9,7 @@ import { FeaturedOn } from "@/components/home/FeaturedOn";
 import { AboutMe } from "@/components/home/AboutMe";
 import { TopicsGrid } from "@/components/home/TopicsGrid";
 import { MindUp } from "@/components/home/MindUp";
-import { MindUpBook } from "@/components/home/MindUpBook";
+import { HomeFlipBooks } from "@/components/home/HomeFlipBooks";
 import { BlogPreview } from "@/components/home/BlogPreview";
 import { Testimonials } from "@/components/home/Testimonials";
 import { MentorshipCta } from "@/components/home/MentorshipCta";
@@ -73,7 +73,7 @@ export default async function HomePage({
         <AboutMe />
         <MindUp />
         <TopicsGrid topics={topicsWithViews} />
-        <MindUpBook />
+        <HomeFlipBooks />
       <BlogPreview posts={posts} showStats />
         <Testimonials />
         <MentorshipCta />
@@ -118,7 +118,7 @@ export default async function HomePage({
       <AboutMe />
       <MindUp />
       <TopicsGrid topics={topicsWithViews} />
-      <MindUpBook />
+      <HomeFlipBooks />
       <BlogPreview posts={posts} showStats />
       <Testimonials />
       <MentorshipCta />
