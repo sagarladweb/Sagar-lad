@@ -12,7 +12,7 @@ import { Pill } from "@/components/ui/Pill";
 
 const stats = [
   { value: Number(METRICS.yearsExperience), suffix: "+", label: "Years in tech & data" },
-  { value: Number(METRICS.countriesTravelled), suffix: "+", label: "Countries worked" },
+  { value: Number(METRICS.countriesTravelled), suffix: "+", label: "Countries travelled" },
   { value: Number(METRICS.booksPublished), suffix: "+", label: "Published books" },
   { value: Number(METRICS.communityReached.replace(/[^0-9]/g, "")), suffix: "K+", label: "Community reached" },
 ];
@@ -128,8 +128,8 @@ export function AboutMe() {
         {/* Mobile: Pill + heading centered, then image, then content */}
         <div className="lg:hidden text-center" data-story-head>
           <Pill>About Sagar</Pill>
-          <h2 className="mt-6 font-display text-3xl sm:text-4xl font-bold leading-[1.15] tracking-tight text-[#1e293b]">
-            A story of almost nothing, and everything.
+          <h2 className="mt-6 font-display text-3xl sm:text-4xl font-bold leading-[1.15] tracking-tight text-[#94a3b8]">
+            Author · Speaker · Human Potential Advocate
           </h2>
         </div>
 
@@ -157,7 +157,7 @@ export function AboutMe() {
                 <figcaption className="absolute bottom-0 inset-x-0 p-7 text-white">
                   <SiteLogo light className="h-12 w-auto" />
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/80">
-                    Author · Public Speaker
+                    Author · Speaker · Human Potential Advocate
                   </p>
                 </figcaption>
               </figure>
@@ -168,25 +168,25 @@ export function AboutMe() {
           <div className="lg:col-span-7 order-3 lg:order-2 text-center lg:text-left">
             <div data-story-head className="hidden lg:block">
               <Pill>About Sagar</Pill>
-              <h2 className="mt-6 font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight text-[#1e293b]">
-                A story of almost nothing, and everything.
+              <h2 className="mt-6 font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight text-[#94a3b8]">
+                Author · Speaker · Human Potential Advocate
               </h2>
               <p className="mt-6 text-base sm:text-lg text-[#64748b] leading-loose max-w-xl mx-auto lg:mx-0">
-                Sagar Lad is someone who explores the power of the
-                human mind and its role in success, leadership, and
-                personal growth. As the founder of MIND UP Theory™,
-                he is on a mission to help people understand their
-                minds, discover their natural gifts, and unlock
-                their potential.
+                What if understanding your mind could change
+                the way you live and lead?
+                Sagar Lad explores that question through MIND
+                UP Theory™—helping people understand their
+                minds, recognize their natural strengths, and
+                unlock their potential.
               </p>
             </div>
             <p className="mt-6 text-base sm:text-lg text-[#64748b] leading-loose max-w-xl mx-auto lg:mx-0 lg:hidden">
-              Sagar Lad is someone who explores the power of the
-              human mind and its role in success, leadership, and
-              personal growth. As the founder of MIND UP Theory™,
-              he is on a mission to help people understand their
-              minds, discover their natural gifts, and unlock
-              their potential.
+              What if understanding your mind could change
+              the way you live and lead?
+              Sagar Lad explores that question through MIND
+              UP Theory™—helping people understand their
+              minds, recognize their natural strengths, and
+              unlock their potential.
             </p>
 
             {/* Stats matrix */}

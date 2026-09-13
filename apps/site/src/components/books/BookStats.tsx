@@ -52,12 +52,10 @@ export function BookStats({ books, variant }: { books: Book[]; variant: "read" |
         const total = books.length;
         const uniqueAuthors = new Set(books.map((b) => b.author).filter(Boolean)).size;
         const withLearnings = books.filter((b) => b.learning).length;
-        const withTagline = books.filter((b) => b.tagline).length;
         return [
           { icon: BookOpen, value: total, label: "Books Read" },
           { icon: Users, value: uniqueAuthors, label: "Authors" },
           { icon: Lightbulb, value: withLearnings, label: "Key Lessons" },
-          { icon: Tag, value: withTagline, label: "With Tagline" },
         ];
       })()
     : (() => {
@@ -94,7 +92,7 @@ export function BookStats({ books, variant }: { books: Book[]; variant: "read" |
       ref={ref}
       className="rounded-2xl border border-border bg-card/60 backdrop-blur-sm"
     >
-      <div className="grid grid-cols-3 md:grid-cols-4 divide-x divide-border">
+      <div className="grid grid-cols-3 divide-x divide-border">
         {stats.map((s, i) => (
           <div
             key={s.label + i}

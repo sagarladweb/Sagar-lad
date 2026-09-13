@@ -29,30 +29,30 @@ type Node = {
 const nodes: Node[] = [
   {
     year: "2009",
-    title: "School Days",
-    word: "Dreams Begin",
+    title: "School",
+    word: "Dream Begins",
     description:
-      "A small town, a second-hand computer, and a kid who believed technology could change the world.",
+      "D.E Italia High School — where it all started.",
     tag: "Education",
     icon: GraduationCap,
     image: "/images/profile/about.webp",
   },
   {
     year: "2009 – 2013",
-    title: "Engineering",
+    title: "College",
     word: "Hustle",
     description:
-      "Four years in the lab, not the classroom. Building things that broke, fixing them, and building again.",
+      "BVM College of Engineering — Computer Science. Four years of building, breaking, and learning.",
     tag: "Education",
     icon: GraduationCap,
     image: "/images/profile/about-2.webp",
   },
   {
     year: "2013",
-    title: "Joined TCS",
-    word: "First Flight",
+    title: "First Step",
+    word: "Professional",
     description:
-      "From Gujarat to the world. First job, first flight, first taste of what was possible.",
+      "First Professional Step — TCS. From Gujarat to the world.",
     tag: "Career",
     icon: Briefcase,
     image: "/images/profile/about-4.webp",
@@ -62,7 +62,7 @@ const nodes: Node[] = [
     title: "Data Science",
     word: "Reinvent",
     description:
-      "When the world stopped, I started learning. IIIT Bangalore opened a door I never knew existed.",
+      "Reinvent: IIIT Bangalore, Data Science. When the world stopped, I started learning.",
     tag: "Education",
     icon: GraduationCap,
     image: "/images/profile/about-5.webp",
@@ -84,7 +84,7 @@ const nodes: Node[] = [
     title: "Gen AI",
     word: "Stay Curious",
     description:
-      "Purdue University. Back to being a student. Because the best leaders never stop learning.",
+      "Stay Curious: Purdue University, Masters in Gen AI. Back to being a student.",
     tag: "Education",
     icon: GraduationCap,
     image: "/images/speaking/candid-presentation.webp",

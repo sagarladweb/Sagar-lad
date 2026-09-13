@@ -3,7 +3,6 @@ import { ArrowUpRight } from "lucide-react";
 import { getPublishedBooks } from "@/lib/content";
 import { SITE, pageMetadata } from "@/lib/site";
 import { BookLibrary } from "@/components/books/BookLibrary";
-import { BookStats } from "@/components/books/BookStats";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
@@ -50,10 +49,6 @@ export default async function BooksPage() {
             <p className="text-sm text-muted-foreground tabular-nums">
               {String(total).padStart(2, "0")} titles
             </p>
-          </div>
-
-          <div className="mt-10">
-            <BookStats books={books} variant="published" />
           </div>
 
           <div className="mt-10">

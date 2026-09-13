@@ -104,10 +104,10 @@ export function TopicsGrid({ topics }: { topics: Topic[] }) {
           <Pill>Explore</Pill>
         </div>
         <h2 className="text-center font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mt-6 text-[#1e293b]">
-          Simple ideas. Real results.
+          Unlock the full power of The Sagar Lad library
         </h2>
         <p className="mt-4 text-base text-[#94a3b8] leading-relaxed max-w-xl mx-auto">
-          Topics That Helps You MINDUP
+          Find any moment, quote or advice you&apos;re looking for
         </p>
       </div>
 
