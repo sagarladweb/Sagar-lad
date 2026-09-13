@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "@/lib/gsap";
-import { DESIGNATION } from "@/lib/site";
 
 export function Hero() {
   const root = useRef<HTMLElement>(null);
@@ -24,14 +23,6 @@ export function Hero() {
         0
       );
 
-      // Designation line: fade up + blur clear
-      tl.fromTo(
-        "[data-hero-desig]",
-        { opacity: 0, y: 16, filter: "blur(6px)" },
-        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8 },
-        0.3
-      );
-
       // Name: word-by-word stagger with blur clear
       tl.fromTo(
         "[data-hero-word]",
@@ -43,15 +34,7 @@ export function Hero() {
           duration: 1,
           stagger: 0.12,
         },
-        0.5
-      );
-
-      // Tagline: fade up + blur clear
-      tl.fromTo(
-        "[data-hero-tag]",
-        { opacity: 0, y: 24, filter: "blur(4px)" },
-        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 },
-        1.0
+        0.3
       );
 
       // Subtitle: fade up
@@ -59,7 +42,15 @@ export function Hero() {
         "[data-hero-sub]",
         { opacity: 0, y: 16 },
         { opacity: 1, y: 0, duration: 0.8 },
-        1.2
+        0.6
+      );
+
+      // Tagline: fade up + blur clear
+      tl.fromTo(
+        "[data-hero-tag]",
+        { opacity: 0, y: 24, filter: "blur(4px)" },
+        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 },
+        0.8
       );
     }, el);
 
@@ -89,13 +80,6 @@ export function Hero() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-32">
         <div className="max-w-3xl text-center sm:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
-          {/* Pill */}
-          <div data-hero-desig className="mb-4">
-            <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/70 border border-white/20 rounded-full px-5 py-1.5">
-              {DESIGNATION}
-            </span>
-          </div>
-
           {/* Name */}
           <h1 className="mb-2">
             <span data-hero-word className="font-display text-6xl sm:text-7xl md:text-8xl font-bold leading-[1.1] text-[#ffd51d]">
@@ -113,8 +97,10 @@ export function Hero() {
             <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
               MIND UP.
             </p>
-            <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-black inline-block bg-[#ffd51d] px-3 py-0.5 rounded">
-              Change your mind. Change your life.
+            <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+              Change your{" "}
+              <span className="bg-[#ffd51d] text-black px-1.5 rounded">MIND</span>. Change your{" "}
+              <span className="bg-[#ffd51d] text-black px-1.5 rounded">life</span>.
             </p>
           </div>
         </div>

@@ -15,7 +15,7 @@ import { METRICS } from "@/lib/metrics";
 
 const stats = [
   { value: Number(METRICS.yearsExperience), suffix: "+", label: "Years in tech & data" },
-  { value: Number(METRICS.countriesWorked), suffix: "+", label: "Countries lived & worked" },
+  { value: Number(METRICS.countriesTravelled), suffix: "+", label: "Countries lived & worked" },
   { value: Number(METRICS.booksPublished), suffix: "+", label: "Books published" },
   { value: Number(METRICS.communityReached.replace(/[^0-9]/g, "")), suffix: "K+", label: "Community reached" },
 ];

@@ -12,7 +12,7 @@ import { Pill } from "@/components/ui/Pill";
 
 const stats = [
   { value: Number(METRICS.yearsExperience), suffix: "+", label: "Years in tech & data" },
-  { value: Number(METRICS.countriesWorked), suffix: "+", label: "Countries worked" },
+  { value: Number(METRICS.countriesTravelled), suffix: "+", label: "Countries worked" },
   { value: Number(METRICS.booksPublished), suffix: "+", label: "Published books" },
   { value: Number(METRICS.communityReached.replace(/[^0-9]/g, "")), suffix: "K+", label: "Community reached" },
 ];

@@ -11,7 +11,7 @@ export const SITE = {
 } as const;
 
 // Unified designation used across the whole site.
-export const DESIGNATION = "Author · Public Speaker";
+export const DESIGNATION = "Author · Speaker · Human Potential Advocate";
 
 export function pageMetadata({
   title,

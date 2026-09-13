@@ -24,7 +24,7 @@ import {
 import { FaInstagram, FaLinkedinIn, FaYoutube } from "@/lib/icons";
 import { useSocials } from "@/components/SocialLinksContext";
 
-const HEADER_SOCIALS = ["instagram", "youtube", "linkedin"];
+const HEADER_SOCIALS = ["instagram", "linkedin", "youtube"];
 
 type NavBook = {
   id: string;
@@ -64,6 +64,7 @@ function HeaderSocials({ light = false }: HeaderSocialsProps) {
 
   const socials = allSocials
     .filter((s) => HEADER_SOCIALS.includes(s.key))
+    .sort((a, b) => HEADER_SOCIALS.indexOf(a.key) - HEADER_SOCIALS.indexOf(b.key))
     .map((s) => ({
       key: s.key,
       href: s.href,
@@ -642,49 +643,54 @@ export function Navbar() {
                       }`}
                     />
                   </button>
-                  {mobileOpen === "Blogs" && (
-                    <div className="pl-3 space-y-1 border-l-2 border-brand-light/40 ml-3">
-                      <Link
-                        href="/blog"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
-                      >
-                        <FileText className="w-4 h-4 text-brand-light" /> All Blogs
-                      </Link>
-                      <Link
-                        href="/videos"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
-                      >
-                        <Film className="w-4 h-4 text-brand-light" /> Videos
-                      </Link>
-                      <Link
-                        href="/quotes"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
-                      >
-                        <MessageSquareQuote className="w-4 h-4 text-brand-light" /> Quotes
-                      </Link>
-                      <div className="border-t border-border/60 my-1" />
-                      {categories.slice(0, 4).map((c) => (
+                  <div
+                    className="grid transition-[grid-template-rows] duration-300 ease-out"
+                    style={{ gridTemplateRows: mobileOpen === "Blogs" ? "1fr" : "0fr" }}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="pl-3 space-y-1 border-l-2 border-brand-light/40 ml-3 pt-1">
                         <Link
-                          key={c.id}
-                          href={`/content/${c.slug}`}
+                          href="/blog"
                           onClick={() => setOpen(false)}
-                          className="block px-3 py-1.5 text-sm font-medium text-foreground hover:text-accent-strong rounded-md"
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
                         >
-                          {c.name}
+                          <FileText className="w-4 h-4 text-brand-light" /> All Blogs
                         </Link>
-                      ))}
-                      <Link
-                        href="/blog"
-                        onClick={() => setOpen(false)}
-                        className="block px-3 py-1.5 text-xs font-semibold text-accent-strong hover:text-accent-strong rounded-md"
-                      >
-                        All topics →
-                      </Link>
+                        <Link
+                          href="/videos"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
+                        >
+                          <Film className="w-4 h-4 text-brand-light" /> Videos
+                        </Link>
+                        <Link
+                          href="/quotes"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
+                        >
+                          <MessageSquareQuote className="w-4 h-4 text-brand-light" /> Quotes
+                        </Link>
+                        <div className="border-t border-border/60 my-1" />
+                        {categories.slice(0, 4).map((c) => (
+                          <Link
+                            key={c.id}
+                            href={`/content/${c.slug}`}
+                            onClick={() => setOpen(false)}
+                            className="block px-3 py-1.5 text-sm font-medium text-foreground hover:text-accent-strong rounded-md"
+                          >
+                            {c.name}
+                          </Link>
+                        ))}
+                        <Link
+                          href="/blog"
+                          onClick={() => setOpen(false)}
+                          className="block px-3 py-1.5 text-xs font-semibold text-accent-strong hover:text-accent-strong rounded-md"
+                        >
+                          All topics →
+                        </Link>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 <div className="space-y-1">
@@ -702,34 +708,39 @@ export function Navbar() {
                       }`}
                     />
                   </button>
-                  {mobileOpen === "Books" && (
-                    <div className="pl-3 space-y-1 border-l-2 border-brand-light/40 ml-3">
-                      <Link
-                        href="/books"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
-                      >
-                        <BookOpen className="w-4 h-4 text-brand-light" />
-                        Books I Publish
-                      </Link>
-                      <Link
-                        href="/books-read"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
-                      >
-                        <BookMarked className="w-4 h-4 text-brand-light" />
-                        Books I Read
-                      </Link>
-                      <Link
-                        href="/ebooks"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
-                      >
-                        <Library className="w-4 h-4 text-brand-light" />
-                        E-books
-                      </Link>
+                  <div
+                    className="grid transition-[grid-template-rows] duration-300 ease-out"
+                    style={{ gridTemplateRows: mobileOpen === "Books" ? "1fr" : "0fr" }}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="pl-3 space-y-1 border-l-2 border-brand-light/40 ml-3 pt-1">
+                        <Link
+                          href="/books"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
+                        >
+                          <BookOpen className="w-4 h-4 text-brand-light" />
+                          Books I Publish
+                        </Link>
+                        <Link
+                          href="/books-read"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
+                        >
+                          <BookMarked className="w-4 h-4 text-brand-light" />
+                          Books I Read
+                        </Link>
+                        <Link
+                          href="/ebooks"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
+                        >
+                          <Library className="w-4 h-4 text-brand-light" />
+                          E-books
+                        </Link>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 <div className="space-y-1">
@@ -747,26 +758,31 @@ export function Navbar() {
                       }`}
                     />
                   </button>
-                  {mobileOpen === "About" && (
-                    <div className="pl-3 space-y-1 border-l-2 border-brand-light/40 ml-3">
-                      <Link
-                        href="/about"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
-                      >
-                        <User className="w-4 h-4 text-brand-light" />
-                        About Me
-                      </Link>
-                      <Link
-                        href="/speaking"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
-                      >
-                        <Mic2 className="w-4 h-4 text-brand-light" />
-                        Public Speaking
-                      </Link>
+                  <div
+                    className="grid transition-[grid-template-rows] duration-300 ease-out"
+                    style={{ gridTemplateRows: mobileOpen === "About" ? "1fr" : "0fr" }}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="pl-3 space-y-1 border-l-2 border-brand-light/40 ml-3 pt-1">
+                        <Link
+                          href="/about"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
+                        >
+                          <User className="w-4 h-4 text-brand-light" />
+                          About Me
+                        </Link>
+                        <Link
+                          href="/speaking"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
+                        >
+                          <Mic2 className="w-4 h-4 text-brand-light" />
+                          Public Speaking
+                        </Link>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 <MobileLink href="/contact" icon={<Mail className="w-4 h-4 text-brand-light" />} label="Contact" onClick={() => setOpen(false)} />
