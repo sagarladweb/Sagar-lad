@@ -28,7 +28,7 @@ function loadAll(): AllSettings {
 
 function saveAll(s: AllSettings) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-  window.dispatchEvent(new CustomEvent(STORAGE_EVENT));
+  queueMicrotask(() => window.dispatchEvent(new CustomEvent(STORAGE_EVENT)));
 }
 
 function getTransform(all: AllSettings, key: string): ImageTransform {
