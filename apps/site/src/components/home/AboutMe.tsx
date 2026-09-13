@@ -7,7 +7,6 @@ import { gsap } from "@/lib/gsap";
 import { ArrowUpRight } from "lucide-react";
 
 import { METRICS, metricNum } from "@/lib/metrics";
-import { SiteLogo } from "@/components/SiteLogo";
 import { Pill } from "@/components/ui/Pill";
 
 const stats = [
@@ -38,12 +37,11 @@ export function AboutMe() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         "[data-story-head]",
-        { opacity: 0, y: 36, filter: "blur(4px)" },
+        { opacity: 0, y: 28 },
         {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: 0.9,
+          duration: 0.7,
           ease: "power3.out",
           scrollTrigger: { trigger: el, start: "top 80%", toggleActions: "play none none none" },
         }
@@ -51,13 +49,12 @@ export function AboutMe() {
 
       gsap.fromTo(
         "[data-story-visual]",
-        { opacity: 0, scale: 0.94, y: 50, filter: "blur(4px)" },
+        { opacity: 0, scale: 0.96, y: 36 },
         {
           opacity: 1,
           scale: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: 1.1,
+          duration: 0.8,
           ease: "power3.out",
           scrollTrigger: { trigger: el, start: "top 75%", toggleActions: "play none none none" },
         }
@@ -76,13 +73,12 @@ export function AboutMe() {
         render();
         gsap.fromTo(
           card,
-          { opacity: 0, y: 24, filter: "blur(3px)" },
+          { opacity: 0, y: 20 },
           {
             opacity: 1,
             y: 0,
-            filter: "blur(0px)",
-            duration: 0.7,
-            delay: i * 0.08,
+            duration: 0.6,
+            delay: i * 0.06,
             ease: "power3.out",
             scrollTrigger: {
               trigger: card,
@@ -150,16 +146,6 @@ export function AboutMe() {
                   className="object-cover object-right-top sm:object-top"
                   priority
                 />
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent"
-                />
-                <figcaption className="absolute bottom-0 inset-x-0 p-7 text-white">
-                  <SiteLogo light className="h-12 w-auto" />
-                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/80">
-                    Author · Speaker · Human Potential Advocate
-                  </p>
-                </figcaption>
               </figure>
             </div>
           </div>
