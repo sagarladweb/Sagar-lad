@@ -1,258 +1,206 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, BookOpen } from "lucide-react";
+import { motion } from "framer-motion";
 
-const HTMLFlipBook = dynamic(() => import("react-pageflip"), { ssr: false });
-
-type PageFlipInstance = {
-  flipNext: () => void;
-  flipPrev: () => void;
-  flip: (page: number) => void;
-  getPageCount: () => number;
-  getCurrentPageIndex: () => number;
-  destroy: () => void;
-};
+const HTMLFlipBook = dynamic(() => import("react-pageflip"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center bg-[#090909]" style={{ width: 520, height: 680 }}>
+      <div className="w-8 h-8 border-2 border-[#FACC15] border-t-transparent rounded-full animate-spin" />
+    </div>
+  ),
+});
 
 type FlipBookProps = {
   title: string;
   author: string;
-  pages: string[];
   coverImage: string;
+  pages: string[];
   backCoverImage?: string;
   buyLink?: string;
 };
 
-function useIsMobile() {
-  const [mobile, setMobile] = useState(false);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type BookInstance = any;
+
+export function FlipBook({
+  title,
+  author,
+  coverImage,
+  pages,
+  backCoverImage,
+  buyLink,
+}: FlipBookProps) {
+  const [instance, setInstance] = useState<BookInstance | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const lastTap = useRef(0);
+
+  const allPages = [
+    coverImage,
+    ...pages,
+    ...(backCoverImage ? [backCoverImage] : []),
+  ];
+
   useEffect(() => {
-    const check = () => setMobile(window.innerWidth < 640);
+    const check = () => setIsMobile(window.innerWidth < 640);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
-  return mobile;
-}
 
-export function FlipBook({ title, author, pages, coverImage, backCoverImage, buyLink }: FlipBookProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const flipRef = useRef<PageFlipInstance | null>(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [ready, setReady] = useState(false);
-  const [zoomed, setZoomed] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const isMobile = useIsMobile();
-
-  const allPages = [coverImage, ...pages, ...(backCoverImage ? [backCoverImage] : [])];
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (isZoomed && e.key === "Escape") {
+        setIsZoomed(false);
+        return;
+      }
+      if (!instance) return;
+      if (e.key === "ArrowRight") instance.flipNext?.();
+      if (e.key === "ArrowLeft") instance.flipPrev?.();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [instance, isZoomed]);
 
   const onFlip = useCallback((e: { data: number }) => {
     setCurrentPage(e.data);
   }, []);
 
-  const onInit = useCallback((instance: PageFlipInstance) => {
-    flipRef.current = instance;
-    setTotalPages(instance.getPageCount());
-    setReady(true);
+  const onInit = useCallback((inst: BookInstance) => {
+    setInstance(inst);
+    setTotalPages(inst.getPageCount?.() ?? 0);
   }, []);
 
-  // Intersection observer for fade-in
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
+  const handleDoubleTap = useCallback(() => {
+    setIsZoomed((z) => !z);
   }, []);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      if (e.key === "ArrowRight") flipRef.current?.flipNext();
-      else if (e.key === "ArrowLeft") flipRef.current?.flipPrev();
-      else if (e.key === "Escape" && zoomed) setZoomed(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [zoomed]);
+  const onTouchEnd = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTap.current < 300) handleDoubleTap();
+    lastTap.current = now;
+  }, [handleDoubleTap]);
 
-  // Double-click to zoom
-  const onDoubleClick = useCallback(() => setZoomed((z) => !z), []);
-
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (flipRef.current) {
-        try { flipRef.current.destroy(); } catch { /* ignore */ }
-        flipRef.current = null;
-      }
-    };
-  }, []);
-
-  // Dimensions
-  const width = isMobile ? 320 : 520;
-  const height = isMobile ? 440 : 680;
-  const mobilePageWidth = Math.floor(width * 0.95);
-  const mobilePageHeight = Math.floor(height * 0.95);
+  const w = isMobile ? 300 : 520;
+  const h = isMobile ? 420 : 680;
 
   return (
-    <div
-      ref={containerRef}
-      className={`relative flex flex-col items-center transition-opacity duration-700 ${visible ? "opacity-100" : "opacity-0"}`}
-    >
-      {/* Book title */}
-      <div className="mb-6 text-center">
-        <h3 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">{title}</h3>
-        <p className="mt-1 text-sm text-muted-foreground">by {author}</p>
-      </div>
-
-      {/* Book container */}
-      <div
-        className="relative"
-        onDoubleClick={onDoubleClick}
-        style={{
-          transform: zoomed ? "scale(1.4)" : "scale(1)",
-          transformOrigin: "center center",
-          transition: "transform 0.3s ease",
-          cursor: zoomed ? "zoom-out" : "zoom-in",
-        }}
+    <div className="bg-[#090909] py-16 md:py-24">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full"
       >
-        {/* Floating shadow */}
-        <div
-          className="absolute -bottom-6 left-1/2 -translate-x-1/2 rounded-[50%] bg-black/20 blur-xl"
-          style={{ width: width * 0.7, height: 20 }}
-        />
-
-        {/* Book spine hint */}
-        <div className="absolute -left-1 top-2 bottom-2 w-2 rounded-l bg-gradient-to-r from-neutral-700 to-neutral-600 z-10 hidden sm:block" />
-
-        {/* FlipBook */}
-        <div
-          className="relative z-20"
-          style={{ width, height, perspective: "2000px" }}
-        >
-          {typeof window !== "undefined" && (
-            <HTMLFlipBook
-              width={isMobile ? mobilePageWidth : width / 2}
-              height={height}
-              size="fixed"
-              minWidth={280}
-              maxWidth={600}
-              minHeight={380}
-              maxHeight={800}
-              drawShadow
-              flippingTime={600}
-              usePortrait={isMobile}
-              startZIndex={0}
-              autoSize
-              maxShadowOpacity={0.5}
-              showCover
-              mobileScrollSupport
-              clickEventForward={false}
-              useMouseEvents
-              swipeDistance={30}
-              showPageCorners={!isMobile}
-              disableFlipByClick={false}
-              className=""
-              style={{}}
-              startPage={0}
-              onFlip={onFlip}
-              onInit={onInit}
-            >
-              {allPages.map((src, i) => (
-                <div key={i} className="bg-white overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt={`${title} page ${i + 1}`}
-                    loading={i < 3 ? "eager" : "lazy"}
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                  />
-                </div>
-              ))}
-            </HTMLFlipBook>
-          )}
-        </div>
-      </div>
-
-      {/* Controls */}
-      <div className="mt-8 flex flex-col items-center gap-3">
-        {/* Page counter */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <BookOpen className="w-3.5 h-3.5" />
-          <span className="font-mono tabular-nums">
-            Page {Math.min(currentPage + 1, totalPages)} of {totalPages}
-          </span>
-          <span className="inline-flex items-center rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-semibold text-brand">
-            Preview Edition
-          </span>
-        </div>
-
-        {/* Navigation arrows */}
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => flipRef.current?.flipPrev()}
-            disabled={currentPage <= 0}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
-            aria-label="Previous page"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          {/* Progress dots */}
-          <div className="flex items-center gap-1">
-            {allPages.map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === currentPage ? "w-4 bg-brand" : "w-1.5 bg-border"
-                }`}
-              />
-            ))}
+        <div className="relative mx-auto px-4" style={{ maxWidth: w + 40 }}>
+          {/* Header */}
+          <div className="text-center mb-6">
+            <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[#FACC15] mb-1.5">
+              Preview Edition
+            </p>
+            <h3 className="font-display text-xl font-bold text-white">{title}</h3>
+            <p className="text-sm text-neutral-400 mt-0.5">{author}</p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => flipRef.current?.flipNext()}
-            disabled={currentPage >= totalPages - 1}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
-            aria-label="Next page"
+          {/* Book */}
+          <div
+            className="mx-auto"
+            style={{ width: w, height: h, perspective: "2000px" }}
+            onTouchEnd={onTouchEnd}
+            onDoubleClick={() => setIsZoomed((z) => !z)}
           >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
+            <div
+              className={`transition-transform duration-300 origin-center ${
+                isZoomed ? "scale-[1.6] z-50" : "scale-100"
+              }`}
+            >
+              <HTMLFlipBook
+                width={w}
+                height={h}
+                size="fixed"
+                startPage={0}
+                minWidth={0}
+                maxWidth={0}
+                minHeight={0}
+                maxHeight={0}
+                maxShadowOpacity={0.25}
+                showCover={true}
+                mobileScrollSupport={true}
+                flippingTime={400}
+                useMouseEvents={true}
+                drawShadow={true}
+                showPageCorners={true}
+                disableFlipByClick={false}
+                usePortrait={isMobile}
+                autoSize={false}
+                clickEventForward={true}
+                startZIndex={0}
+                swipeDistance={30}
+                renderOnlyPageLengthChange={false}
+                onFlip={onFlip}
+                onInit={onInit}
+                className="mx-auto"
+                style={{ background: "transparent" }}
+              >
+                {allPages.map((src, i) => (
+                  <div key={src} className="bg-white overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={src}
+                      alt={`${title} page ${i + 1}`}
+                      loading={i < 3 ? "eager" : "lazy"}
+                      className="w-full h-full object-cover"
+                      draggable={false}
+                    />
+                  </div>
+                ))}
+              </HTMLFlipBook>
+            </div>
+          </div>
 
-        {/* Zoom + Buy */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setZoomed((z) => !z)}
-            className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
-          >
-            {zoomed ? <ZoomOut className="w-3 h-3" /> : <ZoomIn className="w-3 h-3" />}
-            {zoomed ? "Zoom Out" : "Zoom In"}
-          </button>
+          {/* Controls */}
+          <div className="flex items-center justify-center gap-4 mt-5">
+            <button
+              type="button"
+              onClick={() => instance?.flipPrev?.()}
+              disabled={currentPage <= 0}
+              className="text-xs text-neutral-500 hover:text-white disabled:opacity-30 transition-colors"
+            >
+              ← Prev
+            </button>
+            <span className="text-xs font-mono text-neutral-400 tabular-nums">
+              Page {currentPage + 1} of {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => instance?.flipNext?.()}
+              disabled={currentPage >= totalPages - 1}
+              className="text-xs text-neutral-500 hover:text-white disabled:opacity-30 transition-colors"
+            >
+              Next →
+            </button>
+          </div>
 
           {buyLink && (
-            <a
-              href={buyLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-accent-foreground transition-opacity hover:opacity-90"
-            >
-              Buy on Amazon
-            </a>
+            <div className="text-center mt-4">
+              <a
+                href={buyLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FACC15] hover:underline"
+              >
+                Get the full book →
+              </a>
+            </div>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
