@@ -15,9 +15,6 @@ const YELLOW_COUNTRIES = new Set([
   "PT", "DE", "GB", "CA", "AE", "NL", "HR", "IS",
 ]);
 
-// India dot is hardcoded to Gujarat
-const INDIA_DOT = { x: 588, y: 498 };
-
 export function TraveledMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -55,7 +52,6 @@ export function TraveledMap() {
 
     const centers = Array.from(YELLOW_COUNTRIES)
       .map((code) => {
-        if (code === "IN") return { code, x: INDIA_DOT.x, y: INDIA_DOT.y };
         const el = svg.querySelector(`#map-country-${code}`) as SVGGeometryElement | null;
         if (!el) return null;
         const bbox = el.getBBox();
@@ -209,24 +205,39 @@ export function TraveledMap() {
                 );
               })}
 
-              {/* Dot markers on the 17 yellow countries */}
+              {/* Dot markers — scaled inversely with zoom so they stay consistent on screen */}
               {dotCenters.map((d) => {
                 const isActive = hoveredCode === d.code || selectedCode === d.code;
+                const dotR = (isActive ? 3.5 : 2.5) / zoom;
+                const strokeW = 1.2 / zoom;
+                const pulseR1 = 5 / zoom;
+                const pulseR2 = 9 / zoom;
+                const hitR = 8 / zoom; // larger invisible hit area for small countries
                 return (
                   <g key={`dot-${d.code}`}>
+                    {/* Invisible hit area — easier to hover small countries */}
+                    <circle
+                      cx={d.x}
+                      cy={d.y}
+                      r={hitR}
+                      fill="transparent"
+                      style={{ cursor: "pointer" }}
+                      onMouseEnter={() => { if (!isTouchDevice) setHoveredCode(d.code); }}
+                      onMouseLeave={() => { if (!isTouchDevice) setHoveredCode(null); }}
+                    />
                     {isActive && (
-                      <circle cx={d.x} cy={d.y} r={7} fill="#ef4444" opacity={0.2}>
-                        <animate attributeName="r" values="5;9;5" dur="1.5s" repeatCount="indefinite" />
+                      <circle cx={d.x} cy={d.y} r={pulseR1} fill="#ef4444" opacity={0.2}>
+                        <animate attributeName="r" values={`${pulseR1};${pulseR2};${pulseR1}`} dur="1.5s" repeatCount="indefinite" />
                         <animate attributeName="opacity" values="0.25;0.08;0.25" dur="1.5s" repeatCount="indefinite" />
                       </circle>
                     )}
                     <circle
                       cx={d.x}
                       cy={d.y}
-                      r={isActive ? 4 : 3}
+                      r={dotR}
                       fill="#ef4444"
                       stroke="#ffffff"
-                      strokeWidth={1.5}
+                      strokeWidth={strokeW}
                       className="pointer-events-none"
                     />
                   </g>
@@ -245,11 +256,14 @@ export function TraveledMap() {
             </span>
           </div>
 
-          {/* Hover pill — flag + country name only */}
+          {/* Hover pill — flag + country name only, offset further when zoomed */}
           {activeCountry && (
             <div
               className="absolute z-50 pointer-events-none"
-              style={{ left: `${mousePos.x + 16}px`, top: `${mousePos.y - 16}px` }}
+              style={{
+                left: `${mousePos.x + 16 * zoom}px`,
+                top: `${mousePos.y - 20 * zoom}px`,
+              }}
             >
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-lg border border-black/10 whitespace-nowrap">
                 <span className="text-sm shrink-0" role="img" aria-label={activeCountry.name}>
