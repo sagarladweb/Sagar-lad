@@ -37,6 +37,7 @@ const MARATHON_IMAGES = [
     distance: "21 km",
     count: 3,
     label: "×3",
+    pos: "50% 30%",
   },
   {
     src: "/about me merathon/Sagar Lad Marathon 2021 .webp",
@@ -46,6 +47,7 @@ const MARATHON_IMAGES = [
     distance: "8 km",
     count: 2,
     label: "×2",
+    pos: "50% 1%",
   },
   {
     src: "/about me merathon/Sagar Lad Marathon 2022.webp",
@@ -55,6 +57,7 @@ const MARATHON_IMAGES = [
     distance: "16 km",
     count: 2,
     label: "×2",
+    pos: "50% 1%",
   },
 ];
 
@@ -605,6 +608,7 @@ export default function AboutPage() {
                           fill
                           sizes="(max-width: 640px) 80vw, 25vw"
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          style={{ objectPosition: r.pos }}
                         />
                       </div>
                       {/* Content — 20% of card */}
