@@ -13,6 +13,7 @@ import {
   Clock,
 } from "lucide-react";
 import { validateContact, sanitizeText } from "@/lib/client-validators";
+import { ContactHeroSandbox } from "@/components/ContactHeroSandbox";
 
 const initial = {
   firstName: "",
@@ -106,6 +107,7 @@ export default function ContactPage() {
 
   return (
     <div className="overflow-x-clip">
+      <ContactHeroSandbox />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -145,7 +147,7 @@ export default function ContactPage() {
 
         <div className="relative z-20 mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 sm:gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 pt-6 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20">
           {/* Portrait: First on mobile, Left on desktop */}
-          <div className="order-1 lg:order-1 lg:col-span-5 relative flex justify-center" data-animate="left" data-reverse>
+          <div className="order-1 lg:order-1 lg:col-span-5 relative flex justify-center" data-animate="left" data-reverse suppressHydrationWarning>
             <style>{`
               .contact-hero-img {
                 object-position: 50% 50%;
@@ -185,7 +187,7 @@ export default function ContactPage() {
           </div>
 
           {/* Copy: Below image on mobile, Right on desktop */}
-          <div className="order-2 lg:order-2 lg:col-span-7 text-center lg:text-left" data-animate="right" data-reverse>
+          <div className="order-2 lg:order-2 lg:col-span-7 text-center lg:text-left" data-animate="right" data-reverse suppressHydrationWarning>
             <span className="inline-block rounded-full bg-muted px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Get in touch
             </span>
@@ -219,7 +221,7 @@ export default function ContactPage() {
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 md:py-20">
         <div className="grid lg:grid-cols-[1fr_340px] gap-12 lg:gap-16 items-start">
           {/* ── Form ──────────────────────────────────────────── */}
-          <div data-animate>
+          <div data-animate suppressHydrationWarning>
             <form
               onSubmit={onSubmit}
               className="card-hover rounded-lg border border-border bg-card p-6 sm:p-8 shadow-sm space-y-5"
@@ -371,9 +373,9 @@ export default function ContactPage() {
           </div>
 
           {/* ── Sidebar ───────────────────────────────────────── */}
-          <aside className="flex flex-col gap-4" data-animate-group>
+          <aside className="flex flex-col gap-4" data-animate-group suppressHydrationWarning>
             {/* Contact info */}
-            <div className="card-hover rounded-lg border border-border bg-card p-5 space-y-4" data-animate-item>
+            <div className="card-hover rounded-lg border border-border bg-card p-5 space-y-4" data-animate-item suppressHydrationWarning>
               <div className="flex items-start gap-3">
                 <div className="w-9 h-9 rounded-md bg-muted text-muted-foreground grid place-items-center shrink-0">
                   <Mail className="w-4 h-4" />
@@ -425,7 +427,7 @@ export default function ContactPage() {
             </div>
 
             {/* Common topics */}
-            <div className="card-hover rounded-lg border border-border bg-card p-5" data-animate-item>
+            <div className="card-hover rounded-lg border border-border bg-card p-5" data-animate-item suppressHydrationWarning>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
                 Common topics
               </h3>
