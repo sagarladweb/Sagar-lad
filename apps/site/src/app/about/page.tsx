@@ -8,7 +8,6 @@ import { ArrowRight, Trophy, Medal, Footprints } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Timeline } from "@/components/about/Timeline";
 import { TraveledMap } from "@/components/about/TraveledMap";
-import { RunnerCardSandbox, useRunnerCardTransform } from "@/components/about/RunnerCardSandbox";
 import { JsonLd } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 
@@ -65,8 +64,14 @@ const MARATHON_IMAGES = [
   },
 ];
 
+const CARD_TRANSFORMS: Record<string, { zoom: number; panX: number; panY: number; rotate: number }> = {
+  "marathon-2017": { zoom: 1.3, panX: 0, panY: -6, rotate: 0 },
+  "marathon-2021": { zoom: 1, panX: 0, panY: 0, rotate: 0 },
+  "marathon-2022": { zoom: 1.2, panX: -5, panY: 4, rotate: 0 },
+};
+
 function RunnerCard({ r }: { r: typeof MARATHON_IMAGES[number] }) {
-  const tx = useRunnerCardTransform(r.key);
+  const tx = CARD_TRANSFORMS[r.key] ?? { zoom: 1, panX: 0, panY: 0, rotate: 0 };
   const Icon = r.icon;
   return (
     <div
@@ -633,10 +638,6 @@ export default function AboutPage() {
                   <RunnerCard key={r.key} r={r} />
                 ))}
               </div>
-
-              <RunnerCardSandbox
-                images={MARATHON_IMAGES.map((r) => ({ key: r.key, src: r.src, alt: r.alt, label: r.label }))}
-              />
             </div>
           </div>
         </div>
