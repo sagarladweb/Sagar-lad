@@ -8,6 +8,7 @@ import { ArrowRight, Trophy, Medal, Footprints } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Timeline } from "@/components/about/Timeline";
 import { TraveledMap } from "@/components/about/TraveledMap";
+import { RunnerCardSandbox, useRunnerCardTransform } from "@/components/about/RunnerCardSandbox";
 import { JsonLd } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 
@@ -30,6 +31,7 @@ const pageNav = [
 
 const MARATHON_IMAGES = [
   {
+    key: "marathon-2017",
     src: "/about me merathon/Sagar Lad Marathon 2017.webp",
     alt: "Sagar Lad Marathon 2017",
     icon: Medal,
@@ -40,6 +42,7 @@ const MARATHON_IMAGES = [
     pos: "50% 30%",
   },
   {
+    key: "marathon-2021",
     src: "/about me merathon/Sagar Lad Marathon 2021 .webp",
     alt: "Sagar Lad Marathon 2021",
     icon: Trophy,
@@ -50,6 +53,7 @@ const MARATHON_IMAGES = [
     pos: "50% 1%",
   },
   {
+    key: "marathon-2022",
     src: "/about me merathon/Sagar Lad Marathon 2022.webp",
     alt: "Sagar Lad Marathon 2022",
     icon: Trophy,
@@ -60,6 +64,40 @@ const MARATHON_IMAGES = [
     pos: "50% 1%",
   },
 ];
+
+function RunnerCard({ r }: { r: typeof MARATHON_IMAGES[number] }) {
+  const tx = useRunnerCardTransform(r.key);
+  const Icon = r.icon;
+  return (
+    <div
+      data-runner-card
+      data-count={r.count}
+      className="card-hover rounded-xl border border-border bg-background overflow-hidden snap-center shrink-0 w-[80vw] sm:w-auto flex flex-col group"
+    >
+      <div className="relative overflow-hidden flex-[4] min-h-[220px]">
+        <Image
+          src={r.src}
+          alt={r.alt}
+          fill
+          sizes="(max-width: 640px) 80vw, 25vw"
+          className="object-cover transition-all duration-300"
+          style={{
+            objectPosition: r.pos,
+            transform: `scale(${tx.zoom}) translate(${tx.panX}%, ${tx.panY}%) rotate(${tx.rotate}deg)`,
+          }}
+        />
+      </div>
+      <div className="flex-[1] px-4 py-3 text-center bg-background flex flex-col items-center justify-center min-h-[100px]">
+        <div className="w-8 h-8 rounded-lg bg-brand-light/15 grid place-items-center text-brand mb-1">
+          <Icon className="w-4 h-4" />
+        </div>
+        <p className="font-display text-lg font-extrabold text-accent-strong leading-tight">{r.label}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground leading-tight mt-0.5">{r.race}</p>
+        <p className="text-sm font-bold mt-0.5 text-foreground">{r.distance}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function AboutPage() {
   const root = useRef<HTMLDivElement>(null);
@@ -591,43 +629,14 @@ export default function AboutPage() {
                 data-runner-cards
                 className="no-scrollbar flex sm:grid sm:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth px-1 -mx-1"
               >
-                {MARATHON_IMAGES.map((r) => {
-                  const Icon = r.icon;
-                  return (
-                    <div
-                      key={r.race}
-                      data-runner-card
-                      data-count={r.count}
-                      className="card-hover rounded-xl border border-border bg-background overflow-hidden snap-center shrink-0 w-[80vw] sm:w-auto flex flex-col group"
-                    >
-                      {/* Image — 80% of card */}
-                      <div className="relative overflow-hidden flex-[4] min-h-[220px]">
-                        <Image
-                          src={r.src}
-                          alt={r.alt}
-                          fill
-                          sizes="(max-width: 640px) 80vw, 25vw"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          style={{ objectPosition: r.pos }}
-                        />
-                      </div>
-                      {/* Content — 20% of card */}
-                      <div className="flex-[1] px-4 py-3 text-center bg-background flex flex-col items-center justify-center min-h-[100px]">
-                        <div className="w-8 h-8 rounded-lg bg-brand-light/15 grid place-items-center text-brand mb-1">
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <p className="font-display text-lg font-extrabold text-accent-strong leading-tight">
-                          {r.label}
-                        </p>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground leading-tight mt-0.5">
-                          {r.race}
-                        </p>
-                        <p className="text-sm font-bold mt-0.5 text-foreground">{r.distance}</p>
-                      </div>
-                    </div>
-                  );
-                })}
+                {MARATHON_IMAGES.map((r) => (
+                  <RunnerCard key={r.key} r={r} />
+                ))}
               </div>
+
+              <RunnerCardSandbox
+                images={MARATHON_IMAGES.map((r) => ({ key: r.key, src: r.src, alt: r.alt, label: r.label }))}
+              />
             </div>
           </div>
         </div>

@@ -15,6 +15,13 @@ const YELLOW_COUNTRIES = new Set([
   "PT", "DE", "GB", "CA", "AE", "NL", "HR", "IS",
 ]);
 
+// Manual dot overrides for countries where getBBox() center is off
+const DOT_OVERRIDES: Record<string, { x: number; y: number }> = {
+  FR: { x: 370, y: 360 },  // France — center of mainland, not Corsica
+  ES: { x: 350, y: 415 },  // Spain — center of Iberian mainland
+  PT: { x: 328, y: 418 },  // Portugal — western strip, not Iberian center
+};
+
 export function TraveledMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -52,6 +59,8 @@ export function TraveledMap() {
 
     const centers = Array.from(YELLOW_COUNTRIES)
       .map((code) => {
+        // Use manual override if available
+        if (DOT_OVERRIDES[code]) return { code, ...DOT_OVERRIDES[code] };
         const el = svg.querySelector(`#map-country-${code}`) as SVGGeometryElement | null;
         if (!el) return null;
         const bbox = el.getBBox();
