@@ -8,7 +8,6 @@ import { ArrowRight, Trophy, Medal, Footprints } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Timeline } from "@/components/about/Timeline";
 import { TraveledMap } from "@/components/about/TraveledMap";
-import { MarathonImageSandbox, useBreakpoint } from "@/components/about/MarathonImageSandbox";
 import { JsonLd } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 
@@ -63,42 +62,6 @@ export default function AboutPage() {
   const root = useRef<HTMLDivElement>(null);
   const navContainerRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState<string>("belief");
-  const bp = useBreakpoint();
-  const [imgSettings, setImgSettings] = useState({
-    objectPosition: "50% 30%",
-    objectFit: "cover" as "cover" | "contain" | "fill",
-    zoom: 1,
-    panX: 0,
-    panY: 0,
-    rotate: 0,
-  });
-
-  // Read settings from localStorage on mount and when breakpoint changes
-  useEffect(() => {
-    function readSettings() {
-      try {
-        const raw = localStorage.getItem("marathon-image-settings");
-        if (raw) {
-          const all = JSON.parse(raw);
-          const bpSettings = all[bp];
-          if (bpSettings) {
-            setImgSettings({
-              objectPosition: bpSettings.objectPosition ?? "50% 30%",
-              objectFit: bpSettings.objectFit ?? "cover",
-              zoom: bpSettings.zoom ?? 1,
-              panX: bpSettings.panX ?? 0,
-              panY: bpSettings.panY ?? 0,
-              rotate: bpSettings.rotate ?? 0,
-            });
-          }
-        }
-      } catch {}
-    }
-    readSettings();
-    const onChange = () => readSettings();
-    window.addEventListener("marathon-settings-changed", onChange);
-    return () => window.removeEventListener("marathon-settings-changed", onChange);
-  }, [bp]);
 
   useEffect(() => {
     const el = root.current;
@@ -641,12 +604,7 @@ export default function AboutPage() {
                           alt={r.alt}
                           fill
                           sizes="(max-width: 640px) 80vw, 25vw"
-                          className="transition-all duration-500"
-                          style={{
-                            objectFit: imgSettings.objectFit,
-                            objectPosition: imgSettings.objectPosition,
-                            transform: `scale(${imgSettings.zoom}) translate(${imgSettings.panX}%, ${imgSettings.panY}%) rotate(${imgSettings.rotate}deg)`,
-                          }}
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       </div>
                       {/* Content — 20% of card */}
@@ -666,12 +624,6 @@ export default function AboutPage() {
                   );
                 })}
               </div>
-
-              {/* Sandbox controls */}
-              <MarathonImageSandbox
-                images={MARATHON_IMAGES.map((r) => ({ src: r.src, alt: r.alt, label: r.label }))}
-                activeBreakpoint={bp}
-              />
             </div>
           </div>
         </div>

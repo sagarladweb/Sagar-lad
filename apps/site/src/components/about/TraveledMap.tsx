@@ -187,7 +187,7 @@ export function TraveledMap() {
                     }
                     stroke={
                       isHighlighted
-                        ? "#000000"
+                        ? "#d1d5db"
                         : isYellow
                         ? "#ca8a04"
                         : isVisited
@@ -195,7 +195,7 @@ export function TraveledMap() {
                         : "#cbd5e1"
                     }
                     strokeWidth={
-                      isHighlighted ? 1.8 : isYellow ? 0.9 : 0.45
+                      isHighlighted ? 1.2 : isYellow ? 0.9 : 0.45
                     }
                     strokeLinejoin="round"
                     className="focus:outline-none"
@@ -212,19 +212,8 @@ export function TraveledMap() {
                 const strokeW = 1.2 / zoom;
                 const pulseR1 = 5 / zoom;
                 const pulseR2 = 9 / zoom;
-                const hitR = 8 / zoom; // larger invisible hit area for small countries
                 return (
-                  <g key={`dot-${d.code}`}>
-                    {/* Invisible hit area — easier to hover small countries */}
-                    <circle
-                      cx={d.x}
-                      cy={d.y}
-                      r={hitR}
-                      fill="transparent"
-                      style={{ cursor: "pointer" }}
-                      onMouseEnter={() => { if (!isTouchDevice) setHoveredCode(d.code); }}
-                      onMouseLeave={() => { if (!isTouchDevice) setHoveredCode(null); }}
-                    />
+                  <g key={`dot-${d.code}`} style={{ pointerEvents: "none" }}>
                     {isActive && (
                       <circle cx={d.x} cy={d.y} r={pulseR1} fill="#ef4444" opacity={0.2}>
                         <animate attributeName="r" values={`${pulseR1};${pulseR2};${pulseR1}`} dur="1.5s" repeatCount="indefinite" />
@@ -238,7 +227,6 @@ export function TraveledMap() {
                       fill="#ef4444"
                       stroke="#ffffff"
                       strokeWidth={strokeW}
-                      className="pointer-events-none"
                     />
                   </g>
                 );
