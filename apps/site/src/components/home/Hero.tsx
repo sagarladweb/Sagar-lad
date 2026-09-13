@@ -23,6 +23,14 @@ export function Hero() {
         0
       );
 
+      // Designation pill: fade up + blur clear
+      tl.fromTo(
+        "[data-hero-desig]",
+        { opacity: 0, y: 16, filter: "blur(6px)" },
+        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8 },
+        0.2
+      );
+
       // Name: word-by-word stagger with blur clear
       tl.fromTo(
         "[data-hero-word]",
@@ -80,6 +88,13 @@ export function Hero() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-32">
         <div className="max-w-3xl text-center sm:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
+          {/* Designation Pill */}
+          <div data-hero-desig className="mb-4">
+            <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/70 border border-white/20 rounded-full px-5 py-1.5">
+              Author · Speaker · Human Potential Advocate
+            </span>
+          </div>
+
           {/* Subtitle */}
           <p data-hero-sub className="mb-4 text-lg sm:text-xl text-white/60 font-medium">
             Your friend, mentor and Guide
