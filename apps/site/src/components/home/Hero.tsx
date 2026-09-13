@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "@/lib/gsap";
 
+import { DESIGNATION } from "@/lib/site";
+
 export function Hero() {
   const root = useRef<HTMLElement>(null);
 
@@ -88,24 +90,24 @@ export function Hero() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-32">
         <div className="max-w-3xl text-center sm:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
-          {/* Designation Pill */}
+          {/* Designation pill */}
           <div data-hero-desig className="mb-4">
             <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/70 border border-white/20 rounded-full px-5 py-1.5">
-              Author · Speaker · Human Potential Advocate
+              {DESIGNATION}
             </span>
           </div>
 
-          {/* Subtitle */}
-          <p data-hero-sub className="mb-4 text-lg sm:text-xl text-white/60 font-medium">
-            Your friend, mentor and Guide
-          </p>
-
           {/* Name */}
-          <h1 className="mb-4">
+          <h1 className="mb-2">
             <span data-hero-word className="font-display text-6xl sm:text-7xl md:text-8xl font-bold leading-[1.1] text-[#ffd51d]">
               Sagar Lad
             </span>
           </h1>
+
+          {/* Subtitle */}
+          <p data-hero-sub className="mb-6 text-lg sm:text-xl text-white/60 font-medium">
+            Your friend, mentor and Guide
+          </p>
 
           {/* Tagline */}
           <div data-hero-tag className="mb-8">
