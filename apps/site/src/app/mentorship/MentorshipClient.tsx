@@ -480,25 +480,23 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
 
           gsap.fromTo(
             "[data-m-hero]",
-            { opacity: 0, y: 40, filter: "blur(4px)" },
+            { opacity: 0, y: 30 },
         {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: 1,
+          duration: 0.8,
           ease: "power3.out",
-          stagger: 0.15,
+          stagger: 0.12,
         }
       );
 
       gsap.fromTo(
         "[data-m-cta]",
-        { opacity: 0, y: 30, filter: "blur(3px)" },
+        { opacity: 0, y: 24 },
         {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: 0.8,
+          duration: 0.7,
           ease: "power3.out",
           scrollTrigger: {
             trigger: "[data-m-cta]",

@@ -44,6 +44,7 @@ function SiteFrameInner({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isAdmin = pathname.startsWith("/admin");
+  const isStandalone = pathname.startsWith("/mindup-score");
   const isBarPreview = searchParams.get("announce_preview") === "bar";
   const previewId = searchParams.get("id");
   const [previewAnnouncement, setPreviewAnnouncement] = useState<AnnouncementBarData | null>(null);
@@ -84,10 +85,12 @@ function SiteFrameInner({
     };
   }, []);
 
+  const hideChrome = isAdmin || isStandalone;
+
   return (
     <>
-      {!isAdmin && <GoogleAnalytics />}
-      {!isAdmin && shouldShowBar && (
+      {!hideChrome && <GoogleAnalytics />}
+      {!hideChrome && shouldShowBar && (
         <AnnouncementBar
           text={barText}
           link={barLink}
@@ -97,15 +100,15 @@ function SiteFrameInner({
           textColor={effectiveAnnouncement?.barColor}
         />
       )}
-      {!isAdmin && <Navbar />}
-      <main className="flex-1">
+      {!hideChrome && <Navbar />}
+      <main className={hideChrome ? "" : "flex-1"}>
         {children}
-        {!isAdmin && <ScrollAnimations />}
+        {!hideChrome && <ScrollAnimations />}
       </main>
-      {!isAdmin && <ScrollTopButton />}
-      {!isAdmin && <Footer />}
-      {!isAdmin && pathname === "/" && <NewsletterPopup />}
-      {!isAdmin && showRss && <RssBanner />}
+      {!hideChrome && <ScrollTopButton />}
+      {!hideChrome && <Footer />}
+      {!hideChrome && pathname === "/" && <NewsletterPopup />}
+      {!hideChrome && showRss && <RssBanner />}
     </>
   );
 }

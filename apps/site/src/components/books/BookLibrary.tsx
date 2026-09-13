@@ -5,7 +5,13 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { ShoppingBag, X, Download, Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { validateEmail, validateName } from "@/lib/client-validators";
-import { FlipBookSection, FLIPBOOKS } from "@/components/books/FlipBookSection";
+import dynamic from "next/dynamic";
+import { getFlipbookKey } from "@/components/books/FlipBookSection";
+
+const FlipBookSection = dynamic(
+  () => import("@/components/books/FlipBookSection").then((m) => m.FlipBookSection),
+  { ssr: false }
+);
 
 type BookItem = {
   id: string;
@@ -183,10 +189,16 @@ export function BookLibrary({ books, variant }: { books: BookItem[]; variant: Va
                   </p>
               ) : null}
 
-              {active && FLIPBOOKS[active.title] && (
+              {active && getFlipbookKey(active.title) && (
                 <button
                   type="button"
-                  onClick={() => { setPreviewKey(active!.title); setActive(null); }}
+                  onClick={() => {
+                    const fb = getFlipbookKey(active.title);
+                    if (fb) {
+                      setPreviewKey(fb);
+                      setActive(null);
+                    }
+                  }}
                   className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
                 >
                   <BookOpen className="h-4 w-4" />

@@ -34,7 +34,21 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    ".builds/20260913-214557/types/**/*.ts",
+    ".builds/20260913-214557/dev/types/**/*.ts",
+    ".builds/20260913-215339/types/**/*.ts",
+    ".builds/20260913-215339/dev/types/**/*.ts",
+    ".builds/20260913-220709/types/**/*.ts",
+    ".builds/20260913-220709/dev/types/**/*.ts",
+    ".builds/20260913-221342/types/**/*.ts",
+    ".builds/20260913-221342/dev/types/**/*.ts",
+    ".builds/20260913-223542/types/**/*.ts",
+    ".builds/20260913-223542/dev/types/**/*.ts",
+    ".builds/20260913-224705/types/**/*.ts",
+    ".builds/20260913-224705/dev/types/**/*.ts",
+    ".builds/20260913-224843/types/**/*.ts",
+    ".builds/20260913-224843/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

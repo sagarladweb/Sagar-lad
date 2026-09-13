@@ -68,9 +68,22 @@ export async function sendTestEmail(to: string, subject: string, html: string) {
 }
 
 // Create a campaign and snapshot every active subscriber into the queue.
-export async function enqueueCampaign(subject: string, html: string) {
+export async function enqueueCampaign(
+  subject: string,
+  html: string,
+  options?: {
+    contentJson?: any;
+    scheduledFor?: Date | null;
+  }
+) {
   const campaign = await prisma.newsletterCampaign.create({
-    data: { subject, html },
+    data: {
+      subject,
+      html,
+      contentJson: options?.contentJson ?? undefined,
+      scheduledFor: options?.scheduledFor ?? null,
+      draft: false,
+    },
   });
   const subscribers = await prisma.newsletterSubscriber.findMany({
     where: { unsubscribed: false },
@@ -121,6 +134,13 @@ export async function processNewsletterQueue() {
     where: {
       status: "QUEUED",
       subscriber: { is: { unsubscribed: false } },
+      campaign: {
+        draft: false,
+        OR: [
+          { scheduledFor: null },
+          { scheduledFor: { lte: new Date() } },
+        ],
+      },
     },
     orderBy: { createdAt: "asc" },
     take: Math.min(BATCH_SIZE, remaining),

@@ -7,7 +7,13 @@ import { SiteLogo } from "@/components/SiteLogo";
 import { DotPagination } from "@/components/ui/CarouselNav";
 import { BookStats } from "./BookStats";
 import { Pill } from "@/components/ui/Pill";
-import { FlipBookSection, FLIPBOOKS } from "@/components/books/FlipBookSection";
+import dynamic from "next/dynamic";
+import { getFlipbookKey } from "@/components/books/FlipBookSection";
+
+const FlipBookSection = dynamic(
+  () => import("@/components/books/FlipBookSection").then((m) => m.FlipBookSection),
+  { ssr: false }
+);
 
 export type BookCarouselBook = {
   id: string;
@@ -38,13 +44,6 @@ function getLocalCover(title: string): { front: string; back?: string } | null {
   for (const [key, val] of Object.entries(LOCAL_COVERS)) {
     if (lower.includes(key)) return val;
   }
-  return null;
-}
-
-function getFlipbookKey(title: string): string | null {
-  const lower = title.toLowerCase();
-  if (lower.includes("mind up") || lower.includes("mindup")) return "MindUp";
-  if (lower.includes("foundry") || lower.includes("azure")) return "AI Foundry";
   return null;
 }
 

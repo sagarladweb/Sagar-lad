@@ -106,6 +106,13 @@ export async function processNewsletterQueue() {
     where: {
       status: "QUEUED",
       subscriber: { is: { unsubscribed: false } },
+      campaign: {
+        draft: false,
+        OR: [
+          { scheduledFor: null },
+          { scheduledFor: { lte: new Date() } },
+        ],
+      },
     },
     orderBy: { createdAt: "asc" },
     take: Math.min(BATCH_SIZE, remaining),

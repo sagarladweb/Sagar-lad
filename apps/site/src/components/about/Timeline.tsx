@@ -259,12 +259,11 @@ export function Timeline() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         "[data-tl-header]",
-        { opacity: 0, y: 32, filter: "blur(4px)" },
+        { opacity: 0, y: 24 },
         {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: 0.8,
+          duration: 0.7,
           ease: "power3.out",
           scrollTrigger: { trigger: el, start: "top 82%" },
         }

@@ -13,6 +13,7 @@ const campaignSchema = z.object({
   subject: z.string().trim().min(3, "Subject is too short").max(200),
   html: z.string().trim().min(10, "Email body is too short").max(100_000),
   contentJson: z.unknown().optional(),
+  scheduledFor: z.string().datetime().nullable().optional().or(z.string().optional()),
 });
 
 // Campaigns with per-status delivery counts + the current active subscriber count.
@@ -66,6 +67,7 @@ export async function GET() {
           id: c.id,
           subject: c.subject,
           createdAt: c.createdAt,
+          scheduledFor: c.scheduledFor,
           draft: c.draft,
           contentJson: c.contentJson ?? null,
           total: queued + sending + sent + failed,
@@ -98,28 +100,34 @@ export async function POST(request: Request) {
     // Sanitize HTML before sending — strip any scripts/iframes/event handlers
     const cleanHtml = sanitizeHtml(parsed.data.html);
 
+    const scheduledForDate =
+      parsed.data.scheduledFor && parsed.data.scheduledFor.trim() !== ""
+        ? new Date(parsed.data.scheduledFor)
+        : null;
+
     const { campaign, queued } = await enqueueCampaign(
       parsed.data.subject,
-      cleanHtml
+      cleanHtml,
+      {
+        contentJson: parsed.data.contentJson,
+        scheduledFor: scheduledForDate,
+      }
     );
-    // Store the structured composer state so the campaign can be duplicated later.
-    if (parsed.data.contentJson !== undefined) {
-      await prisma.newsletterCampaign.update({
-        where: { id: campaign.id },
-        data: { contentJson: parsed.data.contentJson as object },
-      });
-    }
     await logAudit("NEWSLETTER", {
       userId: session.user.id,
-      meta: { subject: parsed.data.subject, queued },
+      meta: { subject: parsed.data.subject, queued, scheduledFor: scheduledForDate?.toISOString() },
     });
-    // Fire-and-forget: drain in background so the response returns in <5s.
-    processNewsletterQueue().catch((err) =>
-      console.error("[newsletter] background drain failed:", err)
-    );
+
+    const isFuture = scheduledForDate && scheduledForDate.getTime() > Date.now();
+    // If not scheduled for the future, drain immediately in background so response returns in <5s.
+    if (!isFuture) {
+      processNewsletterQueue().catch((err) =>
+        console.error("[newsletter] background drain failed:", err)
+      );
+    }
 
     return NextResponse.json(
-      { campaign, queued, sentNow: 0, remainingToday: "?" },
+      { campaign, queued, scheduled: !!isFuture, sentNow: 0, remainingToday: "?" },
       { status: 201 }
     );
   } catch (err) {

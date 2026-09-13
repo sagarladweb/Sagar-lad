@@ -3,9 +3,10 @@ import type { NextConfig } from "next";
 const isDev = process.env.NODE_ENV !== "production";
 
 const nextConfig: NextConfig = {
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   serverExternalPackages: ["sharp", "jsdom", "pg", "@prisma/adapter-pg", "@google-analytics/data"],
   experimental: {
-    optimizePackageImports: ["lucide-react"],
+    optimizePackageImports: ["lucide-react", "framer-motion"],
   },
   images: {
     remotePatterns: [
@@ -32,13 +33,32 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
+    // Dev: no strict CSP to prevent chunk reload and MIME issues
+    if (isDev) {
+      return [
+        {
+          source: "/((?!_next/static|_next/image|favicon.ico).*)",
+          headers: [
+            { key: "X-Content-Type-Options", value: "nosniff" },
+            { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          ],
+        },
+      ];
+    }
+
     return [
       {
-        source: "/(.*)",
+        source: "/fonts/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+        ],
+      },
+      {
+        // All routes EXCEPT Next.js static assets & images (chunks must be free of nosniff / CSP overrides)
+        source: "/((?!_next/static|_next/image|favicon.ico).*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
-          // SAMEORIGIN (not DENY) so the admin's own /preview iframe can load.
-          // Cross-site framing is still blocked, which is the actual clickjacking risk.
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
@@ -53,13 +73,13 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
-              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "worker-src 'self' blob:",
               "child-src 'self' blob:",
-              "img-src 'self' data: blob: https: *.supabase.co m.media-amazon.com covers.openlibrary.org *.archive.org i.ytimg.com *.cartocdn.com *.basemaps.cartocdn.com",
-              "font-src 'self'",
-              "connect-src 'self' https://*.supabase.co https://*.cartocdn.com https://cdn.jsdelivr.net",
+              "img-src 'self' data: blob: https:",
+              "font-src 'self' https://fonts.gstatic.com data:",
+              "connect-src 'self' https://*.supabase.co https://*.cartocdn.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://api.brevo.com",
               "frame-src 'self'",
               "frame-ancestors 'self'",
               "object-src 'none'",

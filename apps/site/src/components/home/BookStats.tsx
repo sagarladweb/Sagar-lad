@@ -62,13 +62,12 @@ export function BookStats() {
 
           gsap.fromTo(
             item,
-            { opacity: 0, y: 24, filter: "blur(3px)" },
+            { opacity: 0, y: 20 },
             {
               opacity: 1,
               y: 0,
-              filter: "blur(0px)",
-              duration: 0.7,
-              delay: i * 0.1,
+              duration: 0.6,
+              delay: i * 0.08,
               ease: "power3.out",
             }
           );

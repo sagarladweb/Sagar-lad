@@ -25,42 +25,41 @@ export function Hero() {
         0
       );
 
-      // Designation pill: fade up + blur clear
+      // Designation pill: fade up
       tl.fromTo(
         "[data-hero-desig]",
-        { opacity: 0, y: 16, filter: "blur(6px)" },
-        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8 },
-        0.2
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.7 },
+        0.1
       );
 
-      // Name: word-by-word stagger with blur clear
+      // Name: word-by-word stagger
       tl.fromTo(
         "[data-hero-word]",
-        { opacity: 0, y: 50, filter: "blur(8px)" },
+        { opacity: 0, y: 36 },
         {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: 1,
-          stagger: 0.12,
+          duration: 0.8,
+          stagger: 0.08,
         },
-        0.3
+        0.2
       );
 
       // Subtitle: fade up
       tl.fromTo(
         "[data-hero-sub]",
         { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.8 },
-        0.6
+        { opacity: 1, y: 0, duration: 0.7 },
+        0.4
       );
 
-      // Tagline: fade up + blur clear
+      // Tagline: fade up
       tl.fromTo(
         "[data-hero-tag]",
-        { opacity: 0, y: 24, filter: "blur(4px)" },
-        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 },
-        0.8
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.7 },
+        0.55
       );
     }, el);
 

@@ -189,16 +189,18 @@ model NewsletterSubscriber {
 // state so the admin can pick up where they left off). On send the row becomes
 // a real campaign with rendered `html` + `contentJson` (for duplicating later).
 model NewsletterCampaign {
-  id          String               @id @default(cuid())
-  subject     String
-  html        String
-  contentJson Json?
-  draft       Boolean              @default(false)
-  createdAt   DateTime             @default(now())
-  deliveries  NewsletterDelivery[]
+  id           String               @id @default(cuid())
+  subject      String
+  html         String
+  contentJson  Json?
+  draft        Boolean              @default(false)
+  scheduledFor DateTime?
+  createdAt    DateTime             @default(now())
+  deliveries   NewsletterDelivery[]
 
   @@index([createdAt])
   @@index([draft])
+  @@index([scheduledFor])
 }
 
 // Per-subscriber send record. `@@unique([campaignId, subscriberId])` is the

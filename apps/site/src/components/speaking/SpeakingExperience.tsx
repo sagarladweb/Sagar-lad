@@ -140,33 +140,85 @@ export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactN
         </div>
       </div>
 
-      {/* ── Desktop: 4-card bento grid (3 steps + contact CTA) ────── */}
-      <div className="hidden lg:grid grid-cols-4 gap-6">
-        {STEPS.map((step, i) => (
-          <div
-            key={step.n}
-            className="card-hover group rounded-lg border border-border bg-card p-7 sm:p-8"
-          >
-            <span className="inline-grid place-items-center w-12 h-12 rounded-md bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
-              {step.n}
-            </span>
-            <h3 className="mt-4 font-display text-xl font-bold">{step.title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{step.text}</p>
-            <ul className="mt-5 flex flex-wrap gap-2">
-              {step.bullets.map((b) => (
-                <li
-                  key={b}
-                  className="btn-premium inline-flex items-center gap-1.5 text-xs text-foreground bg-foreground/5 px-3 py-1.5 rounded-full"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-accent" /> {b}
-                </li>
-              ))}
-            </ul>
+      {/* ── Desktop: 2-row Bento Grid (3 steps + contact CTA) ────── */}
+      <div className="hidden lg:grid grid-cols-12 gap-6">
+        {/* Row 1: Step 01 (Span 7) & Step 02 (Span 5) */}
+        <div className="col-span-7 card-hover group rounded-2xl border border-border bg-card p-8 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="inline-grid place-items-center w-12 h-12 rounded-xl bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
+                {STEPS[0].n}
+              </span>
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Phase 01</span>
+            </div>
+            <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{STEPS[0].title}</h3>
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-lg">{STEPS[0].text}</p>
           </div>
-        ))}
+          <ul className="mt-6 flex flex-wrap gap-2">
+            {STEPS[0].bullets.map((b) => (
+              <li
+                key={b}
+                className="btn-premium inline-flex items-center gap-1.5 text-xs text-foreground bg-foreground/5 px-3 py-1.5 rounded-full"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-accent" /> {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="col-span-5 card-hover group rounded-2xl border border-border bg-card p-8 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="inline-grid place-items-center w-12 h-12 rounded-xl bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
+                {STEPS[1].n}
+              </span>
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Phase 02</span>
+            </div>
+            <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{STEPS[1].title}</h3>
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{STEPS[1].text}</p>
+          </div>
+          <ul className="mt-6 flex flex-wrap gap-2">
+            {STEPS[1].bullets.map((b) => (
+              <li
+                key={b}
+                className="btn-premium inline-flex items-center gap-1.5 text-xs text-foreground bg-foreground/5 px-3 py-1.5 rounded-full"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-accent" /> {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Row 2: Step 03 (Span 5) & Contact CTA Card (Span 7) */}
+        <div className="col-span-5 card-hover group rounded-2xl border border-border bg-card p-8 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="inline-grid place-items-center w-12 h-12 rounded-xl bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
+                {STEPS[2].n}
+              </span>
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Phase 03</span>
+            </div>
+            <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{STEPS[2].title}</h3>
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{STEPS[2].text}</p>
+          </div>
+          <ul className="mt-6 flex flex-wrap gap-2">
+            {STEPS[2].bullets.map((b) => (
+              <li
+                key={b}
+                className="btn-premium inline-flex items-center gap-1.5 text-xs text-foreground bg-foreground/5 px-3 py-1.5 rounded-full"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-accent" /> {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {contactCard && (
-          <div className="card-hover rounded-lg border border-border bg-card p-7 sm:p-8 flex flex-col">
-            {contactCard}
+          <div className="col-span-7 card-hover rounded-2xl border border-border bg-card p-8 flex flex-col justify-between relative overflow-hidden">
+            <span aria-hidden="true" className="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-accent/10 blur-2xl" />
+            <div className="relative h-full flex flex-col justify-between">
+              {contactCard}
+            </div>
           </div>
         )}
       </div>

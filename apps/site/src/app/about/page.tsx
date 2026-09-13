@@ -6,8 +6,20 @@ import Link from "next/link";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { ArrowRight, Trophy, Medal, Footprints } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
+import dynamic from "next/dynamic";
 import { Timeline } from "@/components/about/Timeline";
-import { TraveledMap } from "@/components/about/TraveledMap";
+
+const TraveledMap = dynamic(
+  () => import("@/components/about/TraveledMap").then((m) => m.TraveledMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full aspect-[16/9] min-h-[340px] flex items-center justify-center">
+        <div className="h-8 w-8 rounded-full border-2 border-[#FACC15] border-t-transparent animate-spin" />
+      </div>
+    ),
+  }
+);
 import { JsonLd } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 

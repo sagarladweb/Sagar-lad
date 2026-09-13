@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { Plus, Minus, RotateCcw } from "lucide-react";
 import {
   WORLD_MAP_VIEWBOX,
   WORLD_COUNTRIES,
@@ -9,18 +10,53 @@ import {
 } from "./world-map-paths";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
-// 17 countries that get yellow fill + dot marker
+// The 17 countries that receive yellow fill and precision dots
 const YELLOW_COUNTRIES = new Set([
   "IN", "BE", "LU", "IT", "HU", "AT", "CH", "ES", "FR",
   "PT", "DE", "GB", "CA", "AE", "NL", "HR", "IS",
 ]);
 
-// Manual dot overrides for countries where getBBox() center is off
-const DOT_OVERRIDES: Record<string, { x: number; y: number }> = {
-  FR: { x: 370, y: 360 },  // France — center of mainland, not Corsica
-  ES: { x: 350, y: 415 },  // Spain — center of Iberian mainland
-  PT: { x: 328, y: 418 },  // Portugal — western strip, not Iberian center
+// Accurate country display labels and flags
+const COUNTRY_DISPLAY: Record<string, { name: string; flag: string }> = {
+  IN: { name: "India", flag: "🇮🇳" },
+  BE: { name: "Belgium", flag: "🇧🇪" },
+  LU: { name: "Luxembourg", flag: "🇱🇺" },
+  IT: { name: "Italy", flag: "🇮🇹" },
+  HU: { name: "Budapest, Hungary", flag: "🇭🇺" },
+  AT: { name: "Austria", flag: "🇦🇹" },
+  CH: { name: "Switzerland", flag: "🇨🇭" },
+  ES: { name: "Spain", flag: "🇪🇸" },
+  FR: { name: "France", flag: "🇫🇷" },
+  PT: { name: "Portugal", flag: "🇵🇹" },
+  DE: { name: "Germany", flag: "🇩🇪" },
+  GB: { name: "United Kingdom", flag: "🇬🇧" },
+  CA: { name: "Canada", flag: "🇨🇦" },
+  AE: { name: "Dubai, UAE", flag: "🇦🇪" },
+  NL: { name: "Netherlands", flag: "🇳🇱" },
+  HR: { name: "Croatia", flag: "🇭🇷" },
+  IS: { name: "Iceland", flag: "🇮🇸" },
 };
+
+// Exact, calibrated geographic dot coordinates for the 17 yellow countries in SVG viewBox
+const YELLOW_COUNTRY_DOTS: { code: string; x: number; y: number }[] = [
+  { code: "IN", x: 602, y: 473 }, // India
+  { code: "BE", x: 417, y: 394 }, // Belgium
+  { code: "LU", x: 421, y: 397 }, // Luxembourg
+  { code: "IT", x: 435, y: 421 }, // Italy
+  { code: "HU", x: 450, y: 404 }, // Budapest, Hungary
+  { code: "AT", x: 437, y: 403 }, // Austria
+  { code: "CH", x: 425, y: 406 }, // Switzerland
+  { code: "ES", x: 395, y: 425 }, // Spain (Mainland)
+  { code: "FR", x: 413, y: 405 }, // France (Mainland)
+  { code: "PT", x: 387, y: 425 }, // Portugal (Mainland)
+  { code: "DE", x: 430, y: 393 }, // Germany
+  { code: "GB", x: 401, y: 382 }, // United Kingdom
+  { code: "CA", x: 220, y: 340 }, // Canada
+  { code: "AE", x: 534, y: 467 }, // Dubai, UAE
+  { code: "NL", x: 418, y: 389 }, // Netherlands
+  { code: "HR", x: 443, y: 413 }, // Croatia
+  { code: "IS", x: 370, y: 346 }, // Iceland
+];
 
 export function TraveledMap() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,41 +73,25 @@ export function TraveledMap() {
   const [countryCount, setCountryCount] = useState(0);
   const [hasEnteredViewport, setHasEnteredViewport] = useState(false);
 
-  // Dot centers computed from SVG paths
-  const [dotCenters, setDotCenters] = useState<{ code: string; x: number; y: number }[]>([]);
+  // Dragging state for manual panning when zoomed
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
 
+  // 25 visited countries preserved from existing data
   const visitedCountries = useMemo(
     () => VISITED_COUNTRIES_ORDER.map((code) => WORLD_COUNTRIES[code]).filter(Boolean) as CountryData[],
     []
   );
 
-  const activeCountry = hoveredCode ? WORLD_COUNTRIES[hoveredCode] : null;
+  const activeCountry = hoveredCode && YELLOW_COUNTRIES.has(hoveredCode)
+    ? COUNTRY_DISPLAY[hoveredCode]
+    : null;
 
   useEffect(() => {
     setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  // Compute dot centers from SVG paths for the 17 yellow countries
-  useEffect(() => {
-    if (!hasEnteredViewport) return;
-    const svg = svgRef.current;
-    if (!svg) return;
-
-    const centers = Array.from(YELLOW_COUNTRIES)
-      .map((code) => {
-        // Use manual override if available
-        if (DOT_OVERRIDES[code]) return { code, ...DOT_OVERRIDES[code] };
-        const el = svg.querySelector(`#map-country-${code}`) as SVGGeometryElement | null;
-        if (!el) return null;
-        const bbox = el.getBBox();
-        return { code, x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
-      })
-      .filter(Boolean) as { code: string; x: number; y: number }[];
-
-    setDotCenters(centers);
-  }, [hasEnteredViewport]);
-
-  // GSAP country count animation
+  // GSAP country count animation (up to 25 countries)
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -104,53 +124,137 @@ export function TraveledMap() {
     return () => ctx.revert();
   }, [visitedCountries.length]);
 
-  // Click to zoom / click again to zoom out
-  const handleCountryClick = useCallback(
-    (c: CountryData, e: React.MouseEvent<SVGPathElement>) => {
-      if (!c.visited) return;
+  // Handle click on country or background
+  const handleMapClick = useCallback(
+    (e: React.MouseEvent, country?: CountryData) => {
+      const isYellow = country && YELLOW_COUNTRIES.has(country.code);
 
-      if (selectedCode === c.code) {
+      // Rule: clicking country not filled with color or background -> zoom out
+      if (!isYellow || !country) {
+        if (selectedCode !== null || zoom !== 1) {
+          setZoom(1);
+          setPan({ x: 0, y: 0 });
+          setSelectedCode(null);
+        }
+        return;
+      }
+
+      // Rule: clicking again on that same yellow country -> zoom out
+      if (selectedCode === country.code) {
         setZoom(1);
         setPan({ x: 0, y: 0 });
         setSelectedCode(null);
         return;
       }
 
+      // Rule: clicking yellow country (or another yellow country) -> zoom to cursor position
+      // Exactly ONE zoom scale applied by clicking: 2.2x
       const viewport = containerRef.current?.querySelector("[data-map-vp]") as HTMLElement;
       if (!viewport) return;
       const rect = viewport.getBoundingClientRect();
+
       const clickX = e.clientX - rect.left - rect.width / 2;
       const clickY = e.clientY - rect.top - rect.height / 2;
 
-      const targetZoom = 2;
-      const maxBound = rect.width * (targetZoom - 1) * 0.4;
+      const targetZoom = 2.2;
+      const targetPanX = -clickX * (targetZoom - 1);
+      const targetPanY = -clickY * (targetZoom - 1);
+
+      const maxBoundX = rect.width * (targetZoom - 1) * 0.48;
+      const maxBoundY = rect.height * (targetZoom - 1) * 0.48;
+
       setZoom(targetZoom);
       setPan({
-        x: Math.max(-maxBound, Math.min(maxBound, -clickX * (targetZoom - 1))),
-        y: Math.max(-maxBound, Math.min(maxBound, -clickY * (targetZoom - 1))),
+        x: Math.max(-maxBoundX, Math.min(maxBoundX, targetPanX)),
+        y: Math.max(-maxBoundY, Math.min(maxBoundY, targetPanY)),
       });
-      setSelectedCode(c.code);
+      setSelectedCode(country.code);
     },
-    [selectedCode]
+    [selectedCode, zoom]
   );
+
+  // Manual zoom helpers
+  const handleManualZoomIn = () => {
+    setZoom((prev) => Math.min(4, Math.round((prev + 0.5) * 10) / 10));
+  };
+
+  const handleManualZoomOut = () => {
+    setZoom((prev) => {
+      const next = Math.max(1, Math.round((prev - 0.5) * 10) / 10);
+      if (next === 1) {
+        setPan({ x: 0, y: 0 });
+        setSelectedCode(null);
+      }
+      return next;
+    });
+  };
+
+  const handleResetZoom = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+    setSelectedCode(null);
+  };
+
+  // Drag to pan when zoomed
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoom <= 1) return;
+    setIsDragging(true);
+    dragStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      panX: pan.x,
+      panY: pan.y,
+    };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+
+    if (!isDragging || zoom <= 1) return;
+    const dx = e.clientX - dragStartRef.current.x;
+    const dy = e.clientY - dragStartRef.current.y;
+    const maxBoundX = rect.width * (zoom - 1) * 0.5;
+    const maxBoundY = rect.height * (zoom - 1) * 0.5;
+
+    setPan({
+      x: Math.max(-maxBoundX, Math.min(maxBoundX, dragStartRef.current.panX + dx)),
+      y: Math.max(-maxBoundY, Math.min(maxBoundY, dragStartRef.current.panY + dy)),
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
   return (
     <div ref={containerRef} className="w-full space-y-4">
       <div className="relative w-full overflow-hidden">
         <div
           data-map-vp
-          onMouseMove={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={() => {
+            setHoveredCode(null);
+            setIsDragging(false);
           }}
-          onMouseLeave={() => setHoveredCode(null)}
-          className="relative w-full aspect-[16/9.5] sm:aspect-[16/9] min-h-[340px] sm:min-h-[460px] md:min-h-[520px] flex items-center justify-center"
+          onClick={(e) => {
+            // If background clicked directly
+            if ((e.target as HTMLElement).tagName === "svg" || (e.target as HTMLElement).getAttribute("data-map-vp")) {
+              handleMapClick(e);
+            }
+          }}
+          className={`relative w-full aspect-[16/9.5] sm:aspect-[16/9] min-h-[340px] sm:min-h-[460px] md:min-h-[520px] flex items-center justify-center overflow-hidden select-none ${
+            zoom > 1 ? (isDragging ? "cursor-grabbing" : "cursor-grab") : "cursor-default"
+          }`}
         >
+          {/* Zoomable & Pannable Map Layer */}
           <div
-            className="w-full h-full flex items-center justify-center origin-center transition-transform"
+            className="w-full h-full flex items-center justify-center origin-center"
             style={{
               transform: `translate3d(${pan.x}px, ${pan.y}px, 0px) scale(${zoom})`,
-              transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+              transition: isDragging ? "none" : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
             <svg
@@ -173,22 +277,30 @@ export function TraveledMap() {
                     key={c.code}
                     id={`map-country-${c.code}`}
                     d={c.d}
-                    onClick={(e) => handleCountryClick(c, e)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMapClick(e, c);
+                    }}
                     onMouseEnter={() => {
-                      if (!isTouchDevice && isVisited) setHoveredCode(c.code);
+                      // Rule: show hover pill ONLY for yellow-filled countries
+                      if (!isTouchDevice && isYellow) {
+                        setHoveredCode(c.code);
+                      }
                     }}
                     onMouseLeave={() => {
-                      if (!isTouchDevice) setHoveredCode(null);
+                      if (!isTouchDevice) {
+                        setHoveredCode(null);
+                      }
                     }}
                     style={{
-                      transition: "fill 0.2s ease, stroke 0.2s ease",
-                      transitionDelay: hasEnteredViewport && isYellow ? `${orderIndex * 35}ms` : "0ms",
-                      cursor: isVisited ? "pointer" : "default",
+                      transition: "fill 0.25s ease, stroke 0.25s ease",
+                      transitionDelay: hasEnteredViewport && isYellow ? `${orderIndex * 25}ms` : "0ms",
+                      cursor: isYellow ? "pointer" : isVisited ? "default" : "default",
                     }}
                     fill={
                       isYellow
                         ? hasEnteredViewport
-                          ? "#ffd51d"
+                          ? "#FACC15"
                           : "#fef08a"
                         : isVisited
                         ? "#e2e8f0"
@@ -196,7 +308,7 @@ export function TraveledMap() {
                     }
                     stroke={
                       isHighlighted
-                        ? "#d1d5db"
+                        ? "#ca8a04"
                         : isYellow
                         ? "#ca8a04"
                         : isVisited
@@ -204,29 +316,30 @@ export function TraveledMap() {
                         : "#cbd5e1"
                     }
                     strokeWidth={
-                      isHighlighted ? 1.2 : isYellow ? 0.9 : 0.45
+                      isHighlighted ? 1.2 : isYellow ? 0.85 : 0.45
                     }
                     strokeLinejoin="round"
                     className="focus:outline-none"
-                    tabIndex={isVisited ? 0 : -1}
-                    aria-label={isVisited ? `${c.name} (Visited)` : c.name}
+                    tabIndex={isYellow ? 0 : -1}
+                    aria-label={isYellow ? `${COUNTRY_DISPLAY[c.code]?.name || c.name} (Visited)` : c.name}
                   />
                 );
               })}
 
-              {/* Dot markers — scaled inversely with zoom so they stay consistent on screen */}
-              {dotCenters.map((d) => {
+              {/* Exact 17 Geographic Dots (Scales inversely with zoom) */}
+              {YELLOW_COUNTRY_DOTS.map((d) => {
                 const isActive = hoveredCode === d.code || selectedCode === d.code;
-                const dotR = (isActive ? 3.5 : 2.5) / zoom;
+                const dotR = (isActive ? 3.8 : 2.6) / zoom;
                 const strokeW = 1.2 / zoom;
-                const pulseR1 = 5 / zoom;
-                const pulseR2 = 9 / zoom;
+                const pulseR1 = 5.5 / zoom;
+                const pulseR2 = 9.5 / zoom;
+
                 return (
                   <g key={`dot-${d.code}`} style={{ pointerEvents: "none" }}>
                     {isActive && (
-                      <circle cx={d.x} cy={d.y} r={pulseR1} fill="#ef4444" opacity={0.2}>
+                      <circle cx={d.x} cy={d.y} r={pulseR1} fill="#ef4444" opacity={0.25}>
                         <animate attributeName="r" values={`${pulseR1};${pulseR2};${pulseR1}`} dur="1.5s" repeatCount="indefinite" />
-                        <animate attributeName="opacity" values="0.25;0.08;0.25" dur="1.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.3;0.05;0.3" dur="1.5s" repeatCount="indefinite" />
                       </circle>
                     )}
                     <circle
@@ -253,27 +366,66 @@ export function TraveledMap() {
             </span>
           </div>
 
-          {/* Hover pill — flag + country name only, offset further when zoomed */}
+          {/* Manual Zoom Controls: In, Out, Reset */}
+          <div className="absolute bottom-4 right-4 z-40 flex items-center gap-1.5 bg-background/85 backdrop-blur-md p-1.5 rounded-full border border-border/70 shadow-md">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleManualZoomIn();
+              }}
+              disabled={zoom >= 4}
+              aria-label="Zoom in"
+              title="Zoom In"
+              className="grid h-8 w-8 place-items-center rounded-full text-foreground hover:bg-muted active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleManualZoomOut();
+              }}
+              disabled={zoom <= 1}
+              aria-label="Zoom out"
+              title="Zoom Out"
+              className="grid h-8 w-8 place-items-center rounded-full text-foreground hover:bg-muted active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <Minus className="h-4 w-4" />
+            </button>
+            {zoom > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleResetZoom();
+                }}
+                aria-label="Reset zoom"
+                title="Reset Zoom"
+                className="grid h-8 w-8 place-items-center rounded-full text-foreground hover:bg-muted active:scale-95 transition-all"
+              >
+                <RotateCcw className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            )}
+          </div>
+
+          {/* White Solid Hover Pill: ONLY shows when hovering on yellow-filled countries */}
           {activeCountry && (
             <div
-              className="absolute z-50 pointer-events-none"
+              className="absolute z-50 pointer-events-none transition-transform duration-75"
               style={{
-                left: `${mousePos.x + 16 * zoom}px`,
-                top: `${mousePos.y - 20 * zoom}px`,
+                left: `${mousePos.x}px`,
+                top: `${mousePos.y - 18}px`,
+                transform: "translate(-50%, -100%)",
               }}
             >
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-lg border border-black/10 whitespace-nowrap">
-                <span className="text-sm shrink-0" role="img" aria-label={activeCountry.name}>
-                  {activeCountry.flag || "📍"}
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white shadow-xl border border-black/10 whitespace-nowrap">
+                <span className="text-base shrink-0 leading-none" role="img" aria-label={activeCountry.name}>
+                  {activeCountry.flag}
                 </span>
-                <span className="text-xs font-bold text-black">
-                  {activeCountry.code === "IN"
-                    ? "India"
-                    : activeCountry.code === "HU"
-                    ? "Hungary"
-                    : activeCountry.code === "AE"
-                    ? "UAE"
-                    : activeCountry.name}
+                <span className="text-xs font-bold text-neutral-900 tracking-tight">
+                  {activeCountry.name}
                 </span>
               </div>
             </div>

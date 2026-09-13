@@ -3,12 +3,14 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { buildTemplateBody, type NewsletterContent } from "@/lib/newsletterTemplates";
+import { compileNewsletterToHtml } from "@/components/newsletter-composer/lib/compiler";
 
 export const runtime = "nodejs";
 
 const draftSchema = z.object({
   id: z.string().optional(),
   subject: z.string().trim().max(200).default(""),
+  html: z.string().optional(),
   content: z.unknown(),
 });
 
@@ -24,8 +26,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const content = parsed.data.content as NewsletterContent;
-    const html = buildTemplateBody(content.template ?? "letter", content);
+    const content = parsed.data.content as any;
+    let html = parsed.data.html || "";
+    if (!html) {
+      if (content && Array.isArray(content.blocks)) {
+        html = compileNewsletterToHtml(content);
+      } else if (content?.template) {
+        html = buildTemplateBody(content.template ?? "letter", content as NewsletterContent);
+      }
+    }
 
     if (parsed.data.id) {
       const existing = await prisma.newsletterCampaign.findFirst({

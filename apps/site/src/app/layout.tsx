@@ -110,6 +110,33 @@ export default async function RootLayout({
       className={`${beVietnamPro.variable} ${rethinkSans.variable} ${greatVibes.variable} h-full antialiased`}
     >
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                window.addEventListener('error', function(e) {
+                  var target = e.target;
+                  var isCssError = target && target.tagName === 'LINK' && target.rel === 'stylesheet';
+                  var isScriptError = target && target.tagName === 'SCRIPT' && target.src && target.src.indexOf('/_next/static/') !== -1;
+                  var isChunkMsg = e && e.message && (
+                    e.message.indexOf('Loading chunk') !== -1 ||
+                    e.message.indexOf('ChunkLoadError') !== -1 ||
+                    e.message.indexOf('Loading CSS chunk') !== -1 ||
+                    e.message.indexOf('Refused to apply style') !== -1
+                  );
+                  if (isCssError || isScriptError || isChunkMsg) {
+                    var now = Date.now();
+                    var last = parseInt(sessionStorage.getItem('chunk_reload_ts') || '0', 10);
+                    if (now - last > 5000) {
+                      sessionStorage.setItem('chunk_reload_ts', String(now));
+                      window.location.reload();
+                    }
+                  }
+                }, true);
+              }
+            `,
+          }}
+        />
         <link rel="preconnect" href="https://i.ytimg.com" />
         <link rel="preconnect" href="https://www.youtube.com" />
         <link rel="preconnect" href="https://www.instagram.com" />

@@ -76,9 +76,9 @@ export function ScrollAnimations() {
                   case "image":
                     return { opacity: 1, scale: 1, duration: 1.1, ease: "power3.out" };
                   case "blur":
-                    return { opacity: 1, filter: "blur(0px)", duration: 1, ease: "power2.out" };
+                    return { opacity: 1, duration: 0.8, ease: "power2.out" };
                   default:
-                    return { opacity: 1, x: 0, y: 0, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power3.out" };
+                    return { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "power3.out" };
                 }
               })();
 
@@ -122,10 +122,9 @@ export function ScrollAnimations() {
                   {
                     opacity: 1,
                     y: 0,
-                    filter: "blur(0px)",
-                    duration: 0.75,
+                    duration: 0.7,
                     ease: "power3.out",
-                    stagger: 0.1,
+                    stagger: 0.08,
                     scrollTrigger: { trigger: group, start: "top 90%", toggleActions: "play none none none" },
                   }
                 );

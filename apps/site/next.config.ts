@@ -3,9 +3,10 @@ import type { NextConfig } from "next";
 const isDev = process.env.NODE_ENV !== "production";
 
 const nextConfig: NextConfig = {
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   serverExternalPackages: ["sharp", "jsdom", "pg", "@prisma/adapter-pg"],
   experimental: {
-    optimizePackageImports: ["lucide-react"],
+    optimizePackageImports: ["lucide-react", "framer-motion"],
   },
   images: {
     formats: ["image/avif", "image/webp"],
@@ -25,7 +26,7 @@ const nextConfig: NextConfig = {
     if (isDev) {
       return [
         {
-          source: "/(.*)",
+          source: "/((?!_next/static|_next/image|favicon.ico).*)",
           headers: [
             { key: "X-Content-Type-Options", value: "nosniff" },
             { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -34,16 +35,10 @@ const nextConfig: NextConfig = {
       ];
     }
 
-    // Production: full security headers, but NOT on /_next/static (chunks)
+    // Production: full security headers
     return [
       {
         source: "/images/(.*)",
-        headers: [
-          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-        ],
-      },
-      {
-        source: "/_next/static/(.*)",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
@@ -56,8 +51,8 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // All pages EXCEPT /_next/static (chunks must be CSP-free)
-        source: "/((?!_next/static).*)",
+        // All pages EXCEPT /_next/static & images (chunks must be CSP-free and nosniff-free)
+        source: "/((?!_next/static|_next/image|favicon.ico).*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -71,9 +66,9 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
-              "style-src 'self' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://*.supabase.co https://m.media-amazon.com https://covers.openlibrary.org https://*.archive.org https://i.ytimg.com",
-              "font-src 'self'",
+              "font-src 'self' https://fonts.gstatic.com data:",
               "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com",
               "frame-src 'self' https://topmate.io https://www.youtube.com https://www.instagram.com https://player.vimeo.com",
               "frame-ancestors 'self'",
