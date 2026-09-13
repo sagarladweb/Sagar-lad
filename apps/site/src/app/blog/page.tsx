@@ -6,7 +6,7 @@ import { SITE, VISIBLE_POST_WHERE, pageMetadata } from "@/lib/site";
 import { getProfileAvatar } from "@/lib/profile";
 import { BlogVideoGrid } from "@/components/blog/BlogVideoGrid";
 import { JsonLd } from "@/components/JsonLd";
-import { SubscribeModal } from "@/components/blog/SubscribeModal";
+import { FaYoutube } from "@/lib/icons";
 import { BlogCard } from "@/components/blog/BlogCard";
 
 export const metadata: Metadata = pageMetadata({
@@ -169,7 +169,15 @@ export default async function BlogPage({
                 </svg>
                 Follow
               </a>
-              <SubscribeModal />
+              <a
+                href="https://www.youtube.com/@Sagarlad692"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-5 py-2 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+              >
+                <FaYoutube className="w-3.5 h-3.5" />
+                Subscribe
+              </a>
             </div>
           </div>
         </div>

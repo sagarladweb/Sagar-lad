@@ -58,27 +58,52 @@ export default function AboutPage() {
         );
       });
 
-      // Runner race cards — staggered slide-in + count-up
-      const runnerCards = gsap.utils.toArray<HTMLElement>("[data-runner-card]");
-      if (runnerCards.length) {
-        gsap.fromTo(
-          runnerCards,
-          { opacity: 0, x: 40, scale: 0.95 },
-          {
-            opacity: 1,
-            x: 0,
-            scale: 1,
-            duration: 0.6,
-            stagger: 0.12,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: "[data-runner-cards]",
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
+        // Runner race cards — staggered slide-in + count-up
+        const runnerCards = gsap.utils.toArray<HTMLElement>("[data-runner-card]");
+        if (runnerCards.length) {
+          gsap.fromTo(
+            runnerCards,
+            { opacity: 0, x: 40, scale: 0.95 },
+            {
+              opacity: 1,
+              x: 0,
+              scale: 1,
+              duration: 0.6,
+              stagger: 0.12,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: "[data-runner-cards]",
+                start: "top 85%",
+                toggleActions: "play none none none",
+              },
+            }
+          );
+
+          // Mobile: right-to-left scroll hint on runner cards
+          const isMobile = window.innerWidth < 640;
+          if (isMobile) {
+            const cardsContainer = document.querySelector<HTMLElement>("[data-runner-cards]");
+            if (cardsContainer) {
+              // Scroll to right edge first, then animate back to left
+              const maxScroll = cardsContainer.scrollWidth - cardsContainer.clientWidth;
+              if (maxScroll > 0) {
+                cardsContainer.scrollLeft = maxScroll;
+                gsap.to(cardsContainer, {
+                  scrollLeft: 0,
+                  duration: 1.2,
+                  ease: "power2.inOut",
+                  delay: 0.5,
+                  scrollTrigger: {
+                    trigger: cardsContainer,
+                    start: "top 80%",
+                    toggleActions: "play none none none",
+                  },
+                });
+              }
+            }
           }
-        );
-        // Count-up for the race counts
+
+          // Count-up for the race counts
         runnerCards.forEach((card) => {
           const countEl = card.querySelector<HTMLElement>(".runner-count");
           const target = Number(card.dataset.count);
@@ -368,7 +393,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div
             ref={navContainerRef}
-            className="no-scrollbar flex items-center justify-start gap-2 overflow-x-auto px-1 py-3 md:justify-center"
+            className="no-scrollbar flex items-center justify-center gap-2 overflow-x-auto px-1 py-3 md:justify-center"
           >
             {pageNav.map(([id, label]) => {
               const isActive = activeSection === id;
@@ -531,7 +556,7 @@ export default function AboutPage() {
             <div className="lg:col-span-7">
               <div
                 data-runner-cards
-                className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+                className="no-scrollbar flex sm:grid sm:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth px-1 -mx-1"
               >
                 {[
                   {
@@ -568,7 +593,7 @@ export default function AboutPage() {
                       key={r.race}
                       data-runner-card
                       data-count={r.count}
-                      className="card-hover rounded-xl border border-border bg-background overflow-hidden flex flex-col group"
+                      className="card-hover rounded-xl border border-border bg-background overflow-hidden flex flex-col group snap-center shrink-0 w-[70vw] sm:w-auto"
                     >
                       {/* Image */}
                       <div className="relative aspect-[3/4] overflow-hidden">

@@ -53,9 +53,6 @@ export default async function BooksReadPage() {
                 What&apos;s on my shelf
               </h2>
             </div>
-            <p className="text-sm text-muted-foreground tabular-nums">
-              {String(books.length).padStart(2, "0")} titles
-            </p>
           </div>
 
           <div className="mt-10">

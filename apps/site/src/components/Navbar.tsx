@@ -620,7 +620,7 @@ export function Navbar() {
                 />
                 <button
                   type="button"
-                  className="btn-premium p-2 rounded-full hover:bg-muted"
+                  className="p-2 rounded-full hover:bg-muted transition-colors"
                   onClick={() => setOpen(false)}
                   aria-label="Close menu"
                 >
@@ -631,7 +631,7 @@ export function Navbar() {
                 <div className="space-y-1">
                   <button
                     type="button"
-                    className="btn-premium w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl hover:bg-muted"
+                    className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl hover:bg-muted transition-colors"
                     onClick={() => setMobileOpen((c) => (c === "Blogs" ? null : "Blogs"))}
                   >
                     <span className="flex items-center gap-2">
@@ -696,7 +696,7 @@ export function Navbar() {
                 <div className="space-y-1">
                   <button
                     type="button"
-                    className="btn-premium w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl hover:bg-muted"
+                    className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl hover:bg-muted transition-colors"
                     onClick={() => setMobileOpen((c) => (c === "Books" ? null : "Books"))}
                   >
                     <span className="flex items-center gap-2">
@@ -746,7 +746,7 @@ export function Navbar() {
                 <div className="space-y-1">
                   <button
                     type="button"
-                    className="btn-premium w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl hover:bg-muted"
+                    className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl hover:bg-muted transition-colors"
                     onClick={() => setMobileOpen((c) => (c === "About" ? null : "About"))}
                   >
                     <span className="flex items-center gap-2">
