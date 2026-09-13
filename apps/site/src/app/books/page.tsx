@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { getPublishedBooks } from "@/lib/content";
 import { SITE, pageMetadata } from "@/lib/site";
 import { BookLibrary } from "@/components/books/BookLibrary";
+import { FlipBookSection } from "@/components/books/FlipBookSection";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
@@ -56,6 +57,9 @@ export default async function BooksPage() {
           </div>
         </div>
       </section>
+
+      {/* -------- Flip Book Preview -------- */}
+      <FlipBookSection />
 
       {/* -------- Colophon -------- */}
       <section className="bg-background">
