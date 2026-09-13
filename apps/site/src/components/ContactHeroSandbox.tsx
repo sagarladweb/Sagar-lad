@@ -2,12 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Settings2,
-} from "lucide-react";
+import { Download, Settings2 } from "lucide-react";
 
 const STORAGE_KEY = "contact-hero-sandbox-v3";
 
@@ -89,7 +84,7 @@ export function ContactHeroSandbox() {
       </button>
 
       {open && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] bg-[#111] border border-amber-500/30 rounded-2xl p-4 shadow-2xl w-[300px]">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] bg-[#111] border border-amber-500/30 rounded-2xl p-4 shadow-2xl w-[320px]">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">{dk}</span>
             <div className="flex items-center gap-2">
@@ -99,35 +94,14 @@ export function ContactHeroSandbox() {
             </div>
           </div>
 
-          <div className="space-y-2.5">
-            <Row label="Zoom" value={`${cur.z}%`}>
-              <Btn onClick={() => set({ z: Math.max(50, cur.z - 5) })}><ChevronLeft className="w-3 h-3" /></Btn>
-              <Btn onClick={() => set({ z: Math.min(200, cur.z + 5) })}><ChevronRight className="w-3 h-3" /></Btn>
-            </Row>
-            <Row label="Move X" value={`${cur.tx}px`}>
-              <Btn onClick={() => set({ tx: cur.tx - 5 })}><ChevronLeft className="w-3 h-3" /></Btn>
-              <Btn onClick={() => set({ tx: cur.tx + 5 })}><ChevronRight className="w-3 h-3" /></Btn>
-            </Row>
-            <Row label="Move Y" value={`${cur.ty}px`}>
-              <Btn onClick={() => set({ ty: cur.ty - 5 })}><ChevronLeft className="w-3 h-3" /></Btn>
-              <Btn onClick={() => set({ ty: cur.ty + 5 })}><ChevronRight className="w-3 h-3" /></Btn>
-            </Row>
-            <Row label="Focus X" value={`${cur.ox}%`}>
-              <Btn onClick={() => set({ ox: Math.max(0, cur.ox - 5) })}><ChevronLeft className="w-3 h-3" /></Btn>
-              <Btn onClick={() => set({ ox: Math.min(100, cur.ox + 5) })}><ChevronRight className="w-3 h-3" /></Btn>
-            </Row>
-            <Row label="Focus Y" value={`${cur.oy}%`}>
-              <Btn onClick={() => set({ oy: Math.max(0, cur.oy - 5) })}><ChevronLeft className="w-3 h-3" /></Btn>
-              <Btn onClick={() => set({ oy: Math.min(100, cur.oy + 5) })}><ChevronRight className="w-3 h-3" /></Btn>
-            </Row>
-            <Row label="Fade Start" value={`${cur.ms}%`}>
-              <Btn onClick={() => set({ ms: Math.max(0, cur.ms - 1) })}><ChevronLeft className="w-3 h-3" /></Btn>
-              <Btn onClick={() => set({ ms: Math.min(50, cur.ms + 1) })}><ChevronRight className="w-3 h-3" /></Btn>
-            </Row>
-            <Row label="Fade End" value={`${cur.me}%`}>
-              <Btn onClick={() => set({ me: Math.max(1, cur.me - 1) })}><ChevronLeft className="w-3 h-3" /></Btn>
-              <Btn onClick={() => set({ me: Math.min(50, cur.me + 1) })}><ChevronRight className="w-3 h-3" /></Btn>
-            </Row>
+          <div className="space-y-3">
+            <Slider label="Zoom" value={cur.z} min={50} max={200} step={1} unit="%" onChange={(v) => set({ z: v })} />
+            <Slider label="Move X" value={cur.tx} min={-200} max={200} step={1} unit="px" onChange={(v) => set({ tx: v })} />
+            <Slider label="Move Y" value={cur.ty} min={-200} max={200} step={1} unit="px" onChange={(v) => set({ ty: v })} />
+            <Slider label="Focus X" value={cur.ox} min={0} max={100} step={1} unit="%" onChange={(v) => set({ ox: v })} />
+            <Slider label="Focus Y" value={cur.oy} min={0} max={100} step={1} unit="%" onChange={(v) => set({ oy: v })} />
+            <Slider label="Fade Start" value={cur.ms} min={0} max={50} step={1} unit="%" onChange={(v) => set({ ms: v })} />
+            <Slider label="Fade End" value={cur.me} min={1} max={50} step={1} unit="%" onChange={(v) => set({ me: v })} />
           </div>
         </div>
       )}
@@ -136,21 +110,18 @@ export function ContactHeroSandbox() {
   );
 }
 
-function Row({ label, value, children }: { label: string; value: string; children: React.ReactNode }) {
+function Slider({ label, value, min, max, step, unit, onChange }: {
+  label: string; value: number; min: number; max: number; step: number; unit: string; onChange: (v: number) => void;
+}) {
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 w-16 shrink-0">{label}</span>
-      <span className="text-[11px] font-mono text-white tabular-nums w-14 text-center">{value}</span>
-      <div className="flex gap-1.5">{children}</div>
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{label}</span>
+        <span className="text-[11px] font-mono text-white tabular-nums">{value}{unit}</span>
+      </div>
+      <input type="range" min={min} max={max} step={step} value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-amber-500" />
     </div>
-  );
-}
-
-function Btn({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button type="button" onClick={onClick}
-      className="grid h-6 w-6 place-items-center rounded-lg border border-white/10 bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10 transition-colors">
-      {children}
-    </button>
   );
 }

@@ -148,7 +148,7 @@ export default function ContactPage() {
         <div className="relative z-20 mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 sm:gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 pt-6 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20">
           {/* Portrait: First on mobile, Left on desktop */}
           <div className="order-1 lg:order-1 lg:col-span-5 relative flex justify-center" data-animate="left" data-reverse suppressHydrationWarning>
-            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto overflow-hidden rounded-2xl">
+            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto rounded-2xl">
               <Image
                 src="/images/section.png"
                 alt="Sagar Lad"
