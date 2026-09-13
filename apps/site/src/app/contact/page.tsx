@@ -13,7 +13,6 @@ import {
   Clock,
 } from "lucide-react";
 import { validateContact, sanitizeText } from "@/lib/client-validators";
-import { ContactHeroSandbox } from "@/components/ContactHeroSandbox";
 
 const initial = {
   firstName: "",
@@ -107,7 +106,6 @@ export default function ContactPage() {
 
   return (
     <div className="overflow-x-clip">
-      <ContactHeroSandbox />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -148,6 +146,31 @@ export default function ContactPage() {
         <div className="relative z-20 mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 sm:gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 pt-6 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20">
           {/* Portrait: First on mobile, Left on desktop */}
           <div className="order-1 lg:order-1 lg:col-span-5 relative flex justify-center" data-animate="left" data-reverse>
+            <style>{`
+              .contact-hero-img {
+                object-position: 50% 50%;
+                mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
+                -webkit-mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
+              }
+              @media (max-width: 639px) {
+                .contact-hero-img {
+                  transform: scale(1.2) translateX(30px);
+                  object-position: 50% 50%;
+                }
+              }
+              @media (min-width: 640px) and (max-width: 1023px) {
+                .contact-hero-img {
+                  transform: scale(1.35) translateX(30px);
+                  object-position: 50% 50%;
+                }
+              }
+              @media (min-width: 1024px) {
+                .contact-hero-img {
+                  transform: scale(1.15) translate(-60px, -10px);
+                  object-position: 50% 50%;
+                }
+              }
+            `}</style>
             <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto overflow-hidden rounded-2xl">
               <Image
                 src="/images/section.png"
@@ -156,11 +179,7 @@ export default function ContactPage() {
                 height={1600}
                 priority
                 sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 420px"
-                className="relative z-10 h-auto w-full object-contain"
-                style={{
-                  maskImage: "linear-gradient(to top, transparent 0%, black 12%, black 100%)",
-                  WebkitMaskImage: "linear-gradient(to top, transparent 0%, black 12%, black 100%)",
-                }}
+                className="relative z-10 h-auto w-full object-cover contact-hero-img"
               />
             </div>
           </div>
