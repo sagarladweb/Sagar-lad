@@ -14,6 +14,7 @@ import { SpokenAt } from "@/components/speaking/SpokenAt";
 import { BackgroundSection } from "@/components/speaking/BackgroundSection";
 import { SpeakingExperience } from "@/components/speaking/SpeakingExperience";
 import { SpeakingReviewButton } from "@/components/speaking/SpeakingReviewModal";
+import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
@@ -93,28 +94,55 @@ export default function SpeakingPage() {
                   A simple way to stop worrying about AI and actually start using it — at your own pace, in your own way.
                 </p>
                 <div className="mt-6">
-                  <AimFramework />
+                  <ClientErrorBoundary>
+                    <AimFramework />
+                  </ClientErrorBoundary>
                 </div>
               </div>
             </div>
             <div className="lg:col-span-7" data-animate="right" suppressHydrationWarning>
-              <VideoPlayer
-                title="TEDx — The MIND UP message"
-                src="https://youtu.be/A5CJpNDusAU?si=DyeRhRJKxUYsr_eL"
-                thumb="/images/heroes/tedx.webp"
-                platform="youtube"
-                pauseOnLeave
-                overlay={
-                  <div
-                    className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
-                    aria-hidden="true"
+              <ClientErrorBoundary
+                fallback={
+                  <a
+                    href="https://youtu.be/A5CJpNDusAU?si=DyeRhRJKxUYsr_eL"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block aspect-video rounded-xl bg-black overflow-hidden relative"
                   >
-                    <span className="absolute bottom-4 left-5 text-[11px] font-semibold uppercase tracking-widest text-white/90">
-                      Sagar Lad · Keynote &amp; Educator
-                    </span>
-                  </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/heroes/tedx.webp"
+                      alt="TEDx — The MIND UP message"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 grid place-items-center">
+                      <span className="grid h-16 w-16 place-items-center rounded-full bg-white/90 text-black shadow-xl">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </span>
+                    </div>
+                  </a>
                 }
-              />
+              >
+                <VideoPlayer
+                  title="TEDx — The MIND UP message"
+                  src="https://youtu.be/A5CJpNDusAU?si=DyeRhRJKxUYsr_eL"
+                  thumb="/images/heroes/tedx.webp"
+                  platform="youtube"
+                  pauseOnLeave
+                  overlay={
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+                      aria-hidden="true"
+                    >
+                      <span className="absolute bottom-4 left-5 text-[11px] font-semibold uppercase tracking-widest text-white/90">
+                        Sagar Lad · Keynote &amp; Educator
+                      </span>
+                    </div>
+                  }
+                />
+              </ClientErrorBoundary>
             </div>
           </div>
         </div>
