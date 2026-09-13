@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   WORLD_MAP_VIEWBOX,
   WORLD_COUNTRIES,
@@ -32,9 +32,10 @@ export function TraveledMap() {
   const [hasEnteredViewport, setHasEnteredViewport] = useState(false);
 
   // Visited countries list
-  const visitedCountries = VISITED_COUNTRIES_ORDER.map(
-    (code) => WORLD_COUNTRIES[code]
-  ).filter(Boolean) as CountryData[];
+  const visitedCountries = useMemo(
+    () => VISITED_COUNTRIES_ORDER.map((code) => WORLD_COUNTRIES[code]).filter(Boolean) as CountryData[],
+    []
+  );
 
   const activeCountry =
     (hoveredCode ? WORLD_COUNTRIES[hoveredCode] : null) ||
