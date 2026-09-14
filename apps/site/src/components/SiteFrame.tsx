@@ -84,8 +84,7 @@ function SiteFrameInner({
     };
   }, []);
 
-  const isSandbox = pathname.startsWith("/sandbox");
-  const hideChrome = isAdmin || isSandbox;
+  const hideChrome = isAdmin;
 
   return (
     <>
