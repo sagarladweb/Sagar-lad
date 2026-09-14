@@ -135,7 +135,7 @@ export default async function SpeakingPage() {
                   pauseOnLeave
                   overlay={
                     <div
-                      className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+                      className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/50 via-black/15 to-transparent"
                       aria-hidden="true"
                     >
                       <span className="absolute bottom-4 left-5 text-[11px] font-semibold uppercase tracking-widest text-white/90">

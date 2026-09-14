@@ -145,7 +145,7 @@ export default function SpeakingContactPage() {
                   sizes="(max-width: 1024px) 360px, 420px"
                   className="object-cover object-[center_28%]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black/50 via-black/15 to-transparent pointer-events-none" />
 
                 {/* Floating trust badges */}
                 <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-white backdrop-blur-md border border-white/20 text-[11px] font-medium shadow-lg">

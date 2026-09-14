@@ -109,9 +109,8 @@ export default async function AnnouncementPage({
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black" />
           )}
-          {/* Dual gradient overlays — identical to homepage/speaking/about */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-black/10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40" />
+          {/* Bottom-only gradient for text legibility */}
+          <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           {/* Subtle brand glow when no image */}
           {!imageUrl && (
             <div

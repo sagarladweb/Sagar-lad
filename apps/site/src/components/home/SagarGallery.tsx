@@ -68,7 +68,7 @@ export function SagarGallery() {
                 />
                 <div
                   aria-hidden="true"
-                  className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none"
+                  className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none"
                 />
               </figure>
             ))}

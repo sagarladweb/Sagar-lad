@@ -72,7 +72,7 @@ export function NewsletterCta() {
                 sizes="(max-width: 768px) 100vw, 42vw"
                 className="object-cover object-[center_18%] md:object-[center_15%]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent md:hidden pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black/50 via-black/15 to-transparent md:hidden pointer-events-none" />
               <div className="absolute bottom-0 inset-x-0 p-5 sm:p-6 md:hidden">
                 <SiteLogo light className="h-7 w-auto" />
                 <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90">

@@ -44,9 +44,8 @@ export function AnnouncementSection({
               alt={title}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            {/* Premium gradient overlays — matches hero pattern */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent transition-opacity duration-500 group-hover:from-black/90" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+            {/* Bottom-only gradient for text legibility */}
+            <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
             <div className="relative z-10 flex flex-col justify-end h-full p-6 sm:p-10 lg:p-14 max-w-7xl mx-auto min-h-[240px] sm:min-h-[320px] lg:min-h-[420px]">
               {eventDate && (

@@ -523,7 +523,7 @@ export function Timeline() {
                   </div>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/50 via-black/15 to-transparent pointer-events-none" />
 
                 {/* Tag & Year Floating Badges */}
                 <div className="absolute top-4 left-4 flex items-center gap-2">
