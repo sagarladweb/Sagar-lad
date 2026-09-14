@@ -22,7 +22,7 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Sagar Lad delivers high-impact keynotes on AI & Data Leadership, Financial Mindset, and Career Growth at summits, tech conferences, and campuses worldwide.",
   path: "/speaking",
-  ogImage: "/images/heroes/speaking.webp",
+  ogImage: "/images/heroes/Speaking_hero.webp",
 });
 
 export const dynamic = "force-static";
@@ -44,8 +44,8 @@ export default function SpeakingPage() {
       <section className="relative -mt-16 min-h-[calc(100svh+4rem)] bg-foreground text-background overflow-hidden border-b border-border">
         <div className="absolute inset-0" aria-hidden="true">
           <Image
-            src="/images/heroes/speaking.webp"
-            alt=""
+            src="/images/heroes/Speaking_hero.webp"
+            alt="Sagar Lad Keynote Speaker"
             fill
             priority
             className="object-cover object-center hero-drift"

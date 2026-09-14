@@ -372,7 +372,7 @@ export default function AboutPage() {
       <section className="relative -mt-16 min-h-[calc(100svh+4rem)] border-b border-border bg-foreground text-background overflow-hidden">
         <div className="absolute inset-0" aria-hidden="true">
           <Image
-            src="/images/about/sagar-lad-about-hero.webp"
+            src="/images/heroes/sagar-lad-about-me-hero.webp"
             alt="About Sagar Lad – Author, Mentor and Keynote Speaker"
             fill
             priority
