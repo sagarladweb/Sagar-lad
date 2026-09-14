@@ -139,11 +139,12 @@ export function AboutMe() {
               />
               <figure className="card-hover relative aspect-[4/5] rounded-xl overflow-hidden border border-border bg-card">
                 <Image
-                  src="/images/about/about_sagar.webp"
+                  src="/images/about/about-sagar-new.webp?v=2"
                   alt="Sagar Lad"
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover object-[50%_80%]"
+                  unoptimized
                   priority
                 />
               </figure>
