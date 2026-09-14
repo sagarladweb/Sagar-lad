@@ -91,7 +91,7 @@ const nodes: Node[] = [
       "Every book written at 2am, fueled by coffee and the hope that someone, somewhere, would find it useful.",
     tag: "Author",
     icon: PenTool,
-    image: "/images/books/mindup-front.jpg",
+    image: "/images/books/Book-MINDUP/mindup-front.webp",
     imageAlt: "Sagar Lad Author - MIND UP and AI Cloud Architecture Books",
     imageFit: "cover",
     imagePosition: "object-center",

@@ -397,11 +397,6 @@ export default function AboutPage() {
               a system for thinking clearly and acting intentionally.
             </p>
 
-            <p data-reveal className="mb-10 border-l-2 border-accent pl-4 font-display text-base sm:text-lg font-semibold leading-snug text-white/90 text-left max-w-xl mx-auto sm:mx-0">
-              People don&apos;t make poor choices — they make the best choices
-              they can with the information they have.
-            </p>
-
             <div data-reveal className="mb-8">
               <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
                 MIND UP.
