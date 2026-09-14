@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "rm -rf .next && next dev --webpack",
-    "prebuild": "rm -rf .next && npm run db:generate -w @sagarlad/db",
+    "prebuild": "npm run db:generate -w @sagarlad/db",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",

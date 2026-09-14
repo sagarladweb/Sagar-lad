@@ -60,43 +60,43 @@ export function NewsletterCta() {
       className="border-b border-border bg-background py-16 md:py-24"
       aria-label="Subscribe to the newsletter"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div
-          className="mx-auto max-w-2xl overflow-hidden rounded-xl border border-border bg-card shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08)]"
-        >
-          {/* Full-width blog image — top 60%, no gradient overlay */}
-          <div className="relative w-full aspect-[16/10] overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/blog.webp"
-              alt="Blog"
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ transform: "scale(1.04)" }}
-            />
-            <div className="absolute bottom-0 inset-x-0 p-6 sm:p-8 bg-gradient-to-t from-black/60 to-transparent">
-              <SiteLogo light className="h-8 w-auto" />
-              <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">
-                One useful idea, every week
-              </p>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)]">
+          <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
+            {/* Photo column — showcases vertical photo of Sagar with coffee */}
+            <div className="relative md:col-span-5 min-h-[300px] sm:min-h-[360px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden bg-muted/40">
+              <Image
+                src="/images/newsletter/sagar-lad-newsletter.webp"
+                alt="Sagar Lad – The Sagar Lad Letter Newsletter"
+                fill
+                sizes="(max-width: 768px) 100vw, 42vw"
+                className="object-cover object-[center_18%] md:object-[center_15%]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent md:hidden pointer-events-none" />
+              <div className="absolute bottom-0 inset-x-0 p-5 sm:p-6 md:hidden">
+                <SiteLogo light className="h-7 w-auto" />
+                <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90">
+                  One useful idea, every week
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Newsletter form — bottom 40%, light blue blend to white */}
-          <div
-            className="flex flex-col items-center px-6 pt-8 pb-10 sm:px-12 sm:pt-10 sm:pb-12"
-            style={{
-              background: "linear-gradient(180deg, #e8f0fe 0%, #f4f7fd 35%, #ffffff 70%)",
-            }}
-          >
-            <div className="w-full text-center mx-auto max-w-md">
-              <Pill>The Sagar Lad Letter</Pill>
-              <h2 className="mt-3 font-display text-3xl md:text-4xl font-bold leading-tight text-foreground">
-                One practical idea. Every week.
-              </h2>
-              <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-                Unfiltered thoughts on money, mindset, speaking and intentional
-                living — one practical idea, every week. No spam, ever.
-              </p>
+            {/* Newsletter form column */}
+            <div
+              className="md:col-span-7 flex flex-col justify-center px-6 py-10 sm:px-10 sm:py-12"
+              style={{
+                background: "linear-gradient(180deg, #e8f0fe 0%, #f4f7fd 45%, #ffffff 85%)",
+              }}
+            >
+              <div className="w-full text-center md:text-left max-w-md mx-auto md:mx-0">
+                <Pill>The Sagar Lad Letter</Pill>
+                <h2 className="mt-3 font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-foreground">
+                  One practical idea. Every week.
+                </h2>
+                <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  Unfiltered thoughts on money, mindset, speaking and intentional
+                  living — one practical idea, every week. No spam, ever.
+                </p>
 
               {state === "success" ? (
                 <div className="mt-6 flex items-center gap-3 p-4 rounded-2xl bg-brand-light/20 border border-border text-foreground text-sm font-medium">
@@ -104,7 +104,7 @@ export function NewsletterCta() {
                   <span>{message}</span>
                 </div>
               ) : (
-                <form onSubmit={onSubmit} className="mt-6 space-y-3.5 max-w-md mx-auto" noValidate>
+                <form onSubmit={onSubmit} className="mt-6 space-y-3.5 max-w-md mx-auto md:mx-0" noValidate>
                   <div className="relative">
                     <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input
@@ -162,6 +162,7 @@ export function NewsletterCta() {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </div>
+  </section>
+);
 }

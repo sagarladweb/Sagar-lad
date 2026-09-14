@@ -25,6 +25,56 @@ import type { Block } from "@/components/newsletter-composer/types/editor";
 import { cn } from "@/components/newsletter-composer/lib/utils";
 
 /* ------------------------------------------------------------------ *
+ *  Shared hook for fetching newsletter block data
+ * ------------------------------------------------------------------ */
+type BlockData = {
+  booksRead: { id: string; title: string; author: string | null; note: string | null; imageUrl: string | null; buyUrl: string | null }[];
+  booksPublished: { id: string; title: string; tagline: string | null; buyUrl: string | null; imageUrl: string | null }[];
+  ebooks: { id: string; title: string; description: string | null; free: boolean; imageUrl: string | null; buyUrl: string | null }[];
+  quotes: { id: string; text: string; tag: string }[];
+  videos: { id: string; title: string; embedUrl: string; thumbnail: string | null; slug: string | null }[];
+  blogs: { id: string; title: string; slug: string; excerpt: string | null; coverImage: string | null }[];
+};
+
+let cachedData: BlockData | null = null;
+let cachePromise: Promise<BlockData> | null = null;
+
+function useBlockData() {
+  const [data, setData] = React.useState<BlockData | null>(cachedData);
+  const [loading, setLoading] = React.useState(!cachedData);
+
+  React.useEffect(() => {
+    if (cachedData) {
+      setData(cachedData);
+      setLoading(false);
+      return;
+    }
+    if (!cachePromise) {
+      cachePromise = fetch("/api/admin/newsletter/blocks")
+        .then((r) => r.json())
+        .then((d) => {
+          cachedData = d;
+          return d;
+        })
+        .catch(() => ({
+          booksRead: [],
+          booksPublished: [],
+          ebooks: [],
+          quotes: [],
+          videos: [],
+          blogs: [],
+        }));
+    }
+    cachePromise.then((d) => {
+      setData(d);
+      setLoading(false);
+    });
+  }, []);
+
+  return { data, loading };
+}
+
+/* ------------------------------------------------------------------ *
  *  Tone palette used by callouts
  * ------------------------------------------------------------------ */
 const TONES: Record<string, { bg: string; border: string; accent: string }> = {
@@ -1035,6 +1085,37 @@ function ColumnShell({
         </div>
       );
 
+    /* -------------------------- Database-backed -------------------------- */
+    case "booksRead": {
+      const d = block.data as { title?: string; selectedIds?: string[] };
+      return <BooksReadRenderer title={d.title} selectedIds={d.selectedIds} />;
+    }
+
+    case "booksPublished": {
+      const d = block.data as { title?: string; selectedIds?: string[] };
+      return <BooksPublishedRenderer title={d.title} selectedIds={d.selectedIds} />;
+    }
+
+    case "ebooks": {
+      const d = block.data as { title?: string; selectedIds?: string[] };
+      return <EbooksRenderer title={d.title} selectedIds={d.selectedIds} />;
+    }
+
+    case "quotes": {
+      const d = block.data as { title?: string; selectedIds?: string[] };
+      return <QuotesRenderer title={d.title} selectedIds={d.selectedIds} />;
+    }
+
+    case "videoFeed": {
+      const d = block.data as { title?: string; selectedIds?: string[] };
+      return <VideoFeedRenderer title={d.title} selectedIds={d.selectedIds} />;
+    }
+
+    case "blogPosts": {
+      const d = block.data as { title?: string; selectedIds?: string[] };
+      return <BlogPostsRenderer title={d.title} selectedIds={d.selectedIds} />;
+    }
+
     default:
       return (
         <div className="flex items-center gap-2 rounded-[12px] border border-dashed border-line-strong px-4 py-6 text-[13px] text-ink-muted">
@@ -1050,3 +1131,191 @@ function ColumnShell({
  * ------------------------------------------------------------------ */
 export { Avatar, Highlighted, RichText, SmartImage, SectionLabel };
 export const BLOCK_ICONS = { Check, CircleCheck, Clock, Mail };
+
+/* ------------------------------------------------------------------ *
+ *  Database-backed block renderers
+ * ------------------------------------------------------------------ */
+function LoadingState() {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-dashed border-line px-4 py-6 text-[13px] text-ink-muted">
+      <Clock className="h-4 w-4 animate-pulse" />
+      Loading…
+    </div>
+  );
+}
+
+function EmptyState({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-dashed border-line px-4 py-6 text-[13px] text-ink-muted">
+      <Square className="h-4 w-4" />
+      No {label} found in database
+    </div>
+  );
+}
+
+function BooksReadRenderer({ title, selectedIds }: { title?: string; selectedIds?: string[] }) {
+  const { data, loading } = useBlockData();
+  if (loading) return <LoadingState />;
+  const all = data?.booksRead ?? [];
+  const items = selectedIds?.length ? all.filter((i) => selectedIds.includes(i.id)) : all;
+  if (!items.length) return <EmptyState label="books" />;
+  return (
+    <div className="flex flex-col gap-4">
+      {title ? <h3 className="font-serif text-[22px] font-bold text-ink">{title}</h3> : null}
+      {items.map((item, i) => (
+        <div key={item.id} className="flex gap-3 rounded-xl border border-line bg-surface p-4">
+          {item.imageUrl ? (
+            <img src={item.imageUrl} alt={item.title} className="h-12 w-12 shrink-0 rounded-lg object-cover" />
+          ) : (
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-[15px] font-bold text-brand">
+              {i + 1}
+            </span>
+          )}
+          <div className="flex flex-col gap-1 min-w-0">
+            <p className="text-[15px] font-semibold text-ink truncate">{item.title}</p>
+            {item.author ? <p className="text-[13px] text-ink-muted">by {item.author}</p> : null}
+            {item.note ? <p className="text-[13px] text-ink-soft italic line-clamp-2">{item.note}</p> : null}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BooksPublishedRenderer({ title, selectedIds }: { title?: string; selectedIds?: string[] }) {
+  const { data, loading } = useBlockData();
+  if (loading) return <LoadingState />;
+  const all = data?.booksPublished ?? [];
+  const items = selectedIds?.length ? all.filter((i) => selectedIds.includes(i.id)) : all;
+  if (!items.length) return <EmptyState label="published books" />;
+  return (
+    <div className="flex flex-col gap-4">
+      {title ? <h3 className="font-serif text-[22px] font-bold text-ink">{title}</h3> : null}
+      {items.map((item) => (
+        <div key={item.id} className="flex items-center gap-4 rounded-xl border border-line bg-surface p-4">
+          {item.imageUrl ? (
+            <img src={item.imageUrl} alt={item.title} className="h-14 w-10 shrink-0 rounded-lg object-cover" />
+          ) : (
+            <span className="flex h-14 w-10 shrink-0 items-center justify-center rounded-lg bg-brand text-[18px]">📖</span>
+          )}
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <p className="text-[15px] font-semibold text-ink truncate">{item.title}</p>
+            {item.tagline ? <p className="text-[13px] text-ink-muted truncate">{item.tagline}</p> : null}
+          </div>
+          {item.buyUrl ? (
+            <a href={item.buyUrl} target="_blank" rel="noopener" className="ml-auto shrink-0 text-[12px] font-medium text-brand underline">Buy →</a>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EbooksRenderer({ title, selectedIds }: { title?: string; selectedIds?: string[] }) {
+  const { data, loading } = useBlockData();
+  if (loading) return <LoadingState />;
+  const all = data?.ebooks ?? [];
+  const items = selectedIds?.length ? all.filter((i) => selectedIds.includes(i.id)) : all;
+  if (!items.length) return <EmptyState label="e-books" />;
+  return (
+    <div className="flex flex-col gap-4">
+      {title ? <h3 className="font-serif text-[22px] font-bold text-ink">{title}</h3> : null}
+      {items.map((item) => (
+        <div key={item.id} className="flex items-center gap-4 rounded-xl border border-line bg-surface p-4">
+          {item.imageUrl ? (
+            <img src={item.imageUrl} alt={item.title} className="h-14 w-10 shrink-0 rounded-lg object-cover" />
+          ) : (
+            <span className="flex h-14 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-[18px]">📘</span>
+          )}
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <p className="text-[15px] font-semibold text-ink truncate">{item.title}</p>
+            {item.description ? <p className="text-[13px] text-ink-muted truncate">{item.description}</p> : null}
+          </div>
+          <span className="ml-auto shrink-0 text-[12px] font-medium text-emerald-600">
+            {item.free ? "Free" : "Premium"}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function QuotesRenderer({ title, selectedIds }: { title?: string; selectedIds?: string[] }) {
+  const { data, loading } = useBlockData();
+  if (loading) return <LoadingState />;
+  const all = data?.quotes ?? [];
+  const items = selectedIds?.length ? all.filter((i) => selectedIds.includes(i.id)) : all;
+  if (!items.length) return <EmptyState label="quotes" />;
+  return (
+    <div className="flex flex-col gap-5">
+      {title ? <h3 className="font-serif text-[22px] font-bold text-ink">{title}</h3> : null}
+      {items.map((item) => (
+        <div key={item.id} className="border-l-2 border-brand pl-4">
+          <p className="font-serif text-[17px] leading-relaxed text-ink italic">&ldquo;{item.text}&rdquo;</p>
+          {item.tag ? <p className="mt-1 text-[12px] text-ink-muted uppercase tracking-wider">{item.tag}</p> : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function VideoFeedRenderer({ title, selectedIds }: { title?: string; selectedIds?: string[] }) {
+  const { data, loading } = useBlockData();
+  if (loading) return <LoadingState />;
+  const all = data?.videos ?? [];
+  const items = selectedIds?.length ? all.filter((i) => selectedIds.includes(i.id)) : all;
+  if (!items.length) return <EmptyState label="videos" />;
+  return (
+    <div className="flex flex-col gap-4">
+      {title ? <h3 className="font-serif text-[22px] font-bold text-ink">{title}</h3> : null}
+      {items.map((item) => (
+        <div key={item.id} className="flex gap-4 rounded-xl border border-line bg-surface p-4">
+          {item.thumbnail ? (
+            <img src={item.thumbnail} alt={item.title} className="h-16 w-24 shrink-0 rounded-lg object-cover" />
+          ) : (
+            <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded-lg bg-foreground/5">
+              <Play className="h-6 w-6 text-ink-muted" />
+            </div>
+          )}
+          <div className="flex flex-col gap-1 min-w-0">
+            <p className="text-[15px] font-semibold text-ink truncate">{item.title}</p>
+            <a href={item.embedUrl} target="_blank" rel="noopener" className="text-[12px] text-brand underline truncate">
+              Watch video →
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BlogPostsRenderer({ title, selectedIds }: { title?: string; selectedIds?: string[] }) {
+  const { data, loading } = useBlockData();
+  if (loading) return <LoadingState />;
+  const all = data?.blogs ?? [];
+  const items = selectedIds?.length ? all.filter((i) => selectedIds.includes(i.id)) : all;
+  if (!items.length) return <EmptyState label="blog posts" />;
+  return (
+    <div className="flex flex-col gap-4">
+      {title ? <h3 className="font-serif text-[22px] font-bold text-ink">{title}</h3> : null}
+      {items.map((item) => (
+        <div key={item.id} className="flex gap-4 rounded-xl border border-line bg-surface p-4">
+          {item.coverImage ? (
+            <img src={item.coverImage} alt={item.title} className="h-16 w-24 shrink-0 rounded-lg object-cover" />
+          ) : (
+            <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded-lg bg-foreground/5">
+              <Rss className="h-5 w-5 text-ink-muted" />
+            </div>
+          )}
+          <div className="flex flex-col gap-1 min-w-0">
+            <p className="text-[15px] font-semibold text-ink truncate">{item.title}</p>
+            {item.excerpt ? <p className="text-[13px] text-ink-muted line-clamp-2">{item.excerpt}</p> : null}
+            <a href={`https://sagarlad.com/blog/${item.slug}`} target="_blank" rel="noopener" className="text-[12px] text-brand underline">
+              Read post →
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

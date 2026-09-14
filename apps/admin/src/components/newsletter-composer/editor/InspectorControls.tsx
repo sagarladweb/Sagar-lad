@@ -580,3 +580,148 @@ export function SegmentedChoice<T extends string>({
 }
 
 export { Switch, Label, TextareaInput };
+
+/* ------------------------------------------------------------------ *
+ *  Database item selector — picks items from DB for newsletter blocks
+ * ------------------------------------------------------------------ */
+type DBItem = { id: string; title: string; imageUrl?: string | null; thumbnail?: string | null; author?: string | null; slug?: string | null };
+
+type DBBlockType = "booksRead" | "booksPublished" | "ebooks" | "quotes" | "videoFeed" | "blogPosts";
+
+const DB_BLOCK_LABELS: Record<DBBlockType, string> = {
+  booksRead: "Books I Read",
+  booksPublished: "Books I Published",
+  ebooks: "E-books",
+  quotes: "Quotes",
+  videoFeed: "Videos",
+  blogPosts: "Blog Posts",
+};
+
+let dbCache: Record<string, DBItem[]> | null = null;
+let dbPromise: Promise<Record<string, DBItem[]>> | null = null;
+
+function useDBItems(blockType: DBBlockType) {
+  const [items, setItems] = React.useState<DBItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (dbCache) {
+      setItems(dbCache[blockType] ?? []);
+      setLoading(false);
+      return;
+    }
+    if (!dbPromise) {
+      dbPromise = fetch("/api/admin/newsletter/blocks")
+        .then((r) => r.json())
+        .then((d) => {
+          dbCache = d;
+          return d;
+        })
+        .catch(() => ({}));
+    }
+    dbPromise.then((d) => {
+      setItems(d[blockType] ?? []);
+      setLoading(false);
+    });
+  }, [blockType]);
+
+  return { items, loading };
+}
+
+export function ItemSelector({
+  blockType,
+  selectedIds,
+  onChange,
+}: {
+  blockType: DBBlockType;
+  selectedIds: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const { items, loading } = useDBItems(blockType);
+
+  const toggle = (id: string) => {
+    onChange(
+      selectedIds.includes(id)
+        ? selectedIds.filter((x) => x !== id)
+        : [...selectedIds, id],
+    );
+  };
+
+  const selectAll = () => onChange(items.map((i) => i.id));
+  const clearAll = () => onChange([]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl border border-dashed border-line px-3 py-4 text-[12px] text-ink-muted">
+        <span className="h-3 w-3 animate-pulse rounded-full bg-brand/40" />
+        Loading {DB_BLOCK_LABELS[blockType]}…
+      </div>
+    );
+  }
+
+  if (!items.length) {
+    return (
+      <div className="rounded-xl border border-dashed border-line px-3 py-4 text-center text-[12px] text-ink-muted">
+        No {DB_BLOCK_LABELS[blockType].toLowerCase()} in database yet
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-semibold text-ink-muted">
+          {selectedIds.length} / {items.length} selected
+        </span>
+        <div className="flex gap-1">
+          <button type="button" onClick={selectAll} className="rounded-md px-2 py-0.5 text-[11px] font-medium text-brand hover:bg-brand-50">
+            All
+          </button>
+          <button type="button" onClick={clearAll} className="rounded-md px-2 py-0.5 text-[11px] font-medium text-ink-muted hover:bg-canvas">
+            None
+          </button>
+        </div>
+      </div>
+      <div className="flex flex-col gap-1 max-h-60 overflow-y-auto scroll-thin">
+        {items.map((item) => {
+          const selected = selectedIds.includes(item.id);
+          const img = item.imageUrl || item.thumbnail;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => toggle(item.id)}
+              className={cn(
+                "flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition",
+                selected
+                  ? "border-brand bg-brand-50/60"
+                  : "border-line bg-surface hover:bg-canvas",
+              )}
+            >
+              {img ? (
+                <img src={img} alt="" className="h-8 w-8 shrink-0 rounded-lg object-cover" />
+              ) : (
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-[11px] text-ink-muted">
+                  {item.title.charAt(0)}
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[12px] font-medium text-ink">{item.title}</p>
+                {item.author ? <p className="truncate text-[11px] text-ink-muted">{item.author}</p> : null}
+                {item.slug ? <p className="truncate text-[11px] text-ink-muted">/{item.slug}</p> : null}
+              </div>
+              <span
+                className={cn(
+                  "h-4 w-4 shrink-0 rounded-md border-2 flex items-center justify-center transition",
+                  selected ? "border-brand bg-brand" : "border-line-strong",
+                )}
+              >
+                {selected && <span className="h-2 w-2 rounded-sm bg-white" />}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

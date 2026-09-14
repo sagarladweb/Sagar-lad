@@ -16,6 +16,7 @@ export function VideoPlayer({
   title,
   src,
   thumb,
+  thumbClass,
   platform,
   overlay,
   pauseOnLeave = false,
@@ -23,6 +24,7 @@ export function VideoPlayer({
   title: string;
   src: string;
   thumb: string | null;
+  thumbClass?: string;
   platform: VideoPlatform;
   overlay?: ReactNode;
   pauseOnLeave?: boolean;
@@ -67,7 +69,7 @@ export function VideoPlayer({
           <img
             src={thumb}
             alt={title}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover ${thumbClass ?? "object-center"}`}
             loading="lazy"
             decoding="async"
           />

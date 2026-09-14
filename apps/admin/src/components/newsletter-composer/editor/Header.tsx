@@ -52,7 +52,7 @@ function AutosaveStatus() {
       type="button"
       onClick={() => openModal("history")}
       title="Open version history"
-      className="group inline-flex items-center gap-1 rounded-full border border-line/70 bg-canvas/90 px-2 py-0.5 text-[10px] font-medium text-ink-muted/90 transition hover:border-brand/40 hover:text-ink"
+      className="group inline-flex items-center gap-1.5 rounded-full border border-line/70 bg-canvas/90 px-2.5 py-1 text-[11px] font-medium text-ink-muted transition hover:border-brand/40 hover:text-ink"
     >
       <span
         className={cn(
@@ -65,9 +65,8 @@ function AutosaveStatus() {
         )}
       />
       <span className="whitespace-nowrap tabular-nums leading-none">
-        {label} {formatRelativeTime(lastSavedAt)} · {formatClock(lastSavedAt)}
+        {label} {formatRelativeTime(lastSavedAt)}
       </span>
-      <History className="h-2.5 w-2.5 shrink-0 opacity-40 transition group-hover:opacity-100" />
     </button>
   );
 }

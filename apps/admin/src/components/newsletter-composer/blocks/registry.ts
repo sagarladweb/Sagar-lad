@@ -1,11 +1,15 @@
 import {
   AtSign,
   BookOpen,
+  BookMarked,
+  BookCheck,
   ChartBar,
   CircleQuestionMark,
   Code,
   Columns2,
   Columns3,
+  FileText,
+  Quote,
   Film,
   FolderOpen,
   GitCommitVertical,
@@ -26,7 +30,7 @@ import {
   Newspaper,
   PanelTop,
   PenLine,
-  Quote,
+  Book,
   Share2,
   Square,
   Table,
@@ -34,6 +38,8 @@ import {
   Type,
   User,
   Video,
+  Library,
+  Rss,
 } from "lucide-react";
 import type { BlockCategory, BlockDef, BlockType, FieldDef } from "@/components/newsletter-composer/types/editor";
 
@@ -983,9 +989,10 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
       title: "Follow along",
       alignCenter: true,
       items: [
-        { platform: "x", url: "https://x.com" },
-        { platform: "linkedin", url: "https://linkedin.com" },
-        { platform: "website", url: "https://example.com" },
+        { platform: "instagram", url: "https://www.instagram.com/grow_with__sagar/" },
+        { platform: "youtube", url: "https://www.youtube.com/@Sagarlad692" },
+        { platform: "linkedin", url: "https://www.linkedin.com/in/sagarlad/" },
+        { platform: "x", url: "https://x.com/SagarLad692" },
       ],
     },
     fields: [
@@ -1187,6 +1194,85 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
       paddingBottom: 24,
       lineHeight: 1.7,
     },
+  },
+
+  /* -------------------------- Database-backed -------------------------- */
+  booksRead: {
+    type: "booksRead",
+    label: "Books I Read",
+    description: "Select from your reading list",
+    category: "Newsletter",
+    icon: BookOpen,
+    keywords: ["reading", "books", "library"],
+    swatch: "#059669",
+    defaultData: { title: "Books I Read", selectedIds: [] as string[] },
+    fields: [text("title", "Section title")],
+    styleOverride: { gap: 14 },
+  },
+
+  booksPublished: {
+    type: "booksPublished",
+    label: "Books I Published",
+    description: "Select from your published books",
+    category: "Newsletter",
+    icon: BookMarked,
+    keywords: ["published", "author", "books"],
+    swatch: "#1D4ED8",
+    defaultData: { title: "Books I Published", selectedIds: [] as string[] },
+    fields: [text("title", "Section title")],
+    styleOverride: { gap: 14 },
+  },
+
+  ebooks: {
+    type: "ebooks",
+    label: "E-books",
+    description: "Select from your e-books",
+    category: "Newsletter",
+    icon: Book,
+    keywords: ["ebook", "download", "guide"],
+    swatch: "#7C3AED",
+    defaultData: { title: "E-books", selectedIds: [] as string[] },
+    fields: [text("title", "Section title")],
+    styleOverride: { gap: 14 },
+  },
+
+  quotes: {
+    type: "quotes",
+    label: "Quotes",
+    description: "Select from your quotes",
+    category: "Newsletter",
+    icon: Quote,
+    keywords: ["quotes", "inspiration", "sayings"],
+    swatch: "#0F766E",
+    defaultData: { title: "Quotes to Live By", selectedIds: [] as string[] },
+    fields: [text("title", "Section title")],
+    styleOverride: { fontFamily: "serif", gap: 16 },
+  },
+
+  videoFeed: {
+    type: "videoFeed",
+    label: "Videos",
+    description: "Select from your videos",
+    category: "Newsletter",
+    icon: Film,
+    keywords: ["youtube", "video", "watch"],
+    swatch: "#DC2626",
+    defaultData: { title: "Latest Videos", selectedIds: [] as string[] },
+    fields: [text("title", "Section title")],
+    styleOverride: { gap: 14 },
+  },
+
+  blogPosts: {
+    type: "blogPosts",
+    label: "Blogs",
+    description: "Select from your blog posts",
+    category: "Newsletter",
+    icon: Rss,
+    keywords: ["blog", "posts", "articles"],
+    swatch: "#2563EB",
+    defaultData: { title: "From the Blog", selectedIds: [] as string[] },
+    fields: [text("title", "Section title")],
+    styleOverride: { gap: 14 },
   },
 };
 

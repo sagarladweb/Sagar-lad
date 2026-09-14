@@ -54,7 +54,13 @@ export type BlockType =
   | "readingList"
   | "resources"
   | "button"
-  | "footer";
+  | "footer"
+  | "booksRead"
+  | "booksPublished"
+  | "ebooks"
+  | "quotes"
+  | "videoFeed"
+  | "blogPosts";
 
 /* ------------------------------------------------------------------ *
  *  Style model — universal, reused by every block

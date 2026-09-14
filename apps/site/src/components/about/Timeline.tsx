@@ -22,6 +22,10 @@ type Node = {
   tag: string;
   icon: React.ComponentType<{ className?: string }>;
   image?: string;
+  imageAlt?: string;
+  imageFit?: "cover" | "contain";
+  imagePosition?: string;
+  imageBg?: string;
   href?: string;
   hrefLabel?: string;
 };
@@ -35,7 +39,10 @@ const nodes: Node[] = [
       "D.E Italia High School. A small town, a second-hand computer, and a kid who believed technology could change the world.",
     tag: "Education",
     icon: GraduationCap,
-    image: "/images/profile/about.webp",
+    image: "/images/about/sagar-lad-school-de-italia.webp",
+    imageAlt: "Sagar Lad at Shree D.E. Italia High School - Education Journey",
+    imageFit: "contain",
+    imageBg: "bg-white dark:bg-neutral-900",
   },
   {
     year: "2009 – 2013",
@@ -45,7 +52,10 @@ const nodes: Node[] = [
       "BVM College of Engineering — Computer Science. Four years in the lab, not the classroom. Building things that broke, fixing them, and building again.",
     tag: "Education",
     icon: GraduationCap,
-    image: "/images/profile/about-2.webp",
+    image: "/images/about/sagar-lad-bvm-engineering-college.webp",
+    imageAlt: "Sagar Lad at BVM Engineering College Birla Vishvakarma Mahavidyalaya",
+    imageFit: "cover",
+    imagePosition: "object-center",
   },
   {
     year: "2013",
@@ -55,7 +65,10 @@ const nodes: Node[] = [
       "First Professional Step — TCS. From Gujarat to the world. First job, first flight, first taste of what was possible.",
     tag: "Career",
     icon: Briefcase,
-    image: "/images/profile/about-4.webp",
+    image: "/images/about/sagar-lad-first-job-tcs.webp",
+    imageAlt: "Sagar Lad First Job at TCS with Marathon Team Colleagues",
+    imageFit: "cover",
+    imagePosition: "object-[center_65%]",
   },
   {
     year: "2019 – 2020",
@@ -65,7 +78,10 @@ const nodes: Node[] = [
       "Reinvent — IIIT Bangalore, Data Science. When the world stopped, I started learning. IIIT Bangalore opened a door I never knew existed.",
     tag: "Education",
     icon: GraduationCap,
-    image: "/images/profile/about-5.webp",
+    image: "/images/about/sagar-lad-iiit-bangalore.webp",
+    imageAlt: "Sagar Lad Data Science Education at IIIT Bangalore",
+    imageFit: "cover",
+    imagePosition: "object-center",
   },
   {
     year: "2022 – 2026",
@@ -76,6 +92,9 @@ const nodes: Node[] = [
     tag: "Author",
     icon: PenTool,
     image: "/images/books/mindup-front.jpg",
+    imageAlt: "Sagar Lad Author - MIND UP and AI Cloud Architecture Books",
+    imageFit: "cover",
+    imagePosition: "object-center",
     href: "/books",
     hrefLabel: "View all books",
   },
@@ -87,7 +106,10 @@ const nodes: Node[] = [
       "Stay Curious — Purdue University, Masters in Gen AI. Back to being a student. Because the best leaders never stop learning.",
     tag: "Education",
     icon: GraduationCap,
-    image: "/images/speaking/candid-presentation.webp",
+    image: "/images/about/sagar-lad-purdue-university.webp",
+    imageAlt: "Sagar Lad Masters in Gen AI at Purdue University",
+    imageFit: "cover",
+    imagePosition: "object-center",
   },
   {
     year: "2026",
@@ -97,7 +119,10 @@ const nodes: Node[] = [
       "The kid who watched TED talks now stands on the stage. Proof that dreams deferred are not dreams denied.",
     tag: "Speaker",
     icon: Mic,
-    image: "/images/heroes/tedx.webp",
+    image: "/images/speaking/sagar-lad-tedx-speaker.webp",
+    imageAlt: "Sagar Lad Keynote Speaker at TEDx presenting AIM Framework",
+    imageFit: "cover",
+    imagePosition: "object-[center_82%]",
   },
 ];
 
@@ -473,15 +498,23 @@ export function Timeline() {
           <div className="relative rounded-3xl border border-border/70 bg-card/60 backdrop-blur-md shadow-[0_2px_14px_rgba(0,0,0,0.04)] overflow-hidden transition-all duration-300">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
               {/* Left Column: Image with Visual Badges */}
-              <div className="lg:col-span-5 relative min-h-[240px] sm:min-h-[280px] lg:min-h-[380px] bg-muted/40 overflow-hidden">
+              <div
+                className={`lg:col-span-5 relative min-h-[260px] sm:min-h-[300px] lg:min-h-[400px] ${
+                  activeNode.imageBg ?? "bg-muted/40"
+                } overflow-hidden flex items-center justify-center`}
+              >
                 {activeNode.image ? (
                   <Image
                     key={`img-${activeNode.title}`}
                     src={activeNode.image}
-                    alt={activeNode.title}
+                    alt={activeNode.imageAlt ?? activeNode.title}
                     fill
                     sizes="(max-width: 1024px) 100vw, 42vw"
-                    className="object-cover transition-transform duration-700 hover:scale-105"
+                    className={`${
+                      activeNode.imageFit === "contain"
+                        ? "object-contain p-6 sm:p-8"
+                        : `object-cover ${activeNode.imagePosition ?? "object-center"}`
+                    } transition-transform duration-700 hover:scale-105`}
                     priority
                   />
                 ) : (
@@ -490,11 +523,11 @@ export function Timeline() {
                   </div>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent pointer-events-none" />
 
                 {/* Tag & Year Floating Badges */}
                 <div className="absolute top-4 left-4 flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/60 text-white backdrop-blur-md border border-white/20">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/70 text-white backdrop-blur-md border border-white/20">
                     <Icon className="w-3.5 h-3.5" />
                     <span>{activeNode.tag}</span>
                   </span>

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Check, ChevronDown } from "lucide-react";
 import { cn } from "@/components/newsletter-composer/lib/utils";
 
 /* ------------------------------------------------------------------ *
@@ -20,13 +20,6 @@ import { Button as ShadcnButton } from "@/components/newsletter-composer/ui/butt
 import { Input as ShadcnInput } from "@/components/newsletter-composer/ui/input";
 import { ScrollArea as ShadcnScrollArea } from "@/components/newsletter-composer/ui/scroll-area";
 import { Separator as ShadcnSeparator } from "@/components/newsletter-composer/ui/separator";
-import {
-  Select as SelectRoot,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/newsletter-composer/ui/select";
 import { Slider as ShadcnSlider } from "@/components/newsletter-composer/ui/slider";
 import { Switch as ShadcnSwitch } from "@/components/newsletter-composer/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/newsletter-composer/ui/tabs";
@@ -197,7 +190,7 @@ export function Slider({
 }
 
 /* ------------------------------------------------------------------ *
- *  Select — thin adapter over the Radix select
+ *  Select — lightweight custom dropdown (no portal, no overflow issues)
  * ------------------------------------------------------------------ */
 export function Select({
   value,
@@ -212,28 +205,54 @@ export function Select({
   placeholder?: string;
   className?: string;
 }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const selected = options.find((o) => o.value === value);
+
   return (
-    <SelectRoot value={value || undefined} onValueChange={onChange}>
-      <SelectTrigger
-        className={cn(
-          "h-9 w-full rounded-control bg-surface px-3 text-[13px]",
-          className,
-        )}
+    <div ref={ref} className={cn("relative", className)}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-9 w-full items-center justify-between gap-2 rounded-control border border-line bg-surface px-3 text-[13px] text-ink transition hover:bg-canvas"
       >
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-      <SelectContent position="popper" className="rounded-control">
-        {options.map((option) => (
-          <SelectItem
-            key={option.value}
-            value={option.value}
-            className="rounded-[9px] py-1.5 pl-2 pr-8 text-[13px]"
-          >
-            {option.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </SelectRoot>
+        <span className={cn("truncate", !selected && "text-ink-muted")}>
+          {selected?.label ?? placeholder}
+        </span>
+        <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-ink-muted transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-[60] mt-1 max-h-60 w-full overflow-y-auto rounded-xl border border-line bg-surface shadow-lg">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => {
+                onChange(option.value);
+                setOpen(false);
+              }}
+              className={cn(
+                "flex w-full items-center gap-2 px-3 py-2 text-[13px] text-left transition hover:bg-canvas",
+                option.value === value && "bg-brand-50 font-medium text-brand",
+              )}
+            >
+              {option.value === value && <Check className="h-3.5 w-3.5 shrink-0 text-brand" />}
+              <span className={cn(option.value !== value && "pl-5.5")}>{option.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

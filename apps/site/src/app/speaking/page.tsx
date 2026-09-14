@@ -111,9 +111,9 @@ export default function SpeakingPage() {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="/images/heroes/tedx.webp"
-                      alt="TEDx — The MIND UP message"
-                      className="w-full h-full object-cover"
+                      src="/images/speaking/sagar-lad-tedx-talk-aim.webp"
+                      alt="Sagar Lad TEDx Talk on AIM Framework — Stop Chasing AI"
+                      className="w-full h-full object-cover object-[center_30%]"
                     />
                     <div className="absolute inset-0 grid place-items-center">
                       <span className="grid h-16 w-16 place-items-center rounded-full bg-white/90 text-black shadow-xl">
@@ -128,7 +128,8 @@ export default function SpeakingPage() {
                 <VideoPlayer
                   title="TEDx — The MIND UP message"
                   src="https://youtu.be/A5CJpNDusAU?si=DyeRhRJKxUYsr_eL"
-                  thumb="/images/heroes/tedx.webp"
+                  thumb="/images/speaking/sagar-lad-tedx-talk-aim.webp"
+                  thumbClass="object-[center_30%]"
                   platform="youtube"
                   pauseOnLeave
                   overlay={

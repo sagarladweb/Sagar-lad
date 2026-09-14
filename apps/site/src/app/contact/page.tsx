@@ -187,8 +187,8 @@ export default function ContactPage() {
             `}</style>
             <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto rounded-2xl">
               <Image
-                src="/images/section.png"
-                alt="Sagar Lad"
+                src="/images/common/sagar-lad-contact-section.png"
+                alt="Sagar Lad – Get in Touch"
                 width={2400}
                 height={1600}
                 priority

@@ -47,6 +47,7 @@ import {
 import {
   ControlGrid,
   FieldRenderer,
+  ItemSelector,
   SegmentedChoice,
 } from "@/components/newsletter-composer/editor/InspectorControls";
 import { BLOCK_DEFS } from "@/components/newsletter-composer/blocks/registry";
@@ -91,10 +92,14 @@ function useGroupedFields(block: Block) {
 /* ------------------------------------------------------------------ *
  *  CONTENT TAB
  * ------------------------------------------------------------------ */
+const DB_BLOCKS = ["booksRead", "booksPublished", "ebooks", "quotes", "videoFeed", "blogPosts"] as const;
+type DBBlockType = (typeof DB_BLOCKS)[number];
+
 function ContentTab({ block }: { block: Block }) {
   const updateData = useEditorStore((s) => s.updateData);
   const groups = useGroupedFields(block);
   const def = BLOCK_DEFS[block.type];
+  const isDBBlock = (DB_BLOCKS as readonly string[]).includes(block.type);
 
   return (
     <>
@@ -111,24 +116,46 @@ function ContentTab({ block }: { block: Block }) {
         </div>
       </div>
 
-      {groups.map((group, index) => (
-        <AccordionSection
-          key={group.section}
-          title={group.section}
-          defaultOpen={index < 2}
-        >
-          {group.fields.map((field) => (
-            <FieldRenderer
-              key={field.key}
-              field={field}
-              value={block.data[field.key]}
-              onChange={(value) => updateData(block.id, { [field.key]: value })}
+      {isDBBlock ? (
+        <div className="flex flex-col gap-3 px-4 py-4">
+          <Field label="Section title">
+            <Input
+              value={String(block.data.title ?? "")}
+              onChange={(e) => updateData(block.id, { title: e.target.value })}
+              placeholder={def.label}
             />
-          ))}
-        </AccordionSection>
-      ))}
+          </Field>
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
+              Select items to show
+            </label>
+            <ItemSelector
+              blockType={block.type as DBBlockType}
+              selectedIds={Array.isArray(block.data.selectedIds) ? block.data.selectedIds : []}
+              onChange={(ids) => updateData(block.id, { selectedIds: ids })}
+            />
+          </div>
+        </div>
+      ) : (
+        groups.map((group, index) => (
+          <AccordionSection
+            key={group.section}
+            title={group.section}
+            defaultOpen={index < 2}
+          >
+            {group.fields.map((field) => (
+              <FieldRenderer
+                key={field.key}
+                field={field}
+                value={block.data[field.key]}
+                onChange={(value) => updateData(block.id, { [field.key]: value })}
+              />
+            ))}
+          </AccordionSection>
+        ))
+      )}
 
-      {!groups.length ? (
+      {!groups.length && !isDBBlock ? (
         <div className="px-4 py-8 text-center text-[12.5px] text-ink-muted">
           This block has no content controls.
         </div>

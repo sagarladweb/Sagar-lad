@@ -1,17 +1,27 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { DotPagination } from "@/components/ui/CarouselNav";
 
 const photos = [
-  { src: "/images/profile/about.webp", alt: "Sagar Lad", className: "object-top" },
-  { src: "/images/profile/about-2.webp", alt: "Sagar Lad", className: "object-center" },
-  { src: "/images/profile/about-3b.webp", alt: "Sagar Lad", className: "object-center" },
-  { src: "/images/profile/about-4.webp", alt: "Sagar Lad", className: "object-center" },
-  { src: "/images/profile/about-5.webp", alt: "Sagar Lad", className: "object-center" },
-  { src: "/images/profile/about-6.webp", alt: "Sagar Lad", className: "object-top" },
+  {
+    src: "/images/profile/sagar-lad-friend-standing.webp",
+    alt: "Sagar Lad – Your friend, mentor and guide",
+    className: "object-[center_60%]",
+  },
+  {
+    src: "/images/profile/sagar-lad-friend-sitting.webp",
+    alt: "Sagar Lad – Practical wisdom on tech, leadership and life",
+    className: "object-[center_56%]",
+  },
+  {
+    src: "/images/profile/sagar-lad-friend-stairs.webp",
+    alt: "Sagar Lad – Cloud & AI Architect and Keynote Speaker",
+    className: "object-[38%_25%]",
+  },
 ];
 
 export function SagarGallery() {
@@ -41,23 +51,24 @@ export function SagarGallery() {
           <div
             ref={trackRef}
             onScroll={onScroll}
-            className="flex snap-x snap-mandatory overflow-x-auto no-scrollbar scroll-smooth rounded-2xl border border-border"
+            className="flex snap-x snap-mandatory overflow-x-auto no-scrollbar scroll-smooth rounded-2xl border border-border bg-card shadow-sm"
           >
-            {photos.map((p) => (
+            {photos.map((p, idx) => (
               <figure
                 key={p.src}
-                className="relative aspect-[4/3] w-full shrink-0 snap-center overflow-hidden"
+                className="relative aspect-[4/3] w-full shrink-0 snap-center overflow-hidden bg-muted/40"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={p.src}
                   alt={p.alt}
-                  loading="lazy"
-                  className={`absolute inset-0 w-full h-full object-cover ${p.className}`}
+                  fill
+                  priority={idx === 0}
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  className={`object-cover ${p.className} transition-transform duration-700 hover:scale-105`}
                 />
                 <div
                   aria-hidden="true"
-                  className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
+                  className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none"
                 />
               </figure>
             ))}

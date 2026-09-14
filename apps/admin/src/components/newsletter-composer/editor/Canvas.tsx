@@ -589,64 +589,6 @@ function EmptyState() {
 }
 
 /* ------------------------------------------------------------------ *
- *  Inbox snippet & subject card (Simple, minimal, high-visibility)
- * ------------------------------------------------------------------ */
-function InboxMetaCard() {
-  const subject = useEditorStore((s) => s.doc.subject ?? s.doc.title ?? "");
-  const previewText = useEditorStore((s) => s.doc.previewText ?? "");
-  const setSubject = useEditorStore((s) => s.setSubject);
-  const setPreviewText = useEditorStore((s) => s.setPreviewText);
-
-  return (
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="w-full mb-5 rounded-2xl border border-line bg-surface p-5 shadow-sm"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-ink-muted">
-            1. Subject Line
-          </label>
-          <input
-            type="text"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="e.g. The Sagar Lad Letter"
-            className="w-full h-11 px-4 text-sm font-semibold rounded-xl border border-line bg-canvas text-ink placeholder:text-ink-muted/50 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-ink-muted">
-            2. Preview Text (Preheader)
-          </label>
-          <input
-            type="text"
-            value={previewText}
-            onChange={(e) => setPreviewText(e.target.value)}
-            placeholder="e.g. aka safar"
-            className="w-full h-11 px-4 text-sm font-semibold rounded-xl border border-line bg-canvas text-ink placeholder:text-ink-muted/50 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition"
-          />
-        </div>
-      </div>
-
-      {/* Inbox preview strip */}
-      <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-line bg-canvas px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-brand shrink-0" />
-        <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted shrink-0">
-          Inbox Preview:
-        </span>
-        <span className="text-sm font-bold text-ink truncate">
-          {subject.trim() || "Subject line will appear here"}
-        </span>
-        <span className="text-sm text-ink-muted truncate">
-          {previewText.trim() ? `— ${previewText.trim()}` : "— (Preview snippet will appear here…)"}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ *
  *  Canvas
  * ------------------------------------------------------------------ */
 export function Canvas() {
@@ -657,6 +599,8 @@ export function Canvas() {
   const showHidden = useEditorStore((s) => s.showHidden);
   const docTitle = useEditorStore((s) => s.doc.title);
   const docIssue = useEditorStore((s) => s.doc.issue);
+  const subject = useEditorStore((s) => s.doc.subject ?? "");
+  const previewText = useEditorStore((s) => s.doc.previewText ?? "");
 
   const visible = React.useMemo(
     () =>
@@ -703,7 +647,16 @@ export function Canvas() {
           {width ? <span className="text-ink-muted/50">{width}px</span> : null}
         </div>
 
-        <InboxMetaCard />
+        {/* Inbox preview line */}
+        <div className="mb-3 w-full flex items-baseline gap-2 text-[13px]">
+          <span className="font-bold text-ink truncate">{docTitle || "Untitled"}</span>
+          {docIssue ? (
+            <span className="text-ink-muted text-[11px] font-medium uppercase tracking-wider">{docIssue}</span>
+          ) : null}
+          {previewText ? (
+            <span className="text-ink-muted truncate ml-auto">— {previewText}</span>
+          ) : null}
+        </div>
 
         <motion.div
           layout

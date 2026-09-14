@@ -43,8 +43,8 @@ const pageNav = [
 const MARATHON_IMAGES = [
   {
     key: "marathon-2017",
-    src: "/about me merathon/Sagar Lad Marathon 2017.webp",
-    alt: "Sagar Lad Marathon 2017",
+    src: "/images/about/sagar-lad-marathon-2017.webp",
+    alt: "Sagar Lad Marathon 2017 - TCS Amsterdam Half Marathon 21km",
     icon: Medal,
     race: "TCS Amsterdam Half Marathon",
     distance: "21 km",
@@ -54,8 +54,8 @@ const MARATHON_IMAGES = [
   },
   {
     key: "marathon-2021",
-    src: "/about me merathon/Sagar Lad Marathon 2021 .webp",
-    alt: "Sagar Lad Marathon 2021",
+    src: "/images/about/sagar-lad-marathon-2021.webp",
+    alt: "Sagar Lad Marathon 2021 - TCS Amsterdam Marathon 8km",
     icon: Trophy,
     race: "TCS Amsterdam Marathon",
     distance: "8 km",
@@ -65,8 +65,8 @@ const MARATHON_IMAGES = [
   },
   {
     key: "marathon-2022",
-    src: "/about me merathon/Sagar Lad Marathon 2022.webp",
-    alt: "Sagar Lad Marathon 2022",
+    src: "/images/about/sagar-lad-marathon-2022.webp",
+    alt: "Sagar Lad Marathon 2022 - Amsterdam DAM to DAM 16km",
     icon: Trophy,
     race: "Amsterdam DAM to DAM",
     distance: "16 km",
@@ -372,8 +372,8 @@ export default function AboutPage() {
       <section className="relative -mt-16 min-h-[calc(100svh+4rem)] border-b border-border bg-foreground text-background overflow-hidden">
         <div className="absolute inset-0" aria-hidden="true">
           <Image
-            src="/about me hero.webp"
-            alt="About Sagar Lad"
+            src="/images/about/sagar-lad-about-hero.webp"
+            alt="About Sagar Lad – Author, Mentor and Keynote Speaker"
             fill
             priority
             className="object-cover object-[63%_50%] sm:object-center"
