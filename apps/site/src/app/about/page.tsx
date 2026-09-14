@@ -376,7 +376,7 @@ export default function AboutPage() {
             alt="About Sagar Lad – Author, Mentor and Keynote Speaker"
             fill
             priority
-            className="object-cover object-[63%_50%] sm:object-center"
+            className="object-cover object-[77%_50%] sm:object-[80%_50%] lg:object-[50%_50%]"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-black/10" />
