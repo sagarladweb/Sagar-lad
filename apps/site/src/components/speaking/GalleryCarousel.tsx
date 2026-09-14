@@ -13,7 +13,12 @@ const images = [
   { src: "/images/heroes/tedx.webp", alt: "Sagar Lad at TEDx" },
 ];
 
-export function GalleryCarousel() {
+export function GalleryCarousel({
+  images: propImages,
+}: {
+  images?: { src: string; alt: string }[];
+} = {}) {
+  const list = propImages && propImages.length > 0 ? propImages : images;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
 
@@ -24,8 +29,8 @@ export function GalleryCarousel() {
     const cardWidth = el.children[0]?.getBoundingClientRect().width ?? 1;
     const gap = 12;
     const idx = Math.round(scrollLeft / (cardWidth + gap));
-    setCurrent(Math.min(idx, images.length - 1));
-  }, []);
+    setCurrent(Math.min(idx, list.length - 1));
+  }, [list.length]);
 
   const goTo = useCallback((i: number) => {
     const el = scrollRef.current;
@@ -43,7 +48,7 @@ export function GalleryCarousel() {
         onScroll={handleScroll}
         className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 no-scrollbar"
       >
-        {images.map((img) => (
+        {list.map((img) => (
           <div
             key={img.src}
             className="snap-center [scroll-snap-stop:always] shrink-0 w-[85vw] max-w-[360px] aspect-[4/3] rounded-xl overflow-hidden relative"
@@ -59,7 +64,7 @@ export function GalleryCarousel() {
         ))}
       </div>
       <DotPagination
-        total={images.length}
+        total={list.length}
         current={current}
         onChange={goTo}
         label="photo"

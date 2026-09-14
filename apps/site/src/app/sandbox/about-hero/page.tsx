@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import {
   Monitor,
+  Laptop,
   Tablet,
   Smartphone,
   Copy,
@@ -14,7 +15,7 @@ import {
 } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
 
-type DeviceMode = "desktop" | "tablet" | "mobile";
+type DeviceMode = "desktop" | "laptop" | "tablet" | "mobile";
 
 export default function AboutHeroSandbox() {
   const [device, setDevice] = useState<DeviceMode>("desktop");
@@ -27,6 +28,9 @@ export default function AboutHeroSandbox() {
   const [tabletX, setTabletX] = useState(50);
   const [tabletY, setTabletY] = useState(50);
 
+  const [laptopX, setLaptopX] = useState(50);
+  const [laptopY, setLaptopY] = useState(50);
+
   const [desktopX, setDesktopX] = useState(50);
   const [desktopY, setDesktopY] = useState(50);
 
@@ -37,6 +41,16 @@ export default function AboutHeroSandbox() {
     selectedHero === "about"
       ? "/images/heroes/sagar-lad-about-me-hero.webp"
       : "/images/heroes/Speaking_hero.webp";
+
+  // Active current position for live style
+  const currentPos =
+    device === "desktop"
+      ? { x: desktopX, y: desktopY, label: "Desktop (lg)" }
+      : device === "laptop"
+      ? { x: laptopX, y: laptopY, label: "Laptop (md)" }
+      : device === "tablet"
+      ? { x: tabletX, y: tabletY, label: "Tablet (sm)" }
+      : { x: mobileX, y: mobileY, label: "Mobile" };
 
   const mobileClass = `object-[${mobileX}%_${mobileY}%]`;
   const tabletClass = `sm:object-[${tabletX}%_${tabletY}%]`;
@@ -56,6 +70,8 @@ export default function AboutHeroSandbox() {
       setMobileY(50);
       setTabletX(50);
       setTabletY(50);
+      setLaptopX(50);
+      setLaptopY(50);
       setDesktopX(50);
       setDesktopY(50);
     } else {
@@ -63,6 +79,8 @@ export default function AboutHeroSandbox() {
       setMobileY(50);
       setTabletX(50);
       setTabletY(50);
+      setLaptopX(50);
+      setLaptopY(50);
       setDesktopX(50);
       setDesktopY(50);
     }
@@ -82,12 +100,12 @@ export default function AboutHeroSandbox() {
                 <h1 className="font-display text-base sm:text-lg font-bold">
                   Hero Responsive Calibration Sandbox
                 </h1>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  Interactive
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  Live Responsive Engine
                 </span>
               </div>
               <p className="text-xs text-neutral-400">
-                Calibrate responsive coordinates across Mobile, Tablet, and Desktop for the About Me &amp; Speaking heroes.
+                Calibrate object positions with real-time feedback across Desktop, Laptop, Tablet, and Mobile.
               </p>
             </div>
           </div>
@@ -127,43 +145,58 @@ export default function AboutHeroSandbox() {
           {/* Device Selector */}
           <div className="p-4 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
             <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block">
-              1. Select Device Viewport to Test
+              1. Select Device Viewport
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 type="button"
                 onClick={() => setDevice("desktop")}
                 className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
                   device === "desktop"
-                    ? "border-accent bg-accent/15 text-accent shadow-md"
+                    ? "border-accent bg-accent/20 text-white shadow-md ring-1 ring-accent"
                     : "border-neutral-800 bg-neutral-950/60 text-neutral-400 hover:text-white hover:border-neutral-700"
                 }`}
               >
-                <Monitor className="w-5 h-5" />
-                Desktop (lg)
+                <Monitor className="w-5 h-5 text-accent" />
+                Desktop
               </button>
+
+              <button
+                type="button"
+                onClick={() => setDevice("laptop")}
+                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
+                  device === "laptop"
+                    ? "border-accent bg-accent/20 text-white shadow-md ring-1 ring-accent"
+                    : "border-neutral-800 bg-neutral-950/60 text-neutral-400 hover:text-white hover:border-neutral-700"
+                }`}
+              >
+                <Laptop className="w-5 h-5 text-accent" />
+                Laptop
+              </button>
+
               <button
                 type="button"
                 onClick={() => setDevice("tablet")}
                 className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
                   device === "tablet"
-                    ? "border-accent bg-accent/15 text-accent shadow-md"
+                    ? "border-accent bg-accent/20 text-white shadow-md ring-1 ring-accent"
                     : "border-neutral-800 bg-neutral-950/60 text-neutral-400 hover:text-white hover:border-neutral-700"
                 }`}
               >
-                <Tablet className="w-5 h-5" />
-                Tablet (sm)
+                <Tablet className="w-5 h-5 text-accent" />
+                Tablet
               </button>
+
               <button
                 type="button"
                 onClick={() => setDevice("mobile")}
                 className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
                   device === "mobile"
-                    ? "border-accent bg-accent/15 text-accent shadow-md"
+                    ? "border-accent bg-accent/20 text-white shadow-md ring-1 ring-accent"
                     : "border-neutral-800 bg-neutral-950/60 text-neutral-400 hover:text-white hover:border-neutral-700"
                 }`}
               >
-                <Smartphone className="w-5 h-5" />
+                <Smartphone className="w-5 h-5 text-accent" />
                 Mobile
               </button>
             </div>
@@ -172,95 +205,28 @@ export default function AboutHeroSandbox() {
           {/* Coordinate Sliders */}
           <div className="p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                2. Calibrate Position ({device.toUpperCase()})
-              </label>
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-neutral-300 block">
+                  2. Calibrate Position: <span className="text-accent font-bold">{currentPos.label}</span>
+                </label>
+                <p className="text-[11px] text-neutral-500">Sliders adjust the live image instantly</p>
+              </div>
               <button
                 type="button"
                 onClick={handleReset}
-                className="text-xs text-neutral-400 hover:text-accent flex items-center gap-1"
+                className="text-xs text-neutral-400 hover:text-accent flex items-center gap-1 p-1.5 rounded-lg hover:bg-neutral-800 transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" /> Reset
               </button>
             </div>
 
-            {/* Mobile Sliders */}
-            {device === "mobile" && (
-              <div className="space-y-4">
-                <div className="p-3 rounded-xl bg-neutral-950 border border-neutral-800/80 space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-semibold text-neutral-300">Mobile Horizontal (X)</span>
-                    <span className="font-mono text-accent font-bold">{mobileX}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={mobileX}
-                    onChange={(e) => setMobileX(Number(e.target.value))}
-                    className="w-full accent-[#5b7bfb] cursor-pointer"
-                  />
-                </div>
-
-                <div className="p-3 rounded-xl bg-neutral-950 border border-neutral-800/80 space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-semibold text-neutral-300">Mobile Vertical (Y)</span>
-                    <span className="font-mono text-accent font-bold">{mobileY}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={mobileY}
-                    onChange={(e) => setMobileY(Number(e.target.value))}
-                    className="w-full accent-[#5b7bfb] cursor-pointer"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Tablet Sliders */}
-            {device === "tablet" && (
-              <div className="space-y-4">
-                <div className="p-3 rounded-xl bg-neutral-950 border border-neutral-800/80 space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-semibold text-neutral-300">Tablet Horizontal (X)</span>
-                    <span className="font-mono text-accent font-bold">{tabletX}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={tabletX}
-                    onChange={(e) => setTabletX(Number(e.target.value))}
-                    className="w-full accent-[#5b7bfb] cursor-pointer"
-                  />
-                </div>
-
-                <div className="p-3 rounded-xl bg-neutral-950 border border-neutral-800/80 space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-semibold text-neutral-300">Tablet Vertical (Y)</span>
-                    <span className="font-mono text-accent font-bold">{tabletY}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={tabletY}
-                    onChange={(e) => setTabletY(Number(e.target.value))}
-                    className="w-full accent-[#5b7bfb] cursor-pointer"
-                  />
-                </div>
-              </div>
-            )}
-
             {/* Desktop Sliders */}
             {device === "desktop" && (
               <div className="space-y-4">
-                <div className="p-3 rounded-xl bg-neutral-950 border border-neutral-800/80 space-y-2">
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
                   <div className="flex justify-between text-xs">
                     <span className="font-semibold text-neutral-300">Desktop Horizontal (X)</span>
-                    <span className="font-mono text-accent font-bold">{desktopX}%</span>
+                    <span className="font-mono text-accent font-bold text-sm">{desktopX}%</span>
                   </div>
                   <input
                     type="range"
@@ -268,14 +234,19 @@ export default function AboutHeroSandbox() {
                     max="100"
                     value={desktopX}
                     onChange={(e) => setDesktopX(Number(e.target.value))}
-                    className="w-full accent-[#5b7bfb] cursor-pointer"
+                    className="w-full accent-[#5b7bfb] cursor-pointer h-2 bg-neutral-800 rounded-lg"
                   />
+                  <div className="flex justify-between text-[10px] text-neutral-500">
+                    <span>0% (Left)</span>
+                    <span>50% (Center)</span>
+                    <span>100% (Right)</span>
+                  </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-neutral-950 border border-neutral-800/80 space-y-2">
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
                   <div className="flex justify-between text-xs">
                     <span className="font-semibold text-neutral-300">Desktop Vertical (Y)</span>
-                    <span className="font-mono text-accent font-bold">{desktopY}%</span>
+                    <span className="font-mono text-accent font-bold text-sm">{desktopY}%</span>
                   </div>
                   <input
                     type="range"
@@ -283,8 +254,148 @@ export default function AboutHeroSandbox() {
                     max="100"
                     value={desktopY}
                     onChange={(e) => setDesktopY(Number(e.target.value))}
-                    className="w-full accent-[#5b7bfb] cursor-pointer"
+                    className="w-full accent-[#5b7bfb] cursor-pointer h-2 bg-neutral-800 rounded-lg"
                   />
+                  <div className="flex justify-between text-[10px] text-neutral-500">
+                    <span>0% (Top)</span>
+                    <span>50% (Center)</span>
+                    <span>100% (Bottom)</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Laptop Sliders */}
+            {device === "laptop" && (
+              <div className="space-y-4">
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-neutral-300">Laptop Horizontal (X)</span>
+                    <span className="font-mono text-accent font-bold text-sm">{laptopX}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={laptopX}
+                    onChange={(e) => setLaptopX(Number(e.target.value))}
+                    className="w-full accent-[#5b7bfb] cursor-pointer h-2 bg-neutral-800 rounded-lg"
+                  />
+                  <div className="flex justify-between text-[10px] text-neutral-500">
+                    <span>0% (Left)</span>
+                    <span>50% (Center)</span>
+                    <span>100% (Right)</span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-neutral-300">Laptop Vertical (Y)</span>
+                    <span className="font-mono text-accent font-bold text-sm">{laptopY}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={laptopY}
+                    onChange={(e) => setLaptopY(Number(e.target.value))}
+                    className="w-full accent-[#5b7bfb] cursor-pointer h-2 bg-neutral-800 rounded-lg"
+                  />
+                  <div className="flex justify-between text-[10px] text-neutral-500">
+                    <span>0% (Top)</span>
+                    <span>50% (Center)</span>
+                    <span>100% (Bottom)</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tablet Sliders */}
+            {device === "tablet" && (
+              <div className="space-y-4">
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-neutral-300">Tablet Horizontal (X)</span>
+                    <span className="font-mono text-accent font-bold text-sm">{tabletX}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={tabletX}
+                    onChange={(e) => setTabletX(Number(e.target.value))}
+                    className="w-full accent-[#5b7bfb] cursor-pointer h-2 bg-neutral-800 rounded-lg"
+                  />
+                  <div className="flex justify-between text-[10px] text-neutral-500">
+                    <span>0% (Left)</span>
+                    <span>50% (Center)</span>
+                    <span>100% (Right)</span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-neutral-300">Tablet Vertical (Y)</span>
+                    <span className="font-mono text-accent font-bold text-sm">{tabletY}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={tabletY}
+                    onChange={(e) => setTabletY(Number(e.target.value))}
+                    className="w-full accent-[#5b7bfb] cursor-pointer h-2 bg-neutral-800 rounded-lg"
+                  />
+                  <div className="flex justify-between text-[10px] text-neutral-500">
+                    <span>0% (Top)</span>
+                    <span>50% (Center)</span>
+                    <span>100% (Bottom)</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Sliders */}
+            {device === "mobile" && (
+              <div className="space-y-4">
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-neutral-300">Mobile Horizontal (X)</span>
+                    <span className="font-mono text-accent font-bold text-sm">{mobileX}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={mobileX}
+                    onChange={(e) => setMobileX(Number(e.target.value))}
+                    className="w-full accent-[#5b7bfb] cursor-pointer h-2 bg-neutral-800 rounded-lg"
+                  />
+                  <div className="flex justify-between text-[10px] text-neutral-500">
+                    <span>0% (Left)</span>
+                    <span>50% (Center)</span>
+                    <span>100% (Right)</span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-neutral-300">Mobile Vertical (Y)</span>
+                    <span className="font-mono text-accent font-bold text-sm">{mobileY}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={mobileY}
+                    onChange={(e) => setMobileY(Number(e.target.value))}
+                    className="w-full accent-[#5b7bfb] cursor-pointer h-2 bg-neutral-800 rounded-lg"
+                  />
+                  <div className="flex justify-between text-[10px] text-neutral-500">
+                    <span>0% (Top)</span>
+                    <span>50% (Center)</span>
+                    <span>100% (Bottom)</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -311,7 +422,7 @@ export default function AboutHeroSandbox() {
             <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block">
               3. Generated Tailwind Classes
             </label>
-            <div className="p-3 rounded-xl bg-black font-mono text-xs text-amber-300 break-all border border-neutral-800">
+            <div className="p-3.5 rounded-xl bg-black font-mono text-xs text-amber-300 break-all border border-neutral-800 select-all">
               {fullTailwindClass}
             </div>
 
@@ -329,7 +440,7 @@ export default function AboutHeroSandbox() {
           <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300 flex items-start gap-2.5">
             <Info className="w-4 h-4 shrink-0 mt-0.5 text-blue-400" />
             <p>
-              Once you are happy with the visual framing on all devices, copy the Tailwind string and send it here. We will hardcode it into the page component!
+              Once you are happy with the visual framing on all devices, copy the Tailwind string and send it here. We will apply it to the page immediately!
             </p>
           </div>
         </div>
@@ -340,8 +451,8 @@ export default function AboutHeroSandbox() {
             <span className="font-semibold text-neutral-300">
               Live Preview: {selectedHero === "about" ? "About Me Hero" : "Speaking Hero"}
             </span>
-            <span className="font-mono text-[11px]">
-              Frame: {device === "desktop" ? "100% Widescreen" : device === "tablet" ? "768px (iPad)" : "390px (iPhone)"}
+            <span className="font-mono text-[11px] text-accent">
+              Active: {currentPos.label} ({currentPos.x}%, {currentPos.y}%)
             </span>
           </div>
 
@@ -350,44 +461,39 @@ export default function AboutHeroSandbox() {
             <div
               className={`relative transition-all duration-300 rounded-2xl overflow-hidden shadow-2xl border border-neutral-800 bg-neutral-900 text-white flex flex-col ${
                 device === "desktop"
-                  ? "w-full aspect-[16/10]"
+                  ? "w-full aspect-[16/9]"
+                  : device === "laptop"
+                  ? "w-[92%] aspect-[16/10]"
                   : device === "tablet"
-                  ? "w-[85%] aspect-[4/5]"
+                  ? "w-[78%] aspect-[4/5]"
                   : "w-[340px] aspect-[9/16]"
               }`}
             >
               {/* Window Header */}
-              <div className="h-7 bg-neutral-900/95 border-b border-neutral-800 px-3 flex items-center justify-between shrink-0">
+              <div className="h-7 bg-neutral-900/95 border-b border-neutral-800 px-3 flex items-center justify-between shrink-0 z-20">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
                 </div>
                 <span className="text-[10px] text-neutral-400 font-mono">
-                  {device === "desktop"
-                    ? `${desktopClass.replace("lg:", "")}`
-                    : device === "tablet"
-                    ? `${tabletClass.replace("sm:", "")}`
-                    : `${mobileClass}`}
+                  {currentPos.label} · pos: {currentPos.x}% {currentPos.y}%
                 </span>
               </div>
 
               {/* Main Visual Hero Mockup */}
               <div className="relative flex-1 w-full overflow-hidden flex flex-col justify-end">
-                {/* Hero Image */}
+                {/* Hero Image with DIRECT INLINE STYLE for 100% reliable slider movement */}
                 <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
                   <Image
                     src={imageSrc}
                     alt="Preview"
                     fill
                     priority
-                    className={`object-cover ${
-                      device === "desktop"
-                        ? desktopClass.replace("lg:", "")
-                        : device === "tablet"
-                        ? tabletClass.replace("sm:", "")
-                        : mobileClass
-                    }`}
+                    className="object-cover transition-none"
+                    style={{
+                      objectPosition: `${currentPos.x}% ${currentPos.y}%`,
+                    }}
                     sizes="100vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-black/10" />

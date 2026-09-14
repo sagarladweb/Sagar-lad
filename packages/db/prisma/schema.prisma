@@ -381,3 +381,11 @@ model HomeHero {
   tagline3        String   @default("Change your life.")
   updatedAt       DateTime @updatedAt
 }
+
+// Speaking Page Gallery (6 images + show/hide toggle)
+model SpeakingGallery {
+  id        String   @id @default("default")
+  enabled   Boolean  @default(true)
+  images    Json
+  updatedAt DateTime @updatedAt
+}
