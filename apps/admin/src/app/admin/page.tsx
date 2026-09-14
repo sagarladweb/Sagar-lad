@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { SessionProvider } from "@/components/SessionProvider";
-import { PHASE_1 } from "@/lib/phase";
 import { AuthOverlay } from "@/components/AuthOverlay";
 
 const inputBase =
@@ -126,7 +125,7 @@ function AdminLogin() {
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
 
-  const targetRoute = PHASE_1 ? "/admin/posts" : "/admin/dashboard";
+  const targetRoute = "/admin/dashboard";
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration gate

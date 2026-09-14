@@ -28,13 +28,10 @@ import { KPISection } from "@/components/admin/dashboard/KPISection";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PublishedBadge } from "@/components/ui/Badge";
-import { PHASE_1 } from "@/lib/phase";
-
+ 
 export const dynamic = "force-dynamic";
-
+ 
 export default async function DashboardPage() {
-  if (PHASE_1) redirect("/admin/posts");
-
   let recentPosts: { title: string; slug: string; published: boolean; views: number; likes: number }[] = [];
   let published = 0;
   let drafts = 0;

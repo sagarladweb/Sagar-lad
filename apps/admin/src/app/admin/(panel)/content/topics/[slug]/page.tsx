@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, FileText, Video, Pencil } from "lucide-react";
 import { prisma } from "@/lib/db";
-import { assertPhase2 } from "@/lib/phase";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +10,6 @@ export default async function TopicDetailPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  assertPhase2();
   const { slug } = await params;
 
   let category: Awaited<ReturnType<typeof getCategory>> = null;

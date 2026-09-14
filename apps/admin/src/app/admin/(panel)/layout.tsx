@@ -25,14 +25,14 @@ import { PHASE_1 } from "@/lib/phase";
 export const dynamic = "force-dynamic";
 
 const nav: { label: string; href: string; icon: LucideIcon; phase: number }[] = [
-  { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, phase: 2 },
-  { label: "CMS", href: "/admin/cms", icon: LayoutTemplate, phase: 1 },
+  { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, phase: 1 },
   { label: "Posts", href: "/admin/posts", icon: FileText, phase: 1 },
-  { label: "Content", href: "/admin/content", icon: Layers, phase: 2 },
+  { label: "Content", href: "/admin/content", icon: Layers, phase: 1 },
+  { label: "Settings", href: "/admin/settings", icon: Settings, phase: 1 },
+  { label: "CMS", href: "/admin/cms", icon: LayoutTemplate, phase: 2 },
   { label: "Announcement", href: "/admin/announcement", icon: Megaphone, phase: 2 },
   { label: "Newsletter", href: "/admin/newsletter", icon: Mail, phase: 2 },
   { label: "Community", href: "/admin/moderation", icon: MessagesSquare, phase: 2 },
-  { label: "Settings", href: "/admin/settings", icon: Settings, phase: 1 },
 ].filter((item) => !PHASE_1 || item.phase === 1);
 
 async function signOutAction() {

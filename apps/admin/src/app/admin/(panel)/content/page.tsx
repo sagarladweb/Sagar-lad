@@ -1,5 +1,4 @@
 import { ContentHub } from "@/components/admin/ContentHub";
-import { assertPhase2 } from "@/lib/phase";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +7,6 @@ export default async function ContentAdminPage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
-  assertPhase2();
   const { tab } = await searchParams;
   return (
     <div className="space-y-6">

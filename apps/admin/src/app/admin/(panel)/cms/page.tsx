@@ -1,10 +1,12 @@
 import { Suspense } from "react";
 import { HomepageCMS } from "@/components/admin/cms/HomepageCMS";
 import { Loader2 } from "lucide-react";
+import { assertPhase2 } from "@/lib/phase";
 
 export const dynamic = "force-dynamic";
 
 export default function CMSPage() {
+  assertPhase2();
   return (
     <Suspense
       fallback={
