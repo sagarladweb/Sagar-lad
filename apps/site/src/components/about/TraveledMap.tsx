@@ -366,8 +366,26 @@ export function TraveledMap() {
             </span>
           </div>
 
-          {/* Manual Zoom Controls: In, Out, Reset */}
-          <div className="absolute bottom-4 right-4 z-40 flex items-center gap-1.5 bg-background/85 backdrop-blur-md p-1.5 rounded-full border border-border/70 shadow-md">
+          {/* Mobile & Tablet Pill: Simple bordered text pill centered at bottom */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-40 md:hidden pointer-events-auto">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (zoom > 1) {
+                  handleResetZoom();
+                } else {
+                  handleManualZoomIn();
+                }
+              }}
+              className="px-4 py-1.5 rounded-full border border-border/80 bg-background/90 backdrop-blur-md text-xs font-semibold text-foreground shadow-xs hover:bg-muted active:scale-95 transition-all"
+            >
+              {zoom > 1 ? "Reset zoom" : "Click to zoom"}
+            </button>
+          </div>
+
+          {/* Desktop Zoom Controls: In, Out, Reset */}
+          <div className="hidden md:flex absolute bottom-4 right-4 z-40 items-center gap-1.5 bg-background/85 backdrop-blur-md p-1.5 rounded-full border border-border/70 shadow-md">
             <button
               type="button"
               onClick={(e) => {

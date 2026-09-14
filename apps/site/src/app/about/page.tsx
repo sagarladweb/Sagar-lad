@@ -476,7 +476,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div
             ref={navContainerRef}
-            className="no-scrollbar flex items-center justify-center gap-2 overflow-x-auto px-1 py-3 md:justify-center"
+            className="no-scrollbar flex items-center justify-start md:justify-center gap-2 overflow-x-auto px-4 py-3 md:px-1"
           >
             {pageNav.map(([id, label]) => {
               const isActive = activeSection === id;
@@ -530,9 +530,11 @@ export default function AboutPage() {
       {/* ---------- Professional Bio ---------- */}
       <section id="belief" className="scroll-mt-32 py-20 md:py-28 border-b border-border">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <p data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-            Professional Bio
-          </p>
+          <div className="text-center md:text-left">
+            <p data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+              Professional Bio
+            </p>
+          </div>
           <div data-reveal className="mt-6 space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
             <p>
               Sagar Lad works as a Data &amp; AI Architect with a software
