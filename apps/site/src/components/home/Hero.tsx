@@ -84,8 +84,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
           className={`object-cover ${data.mobilePosition} ${data.tabletPosition} ${data.desktopPosition}`}
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40" />
+        <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-32">
