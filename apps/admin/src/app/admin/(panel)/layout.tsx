@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   LayoutDashboard,
+  LayoutTemplate,
   FileText,
   MessagesSquare,
   ExternalLink,
@@ -25,6 +26,7 @@ export const dynamic = "force-dynamic";
 
 const nav: { label: string; href: string; icon: LucideIcon; phase: number }[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, phase: 2 },
+  { label: "CMS", href: "/admin/cms", icon: LayoutTemplate, phase: 1 },
   { label: "Posts", href: "/admin/posts", icon: FileText, phase: 1 },
   { label: "Content", href: "/admin/content", icon: Layers, phase: 2 },
   { label: "Announcement", href: "/admin/announcement", icon: Megaphone, phase: 2 },

@@ -25,6 +25,12 @@ export function showToast(title: string, message?: string, type: ToastType = "su
   }
 }
 
+export const toast = {
+  success: (title: string, message?: string) => showToast(title, message, "success"),
+  error: (title: string, message?: string) => showToast(title, message, "error"),
+  info: (title: string, message?: string) => showToast(title, message, "info"),
+};
+
 export function ToastContainer() {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 

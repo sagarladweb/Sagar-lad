@@ -1,6 +1,7 @@
 import { SITE, VISIBLE_POST_WHERE } from "@/lib/site";
 import { getSiteSocials } from "@/lib/social-links";
 import { getCategoriesWithFallback, getFeaturedPostsWithFallback, getActiveAnnouncement } from "@/lib/content";
+import { getHomeHero } from "@/lib/hero";
 import { prisma } from "@/lib/db";
 import { JsonLd } from "@/components/JsonLd";
 
@@ -38,13 +39,15 @@ export default async function HomePage({
     getSiteSocials().catch(() => []),
     getCategoriesWithFallback().catch(() => []),
     fetchAnnouncement.catch(() => null),
+    getHomeHero().catch(() => null),
   ]);
 
-  const [posts, socials, allCategories, announcement] = results as [
+  const [posts, socials, allCategories, announcement, hero] = results as [
     Awaited<ReturnType<typeof getFeaturedPostsWithFallback>>,
     Awaited<ReturnType<typeof getSiteSocials>>,
     Awaited<ReturnType<typeof getCategoriesWithFallback>>,
     Awaited<typeof fetchAnnouncement>,
+    Awaited<ReturnType<typeof getHomeHero>>,
   ];
 
   const topicsWithViews = allCategories
@@ -68,7 +71,7 @@ export default async function HomePage({
   if (previewMode === "all") {
     return (
       <>
-        <Hero />
+        <Hero hero={hero} />
         <FeaturedOn />
         <AboutMe />
         <MindUp />
@@ -113,7 +116,7 @@ export default async function HomePage({
           },
         }}
       />
-      <Hero />
+      <Hero hero={hero} />
       <FeaturedOn />
       <AboutMe />
       <MindUp />

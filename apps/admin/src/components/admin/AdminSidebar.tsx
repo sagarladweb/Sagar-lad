@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
+  LayoutTemplate,
   FileText,
   Mail,
   Share2,
@@ -20,6 +21,7 @@ import { CommunityBadge } from "./CommunityBadge";
 
 const ICONS: Record<string, LucideIcon> = {
   "/admin/dashboard": LayoutDashboard,
+  "/admin/cms": LayoutTemplate,
   "/admin/posts": FileText,
   "/admin/content": Layers,
   "/admin/announcement": Megaphone,

@@ -3,11 +3,12 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "@/lib/gsap";
+import type { HomeHeroData } from "@/lib/hero-types";
+import { DEFAULT_HOME_HERO } from "@/lib/hero-types";
 
-import { DESIGNATION } from "@/lib/site";
-
-export function Hero() {
+export function Hero({ hero }: { hero?: HomeHeroData }) {
   const root = useRef<HTMLElement>(null);
+  const data = hero ?? DEFAULT_HOME_HERO;
 
   useEffect(() => {
     const el = root.current;
@@ -76,11 +77,11 @@ export function Hero() {
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <Image
           data-hero-bg
-          src="/images/heroes/hero-home.webp"
-          alt=""
+          src={data.imageUrl}
+          alt={data.title}
           fill
           priority
-          className="object-cover object-[70%_85%] sm:object-center"
+          className={`object-cover ${data.mobilePosition} ${data.tabletPosition} ${data.desktopPosition}`}
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-black/10" />
@@ -92,32 +93,32 @@ export function Hero() {
           {/* Designation pill */}
           <div data-hero-desig className="mb-4">
             <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/70 border border-white/20 rounded-full px-5 py-1.5">
-              {DESIGNATION}
+              {data.designation}
             </span>
           </div>
 
           {/* Name */}
           <h1 className="mb-2">
             <span data-hero-word className="font-display text-6xl sm:text-7xl md:text-8xl font-bold leading-[1.1] text-[#ffd51d]">
-              Sagar Lad
+              {data.title}
             </span>
           </h1>
 
           {/* Subtitle */}
           <p data-hero-sub className="mb-6 text-lg sm:text-xl text-white/60 font-medium">
-            Your friend, mentor and Guide
+            {data.subtitle}
           </p>
 
           {/* Tagline */}
           <div data-hero-tag className="mb-8">
             <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              MIND UP.
+              {data.tagline1}
             </p>
             <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              Change your <span className="text-[#ffd51d]">MIND</span>.
+              Change your <span className="text-[#ffd51d]">{data.tagline2.replace(/^Change your /i, "")}</span>.
             </p>
             <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              Change your <span className="text-[#ffd51d]">life</span>.
+              Change your <span className="text-[#ffd51d]">{data.tagline3.replace(/^Change your /i, "")}</span>.
             </p>
           </div>
         </div>

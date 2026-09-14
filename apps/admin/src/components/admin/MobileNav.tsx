@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   LayoutDashboard,
+  LayoutTemplate,
   FileText,
   MessagesSquare,
   Settings,
@@ -15,6 +16,7 @@ import { CommunityBadge } from "./CommunityBadge";
 
 const icons: Record<string, LucideIcon> = {
   "/admin/dashboard": LayoutDashboard,
+  "/admin/cms": LayoutTemplate,
   "/admin/posts": FileText,
   "/admin/content": Layers,
   "/admin/newsletter": Mail,

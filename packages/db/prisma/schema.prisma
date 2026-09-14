@@ -364,3 +364,20 @@ model LifeRazor {
   description String   @default("A razor is a rule you cut your life with. Mine is a reminder to stay curious, keep asking the \"dumb\" questions, and never let the noise of other people's opinions decide my next step.")
   updatedAt   DateTime @updatedAt
 }
+
+// Single-row settings for the Homepage Hero section.
+model HomeHero {
+  id              String   @id @default("default")
+  activeImage     String   @default("hero_sagar_lad")
+  imageUrl        String   @default("/images/heroes/hero_sagar_lad.webp")
+  mobilePosition  String   @default("object-[66%_32%]")
+  tabletPosition  String   @default("sm:object-[61%_24%]")
+  desktopPosition String   @default("lg:object-[0%_43%]")
+  designation     String   @default("Author · Public Speaker")
+  title           String   @default("Sagar Lad")
+  subtitle        String   @default("Your friend, mentor and Guide")
+  tagline1        String   @default("MIND UP.")
+  tagline2        String   @default("Change your MIND.")
+  tagline3        String   @default("Change your life.")
+  updatedAt       DateTime @updatedAt
+}
