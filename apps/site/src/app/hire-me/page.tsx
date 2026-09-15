@@ -261,74 +261,17 @@ export default function HireMePage() {
         {/* Carousel */}
         <WorkShowcase />
 
-        {/* Form + Cards */}
+        {/* Form + Direct Contact */}
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20 grid grid-cols-1 gap-10 items-start">
-          {/* Cards */}
-          <div className="space-y-5">
-            <div className="rounded-2xl border border-brand/20 bg-brand/5 p-5 flex items-start gap-3.5 shadow-2xs">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#0d21a1] text-white shadow-xs">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-foreground">Fast 24–48h Turnaround</h3>
-                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                  Direct review by Sagar&apos;s team with customized proposals and availability.
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
-                <div className="flex items-center gap-2">
-                  <Mic2 className="w-4 h-4 text-brand" />
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Speaking Services</h3>
-                </div>
-                <div className="space-y-3">
-                  {[
-                    { title: "Keynote Addresses", desc: "30–60 min anchor talks for conferences, summits & corporate events" },
-                    { title: "Executive Masterclasses", desc: "Deep-dives on AI, cloud architecture & leadership" },
-                    { title: "Fireside Chats & Panels", desc: "Moderated discussions, Q&A & interactive dialogues" },
-                  ].map((f) => (
-                    <div key={f.title} className="flex items-start gap-2.5 text-xs">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/40" />
-                      <div>
-                        <p className="font-semibold text-foreground text-xs">{f.title}</p>
-                        <p className="text-muted-foreground leading-snug mt-0.5">{f.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
-                <div className="flex items-center gap-2">
-                  <Pen className="w-4 h-4 text-brand" />
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Writing Services</h3>
-                </div>
-                <div className="space-y-3">
-                  {[
-                    { title: "Book Writing & Ghostwriting", desc: "Full manuscript development from concept to publication" },
-                    { title: "Content & Copywriting", desc: "Articles, blogs, brand narratives & thought leadership" },
-                    { title: "Book Coaching", desc: "Guidance for first-time authors on structure, voice & publishing" },
-                  ].map((f) => (
-                    <div key={f.title} className="flex items-start gap-2.5 text-xs">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/40" />
-                      <div>
-                        <p className="font-semibold text-foreground text-xs">{f.title}</p>
-                        <p className="text-muted-foreground leading-snug mt-0.5">{f.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
-              <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Direct Contact</h3>
-              <a href="mailto:contact@sagarlad.com" className="inline-flex items-center gap-2 text-xs font-semibold text-foreground hover:text-brand transition-colors">
-                <Mail className="w-3.5 h-3.5 text-muted-foreground" />
-                contact@sagarlad.com
-              </a>
-              <div className="pt-2 border-t border-border/60">
-                <SocialLinks />
-              </div>
+          {/* Direct Contact */}
+          <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Direct Contact</h3>
+            <a href="mailto:contact@sagarlad.com" className="inline-flex items-center gap-2 text-xs font-semibold text-foreground hover:text-brand transition-colors">
+              <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+              contact@sagarlad.com
+            </a>
+            <div className="pt-2 border-t border-border/60">
+              <SocialLinks />
             </div>
           </div>
 
@@ -575,7 +518,7 @@ function Form({
           value={form.fullName}
           onChange={(e) => update("fullName", e.target.value)}
           maxLength={120}
-          placeholder="e.g. Rahul Sharma"
+          placeholder="e.g. Rahul Kumar Sharma"
           autoComplete="name"
           aria-invalid={!!errors.fullName}
           aria-describedby={errors.fullName ? "fullName-error" : undefined}
@@ -597,7 +540,7 @@ function Form({
             value={form.email}
             onChange={(e) => update("email", e.target.value)}
             maxLength={100}
-            placeholder="rahul@company.in"
+            placeholder="rahulsharma@gmail.com"
             autoComplete="email"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
@@ -617,7 +560,7 @@ function Form({
             autoComplete="tel-national"
             value={form.phone}
             onChange={(e) => update("phone", digitsOnly(e.target.value).slice(0, 10))}
-            placeholder="e.g. 9876543210"
+            placeholder="e.g. 91+ 9876543210"
             maxLength={10}
             aria-invalid={!!errors.phone}
             aria-describedby={errors.phone ? "phone-error" : undefined}
