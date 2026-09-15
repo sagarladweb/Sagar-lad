@@ -140,7 +140,7 @@ export function AboutMe() {
                   alt="Sagar Lad – Author, Speaker and Human Potential Advocate"
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover object-[50%_25%]"
+                  className="object-cover object-[45%_53%] sm:object-[45%_38%] lg:object-[45%_50%]"
                   priority
                 />
               </figure>

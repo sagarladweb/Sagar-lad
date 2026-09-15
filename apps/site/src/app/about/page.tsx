@@ -376,7 +376,7 @@ export default function AboutPage() {
             alt="Sagar Lad – Author, TEDx Speaker and Mind Up Theory Founder"
             fill
             priority
-            className="object-cover object-[77%_50%] sm:object-[80%_50%] lg:object-[50%_50%]"
+            className="object-cover object-[79%_38%] sm:object-[71%_27%] lg:object-[70%_35%]"
             sizes="100vw"
           />
           <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
@@ -483,7 +483,7 @@ export default function AboutPage() {
                   alt="Sagar Lad Inspirational Quote – You are worthy and capable"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover object-[70%_25%] md:object-[68%_25%]"
+                  className="object-cover object-[88%_60%] sm:object-[76%_55%] lg:object-[83%_65%]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/50 via-transparent to-transparent pointer-events-none" />
               </div>

@@ -10,27 +10,27 @@ const photos = [
   {
     src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp",
     alt: "Sagar Lad casual outdoor portrait in nature – Your friend and mentor",
-    className: "object-[50%_30%]",
+    className: "object-[52%_42%] sm:object-[50%_44%] lg:object-[50%_46%]",
   },
   {
     src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-2.webp",
     alt: "Sagar Lad candid conversation – Author and personal guide",
-    className: "object-[50%_25%]",
+    className: "object-[50%_59%] sm:object-[50%_60%] lg:object-[50%_62%]",
   },
   {
     src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-3.webp",
     alt: "Sagar Lad smiling outdoors – Practical wisdom on tech and life",
-    className: "object-[50%_30%]",
+    className: "object-[18%_53%] sm:object-[28%_59%] lg:object-[50%_58%]",
   },
   {
     src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-4.webp",
     alt: "Sagar Lad landscape portrait – Mentor and thought partner",
-    className: "object-[50%_35%]",
+    className: "object-[44%_54%] sm:object-[46%_52%] lg:object-[44%_50%]",
   },
   {
     src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-5.webp",
     alt: "Sagar Lad speaking like a friend would – Mind Up advocate",
-    className: "object-[50%_25%]",
+    className: "object-[26%_62%] sm:object-[29%_71%] lg:object-[50%_70%]",
   },
 ];
 

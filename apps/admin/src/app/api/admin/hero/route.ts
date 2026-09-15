@@ -8,17 +8,17 @@ const HERO_PRESETS = {
     key: "hero_sagar_lad",
     label: "Executive Modern Suite",
     imageUrl: "/images/heroes/sagar-lad-author-mentor-guide-home-hero.webp",
-    mobilePosition: "object-[76%_24%]",
-    tabletPosition: "sm:object-[88%_22%]",
-    desktopPosition: "lg:object-[0%_30%]",
+    mobilePosition: "object-[76%_56%]",
+    tabletPosition: "sm:object-[71%_53%]",
+    desktopPosition: "lg:object-[66%_48%]",
   },
   hero_home: {
     key: "hero_home",
     label: "Executive Modern Suite",
     imageUrl: "/images/heroes/sagar-lad-author-mentor-guide-home-hero.webp",
-    mobilePosition: "object-[76%_24%]",
-    tabletPosition: "sm:object-[88%_22%]",
-    desktopPosition: "lg:object-[0%_30%]",
+    mobilePosition: "object-[76%_56%]",
+    tabletPosition: "sm:object-[71%_53%]",
+    desktopPosition: "lg:object-[66%_48%]",
   },
 };
 

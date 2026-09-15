@@ -158,7 +158,7 @@ export default function ContactPage() {
                 height={912}
                 priority
                 sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 360px"
-                className="relative z-10 h-auto w-full max-h-[440px] sm:max-h-[480px] object-contain drop-shadow-xl"
+                className="relative z-10 h-auto w-full max-h-[440px] sm:max-h-[480px] object-contain object-[51%_61%] sm:object-[51%_58%] lg:object-[52%_34%] drop-shadow-xl"
               />
             </div>
           </div>

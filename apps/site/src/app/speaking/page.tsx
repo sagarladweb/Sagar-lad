@@ -49,7 +49,7 @@ export default async function SpeakingPage() {
             alt="Sagar Lad Keynote Speaker"
             fill
             priority
-            className="object-cover object-[65%_50%] sm:object-[77%_50%] lg:object-[50%_50%] hero-drift"
+            className="object-cover object-[65%_48%] sm:object-[64%_50%] lg:object-[65%_52%] hero-drift"
             sizes="100vw"
           />
           <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />

@@ -70,7 +70,7 @@ export function NewsletterCta() {
                 alt="Sagar Lad Newsletter – One practical idea every week"
                 fill
                 sizes="(max-width: 768px) 100vw, 42vw"
-                className="object-cover object-[center_20%] md:object-[center_18%]"
+                className="object-cover object-[47%_20%] sm:object-[45%_24%] lg:object-[46%_23%]"
               />
               <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black/50 via-black/15 to-transparent md:hidden pointer-events-none" />
               <div className="absolute bottom-0 inset-x-0 p-5 sm:p-6 md:hidden">
