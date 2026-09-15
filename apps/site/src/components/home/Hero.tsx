@@ -110,15 +110,12 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
 
           {/* Tagline — MIND UP format */}
           <div data-hero-tag className="mb-8">
-            <div className="inline-block bg-[#ffd51d] text-black px-4 py-3 rounded-lg">
+            <div className="inline-block bg-[#ffd51d] text-black px-5 py-4 rounded-lg">
               <p className="font-display text-xl sm:text-2xl md:text-3xl font-bold">
                 {data.tagline1}
               </p>
-              <p className="mt-1 font-display text-xl sm:text-2xl md:text-3xl font-bold">
-                Change your <span className="text-[#0d21a1]">{data.tagline2.replace(/^Change your /i, "")}</span>
-              </p>
-              <p className="font-display text-xl sm:text-2xl md:text-3xl font-bold">
-                Change your <span className="text-[#0d21a1]">{data.tagline3.replace(/^Change your /i, "")}</span>
+              <p className="mt-1 font-display text-lg sm:text-xl md:text-2xl font-semibold">
+                Change your <span className="text-[#0d21a1]">{data.tagline2.replace(/^Change your /i, "")}</span>, Change your <span className="text-[#0d21a1]">{data.tagline3.replace(/^Change your /i, "")}</span>
               </p>
             </div>
           </div>
