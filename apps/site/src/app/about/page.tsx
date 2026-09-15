@@ -415,21 +415,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ---------- MIND UP Tagline ---------- */}
-      <section className="py-16 md:py-24 bg-[#ffd51d]">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-          <p className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-[#0d21a1] leading-tight">
-            MIND UP
-          </p>
-          <p className="mt-4 font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#0d21a1]/80">
-            Change your <span className="text-[#0d21a1]">MIND</span>
-          </p>
-          <p className="mt-2 font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#0d21a1]/80">
-            Change your <span className="text-[#0d21a1]">life</span>
-          </p>
-        </div>
-      </section>
-
       {/* ---------- Personal Story ---------- */}
       <section className="py-16 md:py-24 border-b border-border bg-background">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
@@ -600,7 +585,7 @@ export default function AboutPage() {
               what is possible.
             </p>
             <p className="btn-premium inline-block bg-accent text-black px-3 py-0.5 font-display text-xl sm:text-2xl font-bold">
-              MIND UP.
+              MIND UP
             </p>
           </div>
         </div>
