@@ -107,6 +107,7 @@ h6 {
 
 /* ---------- Reusable prose styles for sanitized TipTap/HTML content ---------- */
 .tip-content {
+  font-family: var(--font-sans), system-ui, sans-serif;
   font-size: 1.0625rem;
   line-height: 1.85;
   color: var(--foreground);
@@ -215,6 +216,7 @@ h6 {
   min-width: 560px;
 }
 .tip-content h2 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
   font-size: 1.65rem;
   font-weight: 700;
   margin: 2.75rem 0 1rem;
@@ -229,6 +231,7 @@ h6 {
   }
 }
 .tip-content h3 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
   font-size: 1.3rem;
   font-weight: 600;
   margin: 2rem 0 0.75rem;

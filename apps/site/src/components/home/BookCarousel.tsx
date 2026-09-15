@@ -131,7 +131,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
 
       {/* Section Header */}
       <div className="mb-12 md:mb-16 text-center">
-        <Pill>The Library</Pill>
+        <Pill supportLine="The Library">The Library</Pill>
         <h2 className="mt-6 font-display text-3xl md:text-4xl font-bold text-[#1e293b]">
           Featured books
         </h2>

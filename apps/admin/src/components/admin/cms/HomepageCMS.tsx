@@ -102,7 +102,7 @@ const DEFAULT_HERO: HeroData = {
   subtitle: "Your friend, mentor and Guide",
   tagline1: "MIND UP.",
   tagline2: "Change your MIND.",
-  tagline3: "Change your life.",
+  tagline3: "Change your LIFE.",
 };
 
 const DEFAULT_SPEAKING_GALLERY: SpeakingGalleryData = {

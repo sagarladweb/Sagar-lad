@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { formatDate, readingTime, postCover } from "@/lib/site";
+import { Eye } from "lucide-react";
+import { formatDateShort, readingTime, postCover } from "@/lib/site";
 import { getEngagement } from "@/lib/engagement";
 import { LikeButton } from "./LikeButton";
 
@@ -28,11 +29,11 @@ export function BlogCard({
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group relative flex flex-col h-full overflow-hidden rounded-2xl border border-border bg-card card-hover transition-all duration-300 hover:border-brand-light/60 hover:text-brand hover:shadow-[0_0_0_1px_var(--brand-light)]"
+      className="group relative flex flex-col h-full min-h-[280px] sm:min-h-[310px] overflow-hidden rounded-2xl border border-border bg-card card-hover transition-all duration-300 hover:border-brand-light/60 hover:text-brand hover:shadow-[0_0_0_1px_var(--brand-light)]"
       suppressHydrationWarning
     >
-      {/* Image */}
-      <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+      {/* Image — compact aspect ratio */}
+      <div className="relative aspect-[16/7] overflow-hidden bg-muted">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={post.coverImage || postCover(post.slug)}
@@ -43,43 +44,49 @@ export function BlogCard({
 
         {/* Views badge — top right */}
         {showStats && (
-          <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-black/30 backdrop-blur-sm px-2 py-0.5 text-[10px] font-medium text-white/80">
-            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/30 backdrop-blur-sm px-2 py-0.5 text-[10px] font-medium text-white/80">
+            <Eye className="w-2.5 h-2.5" />
             {metrics.views.toLocaleString()}
           </div>
         )}
 
         {/* Category pill — top left */}
         {post.category && (
-          <div className="absolute top-3 left-3 rounded-full bg-white/80 backdrop-blur-sm px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/80">
+          <div className="absolute top-2.5 left-2.5 rounded-full bg-white/80 backdrop-blur-sm px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/80">
             {post.category.name}
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <h2 className="text-[15px] sm:text-base font-bold text-foreground leading-snug line-clamp-2">
+      <div className="flex flex-1 flex-col p-4">
+        <h2 className="font-display text-[15px] sm:text-base font-bold text-foreground leading-snug line-clamp-2">
           {post.title}
         </h2>
 
         {post.excerpt && (
-          <p className="mt-2 text-xs sm:text-[13px] text-muted-foreground leading-relaxed line-clamp-2">
+          <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">
             {post.excerpt}
           </p>
         )}
 
-        {/* Meta row */}
-          <div className="mt-auto pt-3 flex items-center justify-between gap-2">
+        {/* Meta row — views, reading time, date */}
+        <div className="mt-auto pt-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <time dateTime={new Date(post.publishedAt).toISOString()}>
-              {formatDate(post.publishedAt)}
+              {formatDateShort(post.publishedAt)}
             </time>
             <span aria-hidden="true" className="text-border">·</span>
             <span>{readingTime(post.excerpt || post.title)}m</span>
+            {showStats && (
+              <>
+                <span aria-hidden="true" className="text-border">·</span>
+                <span className="inline-flex items-center gap-0.5">
+                  <Eye className="w-2.5 h-2.5" />
+                  {metrics.views.toLocaleString()}
+                </span>
+              </>
+            )}
           </div>
 
           {showStats && (

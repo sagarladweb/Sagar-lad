@@ -383,7 +383,7 @@ export function MindUpPillars() {
       <div className="mx-auto max-w-7xl px-6 sm:px-8">
         {/* Mobile / tablet */}
         <div className={`text-center lg:hidden ${inView ? "mindup-content-anim in-view" : "mindup-content-anim"}`}>
-          <Pill supportLine="Discover your framework">The Mind Up Theory</Pill>
+          <Pill supportLine="The Mind Up Theory">The Mind Up Theory</Pill>
           <h2 className="mt-8 font-display text-4xl font-bold leading-[1.1] tracking-tight text-[#1e293b] sm:text-5xl">
             Six Pillars.
             <br />

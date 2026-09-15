@@ -45,9 +45,9 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
   const hiddenCount = comments ? comments.length - INITIAL_COUNT : 0;
 
   return (
-    <section className="mt-14" aria-label="Comments section">
+    <section className="mt-10 sm:mt-14" aria-label="Comments section">
       <div className="flex items-center justify-between pb-3 border-b border-border">
-        <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">
+        <h2 className="font-display text-lg sm:text-xl sm:text-2xl font-bold text-foreground">
           {comments && comments.length > 0
             ? `${comments.length} ${comments.length === 1 ? "Comment" : "Comments"}`
             : "Discussion"}
@@ -59,15 +59,15 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
         )}
       </div>
 
-      <div className="mt-6 space-y-3.5">
+      <div className="mt-5 sm:mt-6 space-y-3">
         {comments === null ? (
-          <div className="rounded-2xl border border-border bg-card/40 p-6 text-center text-sm text-muted-foreground">
+          <div className="rounded-2xl border border-border bg-card/40 p-5 sm:p-6 text-center text-sm text-muted-foreground">
             {error || "Loading comments…"}
           </div>
         ) : (
           <>
             {comments.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-border bg-card/40 p-8 text-center">
+              <div className="rounded-2xl border border-dashed border-border bg-card/40 p-6 sm:p-8 text-center">
                 <p className="text-sm font-semibold text-foreground">No comments yet</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Start the conversation below!
@@ -79,10 +79,10 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
               return (
                 <div
                   key={c.id}
-                  className="rounded-2xl border border-border bg-card/60 p-4 sm:p-5 transition-all hover:border-border/80"
+                  className="rounded-2xl border border-border bg-card/60 p-3.5 sm:p-5 transition-all hover:border-border/80"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-display font-bold text-xs shrink-0">
+                  <div className="flex items-center gap-2.5 sm:gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-display font-bold text-[11px] sm:text-xs shrink-0">
                       {initial}
                     </div>
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
@@ -93,7 +93,7 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
                       </time>
                     </div>
                   </div>
-                  <p className="mt-2.5 text-sm leading-relaxed text-foreground/90 pl-11">
+                  <p className="mt-2 sm:mt-2.5 text-sm leading-relaxed text-foreground/90 pl-9 sm:pl-11">
                     {c.content}
                   </p>
                 </div>

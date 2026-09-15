@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { List, X } from "lucide-react";
 
 type Heading = { id: string; title: string; level: number };
@@ -9,8 +9,11 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeIdx, setActiveIdx] = useState(-1);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [pillVisible, setPillVisible] = useState(true);
   const panelRef = useRef<HTMLDivElement>(null);
   const headingsRef = useRef<Heading[]>([]);
+  const lastScrollY = useRef(0);
+  const scrollDelta = useRef(0);
 
   useEffect(() => {
     const root = document.querySelector(contentSelector);
@@ -77,6 +80,44 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
     };
   }, [contentSelector]);
 
+  // Scroll-based auto-hide for mobile pill (Twitter-like)
+  useEffect(() => {
+    let ticking = false;
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - lastScrollY.current;
+
+        // Reset at top — always show
+        if (y < 100) {
+          setPillVisible(true);
+          scrollDelta.current = 0;
+        } else {
+          scrollDelta.current += delta;
+          // Threshold of 80px to avoid flicker on tiny scrolls
+          if (scrollDelta.current > 80) {
+            setPillVisible(false);
+            scrollDelta.current = 0;
+          } else if (scrollDelta.current < -80) {
+            setPillVisible(true);
+            scrollDelta.current = 0;
+          }
+        }
+
+        lastScrollY.current = y;
+        ticking = false;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Close panel on outside click
   useEffect(() => {
     if (!mobileOpen) return;
     function onClick(e: MouseEvent) {
@@ -158,75 +199,79 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
         </div>
       </nav>
 
-      {/* ═══════ TABLET/MOBILE: Compact floating pill (Zero collision with ScrollTopButton) ═══════ */}
+      {/* ═══════ MOBILE/TABLET: Centered floating pill with scroll auto-hide ═══════ */}
       <div
-        className="fixed bottom-6 left-4 right-16 z-40 lg:hidden"
+        className={`fixed bottom-6 left-0 right-0 z-40 lg:hidden flex justify-center transition-transform duration-300 ease-in-out ${
+          pillVisible ? "translate-y-0" : "translate-y-[120%]"
+        }`}
         ref={panelRef}
       >
-        {/* Expanded sheet */}
-        {mobileOpen && (
-          <div className="mb-3 w-full max-w-sm rounded-2xl border border-border bg-card/98 backdrop-blur-2xl shadow-2xl overflow-hidden max-h-[55vh] flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-200">
-            <div className="px-4 py-3 border-b border-border flex items-center justify-between shrink-0 bg-muted/40">
-              <div className="flex items-center gap-2">
-                <List className="w-4 h-4 text-brand" />
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Table of Contents
-                </p>
+        <div className="relative w-full max-w-sm px-4">
+          {/* Expanded sheet */}
+          {mobileOpen && (
+            <div className="mb-3 w-full rounded-2xl border border-border bg-card/98 backdrop-blur-2xl shadow-2xl overflow-hidden max-h-[55vh] flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-200">
+              <div className="px-4 py-3 border-b border-border flex items-center justify-between shrink-0 bg-muted/40">
+                <div className="flex items-center gap-2">
+                  <List className="w-4 h-4 text-brand" />
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Table of Contents
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(false)}
+                  className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  aria-label="Close table of contents"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setMobileOpen(false)}
-                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                aria-label="Close table of contents"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <ul className="py-2 overflow-y-auto flex-1 divide-y divide-border/30">
-              {headings.map((h, i) => (
-                <li key={h.id}>
-                  <button
-                    type="button"
-                    onClick={() => scrollTo(h.id)}
-                    className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left transition-colors ${
-                      i === activeIdx
-                        ? "text-brand font-semibold bg-brand/5"
-                        : "text-muted-foreground active:bg-muted/50 hover:text-foreground"
-                    } ${h.level === 3 ? "pl-7 text-[13px]" : ""}`}
-                  >
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+              <ul className="py-2 overflow-y-auto flex-1 divide-y divide-border/30">
+                {headings.map((h, i) => (
+                  <li key={h.id}>
+                    <button
+                      type="button"
+                      onClick={() => scrollTo(h.id)}
+                      className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left transition-colors ${
                         i === activeIdx
-                          ? "bg-brand"
-                          : i < activeIdx
-                          ? "bg-brand/40"
-                          : "bg-border"
-                      }`}
-                    />
-                    <span className="line-clamp-2">{h.title}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+                          ? "text-brand font-semibold bg-brand/5"
+                          : "text-muted-foreground active:bg-muted/50 hover:text-foreground"
+                      } ${h.level === 3 ? "pl-7 text-[13px]" : ""}`}
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+                          i === activeIdx
+                            ? "bg-brand"
+                            : i < activeIdx
+                            ? "bg-brand/40"
+                            : "bg-border"
+                        }`}
+                      />
+                      <span className="line-clamp-2">{h.title}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-        {/* Pill trigger — floating at bottom, always visible */}
-        <button
-          type="button"
-          onClick={() => setMobileOpen((v) => !v)}
-          className="flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 backdrop-blur-xl shadow-lg px-4 py-2.5 transition-all active:scale-[0.97] hover:border-brand/50 text-brand"
-          aria-expanded={mobileOpen}
-          aria-label="Table of contents"
-        >
-          <List className="w-4 h-4 shrink-0" />
-          <span className="text-xs font-semibold truncate max-w-[140px] sm:max-w-[180px]">
-            {activeIdx >= 0 ? headings[activeIdx]?.title : "Contents"}
-          </span>
-          <span className="text-[10px] font-mono bg-brand/20 text-brand px-1.5 py-0.5 rounded-full shrink-0">
-            {activeIdx >= 0 ? `${activeIdx + 1}/${headings.length}` : headings.length}
-          </span>
-        </button>
+          {/* Pill trigger — centered */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen((v) => !v)}
+            className="mx-auto flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 backdrop-blur-xl shadow-lg px-4 py-2.5 transition-all active:scale-[0.97] hover:border-brand/50 text-brand"
+            aria-expanded={mobileOpen}
+            aria-label="Table of contents"
+          >
+            <List className="w-4 h-4 shrink-0" />
+            <span className="text-xs font-semibold truncate max-w-[140px] sm:max-w-[180px]">
+              {activeIdx >= 0 ? headings[activeIdx]?.title : "Contents"}
+            </span>
+            <span className="text-[10px] font-mono bg-brand/20 text-brand px-1.5 py-0.5 rounded-full shrink-0">
+              {activeIdx >= 0 ? `${activeIdx + 1}/${headings.length}` : headings.length}
+            </span>
+          </button>
+        </div>
       </div>
     </>
   );

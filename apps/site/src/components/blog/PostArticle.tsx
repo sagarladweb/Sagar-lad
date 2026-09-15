@@ -11,7 +11,7 @@ import {
   Image as ImageIcon,
   Sparkles,
 } from "lucide-react";
-import { SITE, formatDate, readingTime } from "@/lib/site";
+import { SITE, formatDateShort, readingTime } from "@/lib/site";
 import { getEngagement } from "@/lib/engagement";
 import { SanitizedContent } from "@/components/SanitizedContent";
 import { LikeButton } from "@/components/blog/LikeButton";
@@ -69,38 +69,45 @@ export function PostArticle({
   const metrics = { views: getEngagement(post.slug, new Date(post.publishedAt).toISOString()).views, likes: post.likes ?? 0 };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-      {/* ── Visual Breadcrumb & Back Navigation ── */}
-      <nav
-        aria-label="Breadcrumb"
-        className="mb-8 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground"
-      >
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-8 sm:pb-12 lg:pb-16">
+      {/* ── Back Navigation + Author Card ── */}
+      <nav className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Link
           href="/blog"
-          className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 -ml-2.5 hover:bg-muted hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors self-start"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>All articles</span>
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to articles</span>
+          {post.category && (
+            <>
+              <span className="text-border select-none" aria-hidden="true">/</span>
+              <span className="text-muted-foreground hover:text-foreground">{post.category.name}</span>
+            </>
+          )}
         </Link>
-        {post.category && (
-          <>
-            <span className="text-border select-none" aria-hidden="true">
-              /
-            </span>
-            <Link
-              href={`/blog?category=${post.category.slug ?? ""}`}
-              className="hover:text-foreground transition-colors rounded-md px-1.5 py-0.5 hover:bg-muted"
-            >
-              {post.category.name}
-            </Link>
-          </>
-        )}
+
+        {/* Compact author card */}
+        <div className="flex items-center gap-2.5 self-center sm:self-auto">
+          <div className="relative h-8 w-8 shrink-0 rounded-full overflow-hidden bg-muted ring-1 ring-border">
+            <Image
+              src={authorImage ?? "/images/profile/about.webp"}
+              alt={authorName}
+              fill
+              sizes="32px"
+              className="object-cover"
+            />
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">{authorName}</span>
+            <span className="text-border select-none" aria-hidden="true">·</span>
+            <span>{formatDateShort(post.publishedAt)}</span>
+          </div>
+        </div>
       </nav>
 
       {post.showTimeline ? (
-        /* ── Centered Two-Column: Reading Content + Sticky Sidebar TOC ── */
+        /* ── Two-Column: Content + Sticky Sidebar TOC ── */
         <div className="flex flex-col lg:flex-row items-start justify-center gap-10 lg:gap-12 xl:gap-16">
-          {/* Main content column — optimal measure for high legibility */}
           <article className="w-full max-w-2xl lg:max-w-[720px] min-w-0">
             <PostHeader
               post={post}
@@ -113,7 +120,7 @@ export function PostArticle({
               <CoverImage src={post.coverImage} alt={post.title} />
             )}
 
-            <div id="post-content" className="mt-8">
+            <div id="post-content" className="mt-6 sm:mt-8">
               <SanitizedContent html={post.content} />
             </div>
 
@@ -127,11 +134,10 @@ export function PostArticle({
             />
           </article>
 
-          {/* Sidebar TOC — sticky on lg+, auto-contained scroll */}
           <TimelineIndex contentSelector="#post-content" />
         </div>
       ) : (
-        /* ── Centered Single-Column Layout ── */
+        /* ── Single-Column Centered Layout ── */
         <article className="mx-auto w-full max-w-2xl lg:max-w-[720px] min-w-0">
           <PostHeader
             post={post}
@@ -144,7 +150,7 @@ export function PostArticle({
             <CoverImage src={post.coverImage} alt={post.title} />
           )}
 
-          <div id="post-content" className="mt-8">
+          <div id="post-content" className="mt-6 sm:mt-8">
             <SanitizedContent html={post.content} />
           </div>
 
@@ -176,9 +182,9 @@ function PostHeader({
   metrics: { views: number; likes: number };
 }) {
   return (
-    <header className="mb-8 sm:mb-10">
-      {/* Category + kicker */}
-      <div className="flex flex-wrap items-center gap-2.5 mb-4">
+    <header className="mb-6 sm:mb-8">
+      {/* Category + kicker — centered on mobile/tablet */}
+      <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 mb-4">
         {post.category && (
           <Link
             href={`/blog?category=${post.category.slug ?? ""}`}
@@ -195,22 +201,22 @@ function PostHeader({
         )}
       </div>
 
-      {/* Title */}
-      <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-bold leading-[1.18] tracking-tight text-foreground">
+      {/* Title — centered on mobile/tablet */}
+      <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-bold leading-[1.18] tracking-tight text-foreground text-center lg:text-left">
         {post.title}
       </h1>
 
-      {/* Excerpt / Lead */}
+      {/* Excerpt — centered on mobile/tablet */}
       {post.excerpt && (
-        <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground font-normal">
+        <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground font-normal text-center lg:text-left">
           {post.excerpt}
         </p>
       )}
 
-      {/* Author & Meta row */}
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-y-4 gap-x-6 pt-5 border-t border-border">
+      {/* Author & Meta row — centered on mobile/tablet */}
+      <div className="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-center sm:text-left">
         {/* Author info */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center sm:justify-start gap-3">
           <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden bg-muted ring-1 ring-border">
             <Image
               src={authorImage ?? "/images/profile/about.webp"}
@@ -220,31 +226,27 @@ function PostHeader({
               className="object-cover"
             />
           </div>
-          <div className="text-sm leading-tight">
+          <div className="text-sm leading-tight text-left">
             <p className="font-semibold text-foreground">{authorName}</p>
             <p className="text-[11px] text-muted-foreground">Author</p>
           </div>
         </div>
 
-        {/* Read details & Quick like */}
-        <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2 text-xs text-muted-foreground">
+        {/* Read details */}
+        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3.5 gap-y-2 text-xs text-muted-foreground">
           <time
             dateTime={new Date(post.publishedAt).toISOString()}
             className="inline-flex items-center gap-1"
           >
             <CalendarDays className="w-3.5 h-3.5" />
-            {formatDate(post.publishedAt)}
+            {formatDateShort(post.publishedAt)}
           </time>
-          <span className="text-border select-none" aria-hidden="true">
-            ·
-          </span>
+          <span className="text-border select-none" aria-hidden="true">·</span>
           <span className="inline-flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
             {readingTime(post.content)} min read
           </span>
-          <span className="text-border select-none" aria-hidden="true">
-            ·
-          </span>
+          <span className="text-border select-none" aria-hidden="true">·</span>
           <span className="inline-flex items-center gap-1">
             <Eye className="w-3.5 h-3.5" />
             {metrics.views.toLocaleString()} views
@@ -260,7 +262,7 @@ function PostHeader({
 
 function CoverImage({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="relative mb-8 sm:mb-10 aspect-video w-full overflow-hidden rounded-2xl border border-border/80 bg-muted shadow-sm">
+    <div className="relative mb-6 sm:mb-8 aspect-video w-full overflow-hidden rounded-2xl border border-border/80 bg-muted shadow-sm">
       <Image
         src={src}
         alt={alt}
@@ -289,15 +291,14 @@ function PostFooter({
   showShare: boolean;
 }) {
   return (
-    <footer className="mt-12 pt-8 border-t border-border">
-      {/* ── Ultra-Premium Engagement & Reaction Suite ── */}
+    <footer className="mt-10 sm:mt-12 pt-8 border-t border-border">
+      {/* ── Engagement & Reaction ── */}
       {showShare && (
         <section
           aria-label="Article reactions and sharing"
-          className="rounded-3xl border border-border/80 bg-gradient-to-b from-card to-card/50 p-5 sm:p-7 shadow-[0_2px_16px_rgba(0,0,0,0.03)]"
+          className="rounded-3xl border border-border/80 bg-gradient-to-b from-card to-card/50 p-4 sm:p-7 shadow-[0_2px_16px_rgba(0,0,0,0.03)]"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-6">
-            {/* Left: Prominent Like Action with social proof */}
             <div className="flex items-center gap-4">
               <LikeButton
                 slug={post.slug}
@@ -314,11 +315,9 @@ function PostFooter({
               </div>
             </div>
 
-            {/* Clean separator */}
             <div className="hidden sm:block h-10 w-px bg-border/70 shrink-0" aria-hidden="true" />
             <div className="block sm:hidden h-px w-full bg-border/60" aria-hidden="true" />
 
-            {/* Right: Modern Share Suite */}
             <div className="flex flex-col sm:items-end gap-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Share this piece
@@ -406,9 +405,7 @@ function PostFooter({
                 >
                   Know Sagar better →
                 </Link>
-                <span className="text-border select-none" aria-hidden="true">
-                  ·
-                </span>
+                <span className="text-border select-none" aria-hidden="true">·</span>
                 <a
                   href="https://www.instagram.com/grow_with__sagar/"
                   target="_blank"
@@ -417,9 +414,7 @@ function PostFooter({
                 >
                   Instagram
                 </a>
-                <span className="text-border select-none" aria-hidden="true">
-                  ·
-                </span>
+                <span className="text-border select-none" aria-hidden="true">·</span>
                 <Link
                   href="/newsletter"
                   className="text-muted-foreground hover:text-foreground transition-colors"
@@ -432,9 +427,9 @@ function PostFooter({
         </div>
       )}
 
-      {/* ── Related Posts ── */}
+      {/* ── Related Posts — Carousel on mobile/tablet, grid on desktop ── */}
       {related.length > 0 && (
-        <section className="mt-14" aria-label="Related articles">
+        <section className="mt-12 sm:mt-14" aria-label="Related articles">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-foreground">
               Keep reading
@@ -447,20 +442,59 @@ function PostFooter({
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Mobile/tablet: horizontal scroll carousel */}
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide lg:hidden">
+            {related.map((p) => (
+              <Link
+                key={p.slug}
+                href={`/blog/${p.slug}`}
+                className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card/60 transition-all duration-300 hover:border-brand/30 hover:shadow-md snap-start shrink-0 w-[260px] sm:w-[300px]"
+              >
+                <div className="relative aspect-[16/7] w-full overflow-hidden bg-muted">
+                  {p.coverImage ? (
+                    <Image
+                      src={p.coverImage}
+                      alt={p.title}
+                      fill
+                      sizes="300px"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="grid h-full w-full place-items-center bg-brand/5 font-display text-2xl font-bold text-brand/40">
+                      {p.title.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col flex-1 p-3.5">
+                  <time
+                    dateTime={new Date(p.publishedAt).toISOString()}
+                    className="text-[11px] text-muted-foreground mb-1"
+                  >
+                    {formatDateShort(p.publishedAt)}
+                  </time>
+                  <h3 className="font-display text-sm font-bold leading-snug text-foreground line-clamp-2 group-hover:text-brand transition-colors">
+                    {p.title}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Desktop: grid */}
+          <div className="hidden lg:grid lg:grid-cols-3 gap-4">
             {related.map((p) => (
               <Link
                 key={p.slug}
                 href={`/blog/${p.slug}`}
                 className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card/60 transition-all duration-300 hover:border-brand/30 hover:shadow-md hover:-translate-y-0.5"
               >
-                <div className="relative aspect-video w-full overflow-hidden bg-muted">
+                <div className="relative aspect-[16/7] w-full overflow-hidden bg-muted">
                   {p.coverImage ? (
                     <Image
                       src={p.coverImage}
                       alt={p.title}
                       fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      sizes="33vw"
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (
@@ -474,7 +508,7 @@ function PostFooter({
                     dateTime={new Date(p.publishedAt).toISOString()}
                     className="text-[11px] text-muted-foreground mb-1.5"
                   >
-                    {formatDate(p.publishedAt)}
+                    {formatDateShort(p.publishedAt)}
                   </time>
                   <h3 className="font-display text-sm font-bold leading-snug text-foreground line-clamp-2 group-hover:text-brand transition-colors">
                     {p.title}

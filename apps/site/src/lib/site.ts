@@ -58,6 +58,14 @@ export function formatDate(date: Date | string): string {
   });
 }
 
+export function formatDateShort(date: Date | string): string {
+  return new Date(date).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export function readingTime(content: string): number {
   const words = content.replace(/<[^>]*>/g, " ").split(/\s+/).length;
   return Math.max(1, Math.round(words / 200));
