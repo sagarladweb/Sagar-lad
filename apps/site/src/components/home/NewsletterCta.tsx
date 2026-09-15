@@ -66,11 +66,11 @@ export function NewsletterCta() {
             {/* Photo column — showcases vertical photo of Sagar with coffee */}
             <div className="relative md:col-span-5 min-h-[260px] sm:min-h-[300px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden bg-muted/40">
               <Image
-                src="/images/newsletter/sagar-lad-newsletter.webp"
-                alt="Sagar Lad – The Sagar Lad Letter Newsletter"
+                src="/images/newsletter/sagar-lad-newsletter-mindset-coffee.webp"
+                alt="Sagar Lad Newsletter – One practical idea every week"
                 fill
                 sizes="(max-width: 768px) 100vw, 42vw"
-                className="object-cover object-[center_18%] md:object-[center_15%]"
+                className="object-cover object-[center_20%] md:object-[center_18%]"
               />
               <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black/50 via-black/15 to-transparent md:hidden pointer-events-none" />
               <div className="absolute bottom-0 inset-x-0 p-5 sm:p-6 md:hidden">

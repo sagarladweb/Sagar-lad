@@ -6,16 +6,16 @@ import { revalidatePublic } from "@/lib/revalidate";
 const HERO_PRESETS = {
   hero_sagar_lad: {
     key: "hero_sagar_lad",
-    label: "Classic Studio Portrait",
-    imageUrl: "/images/heroes/hero_sagar_lad.webp",
-    mobilePosition: "object-[66%_32%]",
-    tabletPosition: "sm:object-[61%_24%]",
-    desktopPosition: "lg:object-[0%_43%]",
+    label: "Executive Modern Suite",
+    imageUrl: "/images/heroes/sagar-lad-author-mentor-guide-home-hero.webp",
+    mobilePosition: "object-[76%_24%]",
+    tabletPosition: "sm:object-[88%_22%]",
+    desktopPosition: "lg:object-[0%_30%]",
   },
   hero_home: {
     key: "hero_home",
     label: "Executive Modern Suite",
-    imageUrl: "/images/heroes/hero_home.webp",
+    imageUrl: "/images/heroes/sagar-lad-author-mentor-guide-home-hero.webp",
     mobilePosition: "object-[76%_24%]",
     tabletPosition: "sm:object-[88%_22%]",
     desktopPosition: "lg:object-[0%_30%]",

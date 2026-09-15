@@ -146,54 +146,19 @@ export default function ContactPage() {
         <div className="relative z-20 mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 sm:gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 pt-6 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20">
           {/* Portrait: First on mobile, Left on desktop */}
           <div className="order-1 lg:order-1 lg:col-span-5 relative flex justify-center" data-animate="left" data-reverse suppressHydrationWarning>
-            <style>{`
-              .contact-hero-img {
-                object-position: 50% 50%;
-                mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
-                -webkit-mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
-              }
-              @media (max-width: 639px) {
-                .contact-hero-img {
-                  transform: scale(2) translate(10px, 8px);
-                  object-position: 55% 65%;
-                  mask-image: linear-gradient(to top, transparent 9%, black 21%, black 100%);
-                  -webkit-mask-image: linear-gradient(to top, transparent 9%, black 21%, black 100%);
-                }
-              }
-              @media (min-width: 640px) and (max-width: 1023px) {
-                .contact-hero-img {
-                  transform: scale(2) translate(11px, 4px);
-                  object-position: 50% 50%;
-                  mask-image: linear-gradient(to top, transparent 5%, black 14%, black 100%);
-                  -webkit-mask-image: linear-gradient(to top, transparent 5%, black 14%, black 100%);
-                }
-              }
-              @media (min-width: 1024px) and (max-width: 1439px) {
-                .contact-hero-img {
-                  transform: scale(1) translate(0, 0);
-                  object-position: 50% 50%;
-                  mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
-                  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
-                }
-              }
-              @media (min-width: 1440px) {
-                .contact-hero-img {
-                  transform: scale(1.9) translate(7px, -11px);
-                  object-position: 27% 53%;
-                  mask-image: linear-gradient(to top, transparent 9%, black 13%, black 100%);
-                  -webkit-mask-image: linear-gradient(to top, transparent 9%, black 13%, black 100%);
-                }
-              }
-            `}</style>
-            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto rounded-2xl">
+            <div className="relative w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[360px] mx-auto flex justify-center">
+              <div
+                aria-hidden="true"
+                className="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-accent/20 via-accent/5 to-transparent blur-2xl opacity-60 pointer-events-none"
+              />
               <Image
-                src="/images/common/sagar-lad-contact-section.png"
-                alt="Sagar Lad – Get in Touch"
-                width={2400}
-                height={1600}
+                src="/images/contact/sagar-lad-keynote-speaker-contact-portrait.png"
+                alt="Sagar Lad – Contact for Keynotes, Mentorship and Collaborations"
+                width={698}
+                height={912}
                 priority
-                sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 420px"
-                className="relative z-10 h-auto w-full object-cover contact-hero-img"
+                sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 360px"
+                className="relative z-10 h-auto w-full max-h-[440px] sm:max-h-[480px] object-contain drop-shadow-xl"
               />
             </div>
           </div>

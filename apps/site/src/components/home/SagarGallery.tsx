@@ -8,19 +8,29 @@ import { DotPagination } from "@/components/ui/CarouselNav";
 
 const photos = [
   {
-    src: "/images/profile/sagar-lad-friend-standing.webp",
-    alt: "Sagar Lad – Your friend, mentor and guide",
-    className: "object-[center_60%]",
+    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp",
+    alt: "Sagar Lad casual outdoor portrait in nature – Your friend and mentor",
+    className: "object-[50%_30%]",
   },
   {
-    src: "/images/profile/sagar-lad-friend-sitting.webp",
-    alt: "Sagar Lad – Practical wisdom on tech, leadership and life",
-    className: "object-[center_56%]",
+    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-2.webp",
+    alt: "Sagar Lad candid conversation – Author and personal guide",
+    className: "object-[50%_25%]",
   },
   {
-    src: "/images/profile/sagar-lad-friend-stairs.webp",
-    alt: "Sagar Lad – Cloud & AI Architect and Keynote Speaker",
-    className: "object-[38%_25%]",
+    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-3.webp",
+    alt: "Sagar Lad smiling outdoors – Practical wisdom on tech and life",
+    className: "object-[50%_30%]",
+  },
+  {
+    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-4.webp",
+    alt: "Sagar Lad landscape portrait – Mentor and thought partner",
+    className: "object-[50%_35%]",
+  },
+  {
+    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-5.webp",
+    alt: "Sagar Lad speaking like a friend would – Mind Up advocate",
+    className: "object-[50%_25%]",
   },
 ];
 

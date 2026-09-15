@@ -58,7 +58,9 @@
     ".builds/20260914-164424/types/**/*.ts",
     ".builds/20260914-164424/dev/types/**/*.ts",
     ".builds/20260914-192557/types/**/*.ts",
-    ".builds/20260914-192557/dev/types/**/*.ts"
+    ".builds/20260914-192557/dev/types/**/*.ts",
+    ".builds/20260916-000758/types/**/*.ts",
+    ".builds/20260916-000758/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

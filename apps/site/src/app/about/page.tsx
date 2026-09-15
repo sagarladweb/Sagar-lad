@@ -372,8 +372,8 @@ export default function AboutPage() {
       <section className="relative -mt-16 min-h-[calc(100svh+4rem)] border-b border-border bg-foreground text-background overflow-hidden">
         <div className="absolute inset-0" aria-hidden="true">
           <Image
-            src="/images/heroes/sagar-lad-about-me-hero.webp"
-            alt="About Sagar Lad – Author, Mentor and Keynote Speaker"
+            src="/images/heroes/sagar-lad-author-keynote-speaker-about-hero.webp"
+            alt="Sagar Lad – Author, TEDx Speaker and Mind Up Theory Founder"
             fill
             priority
             className="object-cover object-[77%_50%] sm:object-[80%_50%] lg:object-[50%_50%]"
@@ -465,6 +465,47 @@ export default function AboutPage() {
           <div data-reveal className="mt-8 pt-6 border-t border-border">
             <p className="text-sm text-muted-foreground">Love,</p>
             <SiteLogo className="h-12 w-auto mt-3" />
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- Inspirational Quote Card ---------- */}
+      <section className="py-10 sm:py-16 border-b border-border bg-gradient-to-b from-background via-muted/20 to-background">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div
+            data-reveal
+            className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
+              <div className="relative md:col-span-6 min-h-[280px] sm:min-h-[340px] md:min-h-[380px] overflow-hidden bg-muted/40">
+                <Image
+                  src="/images/about/sagar-lad-mindup-quote-inspiration.webp"
+                  alt="Sagar Lad Inspirational Quote – You are worthy and capable"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover object-[70%_25%] md:object-[68%_25%]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/50 via-transparent to-transparent pointer-events-none" />
+              </div>
+              <div className="md:col-span-6 p-6 sm:p-8 md:p-10 flex flex-col justify-between bg-card">
+                <div>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                    Words of Belief
+                  </span>
+                  <blockquote className="mt-5 font-display text-xl sm:text-2xl lg:text-3xl font-bold leading-snug tracking-tight text-foreground">
+                    &ldquo;You are worthy. You are capable, and beautiful things are still ahead of you. Keep believing in yourself.&rdquo;
+                  </blockquote>
+                </div>
+                <div className="mt-8 pt-5 border-t border-border/60 flex items-center justify-between">
+                  <div>
+                    <p className="font-display font-bold text-base text-foreground">Sagar Lad</p>
+                    <p className="text-xs text-muted-foreground font-medium">Author &middot; Speaker &middot; Mentor</p>
+                  </div>
+                  <SiteLogo className="h-7 w-auto opacity-80" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -44,6 +44,7 @@ function SiteFrameInner({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isAdmin = pathname.startsWith("/admin");
+  const isSandbox = pathname.startsWith("/sandbox");
   const isBarPreview = searchParams.get("announce_preview") === "bar";
   const previewId = searchParams.get("id");
   const [previewAnnouncement, setPreviewAnnouncement] = useState<AnnouncementBarData | null>(null);
@@ -84,7 +85,7 @@ function SiteFrameInner({
     };
   }, []);
 
-  const hideChrome = isAdmin;
+  const hideChrome = isAdmin || isSandbox;
 
   return (
     <>
