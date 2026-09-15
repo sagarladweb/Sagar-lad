@@ -93,7 +93,7 @@ function WorkShowcase() {
             fill
             priority={i === 0}
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-contain object-center p-4 sm:p-8 md:p-12"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         </div>
