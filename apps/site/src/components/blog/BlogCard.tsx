@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Eye } from "lucide-react";
 import { formatDateShort, readingTime, postCover } from "@/lib/site";
 import { getEngagement } from "@/lib/engagement";
-import { LikeButton } from "./LikeButton";
 
 type Post = {
   id: string;
@@ -70,29 +69,21 @@ export function BlogCard({
           </p>
         )}
 
-        {/* Meta row — views, reading time, date */}
-        <div className="mt-auto pt-3 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <time dateTime={new Date(post.publishedAt).toISOString()}>
-              {formatDateShort(post.publishedAt)}
-            </time>
-            <span aria-hidden="true" className="text-border">·</span>
-            <span>{readingTime(post.excerpt || post.title)}m</span>
-            {showStats && (
-              <>
-                <span aria-hidden="true" className="text-border">·</span>
-                <span className="inline-flex items-center gap-0.5">
-                  <Eye className="w-2.5 h-2.5" />
-                  {metrics.views.toLocaleString()}
-                </span>
-              </>
-            )}
-          </div>
-
+        {/* Meta row — date, reading time, views */}
+        <div className="mt-auto pt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <time dateTime={new Date(post.publishedAt).toISOString()}>
+            {formatDateShort(post.publishedAt)}
+          </time>
+          <span aria-hidden="true" className="text-border">·</span>
+          <span>{readingTime(post.excerpt || post.title)}m</span>
           {showStats && (
-            <div className="relative z-10 -mr-1 py-1">
-              <LikeButton slug={post.slug} initialLikes={metrics.likes} />
-            </div>
+            <>
+              <span aria-hidden="true" className="text-border">·</span>
+              <span className="inline-flex items-center gap-0.5">
+                <Eye className="w-2.5 h-2.5" />
+                {metrics.views.toLocaleString()}
+              </span>
+            </>
           )}
         </div>
       </div>

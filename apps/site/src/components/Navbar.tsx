@@ -803,6 +803,14 @@ export function Navbar() {
                 <MobileLink href="/contact" icon={<Mail className="w-4 h-4 text-brand-light" />} label="Contact" onClick={() => setOpen(false)} />
 
                 <MobileLink href="/mentorship" icon={<Compass className="w-4 h-4 text-brand-light" />} label="Mentorship" onClick={() => setOpen(false)} />
+
+                {/* Social links at bottom of hamburger */}
+                <div className="pt-3 mt-2 border-t border-border">
+                  <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Connect
+                  </p>
+                  <HamburgerSocials />
+                </div>
               </div>
             </div>
           </div>,
@@ -831,5 +839,35 @@ function MobileLink({
     >
       {icon} {label}
     </Link>
+  );
+}
+
+function HamburgerSocials() {
+  const allSocials = useSocials();
+  const socials = allSocials
+    .filter((s) => HEADER_SOCIALS.includes(s.key))
+    .sort((a, b) => HEADER_SOCIALS.indexOf(a.key) - HEADER_SOCIALS.indexOf(b.key));
+
+  if (!socials.length) return null;
+
+  return (
+    <div className="flex items-center justify-center gap-2 px-3">
+      {socials.map((s) => {
+        const Icon = s.key === "instagram" ? FaInstagram : s.key === "youtube" ? FaYoutube : FaLinkedinIn;
+        const label = SOCIAL_ICONS[s.key]?.label ?? s.key;
+        return (
+          <a
+            key={s.key}
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-muted text-muted-foreground hover:text-accent-strong transition-colors"
+          >
+            <Icon className="w-5 h-5" />
+          </a>
+        );
+      })}
+    </div>
   );
 }

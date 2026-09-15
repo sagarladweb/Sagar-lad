@@ -70,39 +70,15 @@ export function PostArticle({
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-8 sm:pb-12 lg:pb-16">
-      {/* ── Back Navigation + Author Card ── */}
-      <nav className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* ── Back Navigation — icon only ── */}
+      <nav className="mb-4 sm:mb-6">
         <Link
           href="/blog"
-          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors self-start"
+          className="inline-flex items-center justify-center w-9 h-9 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Back to articles"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to articles</span>
-          {post.category && (
-            <>
-              <span className="text-border select-none" aria-hidden="true">/</span>
-              <span className="text-muted-foreground hover:text-foreground">{post.category.name}</span>
-            </>
-          )}
         </Link>
-
-        {/* Compact author card */}
-        <div className="flex items-center gap-2.5 self-center sm:self-auto">
-          <div className="relative h-8 w-8 shrink-0 rounded-full overflow-hidden bg-muted ring-1 ring-border">
-            <Image
-              src={authorImage ?? "/images/profile/about.webp"}
-              alt={authorName}
-              fill
-              sizes="32px"
-              className="object-cover"
-            />
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">{authorName}</span>
-            <span className="text-border select-none" aria-hidden="true">·</span>
-            <span>{formatDateShort(post.publishedAt)}</span>
-          </div>
-        </div>
       </nav>
 
       {post.showTimeline ? (
@@ -183,8 +159,8 @@ function PostHeader({
 }) {
   return (
     <header className="mb-6 sm:mb-8">
-      {/* Category + kicker — centered on mobile/tablet */}
-      <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 mb-4">
+      {/* Category + kicker — centered on all viewports */}
+      <div className="flex flex-wrap items-center justify-center gap-2.5 mb-4">
         {post.category && (
           <Link
             href={`/blog?category=${post.category.slug ?? ""}`}
@@ -201,22 +177,22 @@ function PostHeader({
         )}
       </div>
 
-      {/* Title — centered on mobile/tablet */}
-      <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-bold leading-[1.18] tracking-tight text-foreground text-center lg:text-left">
+      {/* Title — sans-serif, centered on all viewports */}
+      <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-bold leading-[1.18] tracking-tight text-foreground text-center">
         {post.title}
       </h1>
 
-      {/* Excerpt — centered on mobile/tablet */}
+      {/* Excerpt — serif, centered on all viewports */}
       {post.excerpt && (
-        <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground font-normal text-center lg:text-left">
+        <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground font-normal text-center" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
           {post.excerpt}
         </p>
       )}
 
-      {/* Author & Meta row — centered on mobile/tablet */}
-      <div className="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-center sm:text-left">
-        {/* Author info */}
-        <div className="flex items-center justify-center sm:justify-start gap-3">
+      {/* Author & Meta — centered on all viewports */}
+      <div className="mt-5 flex flex-col items-center gap-4">
+        {/* Author row: profile pic + name + date */}
+        <div className="flex items-center gap-3">
           <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden bg-muted ring-1 ring-border">
             <Image
               src={authorImage ?? "/images/profile/about.webp"}
@@ -230,18 +206,17 @@ function PostHeader({
             <p className="font-semibold text-foreground">{authorName}</p>
             <p className="text-[11px] text-muted-foreground">Author</p>
           </div>
-        </div>
-
-        {/* Read details */}
-        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3.5 gap-y-2 text-xs text-muted-foreground">
+          <span className="text-border select-none mx-1" aria-hidden="true">·</span>
           <time
             dateTime={new Date(post.publishedAt).toISOString()}
-            className="inline-flex items-center gap-1"
+            className="text-xs text-muted-foreground"
           >
-            <CalendarDays className="w-3.5 h-3.5" />
             {formatDateShort(post.publishedAt)}
           </time>
-          <span className="text-border select-none" aria-hidden="true">·</span>
+        </div>
+
+        {/* Stats row */}
+        <div className="flex items-center gap-3.5 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
             {readingTime(post.content)} min read
@@ -370,60 +345,6 @@ function PostFooter({
               </li>
             ))}
           </ul>
-        </div>
-      )}
-
-      {/* ── Author Box ── */}
-      {post.showAuthorBox && (
-        <div className="mt-10 rounded-2xl border border-border bg-card/60 p-5 sm:p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
-              <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-full overflow-hidden bg-muted ring-2 ring-border">
-                <Image
-                  src={authorImage ?? "/images/profile/about.webp"}
-                  alt={authorName}
-                fill
-                sizes="64px"
-                className="object-cover"
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-display text-base sm:text-lg font-bold text-foreground">
-                  {authorName}
-                </p>
-                <span className="rounded-full bg-brand/10 text-brand px-2 py-0.5 text-[10px] font-semibold">
-                  Author
-                </span>
-              </div>
-              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                {SITE.description}
-              </p>
-              <div className="mt-3 flex flex-wrap items-center gap-3 text-xs font-semibold">
-                <Link
-                  href="/about"
-                  className="text-brand hover:underline inline-flex items-center gap-1"
-                >
-                  Know Sagar better →
-                </Link>
-                <span className="text-border select-none" aria-hidden="true">·</span>
-                <a
-                  href="https://www.instagram.com/grow_with__sagar/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Instagram
-                </a>
-                <span className="text-border select-none" aria-hidden="true">·</span>
-                <Link
-                  href="/newsletter"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Newsletter
-                </Link>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
