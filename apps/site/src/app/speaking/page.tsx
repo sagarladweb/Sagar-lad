@@ -82,7 +82,7 @@ export default async function SpeakingPage() {
       <section className="relative py-20 md:py-28 border-b border-border bg-card/60 overflow-hidden" aria-label="Sagar's TEDx talk">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            <div className="lg:col-span-5 text-center lg:text-left" data-animate="left" suppressHydrationWarning>
+            <div className="lg:col-span-5 text-center lg:text-left" suppressHydrationWarning>
               <span className="inline-flex items-center justify-center lg:justify-start rounded-full bg-brand-light/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-brand">
                 Watch
               </span>
@@ -100,7 +100,7 @@ export default async function SpeakingPage() {
                 </div>
               </div>
             </div>
-            <div className="lg:col-span-7" data-animate="right" suppressHydrationWarning>
+            <div className="lg:col-span-7" suppressHydrationWarning>
               <ClientErrorBoundary
                 fallback={
                   <a

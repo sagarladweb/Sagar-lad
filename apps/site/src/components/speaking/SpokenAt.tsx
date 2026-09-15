@@ -71,7 +71,7 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
 
 export function SpokenAt() {
   return (
-    <div data-animate suppressHydrationWarning>
+    <div suppressHydrationWarning>
       <div className="max-w-2xl mb-10 text-center sm:text-left mx-auto sm:mx-0">
         <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
           Where I&apos;ve spoken
