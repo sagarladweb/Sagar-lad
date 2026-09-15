@@ -186,7 +186,7 @@ export default function ContactPage() {
                 }
               }
             `}</style>
-            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto rounded-2xl">
+            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto rounded-2xl overflow-hidden">
               <Image
                 src="/images/common/sagar-lad-contact-section.png"
                 alt="Sagar Lad – Get in Touch"
@@ -195,6 +195,11 @@ export default function ContactPage() {
                 priority
                 sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 420px"
                 className="relative z-10 h-auto w-full object-cover contact-hero-img"
+              />
+              {/* Bottom feather gradient */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background via-background/80 to-transparent z-20"
               />
             </div>
           </div>
