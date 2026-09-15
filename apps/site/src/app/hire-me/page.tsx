@@ -330,34 +330,46 @@ export default function HireMePage() {
         </div>
       </div>
 
-      {/* ===== DESKTOP: Carousel first, then hero+form side by side ===== */}
+      {/* ===== DESKTOP: Carousel → Visual Hero → Form ===== */}
       <div className="hidden lg:block">
         {/* Carousel full width */}
         <WorkShowcase />
 
-        {/* Hero content + Form */}
-        <div className="mx-auto max-w-7xl px-6 py-16 grid grid-cols-12 gap-12 items-start">
-          {/* Left: Hero content + cards */}
-          <div className="col-span-5 space-y-10">
-            {/* Hero text */}
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <Pill>Hire Sagar</Pill>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0d21a1]/10 text-[#0d21a1] px-3 py-1 text-[11px] font-bold uppercase tracking-wider">
+        {/* Visual Hero — full width, image + content side by side */}
+        <section className="relative overflow-hidden border-b border-border bg-background">
+          <div className="mx-auto max-w-7xl px-6 py-20 grid grid-cols-12 gap-12 items-center">
+            {/* Left: Image */}
+            <div className="col-span-5 relative">
+              <div className="relative aspect-[4/5] w-full max-w-md mx-auto rounded-3xl overflow-hidden border border-border/60 shadow-2xl bg-muted/40">
+                <Image
+                  src="/images/speaking/Sagarlad_speaker.webp"
+                  alt="Sagar Lad — Author & Speaker"
+                  fill
+                  priority
+                  sizes="480px"
+                  className="object-cover object-top"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-black/50 via-black/15 to-transparent pointer-events-none" />
+                <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-white backdrop-blur-md border border-white/20 text-[11px] font-medium shadow-lg">
                   6+ Books Published
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0d21a1]/10 text-[#0d21a1] px-3 py-1 text-[11px] font-bold uppercase tracking-wider">
+                </div>
+                <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-white backdrop-blur-md border border-white/20 text-[11px] font-medium shadow-lg">
                   Author &amp; Speaker
-                </span>
+                </div>
               </div>
-              <h1 className="font-display text-5xl xl:text-6xl font-bold leading-tight tracking-tight text-foreground">
+            </div>
+
+            {/* Right: Content */}
+            <div className="col-span-7">
+              <Pill>Hire Sagar</Pill>
+              <h1 className="mt-5 font-display text-5xl xl:text-6xl font-bold leading-tight tracking-tight text-foreground">
                 Let&apos;s <span className="text-brand">collaborate</span>
               </h1>
-              <p className="mt-4 text-lg text-muted-foreground leading-relaxed max-w-lg">
+              <p className="mt-5 text-lg text-muted-foreground leading-relaxed max-w-xl">
                 Whether you need a keynote speaker for your next event or a writer for your next book — Sagar brings
                 story-driven impact to every project.
               </p>
-              <ul className="mt-6 space-y-3">
+              <ul className="mt-7 space-y-4">
                 {[
                   "Keynotes, workshops & executive panels on AI and leadership",
                   "Book writing, ghostwriting & manuscript development",
@@ -370,74 +382,77 @@ export default function HireMePage() {
                 ))}
               </ul>
             </div>
+          </div>
+        </section>
 
-            {/* Cards */}
-            <div className="space-y-5">
-              <div className="rounded-2xl border border-brand/20 bg-brand/5 p-5 flex items-start gap-3.5 shadow-2xs">
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#0d21a1] text-white shadow-xs">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-foreground">Fast 24–48h Turnaround</h3>
-                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    Direct review by Sagar&apos;s team with customized proposals and availability.
-                  </p>
-                </div>
+        {/* Form + Cards */}
+        <div className="mx-auto max-w-7xl px-6 py-16 grid grid-cols-12 gap-12 items-start">
+          {/* Left: Cards */}
+          <div className="col-span-5 space-y-5">
+            <div className="rounded-2xl border border-brand/20 bg-brand/5 p-5 flex items-start gap-3.5 shadow-2xs">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#0d21a1] text-white shadow-xs">
+                <Clock className="w-5 h-5" />
               </div>
+              <div>
+                <h3 className="text-sm font-bold text-foreground">Fast 24–48h Turnaround</h3>
+                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                  Direct review by Sagar&apos;s team with customized proposals and availability.
+                </p>
+              </div>
+            </div>
 
-              <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
-                <div className="flex items-center gap-2">
-                  <Mic2 className="w-4 h-4 text-brand" />
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Speaking Services</h3>
-                </div>
-                <div className="space-y-3">
-                  {[
-                    { title: "Keynote Addresses", desc: "30–60 min anchor talks for conferences, summits & corporate events" },
-                    { title: "Executive Masterclasses", desc: "Deep-dives on AI, cloud architecture & leadership" },
-                    { title: "Fireside Chats & Panels", desc: "Moderated discussions, Q&A & interactive dialogues" },
-                  ].map((f) => (
-                    <div key={f.title} className="flex items-start gap-2.5 text-xs">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/40" />
-                      <div>
-                        <p className="font-semibold text-foreground text-xs">{f.title}</p>
-                        <p className="text-muted-foreground leading-snug mt-0.5">{f.desc}</p>
-                      </div>
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
+              <div className="flex items-center gap-2">
+                <Mic2 className="w-4 h-4 text-brand" />
+                <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Speaking Services</h3>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { title: "Keynote Addresses", desc: "30–60 min anchor talks for conferences, summits & corporate events" },
+                  { title: "Executive Masterclasses", desc: "Deep-dives on AI, cloud architecture & leadership" },
+                  { title: "Fireside Chats & Panels", desc: "Moderated discussions, Q&A & interactive dialogues" },
+                ].map((f) => (
+                  <div key={f.title} className="flex items-start gap-2.5 text-xs">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/40" />
+                    <div>
+                      <p className="font-semibold text-foreground text-xs">{f.title}</p>
+                      <p className="text-muted-foreground leading-snug mt-0.5">{f.desc}</p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
+            </div>
 
-              <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
-                <div className="flex items-center gap-2">
-                  <Pen className="w-4 h-4 text-brand" />
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Writing Services</h3>
-                </div>
-                <div className="space-y-3">
-                  {[
-                    { title: "Book Writing & Ghostwriting", desc: "Full manuscript development from concept to publication" },
-                    { title: "Content & Copywriting", desc: "Articles, blogs, brand narratives & thought leadership" },
-                    { title: "Book Coaching", desc: "Guidance for first-time authors on structure, voice & publishing" },
-                  ].map((f) => (
-                    <div key={f.title} className="flex items-start gap-2.5 text-xs">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/40" />
-                      <div>
-                        <p className="font-semibold text-foreground text-xs">{f.title}</p>
-                        <p className="text-muted-foreground leading-snug mt-0.5">{f.desc}</p>
-                      </div>
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
+              <div className="flex items-center gap-2">
+                <Pen className="w-4 h-4 text-brand" />
+                <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Writing Services</h3>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { title: "Book Writing & Ghostwriting", desc: "Full manuscript development from concept to publication" },
+                  { title: "Content & Copywriting", desc: "Articles, blogs, brand narratives & thought leadership" },
+                  { title: "Book Coaching", desc: "Guidance for first-time authors on structure, voice & publishing" },
+                ].map((f) => (
+                  <div key={f.title} className="flex items-start gap-2.5 text-xs">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/40" />
+                    <div>
+                      <p className="font-semibold text-foreground text-xs">{f.title}</p>
+                      <p className="text-muted-foreground leading-snug mt-0.5">{f.desc}</p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
+            </div>
 
-              <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
-                <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Direct Contact</h3>
-                <a href="mailto:contact@sagarlad.com" className="inline-flex items-center gap-2 text-xs font-semibold text-foreground hover:text-brand transition-colors">
-                  <Mail className="w-3.5 h-3.5 text-muted-foreground" />
-                  contact@sagarlad.com
-                </a>
-                <div className="pt-2 border-t border-border/60">
-                  <SocialLinks />
-                </div>
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-2xs">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Direct Contact</h3>
+              <a href="mailto:contact@sagarlad.com" className="inline-flex items-center gap-2 text-xs font-semibold text-foreground hover:text-brand transition-colors">
+                <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+                contact@sagarlad.com
+              </a>
+              <div className="pt-2 border-t border-border/60">
+                <SocialLinks />
               </div>
             </div>
           </div>
