@@ -415,6 +415,26 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* ---------- Quote Section ---------- */}
+      <section className="py-16 md:py-24 border-b border-border bg-background">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
+          <p data-reveal className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed">
+            I believe you don&apos;t have to be fearless. You don&apos;t need a perfect plan. You simply need to decide that where you are is not where you want to stay. Because when you change the way you use your mind, you can change what is possible for your life.
+          </p>
+          <div data-reveal className="mt-8 space-y-2">
+            <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
+              MIND UP
+            </p>
+            <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold">
+              <span className="bg-[#ffd51d] text-black px-3 py-1 rounded-md">Change your mind</span>
+            </p>
+            <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold">
+              <span className="bg-[#ffd51d] text-black px-3 py-1 rounded-md">Change your life</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ---------- Personal Story ---------- */}
       <section className="py-16 md:py-24 border-b border-border bg-background">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
