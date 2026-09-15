@@ -40,104 +40,6 @@ type Errors = {
   message?: string;
 };
 
-function DesktopCarousel({
-  slides,
-  active,
-  setActive,
-  next,
-}: {
-  slides: { src: string; alt: string; label: string; caption: string }[];
-  active: number;
-  setActive: (i: number) => void;
-  next: () => void;
-}) {
-  const [inView, setInView] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.3 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!inView) return;
-    const id = setInterval(next, 5000);
-    return () => clearInterval(id);
-  }, [inView, next]);
-
-  return (
-    <section ref={ref} className="relative w-full h-[80vh] overflow-hidden bg-black">
-      {slides.map((s, i) => (
-        <div
-          key={s.src}
-          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${i === active ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-        >
-          <Image
-            src={s.src}
-            alt={s.alt}
-            fill
-            priority={i === 0}
-            sizes="100vw"
-            className="object-contain object-center p-12"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-        </div>
-      ))}
-
-      {/* Content overlay — left side */}
-      <div className="absolute inset-0 flex items-center">
-        <div className="mx-auto max-w-7xl w-full px-6">
-          <div className="max-w-xl">
-            <div className="flex flex-wrap items-center gap-2 mb-5">
-              <Pill>Hire Sagar</Pill>
-              <span className="inline-flex items-center rounded-full bg-white/15 text-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur-sm">
-                6+ Books Published
-              </span>
-              <span className="inline-flex items-center rounded-full bg-white/15 text-white px-3 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur-sm">
-                Author &amp; Speaker
-              </span>
-            </div>
-            <h1 className="font-display text-5xl xl:text-6xl font-bold leading-tight tracking-tight text-white">
-              Let&apos;s <span className="text-[#ffd51d]">collaborate</span>
-            </h1>
-            <p className="mt-5 text-lg text-white/80 leading-relaxed">
-              Whether you need a keynote speaker for your next event or a writer for your next book — Sagar brings
-              story-driven impact to every project.
-            </p>
-            <ul className="mt-6 space-y-3">
-              {[
-                "Keynotes, workshops & executive panels on AI and leadership",
-                "Book writing, ghostwriting & manuscript development",
-                "Customized content mapped to your vision and audience",
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm font-semibold text-white/90">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#ffd51d]" aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-        {slides.map((s, i) => (
-          <button
-            key={s.src}
-            onClick={() => setActive(i)}
-            aria-label={`Go to slide ${i + 1}`}
-            className={`w-2 h-2 rounded-full transition-all ${i === active ? "bg-white w-5" : "bg-white/40"}`}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function WorkShowcase() {
   const [active, setActive] = useState(0);
   const [inView, setInView] = useState(false);
@@ -223,24 +125,6 @@ export default function HireMePage() {
   const [errors, setErrors] = useState<Errors>({});
   const [state, setState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
-  const [activeSlide, setActiveSlide] = useState(0);
-
-  const slides = [
-    {
-      src: "/images/books/Book_hero.png",
-      alt: "MIND UP and AI Foundry — books by Sagar Lad",
-      label: "Published Author",
-      caption: "MIND UP & AI Foundry",
-    },
-    {
-      src: "/images/speaking/Sagarlad_speaker.webp",
-      alt: "Sagar Lad speaking at TEDx AICS on AI, Awareness, Integration, and Mastery",
-      label: "TEDx Speaker",
-      caption: "TEDx AICS",
-    },
-  ];
-
-  const nextSlide = useCallback(() => setActiveSlide((i) => (i + 1) % slides.length), [slides.length]);
 
   function update<K extends keyof typeof initial>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -327,20 +211,39 @@ export default function HireMePage() {
         }}
       />
 
-      {/* ===== MOBILE / TABLET: Original layout (hero → carousel → form) ===== */}
+      {/* ===== MOBILE / TABLET: Image → Content → Carousel → Form ===== */}
       <div className="lg:hidden">
-        {/* Hero */}
-        <header className="overflow-hidden border-b border-border bg-background text-foreground py-14 sm:py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 text-center">
+        {/* Image with pills */}
+        <section className="relative w-full aspect-[4/5] sm:aspect-[16/10] overflow-hidden bg-black">
+          <Image
+            src="/images/speaking/Sagarlad_speaker.webp"
+            alt="Sagar Lad — Author & Speaker"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-top"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-white backdrop-blur-md border border-white/20 text-[11px] font-medium shadow-lg">
+            6+ Books Published
+          </div>
+          <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-white backdrop-blur-md border border-white/20 text-[11px] font-medium shadow-lg">
+            Author &amp; Speaker
+          </div>
+        </section>
+
+        {/* Content */}
+        <section className="border-b border-border bg-background py-10 sm:py-14">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6">
             <Pill>Hire Sagar</Pill>
-            <h1 className="mt-4 font-display text-4xl font-bold leading-tight sm:text-5xl tracking-tight text-foreground">
+            <h1 className="mt-4 font-display text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-foreground">
               Let&apos;s <span className="text-brand">collaborate</span>
             </h1>
-            <p className="mt-4 max-w-xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed">
+            <p className="mt-3 text-base sm:text-lg text-muted-foreground leading-relaxed">
               Whether you need a keynote speaker for your next event or a writer for your next book — Sagar brings
               story-driven impact to every project.
             </p>
-            <ul className="mt-6 space-y-3 max-w-lg mx-auto text-left">
+            <ul className="mt-5 space-y-3">
               {[
                 "Keynotes, workshops & executive panels on AI and leadership",
                 "Book writing, ghostwriting & manuscript development",
@@ -353,7 +256,7 @@ export default function HireMePage() {
               ))}
             </ul>
           </div>
-        </header>
+        </section>
 
         {/* Carousel */}
         <WorkShowcase />
@@ -446,15 +349,57 @@ export default function HireMePage() {
         </div>
       </div>
 
-      {/* ===== DESKTOP: Carousel hero (content overlay) → Form ===== */}
+      {/* ===== DESKTOP: Visual Hero → Form ===== */}
       <div className="hidden lg:block">
-        {/* Carousel hero — content overlaid on images */}
-        <DesktopCarousel
-          slides={slides}
-          active={activeSlide}
-          setActive={setActiveSlide}
-          next={nextSlide}
-        />
+        {/* Visual Hero — full width, image + content side by side */}
+        <section className="relative overflow-hidden border-b border-border bg-background">
+          <div className="mx-auto max-w-7xl px-6 py-20 grid grid-cols-12 gap-12 items-center">
+            {/* Left: Image */}
+            <div className="col-span-5 relative">
+              <div className="relative aspect-[4/5] w-full max-w-md mx-auto rounded-3xl overflow-hidden border border-border/60 shadow-2xl bg-muted/40">
+                <Image
+                  src="/images/speaking/Sagarlad_speaker.webp"
+                  alt="Sagar Lad — Author & Speaker"
+                  fill
+                  priority
+                  sizes="480px"
+                  className="object-cover object-top"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-black/50 via-black/15 to-transparent pointer-events-none" />
+                <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-white backdrop-blur-md border border-white/20 text-[11px] font-medium shadow-lg">
+                  6+ Books Published
+                </div>
+                <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-white backdrop-blur-md border border-white/20 text-[11px] font-medium shadow-lg">
+                  Author &amp; Speaker
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Content */}
+            <div className="col-span-7">
+              <Pill>Hire Sagar</Pill>
+              <h1 className="mt-5 font-display text-5xl xl:text-6xl font-bold leading-tight tracking-tight text-foreground">
+                Let&apos;s <span className="text-brand">collaborate</span>
+              </h1>
+              <p className="mt-5 text-lg text-muted-foreground leading-relaxed max-w-xl">
+                Whether you need a keynote speaker for your next event or a writer for your next book — Sagar brings
+                story-driven impact to every project.
+              </p>
+              <ul className="mt-7 space-y-4">
+                {[
+                  "Keynotes, workshops & executive panels on AI and leadership",
+                  "Book writing, ghostwriting & manuscript development",
+                  "Customized content mapped to your vision and audience",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm font-semibold text-foreground">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
 
         {/* Form + Cards */}
         <div className="mx-auto max-w-7xl px-6 py-16 grid grid-cols-12 gap-12 items-start">
