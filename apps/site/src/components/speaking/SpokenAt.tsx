@@ -56,7 +56,7 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
         </div>
 
         {/* Title: outline always visible, fill transitions via CSS */}
-        <h3 className="spoken-title font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05]">
+        <h3 className="spoken-title font-display text-2xl sm:text-3xl md:text-4xl font-extrabold leading-[1.05] whitespace-nowrap overflow-hidden text-ellipsis">
           {event.title}
         </h3>
 
@@ -95,19 +95,19 @@ export function SpokenAt() {
           background-image: linear-gradient(var(--brand, #3b82f6), var(--brand, #3b82f6));
           background-size: 0% 100%;
           background-repeat: no-repeat;
-          transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                      -webkit-text-stroke-color 0.4s ease,
-                      letter-spacing 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                      opacity 0.4s ease;
+          transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                      -webkit-text-stroke-color 0.5s ease,
+                      letter-spacing 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                      opacity 0.5s ease;
           -webkit-text-stroke-color: var(--muted-foreground, #94a3b8);
-          letter-spacing: -0.02em;
-          opacity: 0.5;
+          letter-spacing: -0.01em;
+          opacity: 0.6;
         }
 
         .spoken-card.is-filled .spoken-title {
           background-size: 100% 100%;
           -webkit-text-stroke-color: var(--brand, #3b82f6);
-          letter-spacing: 0.02em;
+          letter-spacing: 0.03em;
           opacity: 1;
         }
 

@@ -2,6 +2,8 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { prisma, dbSafe } from "@/lib/db";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 export type LifeRazorData = {
   id: string;
   pill: string;
@@ -35,7 +37,7 @@ const getLifeRazorCached = unstable_cache(
     };
   },
   ["site-liferazor-v1"],
-  { revalidate: 300, tags: ["liferazor"] }
+  { revalidate: isDev ? 0 : 300, tags: ["liferazor"] }
 );
 
 export const getLifeRazor = cache(async (): Promise<LifeRazorData> => {

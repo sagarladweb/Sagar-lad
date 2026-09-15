@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 
+const isDev = process.env.NODE_ENV !== "production";
 const DEFAULT_AVATAR = "/images/profile/about.webp";
 
 export const getProfileAvatar = unstable_cache(
@@ -15,5 +16,5 @@ export const getProfileAvatar = unstable_cache(
     };
   },
   ["profile-avatar-v1"],
-  { revalidate: 604800, tags: ["profile"] }
+  { revalidate: isDev ? 0 : 604800, tags: ["profile"] }
 );

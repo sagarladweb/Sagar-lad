@@ -149,7 +149,6 @@ export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactN
               <span className="inline-grid place-items-center w-12 h-12 rounded-xl bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
                 {STEPS[0].n}
               </span>
-              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Step {STEPS[0].n}</span>
             </div>
             <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{STEPS[0].title}</h3>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-lg">{STEPS[0].text}</p>
@@ -172,7 +171,6 @@ export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactN
               <span className="inline-grid place-items-center w-12 h-12 rounded-xl bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
                 {STEPS[1].n}
               </span>
-              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Step {STEPS[1].n}</span>
             </div>
             <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{STEPS[1].title}</h3>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{STEPS[1].text}</p>
@@ -196,7 +194,6 @@ export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactN
               <span className="inline-grid place-items-center w-12 h-12 rounded-xl bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
                 {STEPS[2].n}
               </span>
-              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Step {STEPS[2].n}</span>
             </div>
             <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{STEPS[2].title}</h3>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{STEPS[2].text}</p>

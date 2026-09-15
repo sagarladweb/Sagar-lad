@@ -40,7 +40,7 @@ const getHomeHeroCached = unstable_cache(
     };
   },
   ["site-home-hero-v1"],
-  { revalidate: 300, tags: ["hero"] }
+  { revalidate: process.env.NODE_ENV === "production" ? 300 : 0, tags: ["hero"] }
 );
 
 export const getHomeHero = cache(async (): Promise<HomeHeroData> => {

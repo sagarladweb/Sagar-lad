@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/blog",
 });
 
-export const revalidate = 300;
+export const revalidate = process.env.NODE_ENV === "production" ? 300 : 0;
 
 const PAGE_SIZE = 9;
 
