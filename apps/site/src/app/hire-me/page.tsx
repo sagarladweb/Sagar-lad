@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import {
   Loader2,
@@ -43,6 +43,86 @@ type Errors = {
   organization?: string;
   message?: string;
 };
+
+function WorkShowcase() {
+  const [active, setActive] = useState(0);
+  const [inView, setInView] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const slides = [
+    {
+      src: "/images/books/hire-sagar-books.png",
+      alt: "MIND UP and AI Foundry — books by Sagar Lad",
+      label: "Published Author",
+      caption: "MIND UP & AI Foundry",
+    },
+    {
+      src: "/images/speaking/sagar-lad-tedx-talk-aim.webp",
+      alt: "Sagar Lad speaking at TEDx AICS on AI, Awareness, Integration, and Mastery",
+      label: "TEDx Speaker",
+      caption: "TEDx AICS",
+    },
+  ];
+
+  const next = useCallback(() => setActive((i) => (i + 1) % slides.length), [slides.length]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.3 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!inView) return;
+    const id = setInterval(next, 5000);
+    return () => clearInterval(id);
+  }, [inView, next]);
+
+  return (
+    <section ref={ref} className="relative w-full h-[50vh] sm:h-[60vh] md:h-[70vh] overflow-hidden bg-black">
+      {slides.map((s, i) => (
+        <div
+          key={s.src}
+          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${i === active ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        >
+          <Image
+            src={s.src}
+            alt={s.alt}
+            fill
+            priority={i === 0}
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        </div>
+      ))}
+
+      {/* Caption overlay */}
+      <div className="absolute bottom-6 sm:bottom-10 left-0 right-0 px-4 sm:px-6 text-center z-10">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-white/70 mb-1">
+          {slides[active].label}
+        </p>
+        <p className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-white">
+          {slides[active].caption}
+        </p>
+      </div>
+
+      {/* Dots */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        {slides.map((s, i) => (
+          <button
+            key={s.src}
+            onClick={() => setActive(i)}
+            aria-label={`Go to slide ${i + 1}`}
+            className={`w-2 h-2 rounded-full transition-all ${i === active ? "bg-white w-5" : "bg-white/40"}`}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export default function HireMePage() {
   const [form, setForm] = useState(initial);
@@ -189,29 +269,8 @@ export default function HireMePage() {
         </div>
       </header>
 
-      {/* Work Section — Published Books */}
-      <section className="border-b border-border bg-muted/30 py-12 sm:py-16">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 text-center">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Published Work</p>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
-            Books written &amp; published
-          </h2>
-          <div className="mt-8 flex justify-center">
-            <div className="relative w-full max-w-md aspect-[4/3] rounded-2xl overflow-hidden border border-border/60 shadow-lg bg-muted/40">
-              <Image
-                src="/images/books/hire-sagar-books.png"
-                alt="MIND UP and AI Foundry — books by Sagar Lad"
-                fill
-                sizes="(max-width: 640px) 100vw, 480px"
-                className="object-contain p-4"
-              />
-            </div>
-          </div>
-          <p className="mt-5 text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            MIND UP and AI Foundry — two published works exploring the intersection of mindset, AI, and human potential.
-          </p>
-        </div>
-      </section>
+      {/* Work Showcase — Auto-scrolling carousel */}
+      <WorkShowcase />
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
         {/* Left Column: Service cards */}
