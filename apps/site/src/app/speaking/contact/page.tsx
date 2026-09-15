@@ -164,7 +164,7 @@ export default function SpeakingContactPage() {
               Book Sagar for your next <span className="text-brand">event</span>
             </h1>
             <p className="mt-4 max-w-xl mx-auto lg:mx-0 text-base sm:text-lg text-muted-foreground leading-relaxed">
-              Story-driven keynotes, interactive workshops, and executive panels on AI leadership, financial freedom, and career momentum.
+              Story-driven keynotes, interactive workshops, and executive panels on AI leadership and career momentum.
             </p>
             <ul className="mt-6 space-y-3 max-w-lg mx-auto lg:mx-0 text-left">
               {[

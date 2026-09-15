@@ -64,7 +64,7 @@ export default async function SpeakingPage() {
               Ideas that ignite rooms and transform mindsets
             </h1>
             <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-2xl drop-shadow-sm font-medium">
-              Delivering story-driven, actionable keynotes on AI leadership, financial freedom, and career momentum for summits, universities, and enterprise events worldwide.
+              Delivering story-driven, actionable keynotes on AI leadership and career momentum for summits, universities, and enterprise events worldwide.
             </p>
             <div className="pt-2 flex flex-col gap-4 items-center sm:flex-row sm:items-center">
               <Link

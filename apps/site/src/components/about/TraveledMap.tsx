@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { Plus, Minus, RotateCcw } from "lucide-react";
 import {
   WORLD_MAP_VIEWBOX,
   WORLD_COUNTRIES,
@@ -384,48 +383,22 @@ export function TraveledMap() {
             </button>
           </div>
 
-          {/* Desktop Zoom Controls: In, Out, Reset */}
-          <div className="hidden md:flex absolute bottom-4 right-4 z-40 items-center gap-1.5 bg-background/85 backdrop-blur-md p-1.5 rounded-full border border-border/70 shadow-md">
+          {/* Desktop Pill: Top right side of the map */}
+          <div className="hidden md:block absolute top-4 right-4 sm:top-6 sm:right-6 z-40 pointer-events-auto">
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                handleManualZoomIn();
-              }}
-              disabled={zoom >= 4}
-              aria-label="Zoom in"
-              title="Zoom In"
-              className="grid h-8 w-8 place-items-center rounded-full text-foreground hover:bg-muted active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleManualZoomOut();
-              }}
-              disabled={zoom <= 1}
-              aria-label="Zoom out"
-              title="Zoom Out"
-              className="grid h-8 w-8 place-items-center rounded-full text-foreground hover:bg-muted active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none"
-            >
-              <Minus className="h-4 w-4" />
-            </button>
-            {zoom > 1 && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
+                if (zoom > 1) {
                   handleResetZoom();
-                }}
-                aria-label="Reset zoom"
-                title="Reset Zoom"
-                className="grid h-8 w-8 place-items-center rounded-full text-foreground hover:bg-muted active:scale-95 transition-all"
-              >
-                <RotateCcw className="h-3.5 w-3.5 text-muted-foreground" />
-              </button>
-            )}
+                } else {
+                  handleManualZoomIn();
+                }
+              }}
+              className="px-4 py-1.5 rounded-full border border-border/80 bg-background/90 backdrop-blur-md text-xs font-semibold text-foreground shadow-xs hover:bg-muted active:scale-95 transition-all"
+            >
+              {zoom > 1 ? "Reset zoom" : "Click to zoom"}
+            </button>
           </div>
 
           {/* White Solid Hover Pill: ONLY shows when hovering on yellow-filled countries */}
