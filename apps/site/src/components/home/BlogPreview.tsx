@@ -36,8 +36,14 @@ export function BlogPreview({
         </div>
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {posts.map((post) => (
-            <BlogCard key={post.id} post={post} showStats={showStats} />
+          {posts.map((post, i) => (
+            <div
+              key={post.id}
+              className="blog-card-stagger"
+              style={{ animationDelay: `${i * 0.1}s` }}
+            >
+              <BlogCard post={post} showStats={showStats} />
+            </div>
           ))}
         </div>
 

@@ -14,6 +14,8 @@ export function LazySection({ children, className }: LazySectionProps) {
     const el = ref.current;
     if (!el) return;
 
+    el.setAttribute("data-lazy-init", "");
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -22,7 +24,7 @@ export function LazySection({ children, className }: LazySectionProps) {
           el.classList.remove("lazy-visible");
         }
       },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.05, rootMargin: "0px 0px -30px 0px" }
     );
 
     observer.observe(el);

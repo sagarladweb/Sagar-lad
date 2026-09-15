@@ -298,6 +298,7 @@ export function FlipBook({
   const { width: w, height: h, isSinglePage } = dimensions;
   const spreadWidth = isSinglePage ? w : w * 2;
   const readPct = totalPages > 0 ? Math.round(((currentPage + 1) / totalPages) * 100) : 0;
+  const isOnLastPage = currentPage >= totalPages - 1;
 
   return (
     <div className="relative flex flex-col items-center justify-center gap-3 sm:gap-5 w-full max-w-full">
@@ -435,6 +436,21 @@ export function FlipBook({
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>
+      </div>
+
+      {/* Back cover close overlay — fades in when on last page */}
+      <div
+        className={`absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-700 pointer-events-none ${
+          isOnLastPage ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ pointerEvents: isOnLastPage ? "auto" : "none" }}
+      >
+        <p className="font-display text-2xl sm:text-3xl font-bold text-white mb-2">
+          The End
+        </p>
+        <p className="text-sm text-white/60 mb-8">
+          Thanks for previewing this book
+        </p>
       </div>
     </div>
   );

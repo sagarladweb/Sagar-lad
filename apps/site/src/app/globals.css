@@ -1490,14 +1490,82 @@ nav a:not([class*="rounded-full"]) {
   100% { transform: translate(20px, -15px) scale(1.1); }
 }
 
+/* Scroll-reveal: content visible by default, animation is cosmetic */
 .lazy-section {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
-.lazy-section.lazy-visible {
+.lazy-section[data-lazy-init] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+.lazy-section.lazy-visible,
+.lazy-section[data-lazy-init].lazy-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Hero image entrance — slide up + fade */
+@keyframes heroImageIn {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+[data-hero-bg] {
+  animation: heroImageIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+/* MindUp split — content from left */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-32px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+/* MindUp split — ring from right */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(32px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.mindup-content-anim {
+  opacity: 0;
+}
+.mindup-content-anim.in-view {
+  animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.mindup-ring-anim {
+  opacity: 0;
+}
+.mindup-ring-anim.in-view {
+  animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+}
+
+/* Typewriter cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.typewriter-cursor::after {
+  content: "|";
+  animation: blink 0.8s step-end infinite;
+  color: #ffd51d;
+  font-weight: 300;
+}
+
+/* Blog card stagger fade-in */
+@keyframes blogCardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.blog-card-stagger {
+  opacity: 0;
+  animation: blogCardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.lazy-section.lazy-visible .blog-card-stagger,
+.lazy-section:not([data-lazy-init]) .blog-card-stagger {
+  animation-play-state: running;
 }

@@ -1,4 +1,5 @@
 import { getLifeRazor } from "@/lib/liferazor";
+import { LifeRazorTypewriter } from "./LifeRazorTypewriter";
 
 export async function LifeRazor() {
   const data = await getLifeRazor();
@@ -18,6 +19,7 @@ export async function LifeRazor() {
         <p className="mt-7 mx-auto max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed">
           {data.description}
         </p>
+        <LifeRazorTypewriter />
       </div>
     </section>
   );

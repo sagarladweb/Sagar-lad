@@ -282,10 +282,23 @@ export function MindUpPillars() {
   const [playing, setPlaying] = useState(false);
   const [playIdx, setPlayIdx] = useState(-1);
   const [playProgress, setPlayProgress] = useState(0);
+  const [inView, setInView] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafRef = useRef<number>(0);
   const idxRef = useRef(0);
   const startTimeRef = useRef(0);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setInView(true); },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const activePillar = active
     ? (MINDUP_PILLARS.find((p) => p.id === active) ?? null)
@@ -363,12 +376,13 @@ export function MindUpPillars() {
 
   return (
     <section
+      ref={sectionRef}
       aria-label="Mind Up Theory — Six Pillars"
       className="relative overflow-hidden bg-[#FAF9F6] py-16 md:py-24 border-b border-[#e2e8f0]/40"
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-8">
         {/* Mobile / tablet */}
-        <div className="text-center lg:hidden">
+        <div className={`text-center lg:hidden ${inView ? "mindup-content-anim in-view" : "mindup-content-anim"}`}>
           <Pill>The Mind Up Theory</Pill>
           <h2 className="mt-8 font-display text-4xl font-bold leading-[1.1] tracking-tight text-[#1e293b] sm:text-5xl">
             Six Pillars.
@@ -387,7 +401,7 @@ export function MindUpPillars() {
 
         {/* Desktop */}
         <div className="hidden lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-24">
-          <div className="lg:min-h-[280px]">
+          <div className={`lg:min-h-[280px] ${inView ? "mindup-content-anim in-view" : "mindup-content-anim"}`}>
             <Pill>The Mind Up Theory</Pill>
             <div key={activePillar?.id ?? "intro"} className="pillar-swap mt-8">
               {activePillar && !playing ? (
@@ -427,7 +441,7 @@ export function MindUpPillars() {
             </Link>
           </div>
 
-          <div>
+          <div className={inView ? "mindup-ring-anim in-view" : "mindup-ring-anim"}>
             <PillarRing
               active={active}
               activePillar={activePillar}
@@ -443,7 +457,7 @@ export function MindUpPillars() {
         </div>
 
         {/* Mobile / tablet ring */}
-        <div className="mt-14 lg:hidden">
+        <div className={`mt-14 lg:hidden ${inView ? "mindup-ring-anim in-view" : "mindup-ring-anim"}`}>
           <PillarRing
             active={active}
             activePillar={activePillar}

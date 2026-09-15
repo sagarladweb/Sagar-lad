@@ -18,23 +18,15 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-      // Background image: subtle zoom-in
-      tl.fromTo(
-        "[data-hero-bg]",
-        { scale: 1.05, opacity: 0.85 },
-        { scale: 1, opacity: 1, duration: 1.4, ease: "power2.out" },
-        0
-      );
-
       // Subtitle: fade up (first)
       tl.fromTo(
         "[data-hero-sub]",
         { opacity: 0, y: 16 },
         { opacity: 1, y: 0, duration: 0.7 },
-        0.1
+        0.3
       );
 
-      // Name: word-by-word stagger (second)
+      // Name: fade up (second)
       tl.fromTo(
         "[data-hero-word]",
         { opacity: 0, y: 36 },
@@ -42,9 +34,8 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
           opacity: 1,
           y: 0,
           duration: 0.8,
-          stagger: 0.08,
         },
-        0.2
+        0.45
       );
 
       // Designation pill: fade up (third)
@@ -52,7 +43,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
         "[data-hero-desig]",
         { opacity: 0, y: 16 },
         { opacity: 1, y: 0, duration: 0.7 },
-        0.4
+        0.65
       );
 
       // Tagline: fade up (fourth)
@@ -60,7 +51,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
         "[data-hero-tag]",
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, duration: 0.7 },
-        0.55
+        0.8
       );
     }, el);
 
