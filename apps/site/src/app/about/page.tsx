@@ -400,11 +400,11 @@ export default function AboutPage() {
               <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
                 MIND UP
               </p>
-              <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-black bg-[#ffd51d] inline-block px-3 py-1 rounded-sm">
-                Change your <span>MIND</span>
+              <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                Change your <span className="text-[#ffd51d]">MIND</span>
               </p>
-              <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-black bg-[#ffd51d] inline-block px-3 py-1 rounded-sm">
-                Change your <span>life</span>
+              <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                Change your <span className="text-[#ffd51d]">life</span>
               </p>
             </div>
 
@@ -457,8 +457,8 @@ export default function AboutPage() {
             <div className="pt-3">
               <span className="inline-block font-display font-bold tracking-tight">
                 <span className="text-lg sm:text-xl md:text-2xl block">MIND UP</span>
-                <span className="text-base sm:text-lg md:text-xl block">Change your <span className="text-[#ffd51d]">mind</span></span>
-                <span className="text-base sm:text-lg md:text-xl block">Change your <span className="text-[#ffd51d]">life</span></span>
+                <span className="text-base sm:text-lg md:text-xl block text-black bg-[#ffd51d] inline-block px-3 py-1 rounded-sm mt-1">Change your mind</span>
+                <span className="text-base sm:text-lg md:text-xl block text-black bg-[#ffd51d] inline-block px-3 py-1 rounded-sm mt-1">Change your life</span>
               </span>
             </div>
           </div>
