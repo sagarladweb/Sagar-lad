@@ -119,8 +119,8 @@ function TestimonialCard({
 export function SpeakingTestimonials() {
   return (
     <>
-      {/* Mobile — marquee */}
-      <div className="md:hidden space-y-4 overflow-hidden">
+      {/* Mobile & Tablet — marquee */}
+      <div className="lg:hidden space-y-4 overflow-hidden">
         <div className="marquee-mask marquee-pauser mb-4">
           <div
             className="flex w-max gap-4 animate-marquee"
@@ -144,7 +144,7 @@ export function SpeakingTestimonials() {
       </div>
 
       {/* Desktop — grid */}
-      <div className="hidden md:grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-5">
         <blockquote className="card-hover rounded-lg border border-border bg-card p-7 sm:p-9 flex flex-col justify-between gap-6 lg:col-span-6 lg:row-span-2">
           <Quote className="w-6 h-6 text-accent-strong" aria-hidden="true" />
           <p className="text-foreground/85 leading-relaxed text-lg">

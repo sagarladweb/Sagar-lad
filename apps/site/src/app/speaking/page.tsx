@@ -56,8 +56,8 @@ export default async function SpeakingPage() {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-16 sm:pb-20 md:pb-24 pt-24 sm:pt-28">
-          <div className="max-w-2xl space-y-5 text-center sm:text-left mx-auto sm:mx-0">
-            <span className="btn-premium inline-flex items-center justify-center sm:justify-start rounded-full bg-accent px-4 py-1.5 text-xs font-semibold tracking-wide text-accent-foreground shadow-md">
+          <div className="max-w-2xl space-y-5 text-center lg:text-left mx-auto lg:mx-0">
+            <span className="btn-premium inline-flex items-center justify-center lg:justify-start rounded-full bg-accent px-4 py-1.5 text-xs font-semibold tracking-wide text-accent-foreground shadow-md">
               Speaking
             </span>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] drop-shadow-md">
@@ -82,7 +82,7 @@ export default async function SpeakingPage() {
       <section className="relative py-12 sm:py-16 md:py-20 border-b border-border bg-card/60 overflow-hidden" aria-label="Sagar's TEDx talk">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            <div className="lg:col-span-5 text-center lg:text-left" suppressHydrationWarning>
+            <div className="lg:col-span-5 text-center lg:text-left">
               <span className="inline-flex items-center justify-center lg:justify-start rounded-full bg-brand-light/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-brand">
                 Watch
               </span>
@@ -100,7 +100,7 @@ export default async function SpeakingPage() {
                 </div>
               </div>
             </div>
-            <div className="lg:col-span-7" suppressHydrationWarning>
+            <div className="lg:col-span-7">
               <ClientErrorBoundary
                 fallback={
                   <a
@@ -230,7 +230,7 @@ export default async function SpeakingPage() {
       {/* Professional Experience — how the engagement works, then the ask */}
       <section className="card-hover py-12 sm:py-16 md:py-20 border-b border-border bg-card/40" aria-label="Professional experience">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="max-w-2xl text-center sm:text-left mx-auto sm:mx-0" data-animate suppressHydrationWarning>
+          <div className="max-w-2xl text-center lg:text-left mx-auto lg:mx-0" data-animate>
             <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">How it works</span>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">Three simple steps</h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
@@ -238,7 +238,7 @@ export default async function SpeakingPage() {
             </p>
           </div>
 
-          <div className="mt-12" data-animate-group suppressHydrationWarning>
+          <div className="mt-12" data-animate-group>
             <SpeakingExperience
               contactCard={
                 <>
@@ -269,7 +269,7 @@ export default async function SpeakingPage() {
       {/* Organizer voices — marquee on mobile, grid on desktop */}
       <section className="py-12 sm:py-16 md:py-20 bg-background" aria-label="What organizers say">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16" data-animate suppressHydrationWarning>
+          <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16" data-animate>
             <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Kind words</span>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">What people say</h2>
             <p className="mt-3 text-sm sm:text-base text-muted-foreground">

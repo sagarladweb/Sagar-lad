@@ -383,7 +383,7 @@ export default function AboutPage() {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-16 md:py-20">
-          <div className="max-w-3xl text-center sm:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
+          <div className="max-w-3xl text-center lg:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
             <div data-reveal className="mb-4">
               <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/70 border border-white/20 rounded-full px-5 py-1.5">
                 The full story
@@ -409,7 +409,7 @@ export default function AboutPage() {
             </div>
 
             <div data-reveal className="mt-2">
-              <SiteLogo light className="h-12 w-auto mx-auto sm:mx-0" />
+              <SiteLogo light className="h-12 w-auto mx-auto lg:mx-0" />
             </div>
           </div>
         </div>
@@ -418,7 +418,7 @@ export default function AboutPage() {
       {/* ---------- Personal Story ---------- */}
       <section className="py-10 sm:py-14 md:py-16 border-b border-border bg-background">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <div data-reveal className="space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
+          <div data-reveal className="space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed text-center lg:text-left">
             <p>
               You are probably on this page because you want to know more about
               me. I&apos;m not going to lie, changing my life wasn&apos;t
@@ -514,7 +514,7 @@ export default function AboutPage() {
                 key={s.label}
                 data-stat={s.value}
                 data-stat-suffix={s.suffix}
-                className="flex flex-col text-center md:text-left"
+                className="flex flex-col text-center lg:text-left"
               >
                 <dt className="order-2 mt-1 text-xs uppercase tracking-wider font-semibold text-muted-foreground">
                   {s.label}
@@ -531,12 +531,12 @@ export default function AboutPage() {
       {/* ---------- Professional Bio ---------- */}
       <section id="belief" className="scroll-mt-32 py-12 sm:py-16 md:py-20 border-b border-border">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="text-center md:text-left">
+          <div className="text-center lg:text-left">
             <p data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
               Professional Bio
             </p>
           </div>
-          <div data-reveal className="mt-6 space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
+          <div data-reveal className="mt-6 space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed text-center lg:text-left">
             <p>
               Sagar Lad works as a Data &amp; AI Architect with a software
               company. He is also a TEDx Speaker and author of 6+ books. But
@@ -603,7 +603,7 @@ export default function AboutPage() {
       {/* ---------- Traveled Countries (Global Explorations) ---------- */}
       <section id="travel" className="scroll-mt-32 py-10 sm:py-14 md:py-16 border-b border-border bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mb-6 sm:mb-8 text-center sm:text-left">
+          <div className="mb-6 sm:mb-8 text-center lg:text-left">
             <span data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
               Global Journey
             </span>
@@ -644,7 +644,7 @@ export default function AboutPage() {
             <div className="lg:col-span-7">
               <div
                 data-runner-cards
-                className="no-scrollbar flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth px-1 -mx-1"
+                className="no-scrollbar flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth px-1 -mx-1"
               >
                 {MARATHON_IMAGES.map((r) => (
                   <RunnerCard key={r.key} r={r} />

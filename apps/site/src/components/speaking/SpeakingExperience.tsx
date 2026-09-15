@@ -52,8 +52,8 @@ export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactN
 
   return (
     <>
-      {/* ── Mobile & Tablet: Step Carousel ─────────────────────── */}
-      <div className="lg:hidden">
+      {/* ── Mobile: Step Carousel ─────────────────────── */}
+      <div className="md:hidden">
         {/* Step progress bar */}
         <div className="flex items-center justify-center gap-0 mb-6">
           {STEPS.map((step, i) => (
@@ -140,8 +140,8 @@ export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactN
         </div>
       </div>
 
-      {/* ── Desktop: 2-row Bento Grid (3 steps + contact CTA) ────── */}
-      <div className="hidden lg:grid grid-cols-12 gap-6">
+      {/* ── Tablet & Desktop: 2-row Bento Grid (3 steps + contact CTA) ────── */}
+      <div className="hidden md:grid grid-cols-12 gap-6">
         {/* Row 1: Step 1 (Span 7) & Step 2 (Span 5) */}
         <div className="col-span-7 card-hover group rounded-2xl border border-border bg-card p-8 flex flex-col justify-between">
           <div>
