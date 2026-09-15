@@ -13,6 +13,8 @@ import {
   HeartPulse,
   Brain,
   Flame,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Pill } from "@/components/ui/Pill";
 
@@ -68,17 +70,15 @@ function sortTopics(topics: Topic[]) {
   });
 }
 
-function MarqueeTopicCard({ t, onPause, onResume }: { t: Topic; onPause: () => void; onResume: () => void }) {
+function MarqueeTopicCard({ t }: { t: Topic }) {
   const Icon = ICONS[t.name] ?? Brain;
   return (
     <Link
       href={`/blog?category=${encodeURIComponent(t.slug)}`}
-      className="card-hover group flex flex-col items-center justify-center text-center p-4 sm:p-9 rounded-xl border border-border bg-card shrink-0 h-[140px] w-[140px] sm:h-[220px] sm:w-[280px] select-none cursor-pointer"
-      onMouseEnter={onPause}
-      onMouseLeave={onResume}
+      className="card-hover group flex flex-col items-center justify-center text-center p-4 sm:p-9 rounded-xl border border-border bg-card shrink-0 h-[140px] w-[140px] sm:h-[220px] sm:w-[280px] select-none cursor-pointer snap-start"
     >
       <span className="grid h-9 w-9 sm:h-14 sm:w-14 place-items-center rounded-full bg-muted text-muted-foreground mb-2 sm:mb-4 transition-all duration-300 group-hover:bg-brand/10 group-hover:text-brand">
-        <Icon className="w-4 h-4 sm:w-6 sm:h-6" strokeWidth={1.5} />
+        <Icon className="w-4 h-4 sm:w-6 sm:h-6" strokeWidth={2} />
       </span>
       <h3 className="font-display text-xs sm:text-lg font-semibold leading-snug text-foreground group-hover:text-foreground transition-colors duration-200 line-clamp-2">
         {t.name}
@@ -90,12 +90,14 @@ function MarqueeTopicCard({ t, onPause, onResume }: { t: Topic; onPause: () => v
 export function TopicsGrid({ topics }: { topics: Topic[] }) {
   const items = topics.length > 0 ? sortTopics(topics) : COACH_TOPICS;
   const list = items.slice(0, 8);
-  const doubled = [...list, ...list, ...list];
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const pause = useCallback(() => setPaused(true), []);
-  const resume = useCallback(() => setPaused(false), []);
+  const scrollBy = useCallback((dir: -1 | 1) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardW = el.querySelector<HTMLElement>("a")?.offsetWidth ?? 200;
+    el.scrollBy({ left: dir * (cardW + 16), behavior: "smooth" });
+  }, []);
 
   return (
     <section className="py-16 md:py-24 border-b border-border bg-background overflow-hidden" aria-label="Explore Topics">
@@ -111,22 +113,33 @@ export function TopicsGrid({ topics }: { topics: Topic[] }) {
         </p>
       </div>
 
-      {/* Infinite auto-scrolling marquee — all viewports */}
-      <div
-        className="mt-12 md:mt-20 relative overflow-hidden marquee-mask marquee-pauser"
-        onMouseEnter={pause}
-        onMouseLeave={resume}
-      >
-        <div
-          ref={trackRef}
-          className="flex w-max gap-3 sm:gap-6 animate-marquee py-3"
-          style={{
-            animationDuration: "50s",
-            animationPlayState: paused ? "paused" : "running",
-          }}
+      {/* Scrollable topic cards with nav arrows */}
+      <div className="mt-12 md:mt-20 relative max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Left arrow */}
+        <button
+          type="button"
+          onClick={() => scrollBy(-1)}
+          aria-label="Scroll left"
+          className="absolute left-0 md:-left-1 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 place-items-center rounded-full border border-border bg-background/90 text-foreground shadow-sm hover:bg-muted transition-colors"
         >
-          {doubled.map((t, i) => (
-            <MarqueeTopicCard key={`${t.id}-${i}`} t={t} onPause={pause} onResume={resume} />
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        {/* Right arrow */}
+        <button
+          type="button"
+          onClick={() => scrollBy(1)}
+          aria-label="Scroll right"
+          className="absolute right-0 md:-right-1 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 place-items-center rounded-full border border-border bg-background/90 text-foreground shadow-sm hover:bg-muted transition-colors"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+
+        <div
+          ref={scrollRef}
+          className="flex gap-3 sm:gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-8 md:px-12 py-3"
+        >
+          {list.map((t) => (
+            <MarqueeTopicCard key={t.id} t={t} />
           ))}
         </div>
       </div>

@@ -43,6 +43,31 @@
   /* Light Blue — secondary buttons, metadata, supporting info, subtle hover. */
   --brand-light: #3f88c5;
   --border: #e5e4e0;
+
+  /* ── Type scale tokens ────────────────────────────────────────────── */
+  --text-xs: 0.75rem;      /* 12px — captions, badges, metadata */
+  --text-sm: 0.875rem;     /* 14px — secondary body, nav */
+  --text-base: 1rem;       /* 16px — body */
+  --text-lg: 1.125rem;     /* 18px — section lead */
+  --text-xl: 1.25rem;      /* 20px — card titles */
+  --text-2xl: 1.5rem;      /* 24px — subsection headings */
+  --text-3xl: 1.875rem;    /* 30px — section headings */
+  --text-4xl: 2.25rem;     /* 36px — page headings */
+  --text-5xl: 3rem;        /* 48px — hero sub */
+  --text-6xl: 3.75rem;     /* 60px — hero */
+  --text-7xl: 4.5rem;      /* 72px — hero large */
+
+  /* ── Text colour tokens ───────────────────────────────────────────── */
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted-foreground);
+  --text-muted: #94a3b8;
+  --text-brand: var(--brand);
+  --text-brand-light: var(--brand-light);
+  --text-accent: var(--accent);
+  --text-on-accent: var(--accent-foreground);
+  --text-on-brand: #ffffff;
+  --text-white: #ffffff;
+  --text-dark: #1e293b;
 }
 
 .dark {
@@ -58,6 +83,18 @@
   --brand: #3f88c5;
   --brand-light: #7fa8d9;
   --border: #26262c;
+
+  /* Text colour tokens for dark mode */
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted-foreground);
+  --text-muted: #64748b;
+  --text-brand: var(--brand);
+  --text-brand-light: var(--brand-light);
+  --text-accent: var(--accent);
+  --text-on-accent: var(--accent-foreground);
+  --text-on-brand: #ffffff;
+  --text-white: #ffffff;
+  --text-dark: #1e293b;
 }
 
 body {

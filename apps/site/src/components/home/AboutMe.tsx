@@ -191,7 +191,7 @@ export function AboutMe() {
                   >
                     0{s.suffix}
                   </p>
-                  <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8] leading-tight">
+                  <p className="mt-1.5 text-xs font-semibold uppercase tracking-wider text-[#94a3b8] leading-tight">
                     {s.label}
                   </p>
                 </div>

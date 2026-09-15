@@ -139,6 +139,28 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
 
       {/* Carousel area */}
       <div className="relative">
+        {/* Left arrow — outer edge */}
+        {total > 1 && (
+          <button
+            type="button"
+            onClick={prev}
+            aria-label="Previous book"
+            className="absolute left-0 md:-left-2 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 md:h-11 md:w-11 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] shadow-sm hover:border-[#1e293b] hover:text-[#1e293b] transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+        )}
+        {/* Right arrow — outer edge */}
+        {total > 1 && (
+          <button
+            type="button"
+            onClick={next}
+            aria-label="Next book"
+            className="absolute right-0 md:-right-2 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 md:h-11 md:w-11 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] shadow-sm hover:border-[#1e293b] hover:text-[#1e293b] transition-colors"
+          >
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+        )}
         <div
           className="touch-pan-y select-none px-0 md:px-20"
           onPointerDown={onPointerDown}
@@ -151,28 +173,6 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
             <article className="flex flex-col md:flex-row items-center gap-10 md:gap-16 lg:gap-20">
             {/* Book Cover with arrows */}
             <div className="relative w-full md:w-2/5 lg:w-2/5 shrink-0 flex justify-center">
-              {/* Left arrow */}
-              {total > 1 && (
-                <button
-                  type="button"
-                  onClick={prev}
-                  aria-label="Previous book"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 md:h-11 md:w-11 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] shadow-sm hover:border-[#1e293b] hover:text-[#1e293b] transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
-                </button>
-              )}
-              {/* Right arrow */}
-              {total > 1 && (
-                <button
-                  type="button"
-                  onClick={next}
-                  aria-label="Next book"
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 md:h-11 md:w-11 place-items-center rounded-full border border-[#e2e8f0] bg-white text-[#475569] shadow-sm hover:border-[#1e293b] hover:text-[#1e293b] transition-colors"
-                >
-                  <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
-                </button>
-              )}
               <button
                 type="button"
                 onClick={(e) => {
@@ -227,7 +227,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
                 {/* Static hint with upward icon animation */}
                 <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 pointer-events-none flex flex-col items-center opacity-80 group-hover/book:opacity-100 transition-opacity">
                   <ChevronUp className="w-4 h-4 text-[#1e293b] animate-bounce" />
-                  <span className="text-[11px] font-bold text-[#1e293b] whitespace-nowrap">
+                  <span className="text-xs font-bold text-[#1e293b] whitespace-nowrap">
                     Click to preview
                   </span>
                 </div>

@@ -26,10 +26,10 @@ export function DotPagination({
           onClick={() => onChange(i)}
           aria-label={`Go to ${label} ${i + 1}`}
           aria-current={i === current ? "true" : undefined}
-          className={`h-1.5 rounded-full transition-all duration-300 ${
+          className={`h-2 rounded-full transition-all duration-300 ${
             i === current
-              ? "w-6 bg-accent-strong"
-              : "w-1.5 bg-border hover:bg-muted-foreground/30"
+              ? "w-7 bg-accent-strong"
+              : "w-2 bg-border hover:bg-muted-foreground/30"
           }`}
         />
       ))}
