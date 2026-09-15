@@ -24,7 +24,7 @@ export function BlogPreview({
   showStats?: boolean;
 }) {
   return (
-    <section className="py-16 md:py-24 border-b border-border">
+    <section className="py-10 sm:py-14 md:py-16 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-center sm:text-left">
            <div>
@@ -48,7 +48,7 @@ export function BlogPreview({
         </div>
 
         {/* View More Button redirecting to blogs page */}
-        <div className="mt-12 text-center">
+        <div className="mt-8 text-center">
           <Link
             href="/blog"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-strong hover:underline underline-offset-4 transition-colors"

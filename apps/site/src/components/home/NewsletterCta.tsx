@@ -57,14 +57,14 @@ export function NewsletterCta() {
 
   return (
     <section
-      className="border-b border-border bg-background py-16 md:py-24"
+      className="border-b border-border bg-background py-10 sm:py-14 md:py-16"
       aria-label="Subscribe to the newsletter"
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)]">
           <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
             {/* Photo column — showcases vertical photo of Sagar with coffee */}
-            <div className="relative md:col-span-5 min-h-[300px] sm:min-h-[360px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden bg-muted/40">
+            <div className="relative md:col-span-5 min-h-[260px] sm:min-h-[300px] md:min-h-full aspect-[4/3] md:aspect-auto overflow-hidden bg-muted/40">
               <Image
                 src="/images/newsletter/sagar-lad-newsletter.webp"
                 alt="Sagar Lad – The Sagar Lad Letter Newsletter"

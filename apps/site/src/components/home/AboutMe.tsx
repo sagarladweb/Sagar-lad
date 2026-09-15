@@ -112,7 +112,7 @@ export function AboutMe() {
   return (
     <section
       ref={root}
-      className="relative overflow-hidden border-b border-border bg-background py-16 md:py-24"
+      className="relative overflow-hidden border-b border-border bg-background py-10 sm:py-14 md:py-16"
       aria-label="About Sagar Lad"
     >
       <div

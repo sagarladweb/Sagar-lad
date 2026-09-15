@@ -130,7 +130,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
       )}
 
       {/* Section Header */}
-      <div className="mb-12 md:mb-16 text-center">
+      <div className="mb-8 md:mb-10 text-center">
         <Pill supportLine="The Library">The Library</Pill>
         <h2 className="mt-6 font-display text-3xl md:text-4xl font-bold text-[#1e293b]">
           Featured books
@@ -140,7 +140,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
       {/* Carousel area */}
       <div className="relative">
         <div
-          className="touch-pan-y select-none px-0 md:px-20"
+          className="touch-pan-y select-none px-0 md:px-8"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -148,7 +148,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
         >
           {/* Book slide */}
           <div key={book.id} className="book-slide-enter">
-            <article className="flex flex-col md:flex-row items-center gap-10 md:gap-16 lg:gap-20">
+            <article className="flex flex-col md:flex-row items-center gap-6 md:gap-10 lg:gap-16">
             {/* Book Cover with arrows */}
             <div className="relative w-full md:w-2/5 lg:w-2/5 shrink-0 flex justify-center">
               {/* Left arrow */}
@@ -273,13 +273,13 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
 
       {/* Bottom Dot Pagination */}
       {total > 1 && (
-        <div className="mt-14 md:mt-16 flex justify-center">
+        <div className="mt-10 md:mt-12 flex justify-center">
           <DotPagination total={total} current={index} onChange={setIndex} />
         </div>
       )}
 
       {/* Book Stats — inside the section */}
-      <div className="mt-14 md:mt-20 pt-8 border-t border-[#e2e8f0]/40">
+      <div className="mt-10 md:mt-12 pt-8 border-t border-[#e2e8f0]/40">
         <BookStats />
       </div>
     </div>

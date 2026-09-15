@@ -5,7 +5,7 @@ export async function LifeRazor() {
   const data = await getLifeRazor();
 
   return (
-    <section className="py-16 md:py-24 border-b border-border bg-background">
+    <section className="py-10 sm:py-14 md:py-16 border-b border-border bg-background">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
         <span className="lg:hidden inline-block text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           Daily wisdom

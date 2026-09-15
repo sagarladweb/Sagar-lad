@@ -108,7 +108,7 @@ export function Testimonials() {
   const t = testimonials[index];
 
   return (
-    <section ref={rootRef} className="card-hover py-16 md:py-24 border-b border-border bg-card/40 group/carousel" aria-label="Testimonials">
+    <section ref={rootRef} className="card-hover py-10 sm:py-14 md:py-16 border-b border-border bg-card/40 group/carousel" aria-label="Testimonials">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="text-center">
            <Pill supportLine="What people say">Testimonials</Pill>
@@ -117,7 +117,7 @@ export function Testimonials() {
            </h2>
          </div>
 
-         <div className="mt-12">
+         <div className="mt-8">
           <div className="flex items-center gap-3">
             {/* Prev arrow */}
             <button

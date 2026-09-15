@@ -378,7 +378,7 @@ export function MindUpPillars() {
     <section
       ref={sectionRef}
       aria-label="Mind Up Theory — Six Pillars"
-      className="relative overflow-hidden bg-[#FAF9F6] py-16 md:py-24 border-b border-[#e2e8f0]/40"
+      className="relative overflow-hidden bg-[#FAF9F6] py-10 sm:py-14 md:py-16 border-b border-[#e2e8f0]/40"
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-8">
         {/* Mobile / tablet */}
@@ -457,7 +457,7 @@ export function MindUpPillars() {
         </div>
 
         {/* Mobile / tablet ring */}
-        <div className={`mt-14 lg:hidden ${inView ? "mindup-ring-anim in-view" : "mindup-ring-anim"}`}>
+        <div className={`mt-8 lg:hidden ${inView ? "mindup-ring-anim in-view" : "mindup-ring-anim"}`}>
           <PillarRing
             active={active}
             activePillar={activePillar}

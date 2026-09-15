@@ -30,7 +30,7 @@ export async function MindUpBook() {
 
   return (
     <section
-      className="relative overflow-hidden border-b border-border bg-background py-16 md:py-24"
+      className="relative overflow-hidden border-b border-border bg-background py-10 sm:py-14 md:py-16"
       aria-label="Featured books"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">

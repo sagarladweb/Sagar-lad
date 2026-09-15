@@ -78,7 +78,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
         <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-20 sm:pb-28 md:pb-32 pt-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-16 sm:pb-20 md:pb-24 pt-24 sm:pt-28">
         <div className="max-w-3xl text-center mt-auto">
           {/* Subtitle — first */}
           <p data-hero-sub className="mb-3 sm:mb-4 text-sm sm:text-base md:text-lg text-white/60 font-medium">

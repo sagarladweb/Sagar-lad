@@ -98,7 +98,7 @@ export function TopicsGrid({ topics }: { topics: Topic[] }) {
   const resume = useCallback(() => setPaused(false), []);
 
   return (
-    <section className="py-16 md:py-24 border-b border-border bg-background overflow-hidden" aria-label="Explore Topics">
+    <section className="py-10 sm:py-14 md:py-16 border-b border-border bg-background overflow-hidden" aria-label="Explore Topics">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <div className="w-full flex justify-center text-center">
           <Pill supportLine="Browse topics">Explore</Pill>
@@ -113,7 +113,7 @@ export function TopicsGrid({ topics }: { topics: Topic[] }) {
 
       {/* Infinite auto-scrolling marquee — all viewports */}
       <div
-        className="mt-12 md:mt-20 relative overflow-hidden marquee-mask marquee-pauser"
+        className="mt-8 md:mt-12 relative overflow-hidden marquee-mask marquee-pauser"
         onMouseEnter={pause}
         onMouseLeave={resume}
       >

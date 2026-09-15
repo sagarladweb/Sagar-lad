@@ -45,7 +45,7 @@ export function SagarGallery() {
   }
 
   return (
-    <section className="border-b border-border bg-background py-16 md:py-24" aria-label="Get to know Sagar">
+    <section className="border-b border-border bg-background py-10 sm:py-14 md:py-16" aria-label="Get to know Sagar">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <div className="relative">
           <div
