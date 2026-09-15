@@ -2,8 +2,6 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { prisma, dbSafe } from "@/lib/db";
 
-const isDev = process.env.NODE_ENV !== "production";
-
 export type SocialLink = {
   id: string;
   key: string;
@@ -46,7 +44,7 @@ const getSiteSocialsCached = unstable_cache(
       }));
   },
   ["site-socials-v1"],
-  { revalidate: isDev ? 0 : 300, tags: ["socials"] }
+  { revalidate: 300, tags: ["socials"] }
 );
 
 export const getSiteSocials = cache(async (): Promise<SocialLink[]> => {

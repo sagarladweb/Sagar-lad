@@ -4,9 +4,6 @@ import { prisma, dbSafe } from "@/lib/db";
 import { isInstagramUrl } from "@/lib/instagram";
 import { VISIBLE_POST_WHERE } from "@/lib/site";
 
-const isDev = process.env.NODE_ENV !== "production";
-const devRevalidate = (prod: number) => (isDev ? 0 : prod);
-
 // Blog posts: Cached with unstable_cache for instant <5ms responses, deduped per-request with React cache.
 const getPostBySlugCached = unstable_cache(
   async (slug: string) => {
@@ -60,7 +57,7 @@ export const getCategories = unstable_cache(
     return null;
   },
   ["categories-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 // Wrapper: if cache returns null, it means DB was down — return empty
@@ -97,7 +94,7 @@ export const getPublishedVideos = unstable_cache(
       );
   },
   ["videos-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 export async function getPublishedVideosWithFallback(take?: number, platform?: "youtube" | "instagram", skip?: number) {
@@ -120,7 +117,7 @@ export const getPublishedVideoBySlug = unstable_cache(
     );
   },
   ["video-by-slug-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 export const getQuotes = unstable_cache(
@@ -136,7 +133,7 @@ export const getQuotes = unstable_cache(
     return null;
   },
   ["quotes-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 export async function getQuotesWithFallback() {
@@ -167,7 +164,7 @@ export const getPublishedBooks = unstable_cache(
     return [];
   },
   ["books-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 // ── Blog listing helpers ──────────────────────────────────────────────
@@ -181,7 +178,7 @@ export const getPostCount = unstable_cache(
     return count;
   },
   ["post-count-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 export async function getPostCountWithFallback(where?: Record<string, unknown>) {
@@ -198,7 +195,7 @@ export const getVideoCount = unstable_cache(
     return count;
   },
   ["video-count-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 export async function getVideoCountWithFallback() {
@@ -228,7 +225,7 @@ export const getPostList = unstable_cache(
     return posts;
   },
   ["post-list-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 export async function getPostListWithFallback(
@@ -257,7 +254,7 @@ export const getFeaturedPosts = unstable_cache(
     return posts;
   },
   ["featured-posts-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 export async function getFeaturedPostsWithFallback(where: Record<string, unknown>, take: number) {
@@ -301,7 +298,7 @@ export const getRelatedPosts = unstable_cache(
     return (related ?? []).slice(0, 3);
   },
   ["related-posts-v2"],
-  { revalidate: devRevalidate(300), tags: ["content"] }
+  { revalidate: 300, tags: ["content"] }
 );
 
 // Active announcement — cached with unstable_cache, busted instantly by revalidatePublic() via "announcements" tag
@@ -317,7 +314,7 @@ const getActiveAnnouncementCached = unstable_cache(
     );
   },
   ["active-announcement-v1"],
-  { revalidate: devRevalidate(300), tags: ["announcements"] }
+  { revalidate: 300, tags: ["announcements"] }
 );
 
 export const getActiveAnnouncement = cache(async () => {

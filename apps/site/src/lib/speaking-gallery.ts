@@ -9,8 +9,6 @@ import {
   DEFAULT_SPEAKING_GALLERY,
 } from "./speaking-gallery-types";
 
-const isDev = process.env.NODE_ENV !== "production";
-
 export const getSpeakingGallery = cache(async (): Promise<SpeakingGalleryData> => {
   return unstable_cache(
     async (): Promise<SpeakingGalleryData> => {
@@ -33,6 +31,6 @@ export const getSpeakingGallery = cache(async (): Promise<SpeakingGalleryData> =
       };
     },
     ["speaking-gallery"],
-    { revalidate: isDev ? 0 : 300, tags: ["speaking-gallery", "speaking"] }
+    { revalidate: 300, tags: ["speaking-gallery", "speaking"] }
   )();
 });
