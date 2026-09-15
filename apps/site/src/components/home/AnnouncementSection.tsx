@@ -80,7 +80,7 @@ export function AnnouncementSection({
                 )}
                 {showHiringCTA && (
                   <Link
-                    href="/speaking/contact"
+                    href="/hire-me"
                     className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white px-5 py-2.5 text-sm font-semibold hover:bg-white/20 transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -124,7 +124,7 @@ export function AnnouncementSection({
               )}
               {showHiringCTA && (
                 <Link
-                  href="/speaking/contact"
+                  href="/hire-me"
                   className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground hover:border-accent/50 hover:bg-accent/5 transition-colors"
                   onClick={(e) => e.stopPropagation()}
                 >

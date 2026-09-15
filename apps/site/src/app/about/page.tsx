@@ -673,7 +673,7 @@ export default function AboutPage() {
               Get in touch <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/speaking/contact"
+              href="/hire-me"
               className="inline-flex items-center gap-2 rounded-full border border-border px-7 py-3.5 text-sm font-semibold hover:bg-muted transition-colors"
             >
               Book for a talk

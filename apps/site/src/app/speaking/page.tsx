@@ -68,7 +68,7 @@ export default async function SpeakingPage() {
             </p>
             <div className="pt-2 flex flex-col gap-4 items-center sm:flex-row sm:items-center">
               <Link
-                href="/speaking/contact"
+                href="/hire-me"
                 className="btn-premium inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-7 py-3.5 text-sm font-semibold hover:opacity-95 shadow-xl w-full sm:w-auto"
               >
                 Hire For Speaking <ArrowRight className="w-4 h-4" />
@@ -253,7 +253,7 @@ export default async function SpeakingPage() {
                       Whether it&apos;s a conference, team offsite, university talk, or podcast — let&apos;s make it happen.
                     </p>
                     <Link
-                      href="/speaking/contact"
+                      href="/hire-me"
                       className="btn-premium mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-5 py-3 text-sm font-semibold hover:opacity-95 shadow-md"
                     >
                       Contact For Speaking <ArrowRight className="w-4 h-4" />
@@ -295,7 +295,7 @@ export default async function SpeakingPage() {
                   Whether it&apos;s a conference, team offsite, university talk, or podcast — let&apos;s make it happen.
                 </p>
                 <Link
-                  href="/speaking/contact"
+                  href="/hire-me"
                   className="btn-premium mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-6 py-3.5 text-sm font-semibold hover:opacity-95 shadow-md w-full"
                 >
                   Contact For Speaking <ArrowRight className="w-4 h-4" />
