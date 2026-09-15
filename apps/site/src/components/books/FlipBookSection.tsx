@@ -49,7 +49,7 @@ export const FLIPBOOKS: Record<string, FlipBookData> = {
       "/images/books/Book-AI foundry/A 8.webp",
       "/images/books/Book-AI foundry/A 9.webp",
     ],
-    backCoverImage: "/images/books/Book-AI foundry/A 10.png",
+    backCoverImage: "/images/books/Book-AI foundry/A-backcover.png",
     buyLink: "https://www.amazon.com/stores/author/B0B5R12SHN/allbooks",
   },
 };
