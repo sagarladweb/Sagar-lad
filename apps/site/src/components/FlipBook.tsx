@@ -62,6 +62,7 @@ const BookPage = forwardRef<HTMLDivElement, PageProps>(
             : isLeftPage
             ? "inset -10px 0 18px -6px rgba(0,0,0,0.18), -8px 0 16px -8px rgba(0,0,0,0.3)"
             : "inset 10px 0 18px -6px rgba(0,0,0,0.18), 8px 0 16px -8px rgba(0,0,0,0.3)",
+          animation: isBack ? "backCoverIn 0.6s ease-out both" : undefined,
         }}
       >
         {/* Page Image */}

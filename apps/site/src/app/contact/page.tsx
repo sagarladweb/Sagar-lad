@@ -149,6 +149,17 @@ export default function ContactPage() {
             <style>{`
               .contact-hero-img {
                 object-position: 50% 50%;
+                animation: contactImgIn 0.8s ease-out both;
+              }
+              @keyframes contactImgIn {
+                from {
+                  opacity: 0;
+                  transform: translateY(30px) scale(0.95);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0) scale(1);
+                }
               }
               @media (max-width: 639px) {
                 .contact-hero-img {

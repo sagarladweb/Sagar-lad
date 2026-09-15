@@ -1569,3 +1569,9 @@ nav a:not([class*="rounded-full"]) {
 .lazy-section:not([data-lazy-init]) .blog-card-stagger {
   animation-play-state: running;
 }
+
+/* FlipBook back cover entrance */
+@keyframes backCoverIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
