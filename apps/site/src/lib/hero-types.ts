@@ -55,7 +55,7 @@ export const DEFAULT_HOME_HERO: HomeHeroData = {
   designation: DESIGNATION,
   title: "Sagar Lad",
   subtitle: "Your friend, mentor and Guide",
-  tagline1: "MIND UP.",
-  tagline2: "Change your MIND.",
-  tagline3: "Change your life.",
+  tagline1: "MIND UP",
+  tagline2: "Change your MIND",
+  tagline3: "Change your life",
 };

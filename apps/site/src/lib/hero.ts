@@ -34,9 +34,9 @@ const getHomeHeroCached = unstable_cache(
       designation: row.designation || DESIGNATION,
       title: row.title || "Sagar Lad",
       subtitle: row.subtitle || "Your friend, mentor and Guide",
-      tagline1: row.tagline1 || "MIND UP.",
-      tagline2: row.tagline2 || "Change your MIND.",
-      tagline3: row.tagline3 || "Change your life.",
+      tagline1: row.tagline1 || "MIND UP",
+      tagline2: row.tagline2 || "Change your MIND",
+      tagline3: row.tagline3 || "Change your life",
     };
   },
   ["site-home-hero-v1"],
