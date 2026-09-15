@@ -57,7 +57,7 @@ function WorkShowcase() {
       caption: "MIND UP & AI Foundry",
     },
     {
-      src: "/images/speaking/sagar-lad-tedx-talk-aim.webp",
+      src: "/images/speaking/Sagarlad_speaker.webp",
       alt: "Sagar Lad speaking at TEDx AICS on AI, Awareness, Integration, and Mastery",
       label: "TEDx Speaker",
       caption: "TEDx AICS",
