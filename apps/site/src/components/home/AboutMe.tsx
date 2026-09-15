@@ -121,7 +121,7 @@ export function AboutMe() {
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Mobile: Pill + heading centered, then image, then content */}
+        {/* Mobile & Tablet: Pill + heading centered, then image, then content */}
         <div className="lg:hidden text-center" data-story-head>
           <Pill>About Sagar</Pill>
           <h2 className="mt-6 font-display text-lg sm:text-xl font-semibold leading-snug tracking-tight text-[#94a3b8]">
@@ -130,8 +130,8 @@ export function AboutMe() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
-          {/* Visual — first on mobile, left on desktop */}
-          <div data-story-visual className="lg:col-span-5 order-2 lg:order-1 relative">
+          {/* Visual — first on mobile/tablet, left on desktop */}
+          <div data-story-visual className="lg:col-span-5 order-2 lg:order-1 relative mt-8 lg:mt-0">
             <div className="relative max-w-md mx-auto lg:mx-0">
               <div
                 aria-hidden="true"
@@ -151,7 +151,7 @@ export function AboutMe() {
             </div>
           </div>
 
-          {/* Content — second on mobile, right on desktop */}
+          {/* Content — second on mobile/tablet, right on desktop */}
           <div className="lg:col-span-7 order-3 lg:order-2 text-center lg:text-left">
             <div data-story-head className="hidden lg:block">
               <Pill>About Sagar</Pill>
@@ -199,7 +199,7 @@ export function AboutMe() {
             </div>
 
             {/* Footer Action */}
-            <div className="mt-6 md:mt-10 text-center sm:text-left">
+            <div className="mt-6 md:mt-10 text-center lg:text-left">
               <Link
                 href="/about"
                 className="btn-premium inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-8 py-3 text-sm font-semibold"
