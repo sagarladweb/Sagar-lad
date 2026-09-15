@@ -455,8 +455,10 @@ export default function AboutPage() {
               use your mind, you can change what is possible for your life.
             </p>
             <div className="pt-3">
-              <span className="inline-block bg-[#ffd51d] text-black px-3 py-1 rounded font-display text-lg sm:text-xl md:text-2xl font-bold tracking-tight shadow-xs">
-                MIND UP Change your mind Change your life
+              <span className="inline-block bg-[#ffd51d] text-black px-4 py-3 rounded font-display font-bold tracking-tight shadow-xs">
+                <span className="text-lg sm:text-xl md:text-2xl block">MIND UP</span>
+                <span className="text-base sm:text-lg md:text-xl block">Change your mind</span>
+                <span className="text-base sm:text-lg md:text-xl block">Change your life</span>
               </span>
             </div>
           </div>
@@ -583,9 +585,6 @@ export default function AboutPage() {
             <p className="font-display text-xl sm:text-2xl font-bold text-foreground pt-2">
               Because when you change the way you use your mind, you can change
               what is possible.
-            </p>
-            <p className="btn-premium inline-block bg-accent text-black px-3 py-0.5 font-display text-xl sm:text-2xl font-bold">
-              MIND UP
             </p>
           </div>
         </div>
