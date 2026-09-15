@@ -38,13 +38,22 @@ export function LifeRazorTypewriter() {
   }, [started, typed]);
 
   return (
-    <div ref={sectionRef} className="mt-10 min-h-[3rem] flex items-center justify-center">
-      <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[#1e293b]">
-        {typed}
+    <div ref={sectionRef} className="mt-10">
+      <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.08] tracking-tight">
+        {typed.split("Don't worry about what others think.").length > 1 ? (
+          <>
+            Be Dumb.{" "}
+            <span className="text-accent-strong">
+              Don&apos;t worry about what others think.
+            </span>
+          </>
+        ) : (
+          <>{typed}</>
+        )}
         {started && typed.length < TYPING_TEXT.length && (
           <span className="typewriter-cursor" />
         )}
-      </p>
+      </h2>
     </div>
   );
 }

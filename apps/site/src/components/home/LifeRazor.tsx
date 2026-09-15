@@ -10,16 +10,12 @@ export async function LifeRazor() {
         <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
           {data.pill}
         </p>
-        <h2 className="mt-8 font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.08] tracking-tight">
-          {data.heading}{" "}
-          <span className="text-accent-strong">
-            {data.accent}
-          </span>
-        </h2>
+        <div className="mt-8">
+          <LifeRazorTypewriter />
+        </div>
         <p className="mt-7 mx-auto max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed">
           {data.description}
         </p>
-        <LifeRazorTypewriter />
       </div>
     </section>
   );
