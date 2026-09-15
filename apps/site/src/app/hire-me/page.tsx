@@ -189,6 +189,30 @@ export default function HireMePage() {
         </div>
       </header>
 
+      {/* Work Section — Published Books */}
+      <section className="border-b border-border bg-muted/30 py-12 sm:py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 text-center">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Published Work</p>
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
+            Books written &amp; published
+          </h2>
+          <div className="mt-8 flex justify-center">
+            <div className="relative w-full max-w-md aspect-[4/3] rounded-2xl overflow-hidden border border-border/60 shadow-lg bg-muted/40">
+              <Image
+                src="/images/books/hire-sagar-books.png"
+                alt="MIND UP and AI Foundry — books by Sagar Lad"
+                fill
+                sizes="(max-width: 640px) 100vw, 480px"
+                className="object-contain p-4"
+              />
+            </div>
+          </div>
+          <p className="mt-5 text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            MIND UP and AI Foundry — two published works exploring the intersection of mindset, AI, and human potential.
+          </p>
+        </div>
+      </section>
+
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
         {/* Left Column: Service cards */}
         <div className="order-2 lg:order-1 lg:col-span-5 space-y-5">
