@@ -578,7 +578,9 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
-            <HeaderSocials light={heroLight} />
+            <div className="hidden lg:block">
+              <HeaderSocials light={heroLight} />
+            </div>
             <button
               type="button"
               className={`lg:hidden p-2 rounded-full transition-colors duration-500 relative z-[110] ${
