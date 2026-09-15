@@ -114,7 +114,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
               {data.tagline1}
             </p>
             <p className="mt-1 font-display text-lg sm:text-xl md:text-2xl font-semibold text-white">
-              Change your <span className="inline-block bg-[#ffd51d] text-black px-2 py-0.5 rounded">{data.tagline2.replace(/^Change your /i, "")}</span>, Change your <span className="inline-block bg-[#ffd51d] text-black px-2 py-0.5 rounded">{data.tagline3.replace(/^Change your /i, "")}</span>
+              Change your <span className="text-[#ffd51d]">{data.tagline2.replace(/^Change your /i, "")}</span>, Change your <span className="text-[#ffd51d]">{data.tagline3.replace(/^Change your /i, "")}</span>
             </p>
           </div>
         </div>
