@@ -55,12 +55,12 @@ export default async function SpeakingPage() {
           <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-20 sm:pb-28 pt-32">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-20 sm:pb-24 md:pb-28 pt-32">
           <div className="max-w-2xl space-y-5 text-center sm:text-left mx-auto sm:mx-0">
             <span className="btn-premium inline-flex items-center justify-center sm:justify-start rounded-full bg-accent px-4 py-1.5 text-xs font-semibold tracking-wide text-accent-foreground shadow-md">
               Speaking
             </span>
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.1] drop-shadow-md">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] drop-shadow-md">
               Ideas that ignite rooms and transform mindsets
             </h1>
             <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-2xl drop-shadow-sm font-medium">

@@ -124,7 +124,7 @@ export function Testimonials() {
               type="button"
               onClick={prev}
               aria-label="Previous testimonial"
-              className="btn-premium shrink-0 grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-muted lg:opacity-0 lg:group-hover/carousel:opacity-100 lg: lg:"
+               className="btn-premium shrink-0 grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-muted lg:opacity-0 lg:group-hover/carousel:opacity-100"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
@@ -152,7 +152,7 @@ export function Testimonials() {
               type="button"
               onClick={next}
               aria-label="Next testimonial"
-              className="btn-premium shrink-0 grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-muted lg:opacity-0 lg:group-hover/carousel:opacity-100 lg: lg:"
+              className="btn-premium shrink-0 grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-muted lg:opacity-0 lg:group-hover/carousel:opacity-100"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
             </button>

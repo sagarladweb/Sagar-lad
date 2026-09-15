@@ -18,7 +18,8 @@ export function LazySection({ children, className }: LazySectionProps) {
       ([entry]) => {
         if (entry.isIntersecting) {
           el.classList.add("lazy-visible");
-          observer.unobserve(el);
+        } else {
+          el.classList.remove("lazy-visible");
         }
       },
       { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }

@@ -382,7 +382,7 @@ export default function AboutPage() {
           <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-32">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-24 md:py-32">
           <div className="max-w-3xl text-center sm:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
             <div data-reveal className="mb-4">
               <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/70 border border-white/20 rounded-full px-5 py-1.5">
@@ -508,7 +508,7 @@ export default function AboutPage() {
         aria-label="Quick facts about Sagar"
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <dl className="grid grid-cols-2 gap-6 md:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-6 lg:grid-cols-4">
             {stats.map((s) => (
               <div
                 key={s.label}
@@ -644,7 +644,7 @@ export default function AboutPage() {
             <div className="lg:col-span-7">
               <div
                 data-runner-cards
-                className="no-scrollbar flex sm:grid sm:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth px-1 -mx-1"
+                className="no-scrollbar flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth px-1 -mx-1"
               >
                 {MARATHON_IMAGES.map((r) => (
                   <RunnerCard key={r.key} r={r} />

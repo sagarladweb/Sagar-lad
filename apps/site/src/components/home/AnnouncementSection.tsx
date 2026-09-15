@@ -55,7 +55,7 @@ export function AnnouncementSection({
                   {formatDate(eventDate)}
                 </span>
               )}
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-white leading-tight max-w-2xl drop-shadow-md">
+              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight max-w-2xl drop-shadow-md">
                 {title}
               </h2>
               {description && (
@@ -99,7 +99,7 @@ export function AnnouncementSection({
                 {formatDate(eventDate)}
               </span>
             )}
-            <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-foreground leading-tight max-w-2xl mx-auto">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight max-w-2xl mx-auto">
               {title}
             </h2>
             {description && (

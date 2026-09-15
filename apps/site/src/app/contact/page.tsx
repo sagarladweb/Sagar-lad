@@ -149,39 +149,29 @@ export default function ContactPage() {
             <style>{`
               .contact-hero-img {
                 object-position: 50% 50%;
-                mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
-                -webkit-mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
               }
               @media (max-width: 639px) {
                 .contact-hero-img {
                   transform: scale(2) translate(10px, 8px);
                   object-position: 55% 65%;
-                  mask-image: linear-gradient(to top, transparent 9%, black 21%, black 100%);
-                  -webkit-mask-image: linear-gradient(to top, transparent 9%, black 21%, black 100%);
                 }
               }
               @media (min-width: 640px) and (max-width: 1023px) {
                 .contact-hero-img {
                   transform: scale(2) translate(11px, 4px);
                   object-position: 50% 50%;
-                  mask-image: linear-gradient(to top, transparent 5%, black 14%, black 100%);
-                  -webkit-mask-image: linear-gradient(to top, transparent 5%, black 14%, black 100%);
                 }
               }
               @media (min-width: 1024px) and (max-width: 1439px) {
                 .contact-hero-img {
                   transform: scale(1) translate(0, 0);
                   object-position: 50% 50%;
-                  mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
-                  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
                 }
               }
               @media (min-width: 1440px) {
                 .contact-hero-img {
                   transform: scale(1.9) translate(7px, -11px);
                   object-position: 27% 53%;
-                  mask-image: linear-gradient(to top, transparent 9%, black 13%, black 100%);
-                  -webkit-mask-image: linear-gradient(to top, transparent 9%, black 13%, black 100%);
                 }
               }
             `}</style>

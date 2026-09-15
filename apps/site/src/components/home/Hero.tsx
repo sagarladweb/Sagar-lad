@@ -87,7 +87,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
         <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-24 md:py-32">
         <div className="max-w-3xl text-center sm:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
           {/* Subtitle — first */}
           <p data-hero-sub className="mb-4 text-base sm:text-lg text-white/60 font-medium">
@@ -96,7 +96,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
 
           {/* Name — second */}
           <h1 className="mb-3">
-            <span data-hero-word className="font-display text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.1] text-[#ffd51d]">
+            <span data-hero-word className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] text-[#ffd51d]">
               {data.title}
             </span>
           </h1>
