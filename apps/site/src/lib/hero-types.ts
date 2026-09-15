@@ -52,7 +52,7 @@ export const DEFAULT_HOME_HERO: HomeHeroData = {
   mobilePosition: HERO_PRESETS.hero_sagar_lad.mobilePosition,
   tabletPosition: HERO_PRESETS.hero_sagar_lad.tabletPosition,
   desktopPosition: HERO_PRESETS.hero_sagar_lad.desktopPosition,
-  designation: DESIGNATION,
+  designation: "Author · Public Speaker · Human Potential Advocate",
   title: "Sagar Lad",
   subtitle: "Your friend, mentor and Guide",
   tagline1: "MIND UP",

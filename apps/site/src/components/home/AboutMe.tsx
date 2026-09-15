@@ -124,7 +124,7 @@ export function AboutMe() {
         {/* Mobile: Pill + heading centered, then image, then content */}
         <div className="lg:hidden text-center" data-story-head>
           <Pill>About Sagar</Pill>
-          <h2 className="mt-6 font-display text-3xl sm:text-4xl font-bold leading-[1.15] tracking-tight text-[#94a3b8]">
+          <h2 className="mt-6 font-display text-lg sm:text-xl font-semibold leading-snug tracking-tight text-[#94a3b8]">
             Author · Speaker · Human Potential Advocate
           </h2>
         </div>
@@ -155,7 +155,7 @@ export function AboutMe() {
           <div className="lg:col-span-7 order-3 lg:order-2 text-center lg:text-left">
             <div data-story-head className="hidden lg:block">
               <Pill>About Sagar</Pill>
-              <h2 className="mt-6 font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight text-[#94a3b8]">
+              <h2 className="mt-6 font-display text-xl sm:text-2xl font-semibold leading-snug tracking-tight text-[#94a3b8]">
                 Author · Speaker · Human Potential Advocate
               </h2>
               <p className="mt-6 text-base sm:text-lg text-[#64748b] leading-loose max-w-xl mx-auto lg:mx-0">

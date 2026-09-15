@@ -31,7 +31,7 @@ const getHomeHeroCached = unstable_cache(
       mobilePosition: row.mobilePosition || preset.mobilePosition,
       tabletPosition: row.tabletPosition || preset.tabletPosition,
       desktopPosition: row.desktopPosition || preset.desktopPosition,
-      designation: row.designation || DESIGNATION,
+      designation: row.designation || "Author · Public Speaker · Human Potential Advocate",
       title: row.title || "Sagar Lad",
       subtitle: row.subtitle || "Your friend, mentor and Guide",
       tagline1: row.tagline1 || "MIND UP",

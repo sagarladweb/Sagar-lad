@@ -26,15 +26,15 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
         0
       );
 
-      // Designation pill: fade up
+      // Subtitle: fade up (first)
       tl.fromTo(
-        "[data-hero-desig]",
+        "[data-hero-sub]",
         { opacity: 0, y: 16 },
         { opacity: 1, y: 0, duration: 0.7 },
         0.1
       );
 
-      // Name: word-by-word stagger
+      // Name: word-by-word stagger (second)
       tl.fromTo(
         "[data-hero-word]",
         { opacity: 0, y: 36 },
@@ -47,15 +47,15 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
         0.2
       );
 
-      // Subtitle: fade up
+      // Designation pill: fade up (third)
       tl.fromTo(
-        "[data-hero-sub]",
+        "[data-hero-desig]",
         { opacity: 0, y: 16 },
         { opacity: 1, y: 0, duration: 0.7 },
         0.4
       );
 
-      // Tagline: fade up
+      // Tagline: fade up (fourth)
       tl.fromTo(
         "[data-hero-tag]",
         { opacity: 0, y: 20 },
@@ -89,35 +89,29 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-32">
         <div className="max-w-3xl text-center sm:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
-          {/* Designation pill */}
-          <div data-hero-desig className="mb-4">
-            <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/70 border border-white/20 rounded-full px-5 py-1.5">
-              {data.designation}
-            </span>
-          </div>
+          {/* Subtitle — first */}
+          <p data-hero-sub className="mb-4 text-base sm:text-lg text-white/60 font-medium">
+            {data.subtitle}
+          </p>
 
-          {/* Name */}
-          <h1 className="mb-2">
-            <span data-hero-word className="font-display text-6xl sm:text-7xl md:text-8xl font-bold leading-[1.1] text-[#ffd51d]">
+          {/* Name — second */}
+          <h1 className="mb-3">
+            <span data-hero-word className="font-display text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.1] text-[#ffd51d]">
               {data.title}
             </span>
           </h1>
 
-          {/* Subtitle */}
-          <p data-hero-sub className="mb-6 text-lg sm:text-xl text-white/60 font-medium">
-            {data.subtitle}
-          </p>
+          {/* Designation pill — third */}
+          <div data-hero-desig className="mb-6">
+            <span className="inline-block text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70 border border-white/20 rounded-full px-4 py-1.5">
+              {data.designation}
+            </span>
+          </div>
 
-          {/* Tagline */}
+          {/* Tagline — one line */}
           <div data-hero-tag className="mb-8">
-            <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              {data.tagline1}
-            </p>
-            <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              Change your <span className="text-[#ffd51d]">{data.tagline2.replace(/^Change your /i, "")}</span>
-            </p>
-            <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              Change your <span className="text-[#ffd51d]">{data.tagline3.replace(/^Change your /i, "")}</span>
+            <p className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-white">
+              {data.tagline1} — Change your <span className="text-[#ffd51d]">{data.tagline2.replace(/^Change your /i, "")}</span>, Change your <span className="text-[#ffd51d]">{data.tagline3.replace(/^Change your /i, "")}</span>
             </p>
           </div>
         </div>
