@@ -13,12 +13,6 @@ import {
   Clock,
 } from "lucide-react";
 import { validateContact, sanitizeText } from "@/lib/client-validators";
-import dynamic from "next/dynamic";
-
-const ContactImageSandbox = dynamic(
-  () => import("@/components/contact/ContactImageSandbox").then((m) => m.ContactImageSandbox),
-  { ssr: false }
-);
 
 const initial = {
   firstName: "",
@@ -165,6 +159,30 @@ export default function ContactPage() {
                 to {
                   opacity: 1;
                   transform: translateY(0) scale(1);
+                }
+              }
+              @media (max-width: 639px) {
+                .contact-hero-img {
+                  transform: scale(1.8) translate(9px, -7px);
+                  object-position: 25% 52%;
+                }
+              }
+              @media (min-width: 640px) and (max-width: 1023px) {
+                .contact-hero-img {
+                  transform: scale(2) translate(11px, 4px);
+                  object-position: 50% 50%;
+                }
+              }
+              @media (min-width: 1024px) and (max-width: 1439px) {
+                .contact-hero-img {
+                  transform: scale(1.8) translate(0px, 1px);
+                  object-position: 51% 51%;
+                }
+              }
+              @media (min-width: 1440px) {
+                .contact-hero-img {
+                  transform: scale(2) translate(7px, -11px);
+                  object-position: 27% 53%;
                 }
               }
             `}</style>
@@ -449,9 +467,6 @@ export default function ContactPage() {
           </aside>
         </div>
       </section>
-
-      {/* Image Sandbox — dev tool for tuning image position & feather */}
-      <ContactImageSandbox />
     </div>
   );
 }
