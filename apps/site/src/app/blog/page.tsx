@@ -148,10 +148,10 @@ export default async function BlogPage({
 
             {/* Bio Description */}
             <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Writing about money, career growth, and intentional living. I believe
+              Writing aboutcareer growth, and intentional living. I believe
               practical ideas — not motivational fluff — are what actually move the
               needle. Here you&apos;ll find honest articles, free eBooks, and
-              frameworks I&apos;ve used to build businesses and invest wisely.
+              frameworks I&apos;ve used to build my personal brand.
             </p>
 
             {/* Both Action Buttons placed AT THE BOTTOM after Bio end, perfectly aligned */}

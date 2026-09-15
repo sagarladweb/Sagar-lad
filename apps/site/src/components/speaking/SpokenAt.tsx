@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Cloud, Globe, GraduationCap, Award } from "lucide-react";
 
 const EVENTS = [
@@ -14,7 +14,6 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
   const [inView, setInView] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [tapped, setTapped] = useState(false);
-  const seenRef = useRef(false);
 
   useEffect(() => {
     const el = cardRef.current;
@@ -22,13 +21,12 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!seenRef.current) {
-          seenRef.current = true;
-          if (entry.isIntersecting) return;
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.unobserve(el);
         }
-        setInView(entry.isIntersecting);
       },
-      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" }
+      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -40,11 +38,11 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
   return (
     <div
       ref={cardRef}
-      className={`spoken-card group relative py-6 px-4 sm:px-6 rounded-xl border border-border/60 bg-card/30 cursor-pointer select-none ${filled ? "is-filled" : ""}`}
+      className={`spoken-card group relative py-6 px-4 sm:px-6 rounded-xl border border-border/60 bg-card/30 cursor-pointer select-none transition-all duration-500 ${filled ? "is-filled" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => setTapped((t) => !t)}
-      data-index={index}
+      style={{ transitionDelay: `${index * 100}ms` }}
     >
       <div className="relative">
         {/* Icon + role text */}
@@ -56,7 +54,7 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
         </div>
 
         {/* Title: outline always visible, fill transitions via CSS */}
-        <h3 className="spoken-title font-display text-2xl sm:text-3xl md:text-4xl font-extrabold leading-[1.05] whitespace-nowrap overflow-hidden text-ellipsis">
+        <h3 className="spoken-title font-display text-xl sm:text-2xl md:text-3xl font-extrabold leading-[1.1] tracking-wide">
           {event.title}
         </h3>
 
@@ -95,26 +93,26 @@ export function SpokenAt() {
           background-image: linear-gradient(var(--brand, #3b82f6), var(--brand, #3b82f6));
           background-size: 0% 100%;
           background-repeat: no-repeat;
-          transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          transition: background-size 0.7s cubic-bezier(0.16, 1, 0.3, 1),
                       -webkit-text-stroke-color 0.5s ease,
-                      letter-spacing 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                      letter-spacing 0.7s cubic-bezier(0.16, 1, 0.3, 1),
                       opacity 0.5s ease;
           -webkit-text-stroke-color: var(--muted-foreground, #94a3b8);
-          letter-spacing: -0.01em;
-          opacity: 0.6;
+          letter-spacing: 0.05em;
+          opacity: 0.5;
         }
 
         .spoken-card.is-filled .spoken-title {
           background-size: 100% 100%;
-          -webkit-text-stroke-color: var(--brand, #3b82f6);
-          letter-spacing: 0.03em;
+          -webkit-text-stroke-color: transparent;
+          letter-spacing: 0.08em;
           opacity: 1;
         }
 
         .spoken-place {
           opacity: 0;
           transform: translateY(8px);
-          transition: opacity 0.3s ease 0.15s, transform 0.3s ease 0.15s;
+          transition: opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s;
         }
         .spoken-card.is-filled .spoken-place {
           opacity: 1;
