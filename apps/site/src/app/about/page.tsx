@@ -474,35 +474,36 @@ export default function AboutPage() {
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <div
             data-reveal
-            className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
+            className="relative overflow-hidden rounded-3xl border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.12)] min-h-[400px] sm:min-h-[460px] lg:min-h-[420px]"
           >
-            <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
-              <div className="relative md:col-span-6 min-h-[280px] sm:min-h-[340px] md:min-h-[380px] overflow-hidden bg-muted/40">
-                <Image
-                  src="/images/about/sagar-lad-mindup-quote-inspiration.webp"
-                  alt="Sagar Lad Inspirational Quote – You are worthy and capable"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover object-[88%_60%] sm:object-[76%_55%] lg:object-[83%_65%]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/50 via-transparent to-transparent pointer-events-none" />
-              </div>
-              <div className="md:col-span-6 p-6 sm:p-8 md:p-10 flex flex-col justify-between bg-card">
-                <div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                    Words of Belief
-                  </span>
-                  <blockquote className="mt-5 font-display text-xl sm:text-2xl lg:text-3xl font-bold leading-snug tracking-tight text-foreground">
-                    &ldquo;You are worthy. You are capable, and beautiful things are still ahead of you. Keep believing in yourself.&rdquo;
-                  </blockquote>
-                </div>
-                <div className="mt-8 pt-5 border-t border-border/60 flex items-center justify-between">
+            {/* Background image — full coverage on all viewports */}
+            <div className="absolute inset-0">
+              <Image
+                src="/images/about/sagar-lad-mindup-quote-inspiration.webp"
+                alt="Sagar Lad Inspirational Quote – You are worthy and capable"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 50vw"
+                className="object-cover object-[88%_60%] sm:object-[76%_55%] lg:object-[83%_65%]"
+              />
+              <div className="absolute inset-0 bg-black/40 lg:bg-black/20" />
+            </div>
+
+            {/* Glass card — overlaid on mobile/tablet, right-aligned on desktop */}
+            <div className="relative z-10 flex items-end lg:items-center justify-start lg:justify-end p-6 sm:p-8 lg:p-12 min-h-[400px] sm:min-h-[460px] lg:min-h-[420px]">
+              <div className="w-full max-w-md bg-white/15 backdrop-blur-xl border border-white/25 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 backdrop-blur-sm px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                  Words of Belief
+                </span>
+                <blockquote className="mt-5 font-display text-xl sm:text-2xl lg:text-3xl font-bold leading-snug tracking-tight text-white">
+                  &ldquo;You are worthy. You are capable, and beautiful things are still ahead of you. Keep believing in yourself.&rdquo;
+                </blockquote>
+                <div className="mt-6 pt-4 border-t border-white/20 flex items-center justify-between">
                   <div>
-                    <p className="font-display font-bold text-base text-foreground">Sagar Lad</p>
-                    <p className="text-xs text-muted-foreground font-medium">Author &middot; Speaker &middot; Mentor</p>
+                    <p className="font-display font-bold text-base text-white">Sagar Lad</p>
+                    <p className="text-xs text-white/70 font-medium">Author &middot; Speaker</p>
                   </div>
-                  <SiteLogo className="h-7 w-auto opacity-80" />
+                  <SiteLogo light className="h-7 w-auto opacity-80" />
                 </div>
               </div>
             </div>
