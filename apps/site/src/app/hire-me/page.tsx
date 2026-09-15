@@ -51,7 +51,7 @@ function WorkShowcase() {
 
   const slides = [
     {
-      src: "/images/books/hire-sagar-books.png",
+      src: "/images/books/Book_hero.png",
       alt: "MIND UP and AI Foundry — books by Sagar Lad",
       label: "Published Author",
       caption: "MIND UP & AI Foundry",
