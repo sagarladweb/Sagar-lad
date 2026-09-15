@@ -4,23 +4,29 @@ import { useEffect, useRef, type ReactNode } from "react";
 
 interface LazySectionProps {
   children: ReactNode;
-  delay?: number;
   className?: string;
 }
 
-export function LazySection({ children, delay = 0, className }: LazySectionProps) {
+export function LazySection({ children, className }: LazySectionProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    const timer = setTimeout(() => {
-      el.classList.add("lazy-visible");
-    }, delay);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("lazy-visible");
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+    );
 
-    return () => clearTimeout(timer);
-  }, [delay]);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div ref={ref} className={`lazy-section ${className ?? ""}`}>
