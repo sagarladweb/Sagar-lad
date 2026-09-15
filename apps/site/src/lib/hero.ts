@@ -24,10 +24,14 @@ const getHomeHeroCached = unstable_cache(
       : "hero_sagar_lad";
     const preset = HERO_PRESETS[activeKey] ?? HERO_PRESETS.hero_sagar_lad;
 
+    const rawUrl = row.imageUrl || "";
+    const isOldImage = !rawUrl || rawUrl.includes("hero_home.webp") || rawUrl.includes("hero_sagar_lad.webp") || rawUrl.includes("hero-home.webp");
+    const finalImageUrl = isOldImage ? preset.imageUrl : rawUrl;
+
     return {
       id: row.id,
       activeImage: activeKey,
-      imageUrl: row.imageUrl || preset.imageUrl,
+      imageUrl: finalImageUrl,
       mobilePosition: row.mobilePosition || preset.mobilePosition,
       tabletPosition: row.tabletPosition || preset.tabletPosition,
       desktopPosition: row.desktopPosition || preset.desktopPosition,
@@ -39,7 +43,7 @@ const getHomeHeroCached = unstable_cache(
       tagline3: row.tagline3 || "Change your life",
     };
   },
-  ["site-home-hero-v1"],
+  ["site-home-hero-v2"],
   { revalidate: 300, tags: ["hero"] }
 );
 
