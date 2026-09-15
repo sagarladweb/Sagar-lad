@@ -398,13 +398,13 @@ export default function AboutPage() {
 
             <div data-reveal className="mb-8">
               <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-                MIND UP.
+                MIND UP
               </p>
               <p className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-                Change your <span className="text-[#ffd51d]">MIND</span>.
+                Change your <span className="text-[#ffd51d]">MIND</span>
               </p>
               <p className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-                Change your <span className="text-[#ffd51d]">life</span>.
+                Change your <span className="text-[#ffd51d]">life</span>
               </p>
             </div>
 
@@ -412,6 +412,21 @@ export default function AboutPage() {
               <SiteLogo light className="h-12 w-auto mx-auto sm:mx-0" />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ---------- MIND UP Tagline ---------- */}
+      <section className="py-16 md:py-24 bg-[#ffd51d]">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
+          <p className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-[#0d21a1] leading-tight">
+            MIND UP
+          </p>
+          <p className="mt-4 font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#0d21a1]/80">
+            Change your <span className="text-[#0d21a1]">MIND</span>
+          </p>
+          <p className="mt-2 font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#0d21a1]/80">
+            Change your <span className="text-[#0d21a1]">life</span>
+          </p>
         </div>
       </section>
 
@@ -456,7 +471,7 @@ export default function AboutPage() {
             </p>
             <div className="pt-3">
               <span className="inline-block bg-[#ffd51d] text-black px-3 py-1 rounded font-display text-lg sm:text-xl md:text-2xl font-bold tracking-tight shadow-xs">
-                MIND UP. Change your mind. Change your life.
+                MIND UP Change your mind Change your life
               </span>
             </div>
           </div>

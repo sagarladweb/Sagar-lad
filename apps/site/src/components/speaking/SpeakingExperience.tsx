@@ -5,19 +5,19 @@ import { CheckCircle2, ChevronRight } from "lucide-react";
 
 const STEPS = [
   {
-    n: "01",
+    n: "1",
     title: "Reach out & align",
     text: "Share your event's theme, audience, and goals — I'll map the right talk, format, and length.",
     bullets: ["Kick-off call", "Theme & goals scoped"],
   },
   {
-    n: "02",
+    n: "2",
     title: "We co-create",
     text: "A planning call shapes the narrative, then I deliver polished decks, bio, and media assets on day one.",
     bullets: ["Planning call", "Decks, bio & media ready"],
   },
   {
-    n: "03",
+    n: "3",
     title: "Deliver & follow up",
     text: "An energetic session with live Q&A, plus a one-page takeaway sheet attendees can keep.",
     bullets: ["Live session + Q&A", "Takeaway sheet"],
@@ -142,14 +142,14 @@ export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactN
 
       {/* ── Desktop: 2-row Bento Grid (3 steps + contact CTA) ────── */}
       <div className="hidden lg:grid grid-cols-12 gap-6">
-        {/* Row 1: Step 01 (Span 7) & Step 02 (Span 5) */}
+        {/* Row 1: Step 1 (Span 7) & Step 2 (Span 5) */}
         <div className="col-span-7 card-hover group rounded-2xl border border-border bg-card p-8 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <span className="inline-grid place-items-center w-12 h-12 rounded-xl bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
                 {STEPS[0].n}
               </span>
-              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Phase 01</span>
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Step {STEPS[0].n}</span>
             </div>
             <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{STEPS[0].title}</h3>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-lg">{STEPS[0].text}</p>
@@ -172,7 +172,7 @@ export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactN
               <span className="inline-grid place-items-center w-12 h-12 rounded-xl bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
                 {STEPS[1].n}
               </span>
-              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Phase 02</span>
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Step {STEPS[1].n}</span>
             </div>
             <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{STEPS[1].title}</h3>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{STEPS[1].text}</p>
@@ -189,14 +189,14 @@ export function SpeakingExperience({ contactCard }: { contactCard?: React.ReactN
           </ul>
         </div>
 
-        {/* Row 2: Step 03 (Span 5) & Contact CTA Card (Span 7) */}
+        {/* Row 2: Step 3 (Span 5) & Contact CTA Card (Span 7) */}
         <div className="col-span-5 card-hover group rounded-2xl border border-border bg-card p-8 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <span className="inline-grid place-items-center w-12 h-12 rounded-xl bg-accent/15 font-display text-lg font-extrabold text-accent-strong">
                 {STEPS[2].n}
               </span>
-              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Phase 03</span>
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Step {STEPS[2].n}</span>
             </div>
             <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{STEPS[2].title}</h3>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{STEPS[2].text}</p>

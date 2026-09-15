@@ -7,7 +7,7 @@ export const METRICS = {
   booksPublished: "6",
   yearsExperience: "15",
   countriesTravelled: "25+",
-  communityReached: "10K+",
+  communityReached: "20K+",
 
   // Speaking
   keynotes: "25+",

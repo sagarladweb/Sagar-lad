@@ -11,7 +11,6 @@ import { GalleryCarousel } from "@/components/speaking/GalleryCarousel";
 import { SpeakingTestimonials } from "@/components/speaking/SpeakingTestimonials";
 import { AimFramework } from "@/components/speaking/AimFramework";
 import { SpokenAt } from "@/components/speaking/SpokenAt";
-import { BackgroundSection } from "@/components/speaking/BackgroundSection";
 import { SpeakingExperience } from "@/components/speaking/SpeakingExperience";
 import { SpeakingReviewButton } from "@/components/speaking/SpeakingReviewModal";
 import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
@@ -62,7 +61,7 @@ export default async function SpeakingPage() {
               Speaking
             </span>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.1] drop-shadow-md">
-              Ideas that ignite rooms and transform mindsets.
+              Ideas that ignite rooms and transform mindsets
             </h1>
             <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-2xl drop-shadow-sm font-medium">
               Delivering story-driven, actionable keynotes on AI leadership, financial freedom, and career momentum for summits, universities, and enterprise events worldwide.
@@ -72,7 +71,7 @@ export default async function SpeakingPage() {
                 href="/speaking/contact"
                 className="btn-premium inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-7 py-3.5 text-sm font-semibold hover:opacity-95 shadow-xl w-full sm:w-auto"
               >
-                Inquire about speaking <ArrowRight className="w-4 h-4" />
+                Hire For Speaking <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
@@ -225,9 +224,6 @@ export default async function SpeakingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-16">
           {/* Events Hosted — visual cards */}
           <SpokenAt />
-
-          {/* Memberships & Certifications — interactive expanding panels */}
-          <BackgroundSection />
         </div>
       </section>
 
