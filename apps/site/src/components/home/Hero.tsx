@@ -79,7 +79,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-16 sm:pb-20 md:pb-24 pt-24 sm:pt-28">
-        <div className="max-w-3xl text-center mt-auto">
+        <div className="max-w-3xl text-center lg:text-left mt-auto">
           {/* Subtitle — first */}
           <p data-hero-sub className="mb-3 sm:mb-4 text-sm sm:text-base md:text-lg text-white/60 font-medium">
             {data.subtitle}

@@ -55,7 +55,7 @@ export default async function SpeakingPage() {
           <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-20 sm:pb-24 md:pb-28 pt-32">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-16 sm:pb-20 md:pb-24 pt-24 sm:pt-28">
           <div className="max-w-2xl space-y-5 text-center sm:text-left mx-auto sm:mx-0">
             <span className="btn-premium inline-flex items-center justify-center sm:justify-start rounded-full bg-accent px-4 py-1.5 text-xs font-semibold tracking-wide text-accent-foreground shadow-md">
               Speaking
@@ -79,7 +79,7 @@ export default async function SpeakingPage() {
       </section>
 
       {/* TEDx Spotlight — the strongest proof, right after the hook */}
-      <section className="relative py-20 md:py-28 border-b border-border bg-card/60 overflow-hidden" aria-label="Sagar's TEDx talk">
+      <section className="relative py-12 sm:py-16 md:py-20 border-b border-border bg-card/60 overflow-hidden" aria-label="Sagar's TEDx talk">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             <div className="lg:col-span-5 text-center lg:text-left" suppressHydrationWarning>
@@ -151,7 +151,7 @@ export default async function SpeakingPage() {
 
       {/* Videos & Photos — bento on desktop, horizontal snap carousel on mobile */}
       {gallery.enabled && (
-        <section className="border-b border-border bg-muted/30 py-20 md:py-24 overflow-hidden" aria-label="Videos and photos">
+        <section className="border-b border-border bg-muted/30 py-12 sm:py-16 md:py-20 overflow-hidden" aria-label="Videos and photos">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             {/* Mobile: horizontal snap carousel */}
             <div className="lg:hidden">
@@ -220,7 +220,7 @@ export default async function SpeakingPage() {
       )}
 
       {/* Stages & Credentials — visual-first animated cards */}
-      <section className="border-b border-border bg-background py-20 md:py-24" aria-label="Stages and Credentials">
+      <section className="border-b border-border bg-background py-12 sm:py-16 md:py-20" aria-label="Stages and Credentials">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-16">
           {/* Events Hosted — visual cards */}
           <SpokenAt />
@@ -228,7 +228,7 @@ export default async function SpeakingPage() {
       </section>
 
       {/* Professional Experience — how the engagement works, then the ask */}
-      <section className="card-hover py-20 md:py-28 border-b border-border bg-card/40" aria-label="Professional experience">
+      <section className="card-hover py-12 sm:py-16 md:py-20 border-b border-border bg-card/40" aria-label="Professional experience">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-2xl text-center sm:text-left mx-auto sm:mx-0" data-animate suppressHydrationWarning>
             <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">How it works</span>
@@ -267,7 +267,7 @@ export default async function SpeakingPage() {
       </section>
 
       {/* Organizer voices — marquee on mobile, grid on desktop */}
-      <section className="py-20 md:py-28 bg-background" aria-label="What organizers say">
+      <section className="py-12 sm:py-16 md:py-20 bg-background" aria-label="What organizers say">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16" data-animate suppressHydrationWarning>
             <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Kind words</span>

@@ -40,7 +40,7 @@ export default function AboutLoading() {
       </section>
 
       {/* ── Belief section ── */}
-      <section className="scroll-mt-32 py-20 md:py-28 border-b border-border">
+      <section className="scroll-mt-32 py-12 sm:py-16 md:py-20 border-b border-border">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-4">
           <Shimmer className="h-6 w-16 rounded-full mx-auto" />
           <Shimmer className="h-8 w-72 mx-auto" />
@@ -50,7 +50,7 @@ export default function AboutLoading() {
       </section>
 
       {/* ── Rules section ── */}
-      <section className="py-16 md:py-24 border-b border-border bg-background">
+      <section className="py-10 sm:py-14 md:py-16 border-b border-border bg-background">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-4">
           <Shimmer className="h-8 w-64 mx-auto" />
           <Shimmer className="h-4 w-80 max-w-full mx-auto" />
@@ -58,7 +58,7 @@ export default function AboutLoading() {
       </section>
 
       {/* ── Timeline ── */}
-      <section className="scroll-mt-32 py-16 md:py-24 border-b border-border">
+      <section className="scroll-mt-32 py-10 sm:py-14 md:py-16 border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-6">
           <Shimmer className="h-4 w-24 mx-auto rounded-full" />
           <Shimmer className="h-8 w-72 mx-auto" />
@@ -93,7 +93,7 @@ export default function AboutLoading() {
       </section>
 
       {/* ── Connect CTA ── */}
-      <section className="scroll-mt-32 py-20 md:py-28 bg-card/50">
+      <section className="scroll-mt-32 py-12 sm:py-16 md:py-20 bg-card/50">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-6">
           <Shimmer className="h-8 w-56 mx-auto" />
           <Shimmer className="h-4 w-64 mx-auto" />

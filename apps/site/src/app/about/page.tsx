@@ -382,7 +382,7 @@ export default function AboutPage() {
           <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-24 md:py-32">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-16 md:py-20">
           <div className="max-w-3xl text-center sm:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
             <div data-reveal className="mb-4">
               <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/70 border border-white/20 rounded-full px-5 py-1.5">
@@ -416,7 +416,7 @@ export default function AboutPage() {
       </section>
 
       {/* ---------- Personal Story ---------- */}
-      <section className="py-16 md:py-24 border-b border-border bg-background">
+      <section className="py-10 sm:py-14 md:py-16 border-b border-border bg-background">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div data-reveal className="space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
             <p>
@@ -529,7 +529,7 @@ export default function AboutPage() {
       </section>
 
       {/* ---------- Professional Bio ---------- */}
-      <section id="belief" className="scroll-mt-32 py-20 md:py-28 border-b border-border">
+      <section id="belief" className="scroll-mt-32 py-12 sm:py-16 md:py-20 border-b border-border">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="text-center md:text-left">
             <p data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
@@ -601,7 +601,7 @@ export default function AboutPage() {
       </div>
 
       {/* ---------- Traveled Countries (Global Explorations) ---------- */}
-      <section id="travel" className="scroll-mt-32 py-16 md:py-24 border-b border-border bg-background">
+      <section id="travel" className="scroll-mt-32 py-10 sm:py-14 md:py-16 border-b border-border bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-6 sm:mb-8 text-center sm:text-left">
             <span data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
@@ -656,7 +656,7 @@ export default function AboutPage() {
       </section>
 
       {/* ---------- Connect CTA ---------- */}
-      <section id="connect" className="card-hover scroll-mt-32 py-20 md:py-28 bg-card/50">
+      <section id="connect" className="card-hover scroll-mt-32 py-12 sm:py-16 md:py-20 bg-card/50">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-6">
           <h2 data-reveal className="font-display text-3xl sm:text-4xl font-bold">
             Come say hi &amp; connect.
