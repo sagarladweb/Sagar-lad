@@ -43,8 +43,8 @@ export default async function BooksReadPage() {
 
       {/* -------- Books I Read -------- */}
       <section className="border-b border-border bg-card/40">
-        <div className="mx-auto max-w-7xl px-4 pt-20 pb-20 sm:px-6 md:pt-24 md:pb-24">
-          <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 sm:pt-14 md:pt-20 md:pb-24">
+          <div className="flex flex-col items-center text-center sm:flex-row sm:items-end sm:justify-between sm:text-left gap-4">
             <div>
               <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
                 Books I read

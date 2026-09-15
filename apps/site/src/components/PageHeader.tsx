@@ -9,7 +9,7 @@ export function PageHeader({
 }) {
   return (
     <header className="border-b border-border bg-background">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14 md:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-10 md:py-14 text-center sm:text-left">
         {eyebrow && (
           <p className="btn-premium inline-block text-xs font-semibold uppercase tracking-[0.2em] text-brand bg-brand-light/10 rounded-full px-3.5 py-1">
             {eyebrow}

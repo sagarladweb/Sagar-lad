@@ -225,7 +225,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
                 )}
 
                 {/* Static hint with upward icon animation */}
-                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 pointer-events-none flex flex-col items-center opacity-80 group-hover/book:opacity-100 transition-opacity">
+                <div className="hidden sm:flex absolute -bottom-10 left-1/2 -translate-x-1/2 pointer-events-none flex-col items-center opacity-80 group-hover/book:opacity-100 transition-opacity">
                   <ChevronUp className="w-4 h-4 text-[#1e293b] animate-bounce" />
                   <span className="text-[11px] font-bold text-[#1e293b] whitespace-nowrap">
                     Click to preview

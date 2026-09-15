@@ -39,12 +39,14 @@ export default async function EbooksPage() {
         title="Guides you can start today"
         subtitle="Quick, practical reads to help you get moving on money, career and productivity."
       />
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
-        {ebooks.length === 0 ? (
-          <p className="text-center text-muted-foreground">No eBooks yet.</p>
-        ) : (
-          <BookLibrary books={ebooks} variant="ebook" />
-        )}
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-8 pb-16 sm:pt-12 md:pt-16">
+        <div className="text-center">
+          {ebooks.length === 0 ? (
+            <p className="text-muted-foreground">No eBooks yet.</p>
+          ) : (
+            <BookLibrary books={ebooks} variant="ebook" />
+          )}
+        </div>
       </div>
     </>
   );
