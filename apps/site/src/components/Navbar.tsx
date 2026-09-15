@@ -20,6 +20,7 @@ import {
   User,
   Mail,
   ChevronDown,
+  Briefcase,
 } from "lucide-react";
 import { FaInstagram, FaLinkedinIn, FaYoutube } from "@/lib/icons";
 import { useSocials } from "@/components/SocialLinksContext";
@@ -546,6 +547,12 @@ export function Navbar() {
                       title="Public Speaking"
                       onClick={() => setHovered(null)}
                     />
+                    <FlyoutLink
+                      href="/hire-me"
+                      icon={<Briefcase className="w-4 h-4" />}
+                      title="Hire Me"
+                      onClick={() => setHovered(null)}
+                    />
                   </div>
                 </div>
               )}
@@ -779,6 +786,14 @@ export function Navbar() {
                         >
                           <Mic2 className="w-4 h-4 text-brand-light" />
                           Public Speaking
+                        </Link>
+                        <Link
+                          href="/hire-me"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
+                        >
+                          <Briefcase className="w-4 h-4 text-brand-light" />
+                          Hire Me
                         </Link>
                       </div>
                     </div>
