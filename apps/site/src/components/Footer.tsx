@@ -179,9 +179,9 @@ export function Footer() {
             <div className="hidden md:grid grid-cols-4 gap-6">
               {footerCols.map((col) => (
                 <div key={col.title}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-background/50 mb-3">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-background/50 mb-3">
                     {col.title}
-                  </h3>
+                  </h4>
                   <ul className="space-y-2.5">
                     {col.links.map((l) => (
                       <li key={l.href + l.label}>

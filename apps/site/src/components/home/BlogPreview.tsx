@@ -48,7 +48,7 @@ export function BlogPreview({
         </div>
 
         {/* View More Button redirecting to blogs page */}
-        <div className="mt-12">
+        <div className="mt-12 text-center">
           <Link
             href="/blog"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-strong hover:underline underline-offset-4 transition-colors"

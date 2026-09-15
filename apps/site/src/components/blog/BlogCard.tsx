@@ -74,7 +74,7 @@ export function BlogCard({
 
         {/* Meta row */}
           <div className="mt-auto pt-3 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <time dateTime={new Date(post.publishedAt).toISOString()}>
               {formatDate(post.publishedAt)}
             </time>

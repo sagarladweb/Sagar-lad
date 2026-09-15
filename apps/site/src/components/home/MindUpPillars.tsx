@@ -434,7 +434,7 @@ export function MindUpPillars() {
             </div>
             <Link
               href="/mindup-score"
-              className="btn-premium group inline-flex items-center gap-2 mt-5 px-8 py-3.5 rounded-full bg-accent text-accent-foreground font-semibold text-sm hover:shadow-lg active:scale-100 active:opacity-100"
+              className="btn-premium group inline-flex items-center gap-2 mt-8 px-8 py-3.5 rounded-full bg-accent text-accent-foreground font-semibold text-sm hover:shadow-lg active:scale-100 active:opacity-100"
             >
               Discover Your MIND UP Score
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -472,7 +472,7 @@ export function MindUpPillars() {
         </div>
 
         {/* Mobile / tablet button — below donut */}
-        <div className="mt-6 text-center lg:hidden">
+        <div className="mt-10 text-center lg:hidden">
           <Link
             href="/mindup-score"
             className="btn-premium group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-accent-foreground font-semibold text-sm hover:shadow-lg active:scale-100 active:opacity-100"
