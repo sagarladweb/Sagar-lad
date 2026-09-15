@@ -79,7 +79,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-20 sm:pb-28 md:pb-32 pt-32">
-        <div className="max-w-3xl text-center sm:text-left mt-auto">
+        <div className="max-w-3xl text-center mt-auto">
           {/* Subtitle — first */}
           <p data-hero-sub className="mb-3 sm:mb-4 text-sm sm:text-base md:text-lg text-white/60 font-medium">
             {data.subtitle}
@@ -92,8 +92,8 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
             </span>
           </h1>
 
-          {/* Designation pill — third */}
-          <div data-hero-desig className="mb-5 sm:mb-6">
+          {/* Designation pill — third, hidden on mobile/tablet */}
+          <div data-hero-desig className="mb-5 sm:mb-6 hidden lg:block">
             <span className="inline-block text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70 border border-white/20 rounded-full px-4 py-1.5">
               {data.designation}
             </span>

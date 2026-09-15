@@ -111,7 +111,7 @@ export function Testimonials() {
     <section ref={rootRef} className="card-hover py-16 md:py-24 border-b border-border bg-card/40 group/carousel" aria-label="Testimonials">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="text-center">
-           <Pill>Testimonials</Pill>
+           <Pill supportLine="What people say">Testimonials</Pill>
            <h2 className="mt-3 font-display text-3xl md:text-4xl font-bold">
              What people say
            </h2>

@@ -383,7 +383,7 @@ export function MindUpPillars() {
       <div className="mx-auto max-w-7xl px-6 sm:px-8">
         {/* Mobile / tablet */}
         <div className={`text-center lg:hidden ${inView ? "mindup-content-anim in-view" : "mindup-content-anim"}`}>
-          <Pill>The Mind Up Theory</Pill>
+          <Pill supportLine="Discover your framework">The Mind Up Theory</Pill>
           <h2 className="mt-8 font-display text-4xl font-bold leading-[1.1] tracking-tight text-[#1e293b] sm:text-5xl">
             Six Pillars.
             <br />
@@ -402,7 +402,7 @@ export function MindUpPillars() {
         {/* Desktop */}
         <div className="hidden lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-24">
           <div className={`lg:min-h-[280px] ${inView ? "mindup-content-anim in-view" : "mindup-content-anim"}`}>
-            <Pill>The Mind Up Theory</Pill>
+            <Pill supportLine="Discover your framework">The Mind Up Theory</Pill>
             <div key={activePillar?.id ?? "intro"} className="pillar-swap mt-8">
               {activePillar && !playing ? (
                 <>

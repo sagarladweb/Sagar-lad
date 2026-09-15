@@ -101,7 +101,7 @@ export function TopicsGrid({ topics }: { topics: Topic[] }) {
     <section className="py-16 md:py-24 border-b border-border bg-background overflow-hidden" aria-label="Explore Topics">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <div className="w-full flex justify-center text-center">
-          <Pill>Explore</Pill>
+          <Pill supportLine="Browse topics">Explore</Pill>
         </div>
         <h2 className="text-center font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mt-6 text-[#1e293b]">
           Unlock the full power of The Sagar Lad library

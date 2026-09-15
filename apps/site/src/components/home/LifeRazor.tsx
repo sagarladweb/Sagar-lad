@@ -7,9 +7,12 @@ export async function LifeRazor() {
   return (
     <section className="py-16 md:py-24 border-b border-border bg-background">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-        <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
+        <span className="lg:hidden inline-block text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          Daily wisdom
+        </span>
+        <span className="hidden lg:inline-block text-[11px] font-semibold uppercase tracking-[0.25em] text-brand border border-brand/20 rounded-full px-5 py-1.5 bg-brand/5">
           {data.pill}
-        </p>
+        </span>
         <div className="mt-8">
           <LifeRazorTypewriter />
         </div>

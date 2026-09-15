@@ -38,7 +38,7 @@ export function FeaturedOn() {
       aria-label="Featured in the press"
     >
       <div className="text-center">
-        <Pill>Featured on</Pill>
+        <Pill supportLine="As featured in">Featured on</Pill>
 
         {/* Marquee on all viewports */}
         <div className="mt-6 marquee-mask overflow-hidden">

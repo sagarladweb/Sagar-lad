@@ -123,10 +123,7 @@ export function AboutMe() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
         {/* Mobile & Tablet: Pill + heading centered, then image, then content */}
         <div className="lg:hidden text-center" data-story-head>
-          <Pill>About Sagar</Pill>
-          <h2 className="mt-6 font-display text-lg sm:text-xl font-semibold leading-snug tracking-tight text-[#94a3b8]">
-            Author · Speaker · Human Potential Advocate
-          </h2>
+              <Pill supportLine="Get to know me">About Sagar</Pill>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
@@ -154,7 +151,7 @@ export function AboutMe() {
           {/* Content — second on mobile/tablet, right on desktop */}
           <div className="lg:col-span-7 order-3 lg:order-2 text-center lg:text-left">
             <div data-story-head className="hidden lg:block">
-              <Pill>About Sagar</Pill>
+          <Pill supportLine="Get to know me">About Sagar</Pill>
               <h2 className="mt-6 font-display text-xl sm:text-2xl font-semibold leading-snug tracking-tight text-[#94a3b8]">
                 Author · Speaker · Human Potential Advocate
               </h2>

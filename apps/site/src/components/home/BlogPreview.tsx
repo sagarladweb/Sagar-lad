@@ -28,7 +28,7 @@ export function BlogPreview({
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-center sm:text-left">
            <div>
-            <Pill>The Blog</Pill>
+            <Pill supportLine="Latest articles">The Blog</Pill>
             <h2 className="mt-3 font-display text-3xl md:text-4xl font-bold">
               Recent writing
             </h2>

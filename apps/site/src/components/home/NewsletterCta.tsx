@@ -89,7 +89,7 @@ export function NewsletterCta() {
               }}
             >
               <div className="w-full text-center md:text-left max-w-md mx-auto md:mx-0">
-                <Pill>The Sagar Lad Letter</Pill>
+                <Pill supportLine="Stay in the loop">The Sagar Lad Letter</Pill>
                 <h2 className="mt-3 font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-foreground">
                   One practical idea. Every week.
                 </h2>
