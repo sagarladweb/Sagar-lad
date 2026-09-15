@@ -167,39 +167,15 @@ export default function ContactPage() {
                   transform: translateY(0) scale(1);
                 }
               }
-              @media (max-width: 639px) {
-                .contact-hero-img {
-                  transform: scale(2) translate(10px, 8px);
-                  object-position: 55% 65%;
-                }
-              }
-              @media (min-width: 640px) and (max-width: 1023px) {
-                .contact-hero-img {
-                  transform: scale(2) translate(11px, 4px);
-                  object-position: 50% 50%;
-                }
-              }
-              @media (min-width: 1024px) and (max-width: 1439px) {
-                .contact-hero-img {
-                  transform: scale(1) translate(0, 0);
-                  object-position: 50% 50%;
-                }
-              }
-              @media (min-width: 1440px) {
-                .contact-hero-img {
-                  transform: scale(1.9) translate(7px, -11px);
-                  object-position: 27% 53%;
-                }
-              }
             `}</style>
-            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto rounded-2xl overflow-hidden">
+            <div className="relative w-full mx-auto">
               <Image
                 src="/images/common/sagar-lad-contact-section.png"
                 alt="Sagar Lad – Get in Touch"
                 width={2400}
                 height={1600}
                 priority
-                sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 420px"
+                sizes="100vw"
                 className="relative z-10 h-auto w-full object-cover contact-hero-img"
               />
               {/* Bottom feather gradient */}
