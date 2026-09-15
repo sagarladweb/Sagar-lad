@@ -39,6 +39,7 @@ type Announcement = {
   barColor: string | null;
   active: boolean;
   eventDate: string | null;
+  showHiringCTA: boolean;
   createdAt: string;
 };
 
@@ -58,6 +59,7 @@ function emptyForm(): Omit<Announcement, "id" | "createdAt"> {
     barColor: "#1e3a5f",
     active: false,
     eventDate: null,
+    showHiringCTA: false,
   };
 }
 
@@ -77,6 +79,7 @@ function toForm(a: Announcement): Omit<Announcement, "id" | "createdAt"> {
     barColor: a.barColor || "#1e3a5f",
     active: a.active,
     eventDate: a.eventDate,
+    showHiringCTA: a.showHiringCTA ?? false,
   };
 }
 
@@ -534,6 +537,41 @@ export function AnnouncementForm({ initial }: AnnouncementFormProps) {
                   placeholder="https://..."
                   className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
                 />
+              </div>
+            </div>
+
+            {/* Hiring CTA Toggle */}
+            <div className="flex items-center justify-between pt-2 border-t border-border/50">
+              <div className="flex items-center gap-2">
+                <Megaphone className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <h2 className="font-display text-sm font-bold">Hiring CTA</h2>
+                  <p className="text-[11px] text-muted-foreground">Show "Hire Sagar for Speaking" contact link</p>
+                </div>
+              </div>
+              <div className="inline-flex rounded-lg border border-border p-0.5 bg-background shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, showHiringCTA: true })}
+                  className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                    form.showHiringCTA
+                      ? "bg-foreground text-background shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, showHiringCTA: false })}
+                  className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                    !form.showHiringCTA
+                      ? "bg-foreground text-background shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  No
+                </button>
               </div>
             </div>
           </div>

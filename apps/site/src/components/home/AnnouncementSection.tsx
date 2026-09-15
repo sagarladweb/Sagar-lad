@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Calendar } from "lucide-react";
+import { ArrowRight, Calendar, Mail } from "lucide-react";
 
 type AnnouncementData = {
   id: string;
@@ -11,6 +11,7 @@ type AnnouncementData = {
   buttonText: string | null;
   buttonLink: string | null;
   eventDate: string | Date | null;
+  showHiringCTA?: boolean;
 };
 
 function formatDate(dateStr: string | Date) {
@@ -27,7 +28,7 @@ export function AnnouncementSection({
 }: {
   announcement: AnnouncementData;
 }) {
-  const { id, title, description, imageUrl, buttonText, buttonLink, eventDate } =
+  const { id, title, description, imageUrl, buttonText, buttonLink, eventDate, showHiringCTA } =
     announcement;
 
   return (
@@ -62,7 +63,7 @@ export function AnnouncementSection({
                   {description}
                 </p>
               )}
-              <div className="mt-5 flex items-center gap-3">
+              <div className="mt-5 flex flex-wrap items-center gap-3">
                 {buttonText && buttonLink ? (
                   <span
                     className="inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-5 py-2.5 text-sm font-semibold shadow-sm group-hover:scale-[1.03] transition-transform"
@@ -76,6 +77,16 @@ export function AnnouncementSection({
                     Learn more
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                   </span>
+                )}
+                {showHiringCTA && (
+                  <Link
+                    href="/speaking/contact"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white px-5 py-2.5 text-sm font-semibold hover:bg-white/20 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    Hire Sagar for Speaking
+                  </Link>
                 )}
               </div>
             </div>
@@ -96,7 +107,7 @@ export function AnnouncementSection({
                 {description}
               </p>
             )}
-            <div className="mt-5">
+            <div className="mt-5 flex flex-wrap items-center gap-3 justify-center">
               {buttonText && buttonLink ? (
                 <span
                   className="inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-5 py-2.5 text-sm font-semibold shadow-sm group-hover:scale-[1.03] transition-transform"
@@ -110,6 +121,16 @@ export function AnnouncementSection({
                   Learn more
                   <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
+              )}
+              {showHiringCTA && (
+                <Link
+                  href="/speaking/contact"
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground hover:border-accent/50 hover:bg-accent/5 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  Hire Sagar for Speaking
+                </Link>
               )}
             </div>
           </div>

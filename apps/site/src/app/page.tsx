@@ -19,6 +19,7 @@ import { SagarGallery } from "@/components/home/SagarGallery";
 import { LifeRazor } from "@/components/home/LifeRazor";
 import { AnnouncementSection } from "@/components/home/AnnouncementSection";
 import { AnnouncementPopup } from "@/components/home/AnnouncementPopup";
+import { LazySection } from "@/components/home/LazySection";
 
 export const revalidate = 300;
 
@@ -72,18 +73,18 @@ export default async function HomePage({
     return (
       <>
         <Hero hero={hero} />
-        <FeaturedOn />
-        <AboutMe />
-        <MindUp />
-        <TopicsGrid topics={topicsWithViews} />
-        <MindUpBook />
-      <BlogPreview posts={posts} showStats />
-        <Testimonials />
-        <MentorshipCta />
-        <NewsletterCta />
-        <SagarGallery />
-        <LifeRazor />
-        {announcement && <AnnouncementSection announcement={announcement} />}
+        <LazySection delay={100}><FeaturedOn /></LazySection>
+        <LazySection delay={200}><AboutMe /></LazySection>
+        <LazySection delay={300}><MindUp /></LazySection>
+        <LazySection delay={400}><TopicsGrid topics={topicsWithViews} /></LazySection>
+        <LazySection delay={500}><MindUpBook /></LazySection>
+        <LazySection delay={600}><BlogPreview posts={posts} showStats /></LazySection>
+        <LazySection delay={700}><Testimonials /></LazySection>
+        <LazySection delay={800}><MentorshipCta /></LazySection>
+        <LazySection delay={900}><NewsletterCta /></LazySection>
+        <LazySection delay={1000}><SagarGallery /></LazySection>
+        <LazySection delay={1100}><LifeRazor /></LazySection>
+        {announcement && <LazySection delay={1200}><AnnouncementSection announcement={announcement} /></LazySection>}
       </>
     );
   }
@@ -117,18 +118,18 @@ export default async function HomePage({
         }}
       />
       <Hero hero={hero} />
-      <FeaturedOn />
-      <AboutMe />
-      <MindUp />
-      <TopicsGrid topics={topicsWithViews} />
-      <MindUpBook />
-      <BlogPreview posts={posts} showStats />
-      <Testimonials />
-      <MentorshipCta />
-      <NewsletterCta />
-      <SagarGallery />
-      <LifeRazor />
-      {announcement && <AnnouncementSection announcement={announcement} />}
+      <LazySection delay={100}><FeaturedOn /></LazySection>
+      <LazySection delay={200}><AboutMe /></LazySection>
+      <LazySection delay={300}><MindUp /></LazySection>
+      <LazySection delay={400}><TopicsGrid topics={topicsWithViews} /></LazySection>
+      <LazySection delay={500}><MindUpBook /></LazySection>
+      <LazySection delay={600}><BlogPreview posts={posts} showStats /></LazySection>
+      <LazySection delay={700}><Testimonials /></LazySection>
+      <LazySection delay={800}><MentorshipCta /></LazySection>
+      <LazySection delay={900}><NewsletterCta /></LazySection>
+      <LazySection delay={1000}><SagarGallery /></LazySection>
+      <LazySection delay={1100}><LifeRazor /></LazySection>
+      {announcement && <LazySection delay={1200}><AnnouncementSection announcement={announcement} /></LazySection>}
       {announcement && <AnnouncementPopup announcement={announcement} />}
     </>
   );

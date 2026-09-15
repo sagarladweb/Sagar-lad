@@ -23,6 +23,7 @@ const fullSchema = z.object({
   barColor: z.string().max(7).nullable().optional().default("#1e3a5f"),
   active: z.boolean().optional().default(false),
   eventDate: z.string().nullable().optional(),
+  showHiringCTA: z.boolean().optional().default(false),
 });
 
 const toggleSchema = z.object({
