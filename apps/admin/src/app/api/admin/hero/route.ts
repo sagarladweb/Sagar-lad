@@ -32,9 +32,9 @@ const DEFAULT_HERO = {
   designation: "Author · Public Speaker",
   title: "Sagar Lad",
   subtitle: "Your friend, mentor and Guide",
-  tagline1: "MIND UP.",
-  tagline2: "Change your MIND.",
-  tagline3: "Change your life.",
+  tagline1: "MIND UP",
+  tagline2: "Change your MIND",
+  tagline3: "Change your life",
 };
 
 export async function GET() {
