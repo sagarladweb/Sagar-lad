@@ -65,7 +65,7 @@ const nodes: Node[] = [
       "First Professional Step — TCS. From Gujarat to the world. First job, first flight, first taste of what was possible.",
     tag: "Career",
     icon: Briefcase,
-    image: "/images/about/sagar-lad-first-job-tcs.webp",
+    image: "/images/about/first-job-tcs.webp",
     imageAlt: "Sagar Lad First Job at TCS with Marathon Team Colleagues",
     imageFit: "cover",
     imagePosition: "object-[center_65%]",
