@@ -457,8 +457,8 @@ export default function AboutPage() {
             <div className="pt-3">
               <span className="inline-block font-display font-bold tracking-tight">
                 <span className="text-lg sm:text-xl md:text-2xl block">MIND UP</span>
-                <span className="text-base sm:text-lg md:text-xl block text-black bg-[#ffd51d] inline-block px-3 py-1 rounded-sm mt-1">Change your mind</span>
-                <span className="text-base sm:text-lg md:text-xl block text-black bg-[#ffd51d] inline-block px-3 py-1 rounded-sm mt-1">Change your life</span>
+                <span className="text-base sm:text-lg md:text-xl block text-black bg-[#ffd51d] px-3 py-1 rounded-sm mt-1">Change your mind</span>
+                <span className="text-base sm:text-lg md:text-xl block text-black bg-[#ffd51d] px-3 py-1 rounded-sm mt-1">Change your life</span>
               </span>
             </div>
           </div>
