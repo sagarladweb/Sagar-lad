@@ -13,6 +13,12 @@ import {
   Clock,
 } from "lucide-react";
 import { validateContact, sanitizeText } from "@/lib/client-validators";
+import dynamic from "next/dynamic";
+
+const ContactImageSandbox = dynamic(
+  () => import("@/components/contact/ContactImageSandbox").then((m) => m.ContactImageSandbox),
+  { ssr: false }
+);
 
 const initial = {
   firstName: "",
@@ -199,7 +205,7 @@ export default function ContactPage() {
               {/* Bottom feather gradient */}
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background via-background/80 to-transparent z-20"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background via-background/80 to-transparent z-20 contact-feather"
               />
             </div>
           </div>
@@ -467,6 +473,9 @@ export default function ContactPage() {
           </aside>
         </div>
       </section>
+
+      {/* Image Sandbox — dev tool for tuning image position & feather */}
+      <ContactImageSandbox />
     </div>
   );
 }
