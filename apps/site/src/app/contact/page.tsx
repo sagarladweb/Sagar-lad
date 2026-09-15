@@ -149,57 +149,51 @@ export default function ContactPage() {
             <style>{`
               .contact-hero-img {
                 object-position: 50% 50%;
-                animation: contactImgIn 0.8s ease-out both;
-              }
-              @keyframes contactImgIn {
-                from {
-                  opacity: 0;
-                  transform: translateY(30px) scale(0.95);
-                }
-                to {
-                  opacity: 1;
-                  transform: translateY(0) scale(1);
-                }
+                mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
+                -webkit-mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
               }
               @media (max-width: 639px) {
                 .contact-hero-img {
-                  transform: scale(1.8) translate(9px, -7px);
-                  object-position: 25% 52%;
+                  transform: scale(2) translate(10px, 8px);
+                  object-position: 55% 65%;
+                  mask-image: linear-gradient(to top, transparent 9%, black 21%, black 100%);
+                  -webkit-mask-image: linear-gradient(to top, transparent 9%, black 21%, black 100%);
                 }
               }
               @media (min-width: 640px) and (max-width: 1023px) {
                 .contact-hero-img {
                   transform: scale(2) translate(11px, 4px);
                   object-position: 50% 50%;
+                  mask-image: linear-gradient(to top, transparent 5%, black 14%, black 100%);
+                  -webkit-mask-image: linear-gradient(to top, transparent 5%, black 14%, black 100%);
                 }
               }
               @media (min-width: 1024px) and (max-width: 1439px) {
                 .contact-hero-img {
-                  transform: scale(1.8) translate(0px, 1px);
-                  object-position: 51% 51%;
+                  transform: scale(1) translate(0, 0);
+                  object-position: 50% 50%;
+                  mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
+                  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 12%, black 100%);
                 }
               }
               @media (min-width: 1440px) {
                 .contact-hero-img {
-                  transform: scale(2) translate(7px, -11px);
+                  transform: scale(1.9) translate(7px, -11px);
                   object-position: 27% 53%;
+                  mask-image: linear-gradient(to top, transparent 9%, black 13%, black 100%);
+                  -webkit-mask-image: linear-gradient(to top, transparent 9%, black 13%, black 100%);
                 }
               }
             `}</style>
-            <div className="relative w-full mx-auto">
+            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] mx-auto rounded-2xl">
               <Image
                 src="/images/common/sagar-lad-contact-section.png"
                 alt="Sagar Lad – Get in Touch"
                 width={2400}
                 height={1600}
                 priority
-                sizes="100vw"
+                sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 420px"
                 className="relative z-10 h-auto w-full object-cover contact-hero-img"
-              />
-              {/* Bottom feather gradient */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background via-background/80 to-transparent z-20 contact-feather"
               />
             </div>
           </div>
