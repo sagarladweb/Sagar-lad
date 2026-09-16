@@ -75,7 +75,7 @@ export function VerticalTimeline({ items }: { items: Item[] }) {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-4xl mx-auto py-10">
+    <div ref={containerRef} className="relative w-full max-w-4xl mx-auto py-2 sm:py-6 md:py-10">
       {/* ── Base track (light grey, 2px) ── */}
       <div className="absolute left-[30px] md:left-1/2 top-0 bottom-0 w-[2px] bg-border/60 -translate-x-1/2 rounded-full z-0" />
 
@@ -95,7 +95,7 @@ export function VerticalTimeline({ items }: { items: Item[] }) {
           <div
             key={item.title}
             data-tl-row
-            className="relative flex flex-col md:flex-row justify-between items-center w-full mb-16 md:mb-24 group"
+            className="relative flex flex-col md:flex-row justify-between items-center w-full mb-8 sm:mb-12 md:mb-24 last:mb-0 group"
           >
             {/* ── Dot ── */}
             <div

@@ -216,7 +216,7 @@ export default function HireMePage() {
         {/* Image with pills */}
         <section className="relative w-full aspect-[4/5] sm:aspect-[16/10] overflow-hidden bg-black">
           <Image
-            src="/images/speaking/sagar-lad-hire-me-speaker-author.webp"
+            src="/images/speaking/sagar-lad-tedx-speaker.webp"
             alt="Sagar Lad — Author & Speaker"
             fill
             priority

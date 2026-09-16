@@ -380,18 +380,24 @@ export default function AboutPage() {
             className="object-cover object-[79%_38%] sm:object-[71%_27%] lg:object-[70%_35%]"
             sizes="100vw"
           />
-          <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          {/* High-contrast gradient overlay ensuring 100% text readability over white image background on mobile & tablet */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/65 via-60% to-black/20 lg:from-black/75 lg:via-black/25 lg:to-transparent lg:inset-x-0 lg:top-auto lg:bottom-0 lg:h-[45%]" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end py-12 sm:py-16 md:py-20">
           <div className="max-w-3xl text-center lg:text-left mt-auto" style={{ display: "grid", gap: "0" }}>
             <div data-reveal className="mb-4">
-              <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/70 border border-white/20 rounded-full px-5 py-1.5">
+              {/* Mobile/tablet underline */}
+              <span className="lg:hidden inline-block border-b-2 border-brand pb-1 text-white font-semibold uppercase tracking-wide text-xs sm:text-sm drop-shadow-sm">
+                The full story
+              </span>
+              {/* Desktop pill badge */}
+              <span className="hidden lg:inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white/90 border border-white/30 rounded-full px-5 py-1.5 bg-black/30 backdrop-blur-sm shadow-sm">
                 The full story
               </span>
             </div>
             
-            <p data-reveal className="mb-8 text-base sm:text-lg text-white/75 leading-relaxed max-w-xl">
+            <p data-reveal className="mb-8 text-base sm:text-lg text-white font-medium leading-relaxed max-w-xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
               Data &amp; AI Architect by profession, TEDx Speaker, and
               published author of 6+ books. Founder of the MIND UP Framework —
               a system for thinking clearly and acting intentionally.

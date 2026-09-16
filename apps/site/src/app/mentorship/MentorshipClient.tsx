@@ -521,7 +521,7 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
     <div ref={rootRef} className="min-h-screen bg-background text-foreground">
       {/* ── 1. Profile Hero ── */}
       <section className="relative overflow-hidden border-b border-border bg-background">
-        <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 md:pt-20 pb-16 sm:pb-24 md:pb-32">
+        <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 md:pt-16 pb-8 sm:pb-12 md:pb-20">
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-14">
             <div data-m-hero className="relative shrink-0 pb-3">
               <div className="relative h-36 w-36 sm:h-48 sm:w-48 rounded-full overflow-hidden border-2 border-border shadow-lg">
@@ -552,21 +552,21 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
               <p data-m-hero className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground max-w-2xl">
                 Direct, 1-on-1 mentorship on Data, Cloud &amp; AI Architecture, career momentum, resume teardowns, and intentional execution. Plain, practical advice — from your friend Sagar.
               </p>
-              <div data-m-hero className="mt-6 flex items-stretch gap-3 justify-center md:justify-start">
+              <div data-m-hero className="mt-6 flex flex-row items-center gap-3 justify-center md:justify-start">
                 <button
                   type="button"
                   onClick={() => scrollTo("testimonials-section")}
-                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 py-3.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors cursor-pointer"
+                  className="flex-1 sm:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 sm:px-6 text-sm font-semibold text-foreground hover:bg-muted hover:border-foreground/20 transition-colors cursor-pointer shadow-xs"
                 >
-                  <Star className="w-3.5 h-3.5" />
+                  <Star className="w-4 h-4 shrink-0 text-accent" />
                   What others say
                 </button>
                 <button
                   type="button"
                   onClick={() => scrollTo("booking-section")}
-                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2.5 rounded-full bg-accent text-accent-foreground px-6 py-3.5 text-sm font-bold shadow-sm hover:scale-[1.03] transition-transform cursor-pointer"
+                  className="flex-1 sm:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-5 sm:px-6 text-sm font-semibold shadow-xs hover:scale-[1.02] transition-transform cursor-pointer"
                 >
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-4 h-4 shrink-0" />
                   Book Session
                 </button>
               </div>
@@ -576,9 +576,9 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
       </section>
 
       {/* ── 2. What You Get — Vertical Timeline ── */}
-      <section className="relative py-20 md:py-28 border-b border-border overflow-hidden">
+      <section className="relative py-10 sm:py-14 md:py-20 border-b border-border overflow-hidden">
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
             <Pill supportLine="What you get">What you get</Pill>
             <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
               What We Cover in 1:1 Sessions
@@ -595,9 +595,9 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
       {/* ── 3. Testimonials — 2-Row Marquee ── */}
       <section
         id="testimonials-section"
-        className="py-20 md:py-28 border-b border-border bg-card/30 overflow-hidden"
+        className="py-8 sm:py-12 md:py-20 border-b border-border bg-card/30 overflow-hidden"
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16 relative">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 mb-6 sm:mb-10 relative">
           <div className="text-center max-w-2xl mx-auto">
             <Pill supportLine="Trusted by professionals">Trusted by professionals</Pill>
             <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
@@ -640,7 +640,7 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
         </div>
 
         {/* Mobile — bottom center */}
-        <div className="md:hidden max-w-xl mx-auto px-4 sm:px-6 mt-12 text-center">
+        <div className="md:hidden max-w-xl mx-auto px-4 sm:px-6 mt-4 sm:mt-6 text-center">
           <button
             type="button"
             onClick={() => setReviewOpen(true)}
@@ -656,20 +656,20 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
       {/* ── 4. Booking CTA ── */}
       <section
         id="booking-section"
-        className="relative py-20 md:py-28 border-b border-border overflow-hidden bg-background"
+        className="relative py-8 sm:py-12 md:py-20 border-b border-border overflow-hidden bg-background"
       >
         <div data-m-cta className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <div className="mb-6">
+          <div className="mb-3 sm:mb-4">
             <Pill supportLine="Open spots">Open spots</Pill>
           </div>
-          <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
+          <h2 className="mt-2 font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
             Ready to move forward?
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+          <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
             Pick a time that works. One focused conversation — real clarity, real
             next steps.
           </p>
-          <div className="mt-10">
+          <div className="mt-5 sm:mt-8">
             <a
               href="https://topmate.io/sagar_lad"
               target="_blank"
@@ -679,7 +679,7 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
               <Calendar className="w-4 h-4" />
               Book on Topmate
             </a>
-            <p className="mt-4 text-xs text-muted-foreground">
+            <p className="mt-3 text-xs text-muted-foreground">
               Book a Free Chat with Sagar
               <br />
               <span className="inline-flex items-center gap-1">
@@ -694,9 +694,9 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
       </section>
 
       {/* ── 5. FAQ — Minimal ── */}
-      <section className="py-20 md:py-24 bg-background">
+      <section className="py-8 sm:py-12 md:py-20 bg-background">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-6 sm:mb-10">
             <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
               FAQ
             </h2>
@@ -713,7 +713,7 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
                   <button
                     type="button"
                     onClick={() => toggleFaq(idx)}
-                    className="w-full flex items-center justify-between gap-4 py-5 text-left cursor-pointer"
+                    className="w-full flex items-center justify-between gap-4 py-4 sm:py-5 text-left cursor-pointer"
                     aria-expanded={isOpen}
                   >
                     <span className="font-display text-sm sm:text-base font-medium text-foreground/80">
