@@ -61,17 +61,17 @@ export default async function SpeakingPage() {
               Speaking
             </span>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] drop-shadow-md">
-              Ideas that ignite rooms and transform mindsets
+              Inspiring People to Think Bigger, Embrance AI, and Unlock Their Full Potential
             </h1>
             <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-2xl drop-shadow-sm font-medium">
-              Delivering story-driven, actionable keynotes on AI leadership and career momentum for summits, universities, and enterprise events worldwide.
+              I deliver engaging keynotes on AI, Mindset, and Self-awareness, helping people navigate change, unlock their potential, and take meaningful action.
             </p>
             <div className="pt-2 flex flex-col gap-4 items-center sm:flex-row sm:items-center">
               <Link
                 href="/hire-me"
                 className="btn-premium inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-7 py-3.5 text-sm font-semibold hover:opacity-95 shadow-xl w-full sm:w-auto"
               >
-                Hire For Speaking <ArrowRight className="w-4 h-4" />
+                Hire Me to Speak <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
