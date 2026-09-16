@@ -301,7 +301,7 @@ export default function HireMePage() {
             <div className="col-span-5 relative">
               <div className="relative aspect-[4/5] w-full max-w-md mx-auto rounded-3xl overflow-hidden border border-border/60 shadow-2xl bg-muted/40">
                 <Image
-                  src="/images/speaking/sagar-lad-hire-me-speaker-author.webp"
+                  src="/images/speaking/sagar-lad-tedx-speaker.webp"
                   alt="Sagar Lad — Author & Speaker"
                   fill
                   priority
