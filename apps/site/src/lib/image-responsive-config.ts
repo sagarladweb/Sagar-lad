@@ -25,21 +25,21 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
     "section": "About Page",
     "src": "/images/heroes/sagar-lad-author-keynote-speaker-about-hero.webp",
     "mobile": {
-      "x": 79,
-      "y": 38,
+      "x": 55,
+      "y": 18,
       "scale": 100
     },
     "tablet": {
-      "x": 71,
-      "y": 27,
-      "scale": 103
+      "x": 55,
+      "y": 18,
+      "scale": 100
     },
     "desktop": {
-      "x": 70,
-      "y": 35,
-      "scale": 103
+      "x": 55,
+      "y": 20,
+      "scale": 100
     },
-    "tailwind": "object-cover object-[79%_38%] sm:object-[71%_27%] lg:object-[70%_35%]"
+    "tailwind": "object-cover object-[55%_18%] sm:object-[55%_18%] lg:object-[55%_20%]"
   },
   "speaking-hero": {
     "id": "speaking-hero",
@@ -69,21 +69,21 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
     "section": "Homepage",
     "src": "/images/heroes/sagar-lad-author-mentor-guide-home-hero.webp",
     "mobile": {
-      "x": 74,
-      "y": 50,
+      "x": 67,
+      "y": 20,
       "scale": 100
     },
     "tablet": {
-      "x": 83,
-      "y": 50,
+      "x": 67,
+      "y": 20,
       "scale": 100
     },
     "desktop": {
-      "x": 66,
-      "y": 48,
-      "scale": 101
+      "x": 65,
+      "y": 22,
+      "scale": 100
     },
-    "tailwind": "object-cover object-[74%_center] sm:object-[83%_center] lg:object-[66%_48%]"
+    "tailwind": "object-cover object-[67%_20%] sm:object-[67%_20%] lg:object-[65%_22%]"
   },
   "about-quote": {
     "id": "about-quote",

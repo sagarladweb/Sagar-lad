@@ -66,9 +66,9 @@ const PRESET_METADATA: PresetItem[] = [
     overlayTitle: "MIND UP",
     overlaySubtitle: "Change your MIND, Change your life",
     centerGuide: {
-      mobileFace: { x: 79, y: 38, scale: 100 },
-      tabletFace: { x: 71, y: 27, scale: 103 },
-      desktopFull: { x: 70, y: 35, scale: 103 },
+      mobileFace: { x: 55, y: 18, scale: 100 },
+      tabletFace: { x: 55, y: 18, scale: 100 },
+      desktopFull: { x: 55, y: 20, scale: 100 },
     },
   },
   {
@@ -102,9 +102,9 @@ const PRESET_METADATA: PresetItem[] = [
     overlayTitle: "Sagar Lad",
     overlaySubtitle: "Your Friend, Mentor and Guide",
     centerGuide: {
-      mobileFace: { x: 76, y: 100, scale: 100 },
-      tabletFace: { x: 66, y: 81, scale: 100 },
-      desktopFull: { x: 66, y: 48, scale: 101 },
+      mobileFace: { x: 67, y: 20, scale: 100 },
+      tabletFace: { x: 67, y: 20, scale: 100 },
+      desktopFull: { x: 65, y: 22, scale: 100 },
     },
   },
   {
