@@ -20,7 +20,7 @@ const photos = [
   {
     src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-nirvana.webp",
     alt: "Sagar Lad casual outdoor portrait – Your Friend and Mentor",
-    className: "object-[50%_58%] sm:object-[50%_61%] lg:object-[50%_57%]",
+    className: "object-[50%_61%] sm:object-[48%_64%] lg:object-[50%_60%]",
   },
   {
     src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp",

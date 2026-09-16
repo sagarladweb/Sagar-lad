@@ -224,20 +224,20 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
     "src": "/images/profile/sagar-lad-friend-mentor-casual-outdoor-nirvana.webp",
     "mobile": {
       "x": 50,
-      "y": 58,
+      "y": 61,
       "scale": 100
     },
     "tablet": {
-      "x": 50,
-      "y": 61,
+      "x": 48,
+      "y": 64,
       "scale": 100
     },
     "desktop": {
       "x": 50,
-      "y": 57,
+      "y": 60,
       "scale": 100
     },
-    "tailwind": "object-cover object-[50%_58%] sm:object-[50%_61%] lg:object-[50%_57%]"
+    "tailwind": "object-cover object-[50%_61%] sm:object-[48%_64%] lg:object-[50%_60%]"
   },
   "contact-hero": {
     "id": "contact-hero",
