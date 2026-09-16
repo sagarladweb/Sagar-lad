@@ -13,7 +13,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   ghost:
     "text-muted-foreground hover:text-foreground hover:bg-muted",
   danger:
-    "text-muted-foreground hover:text-red-600 hover:bg-red-500/10",
+    "text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-500/10",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

@@ -9,7 +9,6 @@ import {
   Link2,
   Video,
   Image as ImageIcon,
-  Sparkles,
 } from "lucide-react";
 import { SITE, formatDateShort, readingTime } from "@/lib/site";
 import { getEngagement } from "@/lib/engagement";
@@ -166,7 +165,6 @@ function PostHeader({
             href={`/blog?category=${post.category.slug ?? ""}`}
             className="inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand/5 px-3 py-1 text-xs font-semibold text-brand hover:bg-brand/15 transition-colors"
           >
-            <Sparkles className="w-3 h-3" />
             {post.category.name}
           </Link>
         )}

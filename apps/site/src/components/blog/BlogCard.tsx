@@ -75,7 +75,7 @@ export function BlogCard({
             {formatDateShort(post.publishedAt)}
           </time>
           <span aria-hidden="true" className="text-border">·</span>
-          <span>{readingTime(post.excerpt || post.title)}m</span>
+          <span>{readingTime(post.content || post.excerpt || post.title)}m</span>
           {showStats && (
             <>
               <span aria-hidden="true" className="text-border">·</span>

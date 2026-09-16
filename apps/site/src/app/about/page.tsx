@@ -488,9 +488,9 @@ export default function AboutPage() {
               <div className="absolute inset-0 bg-black/40 lg:bg-gradient-to-r lg:from-black/60 lg:via-black/20 lg:to-transparent" />
             </div>
 
-            {/* Glass card — left on desktop, bottom on mobile/tablet */}
-            <div className="relative z-10 flex items-end lg:items-center justify-start p-6 sm:p-8 lg:p-12 min-h-[400px] sm:min-h-[460px] lg:min-h-[420px]">
-              <div className="w-full max-w-md bg-white/15 backdrop-blur-xl border border-white/25 rounded-2xl p-6 sm:p-8 shadow-2xl">
+            {/* Glass card — centered on mobile/tablet, left on desktop */}
+            <div className="relative z-10 flex items-center justify-center p-6 sm:p-8 lg:p-12 min-h-[400px] sm:min-h-[460px] lg:min-h-[420px]">
+              <div className="w-full max-w-md bg-[#ffd51d]/10 backdrop-blur-xl border border-[#ffd51d]/25 rounded-2xl p-6 sm:p-8 shadow-2xl">
                 <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 backdrop-blur-sm px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                   Words of Belief

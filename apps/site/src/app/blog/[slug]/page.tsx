@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import { prisma, dbSafe } from "@/lib/db";
 import { getPostBySlug, getRelatedPosts } from "@/lib/content";
+import { getProfileAvatar } from "@/lib/profile";
 import { SITE, VISIBLE_POST_WHERE, stripHtml } from "@/lib/site";
 import { JsonLd } from "@/components/JsonLd";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
@@ -63,7 +64,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug).catch(() => null);
+  const [post, profile] = await Promise.all([
+    getPostBySlug(slug).catch(() => null),
+    getProfileAvatar(),
+  ]);
 
   if (!post || !post.published) notFound();
 
@@ -124,6 +128,7 @@ export default async function PostPage({ params }: Props) {
             : null,
         }}
         related={relatedPosts}
+        authorImage={profile.image}
       />
     </article>
   );
