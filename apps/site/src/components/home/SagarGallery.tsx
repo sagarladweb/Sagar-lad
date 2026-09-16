@@ -123,7 +123,7 @@ export function SagarGallery() {
             href="/about"
             className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-accent text-accent-foreground px-5 py-2.5 text-sm font-semibold hover:opacity-95 transition-opacity"
           >
-            Know me better <ArrowRight className="w-4 h-4" />
+            Know Me Better <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>

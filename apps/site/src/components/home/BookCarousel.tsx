@@ -262,7 +262,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-8 py-3 text-sm font-bold shadow-sm hover:opacity-90 transition-opacity"
                 >
                   <ShoppingBag className="w-4 h-4" />
-                  Get a copy
+                  Get a Copy
                 </a>
               </div>
             </div>

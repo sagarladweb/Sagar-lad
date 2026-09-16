@@ -200,7 +200,7 @@ export function AboutMe() {
                 href="/about"
                 className="btn-premium inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-8 py-3 text-sm font-semibold"
               >
-                MORE ABOUT ME <ArrowUpRight className="w-4 h-4" />
+                More About Me <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

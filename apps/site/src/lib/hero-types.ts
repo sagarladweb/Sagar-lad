@@ -57,5 +57,5 @@ export const DEFAULT_HOME_HERO: HomeHeroData = {
   subtitle: "Your Friend, Mentor and Guide",
   tagline1: "MIND UP",
   tagline2: "Change your MIND",
-  tagline3: "Change your life",
+  tagline3: "Change your LIFE",
 };

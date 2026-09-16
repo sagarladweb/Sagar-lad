@@ -379,7 +379,7 @@ model HomeHero {
   subtitle        String   @default("Your Friend, Mentor and Guide")
   tagline1        String   @default("MIND UP.")
   tagline2        String   @default("Change your MIND.")
-  tagline3        String   @default("Change your life.")
+  tagline3        String   @default("Change your LIFE.")
   updatedAt       DateTime @updatedAt
 }
 
