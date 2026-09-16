@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { auth, signOut } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { MobileTopBar } from "@/components/admin/MobileTopBar";
 import { MobileNav } from "@/components/admin/MobileNav";
 import { ToastContainer } from "@/components/admin/Toast";
 import { ConfirmContainer } from "@/components/admin/ConfirmDialog";
@@ -28,11 +29,11 @@ const nav: { label: string; href: string; icon: LucideIcon; phase: number }[] = 
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, phase: 1 },
   { label: "Posts", href: "/admin/posts", icon: FileText, phase: 1 },
   { label: "Content", href: "/admin/content", icon: Layers, phase: 1 },
-  { label: "Settings", href: "/admin/settings", icon: Settings, phase: 1 },
   { label: "CMS", href: "/admin/cms", icon: LayoutTemplate, phase: 2 },
-  { label: "Announcement", href: "/admin/announcement", icon: Megaphone, phase: 2 },
   { label: "Newsletter", href: "/admin/newsletter", icon: Mail, phase: 2 },
+  { label: "Announcement", href: "/admin/announcement", icon: Megaphone, phase: 2 },
   { label: "Community", href: "/admin/moderation", icon: MessagesSquare, phase: 2 },
+  { label: "Settings", href: "/admin/settings", icon: Settings, phase: 2 },
 ].filter((item) => !PHASE_1 || item.phase === 1);
 
 async function signOutAction() {
@@ -113,31 +114,7 @@ export default async function AdminPanelLayout({
       />
 
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 inset-x-0 z-40 bg-card/95 backdrop-blur border-b border-border flex items-center justify-between px-4 h-14 shadow-sm">
-        <span className="flex items-center gap-2.5 min-w-0">
-          <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full ring-2 ring-border bg-muted grid place-items-center">
-            {user.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.image} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <span className="font-display font-bold text-sm text-muted-foreground">
-                {(user.name || "A").charAt(0).toUpperCase()}
-              </span>
-            )}
-          </span>
-          <span className="font-display font-bold text-base truncate">Sagar Lad Admin</span>
-        </span>
-        <div className="flex items-center gap-2">
-          <Link href="https://www.sagarlad.com" target="_blank" className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground" aria-label="View site">
-            <ExternalLink className="w-4 h-4" />
-          </Link>
-          <form action={signOutAction}>
-            <button type="submit" className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground" aria-label="Sign out">
-              Sign out
-            </button>
-          </form>
-        </div>
-      </div>
+      <MobileTopBar user={user} signOutAction={signOutAction} />
 
       <main className="flex-1 min-w-0 mt-14 md:mt-0 pb-24 md:pb-8">
         <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-7xl mx-auto">{children}</div>

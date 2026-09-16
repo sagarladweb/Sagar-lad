@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import { SITE, pageMetadata } from "@/lib/site";
 import { VideoPlayer } from "@/components/video/VideoPlayer";
-import { GalleryCarousel } from "@/components/speaking/GalleryCarousel";
 import { SpeakingTestimonials } from "@/components/speaking/SpeakingTestimonials";
 import { AimFramework } from "@/components/speaking/AimFramework";
 import { SpokenAt } from "@/components/speaking/SpokenAt";
@@ -16,7 +15,6 @@ import { SpeakingReviewButton } from "@/components/speaking/SpeakingReviewModal"
 import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 import { JsonLd } from "@/components/JsonLd";
 import { Pill } from "@/components/ui/Pill";
-import { getSpeakingGallery } from "@/lib/speaking-gallery";
 
 export const metadata: Metadata = pageMetadata({
   title: "Public Speaking & Keynotes",
@@ -29,7 +27,6 @@ export const metadata: Metadata = pageMetadata({
 export const revalidate = 60;
 
 export default async function SpeakingPage() {
-  const gallery = await getSpeakingGallery();
   return (
     <div className="bg-background overflow-x-clip">
       <JsonLd
@@ -147,76 +144,6 @@ export default async function SpeakingPage() {
           </div>
         </div>
       </section>
-
-      {/* Videos & Photos — bento on desktop, horizontal snap carousel on mobile */}
-      {gallery.enabled && (
-        <section className="border-b border-border bg-muted/30 py-12 sm:py-16 md:py-20 overflow-hidden" aria-label="Videos and photos">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            {/* Mobile: horizontal snap carousel */}
-            <div className="lg:hidden">
-              <GalleryCarousel images={gallery.images} />
-            </div>
-
-            {/* Desktop: bento grid */}
-            <div className="hidden lg:grid grid-cols-12 gap-3 sm:gap-4">
-              {/* Large feature — left, spans 2 rows on desktop */}
-              <div className="sm:col-span-2 lg:col-span-7 lg:row-span-2 rounded-xl overflow-hidden relative group min-h-[280px] sm:min-h-[400px] lg:min-h-0">
-                <Image
-                  src={gallery.images[0]?.src || "/images/speaking/main-full-width.webp"}
-                  alt={gallery.images[0]?.alt || "Sagar Lad delivering a keynote"}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 58vw"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-              </div>
-
-              {/* Top right */}
-              <div className="sm:col-span-1 lg:col-span-5 rounded-xl overflow-hidden relative group aspect-[4/3] min-h-[200px]">
-                <Image
-                  src={gallery.images[1]?.src || "/images/speaking/candid.webp"}
-                  alt={gallery.images[1]?.alt || "Sagar Lad candid"}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 42vw"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-              </div>
-
-              {/* Bottom right */}
-              <div className="sm:col-span-1 lg:col-span-5 rounded-xl overflow-hidden relative group aspect-[4/3] min-h-[200px]">
-                <Image
-                  src={gallery.images[2]?.src || "/images/speaking/candid-speaking.webp"}
-                  alt={gallery.images[2]?.alt || "Sagar Lad speaking"}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 42vw"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-              </div>
-
-              {/* Bottom row — 3 equal cards on desktop */}
-              <div className="sm:col-span-2 lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                {gallery.images.slice(3, 6).map((img, i) => (
-                  <div
-                    key={img.src + i}
-                    className="rounded-xl overflow-hidden relative group aspect-[4/3] min-h-[160px]"
-                  >
-                    <Image
-                      src={img.src}
-                      alt={img.alt}
-                      fill
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 26vw"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Stages & Credentials — visual-first animated cards */}
       <section className="border-b border-border bg-background py-12 sm:py-16 md:py-20" aria-label="Stages and Credentials">

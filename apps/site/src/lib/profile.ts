@@ -10,9 +10,8 @@ export const getProfileAvatar = unstable_cache(
       where: { role: "ADMIN" },
     });
 
-    // Use local avatar always — the Supabase-hosted avatar URL is broken/unreachable
     return {
-      image: DEFAULT_AVATAR,
+      image: user?.image || DEFAULT_AVATAR,
       name: user?.name ?? "Sagar Lad",
     };
   },

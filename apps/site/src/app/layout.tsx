@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import localFont from "next/font/local";
 import "./globals.css";
 import { SiteFrame } from "@/components/SiteFrame";
@@ -162,7 +163,9 @@ export default async function RootLayout({
             }),
           }}
         />
-        <script
+        <Script
+          id="chunk-reload"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               if (typeof window !== 'undefined') {

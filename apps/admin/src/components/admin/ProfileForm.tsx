@@ -297,6 +297,9 @@ export function ProfileForm({ initial, onOpenSecurity }: Props) {
                   src={image}
                   alt="Your profile photo"
                   className="h-24 w-24 rounded-xl border border-border object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp";
+                  }}
                 />
               ) : (
                 <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-brand/10 font-display text-3xl font-bold text-brand">

@@ -248,6 +248,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id as string;
         token.role = (user as { role: string }).role;
+        token.image = (user as { image?: string | null }).image ?? null;
       }
       return token;
     },
@@ -259,6 +260,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // the session to carry the correct role.
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.image = (token as { image?: string | null }).image ?? null;
 
         // A JWT can outlive its account (e.g. after a DB reset), which used to
         // surface as a cryptic FK error on save. Resolve the id against the DB

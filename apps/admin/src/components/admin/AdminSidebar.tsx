@@ -49,11 +49,19 @@ function Avatar({
     size === "md"
       ? "w-9 h-9"
       : "w-8 h-8";
+  const fallback = "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp";
   return (
     <span className={`${cls} shrink-0 aspect-square overflow-hidden rounded-full ring-2 ring-border bg-muted grid place-items-center`}>
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="" className="w-full h-full object-cover" />
+        <img
+          src={src}
+          alt=""
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = fallback;
+          }}
+        />
       ) : (
         <span className="font-display font-bold text-sm text-muted-foreground">
           {(name || "A").charAt(0).toUpperCase()}

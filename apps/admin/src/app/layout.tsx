@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -59,7 +60,9 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <script
+        <Script
+          id="chunk-reload"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               if (typeof window !== 'undefined') {

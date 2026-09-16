@@ -12,30 +12,30 @@ datasource db {
 // ---------------------------------------------------------------------------
 
 model User {
-  id                  String    @id @default(cuid())
-  name                String?
-  email               String    @unique
-  emailVerified       DateTime?
-  image               String?
-  passwordHash        String?
-  role                String    @default("ADMIN")
+  id                String          @id @default(cuid())
+  name              String?
+  email             String          @unique
+  emailVerified     DateTime?
+  image             String?
+  passwordHash      String?
+  role              String          @default("ADMIN")
   // Two-factor authentication (TOTP / Google Authenticator)
-  twoFactorEnabled    Boolean   @default(false)
-  twoFactorSecret     String?
-  twoFactorRecovery   String?
-  lastLoginAt         DateTime?
-  lastLoginIp         String?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  posts               Post[]
-  sessions            Session[]
-  accounts            Account[]
-  comments            Comment[]
-  auditLogs           AuditLogEntry[]
+  twoFactorEnabled  Boolean         @default(false)
+  twoFactorSecret   String?
+  twoFactorRecovery String?
+  lastLoginAt       DateTime?
+  lastLoginIp       String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  posts             Post[]
+  sessions          Session[]
+  accounts          Account[]
+  comments          Comment[]
+  auditLogs         AuditLogEntry[]
 }
 
 model Account {
-  id                String   @id @default(cuid())
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -47,7 +47,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -93,32 +93,32 @@ model AuditLogEntry {
 // ---------------------------------------------------------------------------
 
 model Post {
-  id          String     @id @default(cuid())
-  title       String
-  slug        String     @unique
-  excerpt     String?
-  content     String // sanitized TipTap HTML
-  coverImage  String?
-  featured    Boolean    @default(false)
-  published   Boolean    @default(true)
-  publishedAt DateTime   @default(now())
-  scheduledAt DateTime?
-  kicker      String?
-  showCover   Boolean    @default(true)
-  showAuthorBox Boolean  @default(true)
-  showTimeline Boolean   @default(false)
-  footerNote  String?
-  sources     Json?    // [{ type: "link"|"video"|"image", url: string, title: string }]
-  deletedAt   DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  authorId    String?
-  author      User?      @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  categoryId  String?
-  category    Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  comments    Comment[]
-  views       Int        @default(0)
-  likes       Int        @default(0)
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  excerpt       String?
+  content       String // sanitized TipTap HTML
+  coverImage    String?
+  featured      Boolean   @default(false)
+  published     Boolean   @default(true)
+  publishedAt   DateTime  @default(now())
+  scheduledAt   DateTime?
+  kicker        String?
+  showCover     Boolean   @default(true)
+  showAuthorBox Boolean   @default(true)
+  showTimeline  Boolean   @default(false)
+  footerNote    String?
+  sources       Json? // [{ type: "link"|"video"|"image", url: string, title: string }]
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  authorId      String?
+  author        User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  comments      Comment[]
+  views         Int       @default(0)
+  likes         Int       @default(0)
 
   @@index([deletedAt, published, publishedAt])
   @@index([categoryId])
@@ -171,13 +171,13 @@ model Comment {
 }
 
 model NewsletterSubscriber {
-  id               String   @id @default(cuid())
-  email            String   @unique
+  id               String               @id @default(cuid())
+  email            String               @unique
   name             String?
-  acceptedTerms    Boolean  @default(false)
-  unsubscribed     Boolean  @default(false)
-  unsubscribeToken String   @unique @default(cuid())
-  createdAt        DateTime @default(now())
+  acceptedTerms    Boolean              @default(false)
+  unsubscribed     Boolean              @default(false)
+  unsubscribeToken String               @unique @default(cuid())
+  createdAt        DateTime             @default(now())
   deliveries       NewsletterDelivery[]
 
   @@index([createdAt])
@@ -207,16 +207,16 @@ model NewsletterCampaign {
 // guarantee that nobody is emailed twice for the same campaign, no matter how
 // many cron runs, redeploys or manual triggers fire the queue.
 model NewsletterDelivery {
-  id           String   @id @default(cuid())
+  id           String               @id @default(cuid())
   campaignId   String
-  campaign     NewsletterCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaign     NewsletterCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   subscriberId String
-  subscriber   NewsletterSubscriber   @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
-  status       String   @default("QUEUED") // QUEUED | SENDING | SENT | FAILED
+  subscriber   NewsletterSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  status       String               @default("QUEUED") // QUEUED | SENDING | SENT | FAILED
   sentAt       DateTime?
   error        String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
 
   @@unique([campaignId, subscriberId])
   @@index([status, createdAt])
@@ -224,16 +224,16 @@ model NewsletterDelivery {
 }
 
 model ContactRequest {
-  id            String   @id @default(cuid())
-  firstName     String
-  lastName      String?
-  email         String
-  phone         String?
-  organization  String
-  eventDate     String?
-  message       String?
-  type          String   @default("EVENT")
-  createdAt     DateTime @default(now())
+  id           String   @id @default(cuid())
+  firstName    String
+  lastName     String?
+  email        String
+  phone        String?
+  organization String
+  eventDate    String?
+  message      String?
+  type         String   @default("EVENT")
+  createdAt    DateTime @default(now())
 
   @@index([createdAt])
   @@index([type])
@@ -244,25 +244,25 @@ model ContactRequest {
 // ---------------------------------------------------------------------------
 
 model Book {
-  id              String   @id @default(cuid())
-  type            String   @default("PUBLISHED") // PUBLISHED | READ | EBOOK
-  title           String
-  author          String? // READ: book author
-  tagline         String?
-  description     String?
-  learning        String? // READ: the one lesson left by the book
-  note            String? // READ: short personal note
-  imageUrl        String?
-  buyUrl          String?
-  fileKey         String? // EBOOK: private storage path, never exposed to client
-  free            Boolean  @default(false) // EBOOK: free vs premium
-  featured        Boolean  @default(false)
-  published       Boolean  @default(true)
-  sortOrder       Int      @default(0)
-  currentlyReading Boolean @default(false) // READ: mark as currently reading
-  isReward         Boolean @default(false) // Show as reward on mindup-score page
-  deletedAt       DateTime?
-  createdAt       DateTime @default(now())
+  id               String    @id @default(cuid())
+  type             String    @default("PUBLISHED") // PUBLISHED | READ | EBOOK
+  title            String
+  author           String? // READ: book author
+  tagline          String?
+  description      String?
+  learning         String? // READ: the one lesson left by the book
+  note             String? // READ: short personal note
+  imageUrl         String?
+  buyUrl           String?
+  fileKey          String? // EBOOK: private storage path, never exposed to client
+  free             Boolean   @default(false) // EBOOK: free vs premium
+  featured         Boolean   @default(false)
+  published        Boolean   @default(true)
+  sortOrder        Int       @default(0)
+  currentlyReading Boolean   @default(false) // READ: mark as currently reading
+  isReward         Boolean   @default(false) // Show as reward on mindup-score page
+  deletedAt        DateTime?
+  createdAt        DateTime  @default(now())
 
   @@index([deletedAt, published, type, featured, sortOrder])
   @@index([type, published, sortOrder])
@@ -273,19 +273,19 @@ model Book {
 // Video articles shown across the site: embedded video + optional article
 // text + a layout picker controlling how the two scale together.
 model Video {
-  id        String    @id @default(cuid())
-  title     String
-  slug      String?   @unique
-  embedUrl  String
-  thumbnail String?
-  content   String? // sanitized HTML article body
-  layout    String    @default("video-first") // video-first | text-first | split
-  published Boolean   @default(true)
-  sortOrder Int       @default(0)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
+  id         String    @id @default(cuid())
+  title      String
+  slug       String?   @unique
+  embedUrl   String
+  thumbnail  String?
+  content    String? // sanitized HTML article body
+  layout     String    @default("video-first") // video-first | text-first | split
+  published  Boolean   @default(true)
+  sortOrder  Int       @default(0)
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
   categoryId String?
-  category  Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([deletedAt, published, sortOrder])
   @@index([categoryId])
@@ -334,24 +334,24 @@ model RateLimitEntry {
 // ---------------------------------------------------------------------------
 
 model Announcement {
-  id          String    @id @default(cuid())
-  title       String
-  description String?
-  imageUrl    String?
-  buttonText  String?
-  buttonLink  String?
-  showBar     Boolean   @default(true)
-  barText     String?
-  barLink     String?
-  barStyle    String    @default("scrolling")
-  barSpeed    Int       @default(30)
-  barBgColor  String?   @default("#dbeafe")
-  barColor    String?   @default("#1e3a5f")
-  active      Boolean   @default(false)
-  eventDate   DateTime?
-  showHiringCTA Boolean @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  imageUrl      String?
+  buttonText    String?
+  buttonLink    String?
+  showBar       Boolean   @default(true)
+  barText       String?
+  barLink       String?
+  barStyle      String    @default("scrolling")
+  barSpeed      Int       @default(30)
+  barBgColor    String?   @default("#dbeafe")
+  barColor      String?   @default("#1e3a5f")
+  active        Boolean   @default(false)
+  eventDate     DateTime?
+  showHiringCTA Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([active])
 }
@@ -381,12 +381,4 @@ model HomeHero {
   tagline2        String   @default("Change your MIND.")
   tagline3        String   @default("Change your LIFE.")
   updatedAt       DateTime @updatedAt
-}
-
-// Speaking Page Gallery (6 images + show/hide toggle)
-model SpeakingGallery {
-  id        String   @id @default("default")
-  enabled   Boolean  @default(true)
-  images    Json
-  updatedAt DateTime @updatedAt
 }
