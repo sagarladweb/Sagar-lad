@@ -229,7 +229,7 @@ export default async function SpeakingPage() {
       {/* Professional Experience — how the engagement works, then the ask */}
       <section className="card-hover py-12 sm:py-16 md:py-20 border-b border-border bg-card/40" aria-label="Professional experience">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="max-w-2xl text-center lg:text-left mx-auto lg:mx-0" data-animate>
+          <div className="max-w-2xl text-center lg:text-left mx-auto lg:mx-0">
             <Pill supportLine="How it works">How it works</Pill>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">Three simple steps</h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
