@@ -44,10 +44,10 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
     name: "Home Page Hero",
     section: "Homepage",
     src: "/images/heroes/sagar-lad-author-mentor-guide-home-hero.webp",
-    mobile: { x: 76, y: 56, scale: 100 },
-    tablet: { x: 71, y: 53, scale: 116 },
+    mobile: { x: 76, y: 100, scale: 100 },
+    tablet: { x: 66, y: 81, scale: 100 },
     desktop: { x: 66, y: 48, scale: 101 },
-    tailwind: "object-cover object-[76%_56%] sm:object-[71%_53%] lg:object-[66%_48%]",
+    tailwind: "object-cover object-[76%_100%] sm:object-[66%_81%] lg:object-[66%_48%]",
   },
   "about-quote": {
     id: "about-quote",
