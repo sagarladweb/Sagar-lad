@@ -268,7 +268,7 @@ export default async function SpeakingPage() {
       {/* Organizer voices — marquee on mobile, grid on desktop */}
       <section className="py-12 sm:py-16 md:py-20 bg-background" aria-label="What organizers say">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16" data-animate>
+          <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16">
             <Pill supportLine="Kind words">Kind words</Pill>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">What people say</h2>
             <p className="mt-3 text-sm sm:text-base text-muted-foreground">
@@ -277,10 +277,13 @@ export default async function SpeakingPage() {
           </div>
           <SpeakingTestimonials />
 
-          {/* Mobile/tablet only: review button + booking CTA */}
-          <div className="lg:hidden mt-12 space-y-6 text-center">
+          {/* Review button — mobile/tablet */}
+          <div className="lg:hidden mt-12 text-center">
             <SpeakingReviewButton />
+          </div>
 
+          {/* Booking CTA card — mobile only */}
+          <div className="md:hidden mt-6 text-center">
             <div className="card-hover relative overflow-hidden rounded-lg border border-border bg-card p-8 shadow-xl">
               <span aria-hidden="true" className="pointer-events-none absolute -top-24 -left-10 h-48 w-72 rounded-full bg-accent/15 blur-3xl" />
               <div className="relative shrink-0 mx-auto mb-4">
