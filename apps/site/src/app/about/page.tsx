@@ -483,7 +483,7 @@ export default function AboutPage() {
                 alt="Sagar Lad Inspirational Quote – You are worthy and capable"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 50vw"
-                className="object-cover object-right sm:object-[85%_55%] lg:object-right"
+                className="object-cover object-[88%_60%] sm:object-[76%_55%] lg:object-[83%_65%]"
               />
               <div className="absolute inset-0 bg-black/40 lg:bg-gradient-to-r lg:from-black/60 lg:via-black/20 lg:to-transparent" />
             </div>

@@ -150,8 +150,8 @@ const PRESET_METADATA: PresetItem[] = [
     desktopAspect: "aspect-[16/9] w-full",
     hasTextOverlay: false,
     centerGuide: {
-      mobileFace: { x: 47, y: 20, scale: 98 },
-      tabletFace: { x: 45, y: 24, scale: 100 },
+      mobileFace: { x: 43, y: 20, scale: 98 },
+      tabletFace: { x: 47, y: 24, scale: 100 },
       desktopFull: { x: 46, y: 23, scale: 100 },
     },
   },

@@ -17,7 +17,7 @@ const getPostBySlugCached = unstable_cache(
     );
   },
   ["post-by-slug-v2"],
-  { revalidate: process.env.NODE_ENV === "production" ? 604800 : 0, tags: ["content", "posts"] }
+  { revalidate: process.env.NODE_ENV === "production" ? 604800 : 1, tags: ["content", "posts"] }
 );
 
 export const getPostBySlug = cache(async (slug: string) => {

@@ -1,8 +1,5 @@
 import "server-only";
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
-import { prisma, dbSafe } from "@/lib/db";
-import { DESIGNATION } from "@/lib/site";
 import {
   HERO_PRESETS,
   DEFAULT_HOME_HERO,
@@ -12,41 +9,7 @@ import {
 
 export * from "./hero-types";
 
-const getHomeHeroCached = unstable_cache(
-  async (): Promise<HomeHeroData> => {
-    const row = await dbSafe(
-      () => prisma.homeHero.findUnique({ where: { id: "default" } }),
-      null
-    );
-    if (!row) return DEFAULT_HOME_HERO;
-    const activeKey = (row.activeImage as HeroImageKey) in HERO_PRESETS
-      ? (row.activeImage as HeroImageKey)
-      : "hero_sagar_lad";
-    const preset = HERO_PRESETS[activeKey] ?? HERO_PRESETS.hero_sagar_lad;
-
-    const rawUrl = row.imageUrl || "";
-    const isOldImage = !rawUrl || rawUrl.includes("hero_home.webp") || rawUrl.includes("hero_sagar_lad.webp") || rawUrl.includes("hero-home.webp");
-    const finalImageUrl = isOldImage ? preset.imageUrl : rawUrl;
-
-    return {
-      id: row.id,
-      activeImage: activeKey,
-      imageUrl: finalImageUrl,
-      mobilePosition: row.mobilePosition || preset.mobilePosition,
-      tabletPosition: row.tabletPosition || preset.tabletPosition,
-      desktopPosition: row.desktopPosition || preset.desktopPosition,
-      designation: row.designation || "Author · Public Speaker · Human Potential Advocate",
-      title: row.title || "Sagar Lad",
-      subtitle: row.subtitle || "Your friend, mentor and Guide",
-      tagline1: row.tagline1 || "MIND UP",
-      tagline2: row.tagline2 || "Change your MIND",
-      tagline3: row.tagline3 || "Change your life",
-    };
-  },
-  ["site-home-hero-v2"],
-  { revalidate: 300, tags: ["hero"] }
-);
-
+// Static Home Hero without database query overhead
 export const getHomeHero = cache(async (): Promise<HomeHeroData> => {
-  return getHomeHeroCached();
+  return DEFAULT_HOME_HERO;
 });
