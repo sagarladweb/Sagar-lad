@@ -111,23 +111,23 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
     "id": "about-sagar",
     "name": "About Sagar Section",
     "section": "Homepage",
-    "src": "/images/about/sagar-lad-author-speaker-human-potential-about.webp",
+    "src": "/images/about/sagar-lad-author-speaker-about-me.webp",
     "mobile": {
-      "x": 50,
+      "x": 45,
       "y": 50,
       "scale": 100
     },
     "tablet": {
-      "x": 50,
+      "x": 45,
       "y": 50,
       "scale": 100
     },
     "desktop": {
-      "x": 50,
+      "x": 45,
       "y": 50,
       "scale": 100
     },
-    "tailwind": "object-cover object-center"
+    "tailwind": "object-cover object-[45%_50%] sm:object-[45%_50%] lg:object-[45%_50%]"
   },
   "newsletter": {
     "id": "newsletter",
@@ -221,23 +221,23 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
     "id": "casual-friend",
     "name": "Friend Sagar (Nirvana)",
     "section": "Homepage Gallery",
-    "src": "/images/profile/sagar-lad-friend-mentor-casual-outdoor-friend.webp",
+    "src": "/images/profile/sagar-lad-friend-mentor-casual-outdoor-nirvana.webp",
     "mobile": {
       "x": 50,
-      "y": 25,
+      "y": 58,
       "scale": 100
     },
     "tablet": {
       "x": 50,
-      "y": 25,
+      "y": 61,
       "scale": 100
     },
     "desktop": {
       "x": 50,
-      "y": 25,
+      "y": 57,
       "scale": 100
     },
-    "tailwind": "object-cover object-[50%_25%]"
+    "tailwind": "object-cover object-[50%_58%] sm:object-[50%_61%] lg:object-[50%_57%]"
   },
   "contact-hero": {
     "id": "contact-hero",

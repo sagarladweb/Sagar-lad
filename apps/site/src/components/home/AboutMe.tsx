@@ -136,11 +136,11 @@ export function AboutMe() {
               />
               <figure className="card-hover relative aspect-[4/5] rounded-xl overflow-hidden border border-border bg-card">
                 <Image
-                  src="/images/about/sagar-lad-author-speaker-human-potential-about.webp"
+                  src="/images/about/sagar-lad-author-speaker-about-me.webp"
                   alt="Sagar Lad – Author, Speaker and Human Potential Advocate"
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover object-center"
+                  className="object-cover object-[45%_50%] sm:object-[45%_50%] lg:object-[45%_50%]"
                   priority
                 />
               </figure>

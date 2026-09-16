@@ -18,9 +18,9 @@ const photos = [
     className: "object-[18%_53%] sm:object-[28%_59%] lg:object-[50%_58%]",
   },
   {
-    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-friend.webp",
+    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-nirvana.webp",
     alt: "Sagar Lad casual outdoor portrait – Your Friend and Mentor",
-    className: "object-[50%_25%]",
+    className: "object-[50%_58%] sm:object-[50%_61%] lg:object-[50%_57%]",
   },
   {
     src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp",
