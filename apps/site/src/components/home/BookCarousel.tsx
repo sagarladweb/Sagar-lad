@@ -150,7 +150,7 @@ export function BookCarousel({ books }: { books: BookCarouselBook[] }) {
           <div key={book.id} className="book-slide-enter">
             <article className="flex flex-col md:flex-row items-center gap-6 md:gap-10 lg:gap-16">
             {/* Book Cover with arrows */}
-            <div className="relative w-full md:w-2/5 lg:w-2/5 shrink-0 flex justify-center">
+            <div className="relative w-full md:w-2/5 lg:w-2/5 shrink-0 flex justify-center pb-12 md:pb-0">
               {/* Left arrow */}
               {total > 1 && (
                 <button
