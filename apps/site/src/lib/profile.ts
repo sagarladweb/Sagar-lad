@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 
-const DEFAULT_AVATAR = "/images/profile/about.webp";
+const DEFAULT_AVATAR = "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp";
 
 export const getProfileAvatar = unstable_cache(
   async () => {
@@ -9,8 +9,10 @@ export const getProfileAvatar = unstable_cache(
       select: { image: true, name: true },
       where: { role: "ADMIN" },
     });
+
+    // Use local avatar always — the Supabase-hosted avatar URL is broken/unreachable
     return {
-      image: user?.image ?? DEFAULT_AVATAR,
+      image: DEFAULT_AVATAR,
       name: user?.name ?? "Sagar Lad",
     };
   },

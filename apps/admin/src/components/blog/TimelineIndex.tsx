@@ -16,7 +16,7 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
     const root = document.querySelector(contentSelector);
     if (!root) return;
 
-    const els = root.querySelectorAll<HTMLElement>("h2, h3");
+    const els = root.querySelectorAll<HTMLElement>("h1, h2, h3");
     const result: Heading[] = [];
     const seen = new Set<string>();
 
@@ -42,7 +42,7 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
       result.push({
         id: uniqueId,
         title: el.textContent?.trim() ?? "",
-        level: el.tagName === "H2" ? 2 : 3,
+        level: el.tagName === "H1" ? 1 : el.tagName === "H2" ? 2 : 3,
       });
     });
 
@@ -66,7 +66,7 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
     );
 
     const timer = setTimeout(() => {
-      document.querySelectorAll<HTMLElement>("h2[id], h3[id]").forEach((el) => {
+      document.querySelectorAll<HTMLElement>("h1[id], h2[id], h3[id]").forEach((el) => {
         observer.observe(el);
       });
     }, 200);
@@ -126,7 +126,7 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
                     type="button"
                     onClick={() => scrollTo(h.id)}
                     className={`w-full text-left text-[13px] leading-snug transition-all duration-200 rounded-r-md ${
-                      h.level === 3 ? "pl-6" : "pl-4"
+                      h.level === 1 ? "pl-4 font-semibold" : h.level === 3 ? "pl-6" : "pl-4"
                     } pr-2 py-[7px] ${
                       isActive
                         ? "text-brand font-semibold bg-brand/5 border-l-2 border-brand -ml-px"
@@ -170,7 +170,7 @@ export function TimelineIndex({ contentSelector }: { contentSelector: string }) 
                       i === activeIdx
                         ? "text-brand font-semibold bg-brand/5"
                         : "text-muted-foreground active:bg-muted/50"
-                    } ${h.level === 3 ? "pl-9" : ""}`}
+                    } ${h.level === 1 ? "font-semibold" : h.level === 3 ? "pl-9" : ""}`}
                   >
                     <span
                       className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${

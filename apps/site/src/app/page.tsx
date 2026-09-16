@@ -21,7 +21,7 @@ import { AnnouncementSection } from "@/components/home/AnnouncementSection";
 import { AnnouncementPopup } from "@/components/home/AnnouncementPopup";
 import { LazySection } from "@/components/home/LazySection";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function HomePage({
   searchParams,

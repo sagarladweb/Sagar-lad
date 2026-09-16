@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { SiteFrame } from "@/components/SiteFrame";
 import { BrandingProvider } from "@/components/BrandingProvider";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { SITE } from "@/lib/site";
 import { heartbeat } from "@/lib/heartbeat";
 import { getActiveAnnouncement } from "@/lib/content";
@@ -93,6 +94,9 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
+  other: {
+    "theme-color": "#0d21a1",
+  },
 };
 
 export default async function RootLayout({
@@ -111,6 +115,53 @@ export default async function RootLayout({
       className={`${beVietnamPro.variable} ${rethinkSans.variable} ${greatVibes.variable} h-full antialiased`}
     >
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Sagar Lad",
+              url: "https://sagarlad.com",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://sagarlad.com/blog?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SiteNavigationElement",
+              name: [
+                "Home",
+                "About",
+                "Blog",
+                "Books",
+                "Speaking",
+                "Mentorship",
+                "Videos",
+                "Newsletter",
+                "Contact",
+              ],
+              url: [
+                "https://sagarlad.com",
+                "https://sagarlad.com/about",
+                "https://sagarlad.com/blog",
+                "https://sagarlad.com/books",
+                "https://sagarlad.com/speaking",
+                "https://sagarlad.com/mentorship",
+                "https://sagarlad.com/videos",
+                "https://sagarlad.com/newsletter",
+                "https://sagarlad.com/contact",
+              ],
+            }),
+          }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -145,6 +196,7 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
+        <ScrollToTop />
         <BrandingProvider>
           <SiteFrame announcement={announcement}>{children}</SiteFrame>
         </BrandingProvider>

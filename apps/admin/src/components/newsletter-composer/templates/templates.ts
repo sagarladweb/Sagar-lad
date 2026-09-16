@@ -128,7 +128,7 @@ export const TEMPLATES: Template[] = [
           "signature",
           {
             text: "Thanks for reading — see you next Tuesday.",
-            name: "Karan",
+            name: "Sagar",
             role: "Sagar Lad",
           },
         ],
@@ -388,7 +388,7 @@ export const TEMPLATES: Template[] = [
           {
             quote:
               "Simplicity is not what's left after you remove things. It's what's left after you decide what the product is for.",
-            author: "Karan Dhiver",
+            author: "Sagar Lad",
             role: "Author & Speaker",
             tone: "centered",
           },
@@ -420,7 +420,7 @@ export const TEMPLATES: Template[] = [
         [
           "authorCard",
           {
-            name: "Karan Dhiver",
+            name: "Sagar Lad",
             role: "Author & Speaker",
             bio: "Building a small studio in public. I write one honest letter a month about what broke and what worked.",
             twitter: "https://x.com",
@@ -431,7 +431,7 @@ export const TEMPLATES: Template[] = [
           "signature",
           {
             text: "If this resonated, just hit reply — I read everything.",
-            name: "Karan",
+            name: "Sagar",
             role: "Author & Speaker",
             signatureStyle: true,
           },
@@ -673,7 +673,7 @@ export const TEMPLATES: Template[] = [
           "image",
           {
             caption: "Philosopher's Path, an hour before the crowds.",
-            credit: "Photo: Karan Dhiver",
+            credit: "Photo: Sagar Lad",
             ratio: "16/9",
           },
         ],

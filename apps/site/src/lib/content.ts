@@ -68,9 +68,17 @@ export async function getCategoriesWithFallback() {
 
 export const getPublishedVideos = unstable_cache(
   async (take?: number, platform?: "youtube" | "instagram", skip?: number) => {
+    // Push platform filter to DB instead of filtering in JS
+    const platformFilter =
+      platform === "instagram"
+        ? { embedUrl: { contains: "instagram.com" } }
+        : platform === "youtube"
+          ? { embedUrl: { not: { contains: "instagram.com" } } }
+          : {};
+
     const rows = await dbSafe(
       () => prisma.video.findMany({
-        where: { published: true, deletedAt: null },
+        where: { published: true, deletedAt: null, ...platformFilter },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
         ...(take ? { take } : {}),
         ...(skip ? { skip } : {}),
@@ -83,15 +91,7 @@ export const getPublishedVideos = unstable_cache(
       null,
     );
     if (!rows) return null;
-    return rows
-      .map((v) => ({ ...v, content: v.content }))
-      .filter((v) =>
-        platform
-          ? platform === "instagram"
-            ? isInstagramUrl(v.embedUrl)
-            : !isInstagramUrl(v.embedUrl)
-          : true
-      );
+    return rows.map((v) => ({ ...v, content: v.content }));
   },
   ["videos-v2"],
   { revalidate: 300, tags: ["content"] }

@@ -38,6 +38,8 @@ import {
   Code,
   Heading1,
   Heading2,
+  Heading3,
+  Heading4,
   List,
   Quote as QuoteIcon,
   Link as LinkIcon,
@@ -1840,6 +1842,8 @@ export function TipTapEditor({
   const blockGroup = [
     { label: "Heading 1", shortcut: "Mod Alt 1", icon: <Heading1 className="w-4 h-4" />, active: editor.isActive("heading", { level: 1 }), onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run() },
     { label: "Heading 2", shortcut: "Mod Alt 2", icon: <Heading2 className="w-4 h-4" />, active: editor.isActive("heading", { level: 2 }), onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
+    { label: "Heading 3", shortcut: "Mod Alt 3", icon: <Heading3 className="w-4 h-4" />, active: editor.isActive("heading", { level: 3 }), onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run() },
+    { label: "Heading 4", shortcut: "Mod Alt 4", icon: <Heading4 className="w-4 h-4" />, active: editor.isActive("heading", { level: 4 }), onClick: () => editor.chain().focus().toggleHeading({ level: 4 }).run() },
     { label: "Bullet list", shortcut: "Mod Shift 8", icon: <List className="w-4 h-4" />, active: editor.isActive("bulletList") || editor.isActive("orderedList"), onClick: () => editor.chain().focus().toggleBulletList().run() },
     { label: "Quote", shortcut: "Mod Shift b", icon: <QuoteIcon className="w-4 h-4" />, active: editor.isActive("blockquote"), onClick: () => editor.chain().focus().toggleBlockquote().run() },
     { label: "Callout", shortcut: "Mod Alt c", icon: <Wand2 className="w-4 h-4" />, active: editor.isActive("callout"), onClick: () => editor.chain().focus().toggleWrap("callout").run() },

@@ -225,7 +225,22 @@ h6 {
   scroll-margin-top: 5.5rem;
 }
 @media (max-width: 640px) {
-  .tip-content h2 {
+.tip-content h1 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 3rem 0 1.25rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  scroll-margin-top: 5.5rem;
+}
+@media (max-width: 640px) {
+  .tip-content h1 {
+    font-size: 1.6rem;
+    margin: 2.25rem 0 1rem;
+  }
+}
+.tip-content h2 {
     font-size: 1.38rem;
     margin: 2rem 0 0.75rem;
   }
@@ -243,6 +258,21 @@ h6 {
   .tip-content h3 {
     font-size: 1.18rem;
     margin: 1.65rem 0 0.5rem;
+  }
+}
+.tip-content h4 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.75rem 0 0.65rem;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  scroll-margin-top: 5.5rem;
+}
+@media (max-width: 640px) {
+  .tip-content h4 {
+    font-size: 1.02rem;
+    margin: 1.5rem 0 0.5rem;
   }
 }
 .tip-content p {
@@ -1485,10 +1515,10 @@ nav a:not([class*="rounded-full"]) {
 
 /* Contact hero — fluid glow drift */
 .hero-glow {
-  animation: hero-drift 6s ease-in-out infinite alternate;
+  animation: hero-glow 6s ease-in-out infinite alternate;
 }
 
-@keyframes hero-drift {
+@keyframes hero-glow {
   0% { transform: translate(0, 0) scale(1); }
   100% { transform: translate(20px, -15px) scale(1.1); }
 }

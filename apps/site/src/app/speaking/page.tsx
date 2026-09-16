@@ -26,7 +26,7 @@ export const metadata: Metadata = pageMetadata({
   ogImage: "/images/heroes/Speaking_hero.webp",
 });
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function SpeakingPage() {
   const gallery = await getSpeakingGallery();
