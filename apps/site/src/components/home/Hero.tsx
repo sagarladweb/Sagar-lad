@@ -65,7 +65,7 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
       aria-label="Introduction"
     >
       {/* Full-bleed landscape hero */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+      <div className="absolute inset-x-0 -top-8 sm:-top-10 lg:top-0 bottom-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <Image
           data-hero-bg
           src={data.imageUrl}

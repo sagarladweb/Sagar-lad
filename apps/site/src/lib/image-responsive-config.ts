@@ -69,13 +69,13 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
     "section": "Homepage",
     "src": "/images/heroes/sagar-lad-author-mentor-guide-home-hero.webp",
     "mobile": {
-      "x": 67,
-      "y": 25,
-      "scale": 118
+      "x": 74,
+      "y": 50,
+      "scale": 100
     },
     "tablet": {
-      "x": 66,
-      "y": 81,
+      "x": 83,
+      "y": 50,
       "scale": 100
     },
     "desktop": {
@@ -83,7 +83,7 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
       "y": 48,
       "scale": 101
     },
-    "tailwind": "object-cover object-[67%_25%] scale-[1.18] origin-[67%_25%] sm:scale-100 sm:origin-center sm:object-[66%_81%] lg:object-[66%_48%]"
+    "tailwind": "object-cover object-[74%_center] sm:object-[83%_center] lg:object-[66%_48%]"
   },
   "about-quote": {
     "id": "about-quote",
