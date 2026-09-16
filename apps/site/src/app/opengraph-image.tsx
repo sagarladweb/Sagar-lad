@@ -50,7 +50,7 @@ export default function OgImage() {
               The question is not how to get rich — it&apos;s how to get aware.
             </div>
             <div style={{ fontSize: 26, color: "#9a998f", marginTop: 20 }}>
-              Author · Public Speaker
+              Author · Speaker
             </div>
           </div>
         </div>

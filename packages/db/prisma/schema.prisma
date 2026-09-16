@@ -376,7 +376,7 @@ model HomeHero {
   desktopPosition String   @default("lg:object-[0%_43%]")
   designation     String   @default("Author · Public Speaker")
   title           String   @default("Sagar Lad")
-  subtitle        String   @default("Your friend, mentor and Guide")
+  subtitle        String   @default("Your Friend, Mentor and Guide")
   tagline1        String   @default("MIND UP.")
   tagline2        String   @default("Change your MIND.")
   tagline3        String   @default("Change your life.")

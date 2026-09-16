@@ -9,20 +9,19 @@ export function MentorshipCta() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <Pill className="mb-4" supportLine="Let's connect">1-on-1 Mentorship</Pill>
+          <Pill className="mb-4" supportLine="Let's connect">Work with me</Pill>
           <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-accent-strong">
-            One conversation. Total clarity.
+            Make better. Live better.
           </h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
-            Stuck in your career or building something new? A single honest
-            conversation can save you months.
+            Let's make your business and life better-with better writing, speaking and mindset.
           </p>
           <div className="mt-8 flex justify-center">
             <Link
-              href="/mentorship"
+              href="/hire-me"
               className="inline-flex items-center justify-center rounded-full bg-accent text-accent-foreground px-8 py-3 text-sm font-semibold shadow-sm hover:opacity-90 transition-opacity"
             >
-              Book a session
+              Hire me
             </Link>
           </div>
         </div>

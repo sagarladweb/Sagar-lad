@@ -8,11 +8,6 @@ import { DotPagination } from "@/components/ui/CarouselNav";
 
 const photos = [
   {
-    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp",
-    alt: "Sagar Lad casual outdoor portrait in nature – Your friend and mentor",
-    className: "object-[52%_42%] sm:object-[50%_44%] lg:object-[50%_46%]",
-  },
-  {
     src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-2.webp",
     alt: "Sagar Lad candid conversation – Author and personal guide",
     className: "object-[50%_59%] sm:object-[50%_60%] lg:object-[50%_62%]",
@@ -23,14 +18,14 @@ const photos = [
     className: "object-[18%_53%] sm:object-[28%_59%] lg:object-[50%_58%]",
   },
   {
-    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-4.webp",
-    alt: "Sagar Lad landscape portrait – Mentor and thought partner",
-    className: "object-[44%_54%] sm:object-[46%_52%] lg:object-[44%_50%]",
+    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-friend.webp",
+    alt: "Sagar Lad casual outdoor portrait – Your Friend and Mentor",
+    className: "object-[50%_25%]",
   },
   {
-    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-5.webp",
-    alt: "Sagar Lad speaking like a friend would – Mind Up advocate",
-    className: "object-[26%_62%] sm:object-[29%_71%] lg:object-[50%_70%]",
+    src: "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp",
+    alt: "Sagar Lad casual outdoor portrait in nature – Your Friend and Mentor",
+    className: "object-[52%_42%] sm:object-[50%_44%] lg:object-[50%_46%]",
   },
 ];
 
@@ -119,7 +114,7 @@ export function SagarGallery() {
 
         <div className="mt-6 flex flex-col items-center gap-2.5 text-center">
           <h2 className="font-display text-2xl md:text-3xl font-bold leading-tight text-foreground">
-            It&apos;s your friend, Sagar.
+            It&apos;s Your Friend, Sagar.
           </h2>
           <p className="text-sm text-muted-foreground max-w-md">
             One practical idea, every week — shared like a friend would.

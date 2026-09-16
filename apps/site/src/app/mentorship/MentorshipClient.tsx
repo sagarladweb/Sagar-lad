@@ -550,7 +550,7 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
                 with <span className="text-accent">Sagar Lad</span>
               </h1>
               <p data-m-hero className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground max-w-2xl">
-                Direct, 1-on-1 mentorship on Data, Cloud &amp; AI Architecture, career momentum, resume teardowns, and intentional execution. Plain, practical advice — from your friend Sagar.
+                Direct, 1-on-1 mentorship on Data, Cloud &amp; AI Architecture, career momentum, resume teardowns, and intentional execution. Plain, practical advice — From Your Friend Sagar.
               </p>
               <div data-m-hero className="mt-6 flex flex-row items-center gap-3 justify-center md:justify-start">
                 <button

@@ -216,12 +216,12 @@ export default function HireMePage() {
         {/* Image with pills */}
         <section className="relative w-full aspect-[4/5] sm:aspect-[16/10] overflow-hidden bg-black">
           <Image
-            src="/images/speaking/sagar-lad-tedx-speaker.webp"
+            src="/images/speaking/sagar-lad-hire-me-speaker-author.webp"
             alt="Sagar Lad — Author & Speaker"
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[50%_15%] sm:object-[50%_20%]"
+            className="object-cover object-[50%_20%] sm:object-[50%_18%]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-white backdrop-blur-md border border-white/20 text-[11px] font-medium shadow-lg">
@@ -301,12 +301,12 @@ export default function HireMePage() {
             <div className="col-span-5 relative">
               <div className="relative aspect-[4/5] w-full max-w-md mx-auto rounded-3xl overflow-hidden border border-border/60 shadow-2xl bg-muted/40">
                 <Image
-                  src="/images/speaking/sagar-lad-tedx-speaker.webp"
+                  src="/images/speaking/sagar-lad-hire-me-speaker-author.webp"
                   alt="Sagar Lad — Author & Speaker"
                   fill
                   priority
                   sizes="480px"
-                  className="object-cover object-[50%_15%]"
+                  className="object-cover object-[50%_20%]"
                 />
                 <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-black/50 via-black/15 to-transparent pointer-events-none" />
                 <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 text-white backdrop-blur-md border border-white/20 text-[11px] font-medium shadow-lg">

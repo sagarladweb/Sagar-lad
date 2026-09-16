@@ -113,21 +113,21 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
     "section": "Homepage",
     "src": "/images/about/sagar-lad-author-speaker-human-potential-about.webp",
     "mobile": {
-      "x": 45,
-      "y": 53,
-      "scale": 103
-    },
-    "tablet": {
-      "x": 45,
-      "y": 38,
-      "scale": 101
-    },
-    "desktop": {
-      "x": 45,
+      "x": 50,
       "y": 50,
       "scale": 100
     },
-    "tailwind": "object-cover object-[45%_53%] sm:object-[45%_38%] lg:object-[45%_50%]"
+    "tablet": {
+      "x": 50,
+      "y": 50,
+      "scale": 100
+    },
+    "desktop": {
+      "x": 50,
+      "y": 50,
+      "scale": 100
+    },
+    "tailwind": "object-cover object-center"
   },
   "newsletter": {
     "id": "newsletter",
@@ -217,49 +217,27 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = {
     },
     "tailwind": "object-cover object-[18%_53%] sm:object-[28%_59%] lg:object-[50%_58%]"
   },
-  "casual-4": {
-    "id": "casual-4",
-    "name": "Friend Sagar 4 (Casual)",
+  "casual-friend": {
+    "id": "casual-friend",
+    "name": "Friend Sagar (Nirvana)",
     "section": "Homepage Gallery",
-    "src": "/images/profile/sagar-lad-friend-mentor-casual-outdoor-4.webp",
+    "src": "/images/profile/sagar-lad-friend-mentor-casual-outdoor-friend.webp",
     "mobile": {
-      "x": 44,
-      "y": 54,
-      "scale": 98
+      "x": 50,
+      "y": 25,
+      "scale": 100
     },
     "tablet": {
-      "x": 46,
-      "y": 52,
-      "scale": 103
-    },
-    "desktop": {
-      "x": 44,
-      "y": 50,
-      "scale": 105
-    },
-    "tailwind": "object-cover object-[44%_54%] sm:object-[46%_52%] lg:object-[44%_50%]"
-  },
-  "casual-5": {
-    "id": "casual-5",
-    "name": "Friend Sagar 5 (Casual)",
-    "section": "Homepage Gallery",
-    "src": "/images/profile/sagar-lad-friend-mentor-casual-outdoor-5.webp",
-    "mobile": {
-      "x": 26,
-      "y": 62,
-      "scale": 102
-    },
-    "tablet": {
-      "x": 29,
-      "y": 71,
+      "x": 50,
+      "y": 25,
       "scale": 100
     },
     "desktop": {
       "x": 50,
-      "y": 70,
+      "y": 25,
       "scale": 100
     },
-    "tailwind": "object-cover object-[26%_62%] sm:object-[29%_71%] lg:object-[50%_70%]"
+    "tailwind": "object-cover object-[50%_25%]"
   },
   "contact-hero": {
     "id": "contact-hero",

@@ -787,7 +787,7 @@ export function Navbar() {
                           className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground hover:text-accent-strong rounded-md"
                         >
                           <Mic2 className="w-4 h-4 text-brand-light" />
-                          Public Speaking
+                          Speaking
                         </Link>
                         <Link
                           href="/hire-me"
