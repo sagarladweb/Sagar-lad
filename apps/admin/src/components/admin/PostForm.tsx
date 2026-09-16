@@ -66,7 +66,9 @@ export function PostForm({
   // become updates instead of creates.
   const [postId, setPostId] = useState<string | null>(initial?.id ?? null);
   const postIdRef = useRef(postId);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    initial?.slug ? `/preview/${initial.slug}` : null
+  );
   const [form, setForm] = useState({
     title: initial?.title ?? "",
     slug: initial?.slug ?? "",

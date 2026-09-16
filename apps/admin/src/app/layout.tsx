@@ -88,12 +88,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
-        <div className="hidden lg:block h-full flex-1">
-          {children}
-        </div>
-        <div className="flex md:hidden flex-1 min-h-screen items-center justify-center p-8 text-center text-muted-foreground">
-          <p className="text-lg font-medium">The admin panel is only available on desktop devices.</p>
-        </div>
+        {children}
       </body>
     </html>
   );
