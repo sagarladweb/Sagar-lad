@@ -58,7 +58,7 @@ export default async function SpeakingPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-16 sm:pb-20 md:pb-24 pt-24 sm:pt-28">
           <div className="max-w-2xl space-y-5 text-center lg:text-left mx-auto lg:mx-0">
-            <span className="btn-premium inline-flex items-center justify-center lg:justify-start rounded-full bg-accent px-4 py-1.5 text-xs font-semibold tracking-wide text-accent-foreground shadow-md">
+            <span className="inline-flex items-center justify-center lg:justify-start rounded-full border border-white/30 bg-white/10 backdrop-blur-sm px-4 py-1.5 text-xs font-semibold tracking-wide text-white shadow-sm lg:bg-accent lg:border-transparent lg:text-accent-foreground lg:shadow-md">
               Speaking
             </span>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] drop-shadow-md">
@@ -70,7 +70,7 @@ export default async function SpeakingPage() {
             <div className="pt-2 flex flex-col gap-4 items-center sm:flex-row sm:items-center">
               <Link
                 href="/hire-me"
-                className="btn-premium inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-7 py-3.5 text-sm font-semibold hover:opacity-95 shadow-xl w-full sm:w-auto"
+                className="btn-premium inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-7 py-3.5 text-sm font-semibold hover:opacity-95 shadow-xl"
               >
                 Hire Me to Speak <ArrowRight className="w-4 h-4" />
               </Link>

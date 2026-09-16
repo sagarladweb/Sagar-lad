@@ -556,7 +556,7 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
                 <button
                   type="button"
                   onClick={() => scrollTo("testimonials-section")}
-                  className="flex-1 sm:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 sm:px-6 text-sm font-semibold text-foreground hover:bg-muted hover:border-foreground/20 transition-colors cursor-pointer shadow-xs"
+                  className="flex-1 sm:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 sm:px-6 text-sm font-semibold text-foreground hover:bg-muted hover:border-foreground/20 transition-colors cursor-pointer shadow-xs whitespace-nowrap"
                 >
                   <Star className="w-4 h-4 shrink-0 text-accent" />
                   What others say
@@ -564,7 +564,7 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
                 <button
                   type="button"
                   onClick={() => scrollTo("booking-section")}
-                  className="flex-1 sm:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-5 sm:px-6 text-sm font-semibold shadow-xs hover:scale-[1.02] transition-transform cursor-pointer"
+                  className="flex-1 sm:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full bg-accent text-accent-foreground px-5 sm:px-6 text-sm font-semibold shadow-xs hover:scale-[1.02] transition-transform cursor-pointer whitespace-nowrap"
                 >
                   <Calendar className="w-4 h-4 shrink-0" />
                   Book Session

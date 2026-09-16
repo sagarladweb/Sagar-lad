@@ -469,9 +469,9 @@ export default function AboutPage() {
               </span>
             </div>
           </div>
-          <div data-reveal className="mt-8 pt-6 border-t border-border">
+          <div data-reveal className="mt-8 pt-6 border-t border-border text-center lg:text-left">
             <p className="text-sm text-muted-foreground">Love,</p>
-            <SiteLogo className="h-12 w-auto mt-3" />
+            <SiteLogo className="h-12 w-auto mt-3 mx-auto lg:mx-0" />
           </div>
         </div>
       </section>
@@ -498,11 +498,13 @@ export default function AboutPage() {
             {/* Glass card — center on mobile, left-aligned to image on tablet/desktop */}
             <div className="relative z-10 flex items-center justify-center sm:items-end sm:justify-start lg:items-center p-6 sm:p-8 lg:p-12 min-h-[400px] sm:min-h-[460px] lg:min-h-[420px]">
               <div className="w-full max-w-md bg-[#ffd51d]/10 backdrop-blur-xl border border-[#ffd51d]/25 rounded-2xl p-6 sm:p-8 shadow-2xl">
-                <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 backdrop-blur-sm px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+                {/* Desktop: pill badge. Mobile/tablet: clean title */}
+                <span className="hidden sm:inline-flex items-center gap-2 rounded-full bg-accent/20 backdrop-blur-sm px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                   Words of Belief
                 </span>
-                <blockquote className="mt-5 font-display text-xl sm:text-2xl lg:text-3xl font-bold leading-snug tracking-tight text-white">
+                <h3 className="sm:hidden font-display text-lg font-bold text-accent mb-4">Words of Belief</h3>
+                <blockquote className="mt-0 sm:mt-5 font-display text-xl sm:text-2xl lg:text-3xl font-bold leading-snug tracking-tight text-white">
                   &ldquo;You are worthy. You are capable, and beautiful things are still ahead of you. Keep believing in yourself.&rdquo;
                 </blockquote>
                 <div className="mt-6 pt-4 border-t border-white/20 flex items-center justify-between">
@@ -521,7 +523,7 @@ export default function AboutPage() {
       {/* ---------- In-page navigation ---------- */}
       <nav
         aria-label="On this page"
-        className="sticky top-16 z-40 border-b border-border bg-background/90 backdrop-blur-md"
+        className="hidden md:block sticky top-16 z-40 border-b border-border bg-background/90 backdrop-blur-md"
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div

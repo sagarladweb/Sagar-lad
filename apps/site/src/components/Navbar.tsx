@@ -620,13 +620,20 @@ export function Navbar() {
               }`}
             >
               <div className="flex items-center justify-between px-4 h-16 border-b border-border shrink-0">
-                <Image
-                  src="/logos/site-logo.png"
-                  alt="Sagar Lad"
-                  width={272}
-                  height={179}
-                  className="h-11 w-auto"
-                />
+                <Link
+                  href="/"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center shrink-0"
+                  aria-label="Sagar Lad home"
+                >
+                  <Image
+                    src="/logos/site-logo.png"
+                    alt="Sagar Lad"
+                    width={272}
+                    height={179}
+                    className="h-11 w-auto"
+                  />
+                </Link>
                 <button
                   type="button"
                   className="p-2 rounded-full hover:bg-muted transition-colors"
