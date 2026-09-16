@@ -65,7 +65,7 @@ export async function POST(request: Request) {
   }
   try {
     const video = await prisma.video.create({ data: { ...data, embedUrl: norm.url } });
-    revalidatePublic();
+    await revalidatePublic();
     return NextResponse.json({ video }, { status: 201 });
   } catch (err) {
     console.error("[videos] POST failed:", (err as Error).message);
@@ -102,7 +102,7 @@ export async function PUT(request: Request) {
   }
   try {
     const video = await prisma.video.update({ where: { id }, data });
-    revalidatePublic();
+    await revalidatePublic();
     return NextResponse.json({ video });
   } catch (err) {
     console.error("[videos] PUT failed:", (err as Error).message);
@@ -118,7 +118,8 @@ export async function DELETE(request: Request) {
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
   try {
     await prisma.video.delete({ where: { id } });
-    revalidatePublic();
+    const revalidated = await revalidatePublic();
+    if (!revalidated) console.warn("[videos] DELETE: cache revalidation failed — site may show stale data");
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[videos] DELETE failed:", (err as Error).message);

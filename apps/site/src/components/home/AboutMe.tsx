@@ -152,7 +152,7 @@ export function AboutMe() {
             <div data-story-head className="hidden lg:block">
           <Pill supportLine="Get to know me">About Sagar</Pill>
               <h2 className="mt-6 font-display text-xl sm:text-2xl font-semibold leading-snug tracking-tight text-[#94a3b8]">
-                • Author · Speaker · Human Potential Advocate •
+                • Author • Speaker • Human Potential Advocate •
               </h2>
               <p className="mt-6 text-base sm:text-lg text-[#64748b] leading-loose max-w-xl mx-auto lg:mx-0">
                 What if understanding your mind could change

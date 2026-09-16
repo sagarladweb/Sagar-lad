@@ -66,7 +66,7 @@ export function middleware(request: NextRequest) {
     const ua = request.headers.get("user-agent") || "";
     const suspiciousBots =
       /scrapy|curl|wget|python-requests|go-http|java\/|perl|ruby/i.test(ua);
-    if (suspiciousBots && !pathname.startsWith("/api/cron") && !pathname.startsWith("/api/og")) {
+    if (suspiciousBots && !pathname.startsWith("/api/cron") && !pathname.startsWith("/api/og") && !pathname.startsWith("/api/revalidate")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
   }

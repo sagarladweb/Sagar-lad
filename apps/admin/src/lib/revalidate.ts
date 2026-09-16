@@ -39,10 +39,16 @@ export async function revalidatePublic(): Promise<boolean> {
         },
         signal: AbortSignal.timeout(3000),
       });
-      if (res.ok) return true;
-    } catch {
+      if (res.ok) {
+        console.log(`[revalidate] Site cache busted via ${url}`);
+        return true;
+      }
+      console.warn(`[revalidate] ${url} returned ${res.status}`);
+    } catch (err) {
+      console.warn(`[revalidate] Failed to reach ${url}:`, (err as Error).message);
       // try next candidate
     }
   }
+  console.error("[revalidate] All revalidation attempts failed");
   return false;
 }
