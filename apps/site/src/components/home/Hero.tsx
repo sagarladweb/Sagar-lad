@@ -75,7 +75,10 @@ export function Hero({ hero }: { hero?: HomeHeroData }) {
           className={`object-cover ${data.mobilePosition} ${data.tabletPosition} ${data.desktopPosition}`}
           sizes="100vw"
         />
-        <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+        {/* Top gradient — masks white ceiling on mobile/tablet */}
+        <div className="absolute inset-x-0 top-0 h-[30%] bg-gradient-to-b from-black/50 via-black/20 to-transparent" />
+        {/* Bottom gradient — text legibility */}
+        <div className="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 min-h-[100svh] flex flex-col justify-end pb-16 sm:pb-20 md:pb-24 pt-24 sm:pt-28">

@@ -377,7 +377,7 @@ export default function AboutPage() {
             alt="Sagar Lad – Author, TEDx Speaker and Mind Up Theory Founder"
             fill
             priority
-            className="object-cover object-[55%_18%] sm:object-[55%_18%] lg:object-[55%_20%]"
+            className="object-cover object-[79%_25%] sm:object-[72%_22%] lg:object-[60%_25%]"
             sizes="100vw"
           />
           {/* High-contrast gradient overlay ensuring 100% text readability over white image background on mobile & tablet */}
