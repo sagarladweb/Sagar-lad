@@ -25,10 +25,10 @@ if lsof -nP -iTCP:3000 -sTCP:LISTEN >/dev/null 2>&1; then
   exit 1
 fi
 
-# Keep the newest 3 builds. The running instance (killed above) is the only
+# Keep the newest 2 builds. The running instance (killed above) is the only
 # consumer of old dirs, so pruning the oldest is safe after the port frees.
 mkdir -p .builds
-ls -1dt .builds/* 2>/dev/null | tail -n +4 | xargs -r rm -rf 2>/dev/null || true
+ls -1dt .builds/* 2>/dev/null | tail -n +3 | while read -r d; do [ -n "$d" ] && rm -rf "$d"; done || true
 
 BUILD_ID="$(date +%Y%m%d-%H%M%S)"
 export NEXT_DIST_DIR=".builds/$BUILD_ID"

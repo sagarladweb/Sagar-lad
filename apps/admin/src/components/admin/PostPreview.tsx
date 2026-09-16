@@ -107,7 +107,7 @@ export function PostPreview({
       <div className="overflow-auto rounded-2xl border border-border bg-muted/60 p-3 sm:p-6 shadow-inner">
         <div
           className="mx-auto overflow-hidden rounded-xl border border-border bg-background shadow-2xl transition-[width] duration-300"
-          style={{ width: activeWidth, maxWidth: "none" }}
+          style={{ width: activeWidth, maxWidth: "100%" }}
         >
           {/* Address bar */}
           <div className="sticky top-0 z-40 flex items-center gap-2 border-b border-border bg-card/90 backdrop-blur px-4 py-2 text-xs text-muted-foreground">

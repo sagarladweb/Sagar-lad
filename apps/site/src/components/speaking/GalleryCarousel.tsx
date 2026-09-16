@@ -10,7 +10,7 @@ const images = [
   { src: "/images/speaking/candid-speaking.webp", alt: "Sagar Lad speaking" },
   { src: "/images/speaking/candid-presentation.webp", alt: "Sagar Lad presenting" },
   { src: "/images/speaking/too-close.webp", alt: "Sagar Lad portrait" },
-  { src: "/images/heroes/tedx.webp", alt: "Sagar Lad at TEDx" },
+  { src: "/images/speaking/sagar-lad-tedx-talk-aim.webp", alt: "Sagar Lad at TEDx" },
 ];
 
 export function GalleryCarousel({

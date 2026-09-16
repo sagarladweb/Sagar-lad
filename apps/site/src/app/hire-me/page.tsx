@@ -53,7 +53,7 @@ function WorkShowcase() {
       caption: "MIND UP & AI Foundry",
     },
     {
-      src: "/images/speaking/Sagarlad_speaker.webp",
+      src: "/images/speaking/sagar-lad-tedx-talk-aim.webp",
       alt: "Sagar Lad speaking at TEDx AICS on AI, Awareness, Integration, and Mastery",
       label: "TEDx Speaker",
       caption: "TEDx AICS",
@@ -89,9 +89,13 @@ function WorkShowcase() {
             fill
             priority={i === 0}
             sizes="100vw"
-            className="object-contain object-center p-4 sm:p-8 md:p-12"
+            className={
+              i === 1
+                ? "object-contain object-top pt-3 sm:pt-4 px-3 pb-16 sm:pb-20 md:pb-24"
+                : "object-contain object-center p-4 sm:p-8 md:p-12"
+            }
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
         </div>
       ))}
 

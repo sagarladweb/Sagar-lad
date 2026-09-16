@@ -18,11 +18,17 @@ type Props = { params: Promise<{ slug: string }> };
 // force-dynamic so the preview always reflects the latest saved content.
 export default async function PreviewPage({ params }: Props) {
   const session = await requireAdmin();
-  if (!session) notFound();
+  if (!session) {
+    console.warn("[preview] No admin session — returning 404");
+    notFound();
+  }
 
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-  if (!post) notFound();
+  if (!post) {
+    console.warn(`[preview] Post not found: ${slug}`);
+    notFound();
+  }
 
   return (
     <div className="min-h-screen bg-background">

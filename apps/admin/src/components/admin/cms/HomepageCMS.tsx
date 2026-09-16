@@ -49,7 +49,7 @@ const DEFAULT_SPEAKING_GALLERY: SpeakingGalleryData = {
     { src: "/images/speaking/candid-speaking.webp", alt: "Sagar Lad speaking" },
     { src: "/images/speaking/candid-presentation.webp", alt: "Sagar Lad presenting" },
     { src: "/images/speaking/too-close.webp", alt: "Sagar Lad portrait" },
-    { src: "/images/heroes/tedx.webp", alt: "Sagar Lad at TEDx" },
+    { src: "/images/speaking/sagar-lad-tedx-talk-aim.webp", alt: "Sagar Lad at TEDx" },
   ],
 };
 
@@ -59,7 +59,7 @@ const POPULAR_SPEAKING_PRESETS = [
   { label: "Speaking Close", src: "/images/speaking/candid-speaking.webp" },
   { label: "Presentation", src: "/images/speaking/candid-presentation.webp" },
   { label: "Portrait", src: "/images/speaking/too-close.webp" },
-  { label: "TEDx Red Dot", src: "/images/heroes/tedx.webp" },
+  { label: "TEDx Red Dot", src: "/images/speaking/sagar-lad-tedx-talk-aim.webp" },
   { label: "Keynote Hero", src: "/images/heroes/Speaking_hero.webp" },
 ];
 

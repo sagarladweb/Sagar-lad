@@ -119,10 +119,10 @@ const nodes: Node[] = [
       "The kid who watched TED talks now stands on the stage. Proof that dreams deferred are not dreams denied.",
     tag: "Speaker",
     icon: Mic,
-    image: "/images/speaking/sagar-lad-tedx-speaker.webp",
+    image: "/images/speaking/sagar-lad-tedx-talk-aim.webp",
     imageAlt: "Sagar Lad Keynote Speaker at TEDx presenting AIM Framework",
     imageFit: "cover",
-    imagePosition: "object-[center_82%]",
+    imagePosition: "object-[center_48%]",
   },
 ];
 
