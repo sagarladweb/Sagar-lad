@@ -3,6 +3,7 @@ import { SITE, pageMetadata } from "@/lib/site";
 import { getSiteSocials } from "@/lib/social-links";
 import { SocialsGrid } from "@/components/socials/SocialsGrid";
 import { JsonLd } from "@/components/JsonLd";
+import { Pill } from "@/components/ui/Pill";
 
 export const metadata: Metadata = pageMetadata({
   title: "Social Links",
@@ -29,9 +30,7 @@ export default async function SocialsPage() {
       />
       <section className="border-b border-border bg-background py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 text-center space-y-3">
-          <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-            Connect
-          </span>
+          <Pill supportLine="Connect">Connect</Pill>
           <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
             Find me <span className="text-brand">everywhere.</span>
           </h1>

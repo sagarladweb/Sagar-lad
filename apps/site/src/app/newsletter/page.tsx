@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { SITE, pageMetadata } from "@/lib/site";
 import { JsonLd } from "@/components/JsonLd";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
+import { Pill } from "@/components/ui/Pill";
 
 export const metadata: Metadata = pageMetadata({
   title: "The Sagar Lad Letter",
@@ -29,9 +30,7 @@ export default function NewsletterPage() {
 
       <section className="py-20 md:py-28 border-b border-border bg-background">
         <div className="mx-auto max-w-xl px-4 sm:px-6 text-center">
-          <p className="inline-block text-xs font-semibold uppercase tracking-[0.2em] text-brand bg-brand-light/10 rounded-full px-3.5 py-1">
-            Newsletter
-          </p>
+          <Pill supportLine="Newsletter">Newsletter</Pill>
           <h1 className="mt-4 font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
             The Sagar Lad Letter
           </h1>

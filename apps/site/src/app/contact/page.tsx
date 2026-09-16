@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { JsonLd } from "@/components/JsonLd";
+import { Pill } from "@/components/ui/Pill";
 import { SITE } from "@/lib/site";
 import {
   Loader2,
@@ -165,9 +166,7 @@ export default function ContactPage() {
 
           {/* Copy: Below image on mobile, Right on desktop */}
           <div className="order-2 lg:order-2 lg:col-span-7 text-center lg:text-left" data-animate="right" data-reverse suppressHydrationWarning>
-            <span className="inline-block rounded-full bg-muted px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Get in touch
-            </span>
+            <Pill supportLine="Get in touch">Get in touch</Pill>
             <h1 className="mt-4 sm:mt-6 font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-foreground">
               Let&apos;s{" "}
               <span className="text-accent">connect.</span>

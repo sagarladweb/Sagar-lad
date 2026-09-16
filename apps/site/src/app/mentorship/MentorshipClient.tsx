@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { VerticalTimeline } from "@/components/mentorship/VerticalTimeline";
+import { Pill } from "@/components/ui/Pill";
 
 const PILLARS = [
   {
@@ -540,8 +541,8 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
             </div>
 
             <div className="flex-1 text-center md:text-left">
-              <div data-m-hero className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand bg-brand/5 border border-brand/10 rounded-full px-4 py-1.5">
-              Personal Development Coach
+              <div data-m-hero>
+                <Pill supportLine="Personal Development Coach">Personal Development Coach</Pill>
               </div>
               <h1 data-m-hero className="mt-4 font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15]">
                 Accelerate Your Career
@@ -578,9 +579,7 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
       <section className="relative py-20 md:py-28 border-b border-border overflow-hidden">
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-            <p className="inline-block text-xs font-semibold tracking-wide text-accent-strong bg-accent/10 rounded-full px-4 py-1.5">
-              What you get
-            </p>
+            <Pill supportLine="What you get">What you get</Pill>
             <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
               What We Cover in 1:1 Sessions
             </h2>
@@ -600,9 +599,7 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16 relative">
           <div className="text-center max-w-2xl mx-auto">
-            <p className="inline-block text-xs font-semibold tracking-wide text-accent-strong bg-accent/10 rounded-full px-4 py-1.5">
-              Trusted by professionals
-            </p>
+            <Pill supportLine="Trusted by professionals">Trusted by professionals</Pill>
             <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
               What People Say
             </h2>
@@ -619,8 +616,6 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
             Write a Review
           </button>
         </div>
-
-        {/* Row 1 — scrolls left, starts mid-scroll */}
         <div className="marquee-mask marquee-pauser mb-4">
           <div
             className="flex w-max gap-4 animate-marquee"
@@ -664,10 +659,10 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
         className="relative py-20 md:py-28 border-b border-border overflow-hidden bg-background"
       >
         <div data-m-cta className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide text-accent-strong bg-accent/10 rounded-full px-4 py-1.5 mb-6">
-            Open spots
-          </p>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
+          <div className="mb-6">
+            <Pill supportLine="Open spots">Open spots</Pill>
+          </div>
+          <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
             Ready to move forward?
           </h2>
           <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">

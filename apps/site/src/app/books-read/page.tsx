@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { BookLibrary } from "@/components/books/BookLibrary";
 import { BookStats } from "@/components/books/BookStats";
 import { JsonLd } from "@/components/JsonLd";
+import { Pill } from "@/components/ui/Pill";
 import { SITE, pageMetadata } from "@/lib/site";
 import { getPublishedBooks } from "@/lib/content";
 
@@ -46,9 +47,7 @@ export default async function BooksReadPage() {
         <div className="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 sm:pt-14 md:pt-20 md:pb-24">
           <div className="flex flex-col items-center text-center sm:flex-row sm:items-end sm:justify-between sm:text-left gap-4">
             <div>
-              <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-                Books I read
-              </p>
+              <Pill supportLine="Books I read">Books I read</Pill>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">
                 What&apos;s on my shelf
               </h2>

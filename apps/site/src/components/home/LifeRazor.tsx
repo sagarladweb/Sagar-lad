@@ -1,5 +1,6 @@
 import { getLifeRazor } from "@/lib/liferazor";
 import { LifeRazorTypewriter } from "./LifeRazorTypewriter";
+import { Pill } from "@/components/ui/Pill";
 
 export async function LifeRazor() {
   const data = await getLifeRazor();
@@ -7,12 +8,7 @@ export async function LifeRazor() {
   return (
     <section className="py-10 sm:py-14 md:py-16 border-b border-border bg-background">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-        <span className="lg:hidden inline-block text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Daily wisdom
-        </span>
-        <span className="hidden lg:inline-block text-[11px] font-semibold uppercase tracking-[0.25em] text-brand border border-brand/20 rounded-full px-5 py-1.5 bg-brand/5">
-          {data.pill}
-        </span>
+        <Pill supportLine="Current Life Razor">{data.pill}</Pill>
         <div className="mt-8">
           <LifeRazorTypewriter />
         </div>

@@ -4,6 +4,7 @@ import { getPublishedBooks } from "@/lib/content";
 import { SITE, pageMetadata } from "@/lib/site";
 import { BookLibrary } from "@/components/books/BookLibrary";
 import { JsonLd } from "@/components/JsonLd";
+import { Pill } from "@/components/ui/Pill";
 
 export const metadata: Metadata = pageMetadata({
   title: "Books by Sagar Lad",
@@ -26,11 +27,11 @@ export default async function BooksPage() {
       <JsonLd
         data={{
           "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: SITE.url },
-            { "@type": "ListItem", position: 2, name: "Books", item: SITE.url + "/books" },
-          ],
+          "@type": "CollectionPage",
+          name: "Books by Sagar Lad",
+          description: "Practical data & cloud books by Sagar Lad — Azure, Databricks and modern data architecture.",
+          url: `${SITE.url}/books`,
+          author: { "@type": "Person", name: "Sagar Lad", url: SITE.url },
         }}
       />
 
@@ -39,9 +40,7 @@ export default async function BooksPage() {
         <div className="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 sm:pt-14 md:pt-20 md:pb-24">
           <div className="flex flex-col items-center text-center sm:flex-row sm:items-end sm:justify-between sm:text-left gap-4">
             <div>
-              <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-                All books
-              </p>
+              <Pill supportLine="All books">All books</Pill>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">
                 Every book, on one shelf.
               </h2>
@@ -60,9 +59,7 @@ export default async function BooksPage() {
       {/* -------- Colophon -------- */}
       <section className="bg-background">
         <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6 md:py-24">
-          <p className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-            Details
-          </p>
+          <Pill supportLine="Details">Details</Pill>
           <p className="mt-5 leading-relaxed text-muted-foreground">
             All titles are available on Amazon in paperback and Kindle.
           </p>

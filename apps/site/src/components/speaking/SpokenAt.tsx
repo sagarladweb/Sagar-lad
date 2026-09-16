@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
 import { Cloud, Globe, GraduationCap, Award } from "lucide-react";
+import { Pill } from "@/components/ui/Pill";
 
 const EVENTS = [
   { title: "Scottish Summit", place: "Scotland", role: "Tech conference", icon: Cloud },
@@ -19,14 +20,12 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
     const el = cardRef.current;
     if (!el) return;
 
+    // IntersectionObserver with bidirectional tracking (animates in AND out in reverse)
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.unobserve(el);
-        }
+        setInView(entry.isIntersecting);
       },
-      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.1, rootMargin: "0px 0px -20px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -38,29 +37,49 @@ function SpokenCard({ event, index }: { event: typeof EVENTS[0]; index: number }
   return (
     <div
       ref={cardRef}
-      className={`spoken-card group relative py-6 px-4 sm:px-6 rounded-xl border border-border/60 bg-card/30 cursor-pointer select-none transition-all duration-500 ${filled ? "is-filled" : ""}`}
+      className={`spoken-card group relative py-6 px-4 sm:px-6 rounded-xl border select-none transition-all duration-500 cursor-pointer ${
+        filled
+          ? "border-brand/50 bg-card shadow-md shadow-brand/5 -translate-y-0.5 is-filled"
+          : "border-border/60 bg-card/30 hover:border-brand/30 hover:bg-card/50"
+      }`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => setTapped((t) => !t)}
-      style={{ transitionDelay: `${index * 100}ms` }}
+      style={{ transitionDelay: `${index * 60}ms` }}
     >
       <div className="relative">
         {/* Icon + role text */}
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-lg bg-brand/10 text-brand grid place-items-center shrink-0">
+          <div
+            className={`w-10 h-10 rounded-lg grid place-items-center shrink-0 transition-colors duration-400 ${
+              filled ? "bg-brand text-white shadow-sm" : "bg-brand/10 text-brand"
+            }`}
+          >
             <Icon className="w-5 h-5" />
           </div>
-          <span className="text-sm text-muted-foreground">{event.role}</span>
+          <span className="text-sm font-medium text-muted-foreground">{event.role}</span>
         </div>
 
-        {/* Title: outline always visible, fill transitions via CSS */}
-        <h3 className="spoken-title font-display text-xl sm:text-2xl md:text-3xl font-extrabold leading-[1.1] tracking-wide">
+        {/* Title: crisp, high contrast and beautifully fills/reverses */}
+        <h3
+          className={`spoken-title font-display text-xl sm:text-2xl md:text-3xl font-extrabold leading-[1.15] tracking-wide transition-all duration-500 ${
+            filled ? "text-brand translate-x-1" : "text-foreground"
+          }`}
+        >
           {event.title}
         </h3>
 
-        {/* Place pill */}
-        <div className="spoken-place mt-3">
-          <span className="inline-flex rounded-full bg-brand/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand">
+        {/* Place pill with smooth entrance & exit */}
+        <div
+          className={`spoken-place mt-3.5 transition-all duration-400 ease-out ${
+            filled ? "opacity-100 translate-y-0" : "opacity-40 translate-y-1"
+          }`}
+        >
+          <span
+            className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider transition-colors duration-400 ${
+              filled ? "bg-brand text-white" : "bg-brand/10 text-brand"
+            }`}
+          >
             {event.place}
           </span>
         </div>
@@ -73,10 +92,8 @@ export function SpokenAt() {
   return (
     <div suppressHydrationWarning>
       <div className="max-w-2xl mb-10 text-center sm:text-left mx-auto sm:mx-0">
-        <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-          Where I&apos;ve spoken
-        </span>
-        <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">
+        <Pill supportLine="Where I've spoken">Where I&apos;ve spoken</Pill>
+        <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold text-accent-strong">
           On stage, around the world
         </h2>
         <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
@@ -84,59 +101,7 @@ export function SpokenAt() {
         </p>
       </div>
 
-      <style>{`
-        .spoken-title {
-          -webkit-text-stroke: 1.5px var(--muted-foreground, #94a3b8);
-          -webkit-text-fill-color: transparent;
-          -webkit-background-clip: text;
-          background-clip: text;
-          background-image: linear-gradient(var(--brand, #3b82f6), var(--brand, #3b82f6));
-          background-size: 0% 100%;
-          background-repeat: no-repeat;
-          transition: background-size 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-                      -webkit-text-stroke-color 0.5s ease,
-                      letter-spacing 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-                      opacity 0.5s ease;
-          -webkit-text-stroke-color: var(--muted-foreground, #94a3b8);
-          letter-spacing: 0.05em;
-          opacity: 0.5;
-        }
-
-        .spoken-card.is-filled .spoken-title {
-          background-size: 100% 100%;
-          -webkit-text-stroke-color: transparent;
-          letter-spacing: 0.08em;
-          opacity: 1;
-        }
-
-        .spoken-place {
-          opacity: 0;
-          transform: translateY(8px);
-          transition: opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s;
-        }
-        .spoken-card.is-filled .spoken-place {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .spoken-title {
-            transition: none !important;
-            background-size: 100% 100% !important;
-            -webkit-text-fill-color: var(--foreground) !important;
-            -webkit-text-stroke: 0 !important;
-            letter-spacing: 0.02em !important;
-            opacity: 1 !important;
-          }
-          .spoken-place {
-            transition: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-          }
-        }
-      `}</style>
-
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 gap-3.5">
         {EVENTS.map((event, i) => (
           <SpokenCard key={event.title} event={event} index={i} />
         ))}

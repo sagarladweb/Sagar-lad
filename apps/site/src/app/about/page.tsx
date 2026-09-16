@@ -21,6 +21,7 @@ const TraveledMap = dynamic(
   }
 );
 import { JsonLd } from "@/components/JsonLd";
+import { Pill } from "@/components/ui/Pill";
 import { SITE } from "@/lib/site";
 
 import { METRICS, metricNum } from "@/lib/metrics";
@@ -574,9 +575,7 @@ export default function AboutPage() {
       <section id="belief" className="scroll-mt-32 py-12 sm:py-16 md:py-20 border-b border-border">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="text-center lg:text-left">
-            <p data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-              Professional Bio
-            </p>
+            <Pill supportLine="Professional Bio">Professional Bio</Pill>
           </div>
           <div data-reveal className="mt-6 space-y-5 text-base sm:text-lg text-muted-foreground leading-relaxed text-center lg:text-left">
             <p>
@@ -646,9 +645,7 @@ export default function AboutPage() {
       <section id="travel" className="scroll-mt-32 py-10 sm:py-14 md:py-16 border-b border-border bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-6 sm:mb-8 text-center lg:text-left">
-            <span data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">
-              Global Journey
-            </span>
+            <Pill supportLine="Global Journey">Global Journey</Pill>
             <h2 data-reveal className="mt-3 font-display text-3xl sm:text-4xl font-bold text-foreground">
               Countries I&apos;ve Traveled
             </h2>
@@ -664,7 +661,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             {/* Left: header text */}
             <div className="lg:col-span-5 text-center lg:text-left">
-              <span data-reveal className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Off the clock</span>
+              <Pill supportLine="Off the clock">Off the clock</Pill>
               <h2 data-reveal className="mt-3 font-display text-3xl sm:text-4xl font-bold">
                 Runner for life
               </h2>

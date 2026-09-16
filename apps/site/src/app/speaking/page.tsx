@@ -15,6 +15,7 @@ import { SpeakingExperience } from "@/components/speaking/SpeakingExperience";
 import { SpeakingReviewButton } from "@/components/speaking/SpeakingReviewModal";
 import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 import { JsonLd } from "@/components/JsonLd";
+import { Pill } from "@/components/ui/Pill";
 import { getSpeakingGallery } from "@/lib/speaking-gallery";
 
 export const metadata: Metadata = pageMetadata({
@@ -83,9 +84,7 @@ export default async function SpeakingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             <div className="lg:col-span-5 text-center lg:text-left">
-              <span className="inline-flex items-center justify-center lg:justify-start rounded-full bg-brand-light/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-brand">
-                Watch
-              </span>
+              <Pill supportLine="Watch">Watch</Pill>
               <div className="mt-6">
                 <p className="font-display text-lg sm:text-xl font-bold text-accent-strong">
                   Stop chasing AI. Start A.I.M.ing.
@@ -231,7 +230,7 @@ export default async function SpeakingPage() {
       <section className="card-hover py-12 sm:py-16 md:py-20 border-b border-border bg-card/40" aria-label="Professional experience">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-2xl text-center lg:text-left mx-auto lg:mx-0" data-animate>
-            <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">How it works</span>
+            <Pill supportLine="How it works">How it works</Pill>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">Three simple steps</h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
               No confusion, no last-minute surprises. Here&apos;s exactly how we&apos;ll work together from start to finish.
@@ -270,7 +269,7 @@ export default async function SpeakingPage() {
       <section className="py-12 sm:py-16 md:py-20 bg-background" aria-label="What organizers say">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16" data-animate>
-            <span className="inline-block text-xs font-semibold tracking-wide text-brand bg-brand-light/10 rounded-full px-4 py-1.5">Kind words</span>
+            <Pill supportLine="Kind words">Kind words</Pill>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold text-accent-strong">What people say</h2>
             <p className="mt-3 text-sm sm:text-base text-muted-foreground">
               Honest feedback from organizers and attendees who&apos;ve experienced the talks firsthand.
