@@ -23,7 +23,9 @@ export function BlogCard({
   post: Post;
   showStats?: boolean;
 }) {
-  const metrics = { views: getEngagement(post.slug, new Date(post.publishedAt).toISOString()).views, likes: post.likes ?? 0 };
+  const algorithmViews = getEngagement(post.slug, new Date(post.publishedAt).toISOString()).views;
+  const realViews = post.views ?? 0;
+  const metrics = { views: algorithmViews + realViews, likes: post.likes ?? 0 };
 
   return (
     <Link

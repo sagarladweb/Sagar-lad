@@ -65,7 +65,9 @@ export function PostArticle({
   authorImage?: string | null;
 }) {
   const authorName = post.author?.name ?? SITE.name;
-  const metrics = { views: getEngagement(post.slug, new Date(post.publishedAt).toISOString()).views, likes: post.likes ?? 0 };
+  const algorithmViews = getEngagement(post.slug, new Date(post.publishedAt).toISOString()).views;
+  const realViews = post.views ?? 0;
+  const metrics = { views: algorithmViews + realViews, likes: post.likes ?? 0 };
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-8 sm:pb-12 lg:pb-16">
