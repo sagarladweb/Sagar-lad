@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Mail, CheckCircle2, Loader2 } from "lucide-react";
+import { Mail, CheckCircle2, Loader2, Eye, EyeOff } from "lucide-react";
 
 const STORAGE_KEY = "nl_test_email";
 
@@ -18,10 +18,23 @@ export function NewsletterSettings() {
   const [testEmail, setTestEmail] = useState("");
   const [saved, setSaved] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [showArchive, setShowArchive] = useState(true);
+  const [archiveLoading, setArchiveLoading] = useState(true);
+  const [archiveSaved, setArchiveSaved] = useState(false);
 
   useEffect(() => {
     setTestEmail(getStoredTestEmail());
     setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/admin/newsletter-settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (typeof d.showArchive === "boolean") setShowArchive(d.showArchive);
+      })
+      .catch(() => {})
+      .finally(() => setArchiveLoading(false));
   }, []);
 
   function handleSave() {
@@ -31,10 +44,74 @@ export function NewsletterSettings() {
     setTimeout(() => setSaved(false), 2000);
   }
 
+  function handleArchiveToggle() {
+    const next = !showArchive;
+    setShowArchive(true); // optimistic
+    setArchiveLoading(true);
+    fetch("/api/admin/newsletter-settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ showArchive: next }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (typeof d.showArchive === "boolean") setShowArchive(d.showArchive);
+        setArchiveSaved(true);
+        setTimeout(() => setArchiveSaved(false), 2000);
+      })
+      .catch(() => setShowArchive(!next))
+      .finally(() => setArchiveLoading(false));
+  }
+
   const isValid = !testEmail.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmail.trim());
 
   return (
     <div className="space-y-6">
+      {/* Archive visibility toggle */}
+      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/10">
+            {showArchive ? (
+              <Eye className="w-5 h-5 text-accent-strong" />
+            ) : (
+              <EyeOff className="w-5 h-5 text-muted-foreground" />
+            )}
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">Public Newsletter Archive</h3>
+            <p className="text-xs text-muted-foreground">
+              Show or hide the newsletter archive page at <code className="bg-muted px-1 rounded text-[11px]">/newsletter</code>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {showArchive ? "Archive is visible to public" : "Archive is hidden from public"}
+          </span>
+          <button
+            type="button"
+            onClick={handleArchiveToggle}
+            disabled={archiveLoading}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              showArchive ? "bg-brand" : "bg-border"
+            } ${archiveLoading ? "opacity-60" : ""}`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                showArchive ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
+        {archiveSaved && (
+          <p className="text-xs text-brand font-medium flex items-center gap-1">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Settings saved
+          </p>
+        )}
+      </div>
+
+      {/* Test email */}
       <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/10">

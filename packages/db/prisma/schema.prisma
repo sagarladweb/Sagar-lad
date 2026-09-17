@@ -382,3 +382,9 @@ model HomeHero {
   tagline3        String   @default("Change your LIFE.")
   updatedAt       DateTime @updatedAt
 }
+
+model NewsletterSiteSettings {
+  id            String   @id @default("default")
+  showArchive   Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+}

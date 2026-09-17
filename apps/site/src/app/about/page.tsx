@@ -220,11 +220,18 @@ export default function AboutPage() {
       }
     }, el);
 
-    // ScrollTrigger measured positions before fonts/images settled, which on
-    // mobile leaves below-fold sections stuck at opacity 0. Recalibrate once
-    // layout is stable so every section reveals correctly on all devices.
-    const refresh = () => ScrollTrigger.refresh();
-    window.setTimeout(refresh, 0);
+    // Recalibrate ScrollTrigger after layout stabilizes — but skip the
+    // initial refresh if we just navigated here (scroll is already at 0).
+    const skipFirstRefresh = window.scrollY === 0;
+    let didFirstRefresh = false;
+    const refresh = () => {
+      if (skipFirstRefresh && !didFirstRefresh) {
+        didFirstRefresh = true;
+        return; // Skip first refresh on fresh navigation
+      }
+      ScrollTrigger.refresh();
+    };
+    window.setTimeout(refresh, 100);
     if (document.fonts?.ready) {
       document.fonts.ready.then(refresh).catch(() => {});
     }
