@@ -1,9 +1,21 @@
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import { rateLimitByIp, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
+    const secret = req.headers.get("x-cron-secret");
+    if (!secret || secret !== process.env.CRON_SECRET) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const ip = getClientIp(req);
+    const { ok } = await rateLimitByIp(ip, 5, 60_000);
+    if (!ok) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const body = await req.json();
     if (!body || typeof body !== "object") {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });

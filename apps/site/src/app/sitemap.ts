@@ -1,8 +1,10 @@
 import type { MetadataRoute } from "next";
-import { prisma, dbSafe } from "@/lib/db";
+import { unstable_cache } from "next/cache";
+import { dbSafe } from "@/lib/db";
+import { prisma } from "@/lib/db";
 import { SITE, VISIBLE_POST_WHERE } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 const STATIC_PATHS: { path: string; priority: number; changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never" }[] = [
   { path: "", priority: 1, changeFrequency: "daily" },
@@ -25,25 +27,34 @@ const STATIC_PATHS: { path: string; priority: number; changeFrequency: "always" 
   { path: "/terms", priority: 0.3, changeFrequency: "yearly" },
 ];
 
+const getCachedSitemapData = unstable_cache(
+  async () => {
+    const [posts, videos] = await Promise.all([
+      dbSafe(
+        () =>
+          prisma.post.findMany({
+            where: VISIBLE_POST_WHERE,
+            select: { slug: true, updatedAt: true },
+          }),
+        []
+      ),
+      dbSafe(
+        () =>
+          prisma.video.findMany({
+            where: { published: true, deletedAt: null },
+            select: { slug: true, createdAt: true },
+          }),
+        []
+      ),
+    ]);
+    return { posts, videos };
+  },
+  ["sitemap-data-v1"],
+  { revalidate: 300, tags: ["content"] }
+);
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, videos] = await Promise.all([
-    dbSafe(
-      () =>
-        prisma.post.findMany({
-          where: VISIBLE_POST_WHERE,
-          select: { slug: true, updatedAt: true },
-        }),
-      []
-    ),
-    dbSafe(
-      () =>
-        prisma.video.findMany({
-          where: { published: true, deletedAt: null },
-          select: { slug: true, createdAt: true },
-        }),
-      []
-    ),
-  ]);
+  const { posts, videos } = await getCachedSitemapData();
 
   return [
     ...STATIC_PATHS.map((p) => ({

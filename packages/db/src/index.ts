@@ -138,12 +138,11 @@ async function resetPool() {
 
 /**
  * Run a DB query with retry logic.
- * Retries at 1s, 3s, and 5s — enough time for Supabase free-tier to wake
- * from a paused state (typically 5-15s).
+ * Retries at 2s, 5s, and 8s — covers Supabase free-tier cold starts (5-15s).
  * Returns `fallback` if all retries fail.
  */
 export async function dbSafe<T>(query: () => Promise<T>, fallback: T): Promise<T> {
-  const RETRY_DELAYS = [1000, 3000, 5000];
+  const RETRY_DELAYS = [2000, 5000, 8000];
   const MAX_RETRIES = RETRY_DELAYS.length;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ShoppingBag } from "lucide-react";
 import { type BookId, type PageData, mindupPages, azurePages } from "./BookPages";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 type Props = {
   bookId: BookId;
@@ -172,7 +173,7 @@ function BookViewerInner({ bookId, buyUrl, open, onClose }: Props) {
                 className={`book-page-wrapper bg-white ${pageProps.className ?? ""}`} 
                 style={pageProps.style}
               >
-                <div dangerouslySetInnerHTML={{ __html: pageProps.content }} className="w-full h-full" />
+                <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(pageProps.content) }} className="w-full h-full" />
               </div>
             ))}
           </div>
