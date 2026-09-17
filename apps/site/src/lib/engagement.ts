@@ -61,8 +61,9 @@ export function getEngagement(
   const dailySeed = fnv1a(slug + today) % 100;
   const dailyJitter = 0.9 + (dailySeed / 100) * 0.2; // 0.90..1.10
 
-  const views = Math.round(
-    dailyBase * ageDays * ageMultiplier * weekdayBoost * dailyJitter,
+  const views = Math.max(
+    1,
+    Math.round(dailyBase * ageDays * ageMultiplier * weekdayBoost * dailyJitter),
   );
 
   // --- LIKES ---

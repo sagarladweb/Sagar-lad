@@ -9,9 +9,9 @@ const SESSION_COOKIE = "next-auth.session-token";
 const SESSION_COOKIE_SECURE = "__Secure-next-auth.session-token";
 
 // Admin login page and auth callback are public
-const PUBLIC_PATHS = ["/admin/login", "/api/auth"];
+const PUBLIC_PATHS = ["/login", "/api/auth"];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow public paths
@@ -29,7 +29,7 @@ export function middleware(request: NextRequest) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();

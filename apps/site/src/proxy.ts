@@ -38,7 +38,7 @@ const API_RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
   "/api/revalidate": { limit: 10, windowMs: 60_000 },
 };
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   maybeCleanup();
   const { pathname } = request.nextUrl;
   const ip =
