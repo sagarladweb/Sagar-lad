@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Loader2,
   AlertCircle,
@@ -113,7 +112,6 @@ function PasswordField({
 }
 
 function AdminLogin() {
-  const router = useRouter();
   const { data: session, status } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -266,6 +264,16 @@ function AdminLogin() {
     }
   }, [status, overlay]);
 
+  // Safety fallback: ensure authenticated users never get stuck on login page
+  useEffect(() => {
+    if (status === "authenticated") {
+      const fallback = setTimeout(() => {
+        window.location.replace(targetRoute);
+      }, 2500);
+      return () => clearTimeout(fallback);
+    }
+  }, [status]);
+
   return (
     <div className="admin-panel min-h-screen">
       {/* Full-screen auth overlays */}
@@ -273,7 +281,9 @@ function AdminLogin() {
         <AuthOverlay
           type="success"
           message={`Signed in as ${session?.user?.name || "Sagar Lad"}`}
-          onComplete={() => router.push(targetRoute)}
+          onComplete={() => {
+            window.location.replace(targetRoute);
+          }}
         />
       )}
       {overlay === "error" && (

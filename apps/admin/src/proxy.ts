@@ -5,25 +5,39 @@ import type { NextRequest } from "next/server";
 // Individual routes still call requireAdmin() for full session + role check.
 // This blocks unauthenticated requests at the edge, before they reach any handler.
 
-const SESSION_COOKIE = "next-auth.session-token";
-const SESSION_COOKIE_SECURE = "__Secure-next-auth.session-token";
+const SESSION_COOKIE_NAMES = [
+  "authjs.session-token",
+  "__Secure-authjs.session-token",
+  "next-auth.session-token",
+  "__Secure-next-auth.session-token",
+];
+
+function hasSessionCookie(request: NextRequest): boolean {
+  return request.cookies.getAll().some(
+    (c) =>
+      (c.name.includes("session-token") || SESSION_COOKIE_NAMES.includes(c.name)) &&
+      Boolean(c.value && c.value.trim().length > 0)
+  );
+}
 
 // Admin login page and auth callback are public
 const PUBLIC_PATHS = ["/login", "/api/auth"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const hasCookie = hasSessionCookie(request);
 
-  // Allow public paths
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+  // If already authenticated and visiting login endpoints, forward directly to dashboard
+  if (hasCookie && (pathname === "/admin" || pathname === "/login")) {
+    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+  }
+
+  // Allow login page and NextAuth API callbacks
+  if (pathname === "/admin" || PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
   // Check for session cookie (either regular or secure variant)
-  const hasCookie =
-    request.cookies.has(SESSION_COOKIE) ||
-    request.cookies.has(SESSION_COOKIE_SECURE);
-
   if (!hasCookie) {
     // No session cookie at all — redirect to login (pages) or 401 (API)
     if (pathname.startsWith("/api/")) {
@@ -36,5 +50,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*", "/login"],
 };
+
