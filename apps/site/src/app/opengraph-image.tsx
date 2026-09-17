@@ -18,9 +18,10 @@ export default function OgImage() {
           padding: "0 80px",
           background: "#0e0e10",
           color: "#f5f4f0",
+          position: "relative",
         }}
       >
-        {/* Subtle accent bar at top */}
+        {/* Top accent bar */}
         <div
           style={{
             position: "absolute",
@@ -28,53 +29,49 @@ export default function OgImage() {
             left: 0,
             right: 0,
             height: 4,
+            display: "flex",
             background: "linear-gradient(90deg, #0d21a1, #ffd51d)",
           }}
         />
 
-        <div
-          style={{
-            display: "flex",
-            width: "100%",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div
-              style={{
-                fontSize: 26,
-                color: "#ffd51d",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                fontWeight: 600,
-              }}
-            >
-              Sagar Lad
-            </div>
-            <div
-              style={{
-                fontSize: 60,
-                fontWeight: 700,
-                lineHeight: 1.1,
-                maxWidth: 900,
-                marginTop: 12,
-              }}
-            >
-              MIND UP — Change Your{" "}
-              <span style={{ color: "#ffd51d" }}>MIND</span>, Change Your{" "}
-              <span style={{ color: "#ffd51d" }}>LIFE</span>
-            </div>
-            <div
-              style={{
-                fontSize: 24,
-                color: "#9a998f",
-                marginTop: 20,
-                letterSpacing: "0.05em",
-              }}
-            >
-              Author • Speaker • Human Potential Advocate
-            </div>
+        {/* Content */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div
+            style={{
+              fontSize: 26,
+              color: "#ffd51d",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              fontWeight: 600,
+              display: "flex",
+            }}
+          >
+            Sagar Lad
+          </div>
+          <div
+            style={{
+              fontSize: 60,
+              fontWeight: 700,
+              lineHeight: 1.1,
+              maxWidth: 900,
+              marginTop: 12,
+              display: "flex",
+            }}
+          >
+            MIND UP — Change Your{" "}
+            <span style={{ color: "#ffd51d", display: "flex" }}>MIND</span>, Change Your{" "}
+            <span style={{ color: "#ffd51d", display: "flex" }}>LIFE</span>
+          </div>
+          <div
+            style={{
+              fontSize: 24,
+              color: "#9a998f",
+              marginTop: 20,
+              letterSpacing: "0.05em",
+              display: "flex",
+            }}
+          >
+            Author • Speaker • Human Potential Advocate
           </div>
         </div>
 
@@ -86,6 +83,7 @@ export default function OgImage() {
             left: 0,
             right: 0,
             height: 4,
+            display: "flex",
             background: "linear-gradient(90deg, #ffd51d, #0d21a1)",
           }}
         />
