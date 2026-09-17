@@ -16,6 +16,7 @@ const getActiveAnnouncements = unstable_cache(
         imageUrl: true,
         buttonText: true,
         buttonLink: true,
+        showBar: true,
         barText: true,
         barLink: true,
         barStyle: true,

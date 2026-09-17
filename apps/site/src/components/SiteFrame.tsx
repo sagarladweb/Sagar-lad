@@ -36,10 +36,10 @@ type AnnouncementBarData = {
 
 function SiteFrameInner({
   children,
-  announcement,
+  announcement: serverAnnouncement,
 }: {
   children: React.ReactNode;
-  announcement?: AnnouncementBarData | null;
+  announcement: AnnouncementBarData | null;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -47,25 +47,25 @@ function SiteFrameInner({
   const isSandbox = pathname.startsWith("/sandbox");
   const isBarPreview = searchParams.get("announce_preview") === "bar";
   const previewId = searchParams.get("id");
-  const [previewAnnouncement, setPreviewAnnouncement] = useState<AnnouncementBarData | null>(null);
+  const [announcement, setAnnouncement] = useState<AnnouncementBarData | null>(serverAnnouncement);
 
+  // Preview mode: fetch specific announcement by id
   useEffect(() => {
     if (!isBarPreview || !previewId || announcement) return;
     fetch(`/api/announcements?id=${previewId}`)
       .then((r) => r.json())
-      .then((d) => { if (d.announcement) setPreviewAnnouncement(d.announcement); })
+      .then((d) => { if (d.announcements?.[0]) setAnnouncement(d.announcements[0]); })
       .catch(() => {});
   }, [isBarPreview, previewId, announcement]);
 
-  const effectiveAnnouncement = announcement || previewAnnouncement;
   const showRss = pathname === "/" || pathname === "/blog";
-  const barText = effectiveAnnouncement?.barText || effectiveAnnouncement?.title || null;
-  const barLink = effectiveAnnouncement?.barLink || effectiveAnnouncement?.buttonLink || null;
+  const barText = announcement?.barText || announcement?.title || null;
+  const barLink = announcement?.barLink || announcement?.buttonLink || null;
   const isBarEnabled =
-    effectiveAnnouncement?.showBar !== false &&
-    effectiveAnnouncement?.barStyle !== "none" &&
-    effectiveAnnouncement?.barStyle !== "hidden";
-  const shouldShowBar = isBarEnabled && barText && (effectiveAnnouncement || isBarPreview);
+    announcement?.showBar !== false &&
+    announcement?.barStyle !== "none" &&
+    announcement?.barStyle !== "hidden";
+  const shouldShowBar = isBarEnabled && barText && announcement;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -95,10 +95,10 @@ function SiteFrameInner({
         <AnnouncementBar
           text={barText}
           link={barLink}
-          barStyle={effectiveAnnouncement?.barStyle || "scrolling"}
-          speed={effectiveAnnouncement?.barSpeed || 30}
-          bgColor={effectiveAnnouncement?.barBgColor}
-          textColor={effectiveAnnouncement?.barColor}
+          barStyle={announcement?.barStyle || "scrolling"}
+          speed={announcement?.barSpeed || 30}
+          bgColor={announcement?.barBgColor}
+          textColor={announcement?.barColor}
         />
       )}
       {!hideChrome && <Navbar />}
@@ -124,7 +124,7 @@ export function SiteFrame({
   return (
     <Suspense>
       <SocialsProvider>
-        <SiteFrameInner children={children} announcement={announcement} />
+        <SiteFrameInner announcement={announcement ?? null}>{children}</SiteFrameInner>
       </SocialsProvider>
     </Suspense>
   );

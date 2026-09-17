@@ -10,8 +10,8 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
-  }, [error]);
+    console.error("[error] page render error");
+  }, []);
 
   return (
     <div className="mx-auto max-w-xl px-4 sm:px-6 py-32 text-center">

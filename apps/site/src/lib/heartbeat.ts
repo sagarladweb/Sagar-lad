@@ -63,7 +63,7 @@ export async function heartbeat(): Promise<{
 
       return { published: result.count, alive: true };
     } catch (err) {
-      console.warn("[heartbeat] DB ping failed:", (err as Error).message);
+      console.warn("[heartbeat] DB ping failed");
       lastFailure = Date.now();
       return { published: 0, alive: false };
     } finally {

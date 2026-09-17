@@ -22,7 +22,7 @@ export async function GET() {
       { headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=600" } }
     );
   } catch (err) {
-    console.warn("[api/liferazor] DB unavailable:", (err as Error).message);
+    console.warn("[api/liferazor] DB unavailable");
     return NextResponse.json({ lifeRazor: null });
   }
 }

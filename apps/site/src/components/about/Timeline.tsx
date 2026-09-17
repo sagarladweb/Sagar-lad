@@ -515,7 +515,6 @@ export function Timeline() {
                         ? "object-contain p-6 sm:p-8"
                         : `object-cover ${activeNode.imagePosition ?? "object-center"}`
                     } transition-transform duration-700 hover:scale-105`}
-                    priority
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-muted">

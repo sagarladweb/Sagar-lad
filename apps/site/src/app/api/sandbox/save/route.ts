@@ -54,7 +54,7 @@ export const DEFAULT_IMAGE_CONFIGS: Record<string, ImageBreakpointConfig> = ${JS
 
     return NextResponse.json({ success: true, message: "Configurations saved successfully!" });
   } catch (err) {
-    console.error("Failed to save image config:", err);
+    console.error("Failed to save image config");
     return NextResponse.json(
       { error: "Failed to write configuration file to disk." },
       { status: 500 }

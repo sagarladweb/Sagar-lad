@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import {
   Activity,
@@ -73,7 +73,7 @@ function MarqueeTopicCard({ t }: { t: Topic }) {
   return (
     <Link
       href={`/blog?category=${encodeURIComponent(t.slug)}`}
-      className="card-hover group flex flex-col items-center justify-center text-center p-4 sm:p-9 rounded-xl border border-border bg-card shrink-0 h-[140px] w-[140px] sm:h-[220px] sm:w-[280px] select-none cursor-pointer"
+      className="card-hover group flex flex-col items-center justify-center text-center p-4 sm:p-9 rounded-xl border border-border bg-card shrink-0 h-[140px] w-[140px] sm:h-[220px] sm:w-[280px] select-none cursor-pointer snap-center"
     >
       <span className="grid h-9 w-9 sm:h-14 sm:w-14 place-items-center rounded-full bg-muted text-muted-foreground mb-2 sm:mb-4 transition-all duration-300 group-hover:bg-brand/10 group-hover:text-brand">
         <Icon className="w-4 h-4 sm:w-6 sm:h-6" strokeWidth={1.5} />
@@ -89,75 +89,25 @@ export function TopicsGrid({ topics }: { topics: Topic[] }) {
   const items = topics.length > 0 ? sortTopics(topics) : COACH_TOPICS;
   const list = items.slice(0, 8);
   const doubled = [...list, ...list, ...list];
-  const trackRef = useRef<HTMLDivElement>(null);
   const [cssPaused, setCssPaused] = useState(false);
-  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const rafId = useRef<number>(0);
 
   const pause = useCallback(() => setCssPaused(true), []);
-  const resume = useCallback(() => {
-    if (resumeTimer.current) clearTimeout(resumeTimer.current);
-    resumeTimer.current = setTimeout(() => setCssPaused(false), 3000);
-  }, []);
+  const resume = useCallback(() => setCssPaused(false), []);
 
-  // Mobile/tablet: JS-driven auto-scroll via scrollLeft.
-  // Resumes from where the user left off. Infinite loop by resetting scrollLeft
-  // when it passes one set width.
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const isMobile = () => window.innerWidth < 1024;
-    if (!isMobile()) return;
-
-    const SPEED = 0.5; // px per frame (~30px/s at 60fps)
-    let running = true;
-    let lastTime = 0;
-
-    const tick = (now: number) => {
-      if (!running) return;
-      if (!lastTime) lastTime = now;
-      const dt = now - lastTime;
-      lastTime = now;
-
-      // Only scroll when not being touched
-      if (!track.dataset.touching) {
-        track.scrollLeft += SPEED * (dt / 16.67);
-
-        // Infinite loop: when we've scrolled past one set, jump back
-        const cardW = track.scrollWidth / 3;
-        if (track.scrollLeft >= cardW) {
-          track.scrollLeft -= cardW;
-        }
-      }
-
-      rafId.current = requestAnimationFrame(tick);
-    };
-
-    rafId.current = requestAnimationFrame(tick);
-
-    const onTouchStart = () => {
-      track.dataset.touching = "1";
-    };
-
-    const onTouchEnd = () => {
-      // Resume auto-scrolling from current position after 3s
-      if (resumeTimer.current) clearTimeout(resumeTimer.current);
-      resumeTimer.current = setTimeout(() => {
-        delete track.dataset.touching;
-      }, 3000);
-    };
-
-    track.addEventListener("touchstart", onTouchStart, { passive: true });
-    track.addEventListener("touchend", onTouchEnd, { passive: true });
-
-    return () => {
-      running = false;
-      cancelAnimationFrame(rafId.current);
-      track.removeEventListener("touchstart", onTouchStart);
-      track.removeEventListener("touchend", onTouchEnd);
-      if (resumeTimer.current) clearTimeout(resumeTimer.current);
-    };
-  }, []);
+  const onMouseOver = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+      pause();
+    },
+    [pause],
+  );
+  const onMouseOut = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+      resume();
+    },
+    [resume],
+  );
 
   return (
     <section className="py-10 sm:py-14 md:py-16 border-b border-border bg-background overflow-hidden" aria-label="Explore Topics">
@@ -173,31 +123,26 @@ export function TopicsGrid({ topics }: { topics: Topic[] }) {
         </p>
       </div>
 
-      {/* Desktop: CSS marquee (hover pauses). Mobile/tablet: JS scrollLeft (touch pauses, resumes from position). */}
+      {/* Desktop: CSS marquee — pauses on hover, resumes immediately on leave */}
       <div className="mt-8 md:mt-12 relative overflow-hidden marquee-mask marquee-pauser no-scrollbar">
-        {/* Desktop track — CSS animation */}
         <div
           className="hidden lg:flex w-max gap-6 animate-marquee py-3"
           style={{
             animationDuration: "50s",
             animationPlayState: cssPaused ? "paused" : "running",
           }}
-          onMouseEnter={pause}
-          onMouseLeave={resume}
+          onMouseOver={onMouseOver}
+          onMouseOut={onMouseOut}
         >
           {doubled.map((t, i) => (
             <MarqueeTopicCard key={`${t.id}-${i}`} t={t} />
           ))}
         </div>
 
-        {/* Mobile/tablet track — JS scrollLeft auto-scroll */}
-        <div
-          ref={trackRef}
-          className="lg:hidden flex w-max gap-3 py-3 overflow-x-hidden"
-          style={{ WebkitOverflowScrolling: "touch" }}
-        >
-          {doubled.map((t, i) => (
-            <MarqueeTopicCard key={`${t.id}-${i}`} t={t} />
+        {/* Mobile/tablet: swipeable carousel — one card at a time, snap scroll */}
+        <div className="lg:hidden flex gap-3 py-3 px-4 overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth">
+          {list.map((t) => (
+            <MarqueeTopicCard key={t.id} t={t} />
           ))}
         </div>
       </div>

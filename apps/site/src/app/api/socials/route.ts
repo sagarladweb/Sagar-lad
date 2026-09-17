@@ -23,7 +23,7 @@ export async function GET() {
       { headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=600" } }
     );
   } catch (err) {
-    console.warn("[api/socials] DB unavailable, returning empty:", (err as Error).message);
+    console.warn("[api/socials] DB unavailable, returning empty");
     return NextResponse.json({ socials: [] });
   }
 }

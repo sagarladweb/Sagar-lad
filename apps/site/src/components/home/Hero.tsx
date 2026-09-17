@@ -1,66 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { gsap } from "@/lib/gsap";
 import type { HomeHeroData } from "@/lib/hero-types";
 import { DEFAULT_HOME_HERO } from "@/lib/hero-types";
 
 export function Hero({ hero }: { hero?: HomeHeroData }) {
-  const root = useRef<HTMLElement>(null);
   const data = hero ?? DEFAULT_HOME_HERO;
-
-  useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      // Subtitle: fade up (first)
-      tl.fromTo(
-        "[data-hero-sub]",
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.7 },
-        0.3
-      );
-
-      // Name: fade up (second)
-      tl.fromTo(
-        "[data-hero-word]",
-        { opacity: 0, y: 36 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-        },
-        0.45
-      );
-
-      // Designation pill: fade up (third)
-      tl.fromTo(
-        "[data-hero-desig]",
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.7 },
-        0.65
-      );
-
-      // Tagline: fade up (fourth)
-      tl.fromTo(
-        "[data-hero-tag]",
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.7 },
-        0.8
-      );
-    }, el);
-
-    return () => ctx.revert();
-  }, []);
 
   return (
     <section
-      ref={root}
       className="relative -mt-16 min-h-[calc(100svh+4rem)] border-b border-border bg-foreground text-background overflow-hidden"
       aria-label="Introduction"
     >

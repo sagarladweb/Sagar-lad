@@ -169,7 +169,7 @@ export async function downloadToSupabase(opts: {
       folder: opts.folder,
     });
   } catch (err) {
-    console.error("downloadToSupabase failed:", err);
+    console.error("downloadToSupabase failed");
     return opts.remoteUrl;
   }
 }

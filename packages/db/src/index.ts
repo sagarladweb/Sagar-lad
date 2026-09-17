@@ -15,9 +15,6 @@ const globalForPrisma = globalThis as unknown as {
 let consecutiveFailures = 0;
 
 function markDbUp() {
-  if (consecutiveFailures > 0) {
-    console.log(`[db] connection recovered after ${consecutiveFailures} failure(s)`);
-  }
   consecutiveFailures = 0;
 }
 
@@ -47,7 +44,7 @@ function createPool(): pg.Pool {
   } as Record<string, unknown>);
 
   pool.on("error", (err) => {
-    console.error("[db] idle pool error:", err.message);
+    console.error("[db] idle pool error");
     if (isConnectionError(err)) {
       resetPool().catch(() => {});
     }
@@ -70,7 +67,7 @@ function createClient() {
 
   return new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    log: [],
   });
 }
 
@@ -138,11 +135,12 @@ async function resetPool() {
 
 /**
  * Run a DB query with retry logic.
- * Retries at 2s, 5s, and 8s — covers Supabase free-tier cold starts (5-15s).
+ * Retries at 1s, 2s, 3s — fast enough to not block page loads when offline,
+ * slow enough to cover Supabase free-tier cold starts.
  * Returns `fallback` if all retries fail.
  */
 export async function dbSafe<T>(query: () => Promise<T>, fallback: T): Promise<T> {
-  const RETRY_DELAYS = [2000, 5000, 8000];
+  const RETRY_DELAYS = [1000, 2000, 3000];
   const MAX_RETRIES = RETRY_DELAYS.length;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -165,7 +163,7 @@ export async function dbSafe<T>(query: () => Promise<T>, fallback: T): Promise<T
       markDbDown();
       // Reset pool on failure — next request gets fresh connections
       resetPool().catch(() => {});
-      console.warn("[db] connection error after retries, using fallback:", (err as Error).message);
+      console.warn("[db] connection error after retries, using fallback");
       return fallback;
     }
   }

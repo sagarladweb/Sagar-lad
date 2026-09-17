@@ -6,8 +6,8 @@ import { SiteFrame } from "@/components/SiteFrame";
 import { BrandingProvider } from "@/components/BrandingProvider";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { SITE } from "@/lib/site";
-import { heartbeat } from "@/lib/heartbeat";
-import { getActiveAnnouncement } from "@/lib/content";
+import { HeartbeatMarker } from "@/components/HeartbeatMarker";
+import { prisma } from "@/lib/db";
 
 // Self-hosted fonts — never depend on Google Fonts being reachable at build
 // or serve time, so CSS always loads. Files in src/app/fonts/.
@@ -103,12 +103,27 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // Self-contained heartbeat: keeps Supabase alive + auto-publishes scheduled
-  // posts. Runs once per 60s. Zero external dependencies.
-  // Fire-and-forget: don't block page load on a DB write.
-  heartbeat().catch(() => {});
-
-  const announcement = await getActiveAnnouncement();
+  let announcement = null;
+  try {
+    announcement = await prisma.announcement.findFirst({
+      where: { active: true },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        showBar: true,
+        barText: true,
+        barLink: true,
+        buttonLink: true,
+        barStyle: true,
+        barSpeed: true,
+        barBgColor: true,
+        barColor: true,
+      },
+    });
+  } catch {
+    // DB unreachable — render without announcement bar
+  }
 
   return (
     <html
@@ -195,11 +210,11 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://i.ytimg.com" />
         <link rel="preconnect" href="https://www.youtube.com" />
         <link rel="preconnect" href="https://www.instagram.com" />
-        <link rel="preconnect" href="https://*.supabase.co" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
         <ScrollToTop />
+        <HeartbeatMarker />
         <BrandingProvider>
           <SiteFrame announcement={announcement}>{children}</SiteFrame>
         </BrandingProvider>

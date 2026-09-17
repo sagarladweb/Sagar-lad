@@ -42,8 +42,8 @@ export async function GET(req: Request) {
       where: { published: false, scheduledAt: { not: null }, deletedAt: null },
     });
     if (pending > 0) console.log(`[cron] ${pending} post(s) still pending schedule`);
-  } catch (err) {
-    console.error("[cron] scheduled post publish failed:", (err as Error).message);
+  } catch {
+    console.error("[cron] scheduled post publish failed");
   }
 
   // 2. Keep Supabase alive
@@ -59,8 +59,8 @@ export async function GET(req: Request) {
     if (newsletterResult.sent > 0) {
       console.log(`[cron] newsletter: sent ${newsletterResult.sent}, remaining ${newsletterResult.remaining}`);
     }
-  } catch (err) {
-    console.error("[cron] newsletter drain failed:", (err as Error).message);
+  } catch {
+    console.error("[cron] newsletter drain failed");
   }
 
   return NextResponse.json({

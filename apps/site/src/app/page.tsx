@@ -1,8 +1,7 @@
 import { SITE, VISIBLE_POST_WHERE } from "@/lib/site";
 import { getSiteSocials } from "@/lib/social-links";
-import { getCategoriesWithFallback, getFeaturedPostsWithFallback, getActiveAnnouncement } from "@/lib/content";
+import { getCategoriesWithFallback, getFeaturedPostsWithFallback } from "@/lib/content";
 import { getHomeHero } from "@/lib/hero";
-import { prisma } from "@/lib/db";
 import { JsonLd } from "@/components/JsonLd";
 
 import { Hero } from "@/components/home/Hero";
@@ -17,37 +16,22 @@ import { MentorshipCta } from "@/components/home/MentorshipCta";
 import { NewsletterCta } from "@/components/home/NewsletterCta";
 import { SagarGallery } from "@/components/home/SagarGallery";
 import { LifeRazor } from "@/components/home/LifeRazor";
-import { AnnouncementSection } from "@/components/home/AnnouncementSection";
-import { AnnouncementPopup } from "@/components/home/AnnouncementPopup";
 import { LazySection } from "@/components/home/LazySection";
 
 export const revalidate = 60;
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ announce_preview?: string; id?: string }>;
-}) {
-  const params = await searchParams;
-  const previewMode = params.announce_preview;
-
-  const fetchAnnouncement = params.id
-    ? prisma.announcement.findUnique({ where: { id: params.id } }).catch(() => null)
-    : getActiveAnnouncement();
-
+export default async function HomePage() {
   const results = await Promise.all([
     getFeaturedPostsWithFallback(VISIBLE_POST_WHERE, 4).catch(() => []),
     getSiteSocials().catch(() => []),
     getCategoriesWithFallback().catch(() => []),
-    fetchAnnouncement.catch(() => null),
     getHomeHero().catch(() => null),
   ]);
 
-  const [posts, socials, allCategories, announcement, hero] = results as [
+  const [posts, socials, allCategories, hero] = results as [
     Awaited<ReturnType<typeof getFeaturedPostsWithFallback>>,
     Awaited<ReturnType<typeof getSiteSocials>>,
     Awaited<ReturnType<typeof getCategoriesWithFallback>>,
-    Awaited<typeof fetchAnnouncement>,
     Awaited<ReturnType<typeof getHomeHero>>,
   ];
 
@@ -60,34 +44,6 @@ export default async function HomePage({
     }))
     .sort((a, b) => b.postCount - a.postCount)
     .slice(0, 10);
-
-  if (previewMode === "section") {
-    return (
-      <div className="min-h-screen bg-background">
-        {announcement && <AnnouncementSection announcement={announcement} />}
-      </div>
-    );
-  }
-
-  if (previewMode === "all") {
-    return (
-      <>
-        <Hero hero={hero} />
-        <LazySection><FeaturedOn /></LazySection>
-        <LazySection><AboutMe /></LazySection>
-        <LazySection><MindUp /></LazySection>
-        <LazySection><TopicsGrid topics={topicsWithViews} /></LazySection>
-        <LazySection><MindUpBook /></LazySection>
-        <LazySection><BlogPreview posts={posts} showStats /></LazySection>
-        <LazySection><Testimonials /></LazySection>
-        <LazySection><MentorshipCta /></LazySection>
-        <LazySection><NewsletterCta /></LazySection>
-        <LazySection><SagarGallery /></LazySection>
-        <LazySection><LifeRazor /></LazySection>
-        {announcement && <LazySection><AnnouncementSection announcement={announcement} /></LazySection>}
-      </>
-    );
-  }
 
   return (
     <>
@@ -129,8 +85,6 @@ export default async function HomePage({
       <LazySection><NewsletterCta /></LazySection>
       <LazySection><SagarGallery /></LazySection>
       <LazySection><LifeRazor /></LazySection>
-      {announcement && <LazySection><AnnouncementSection announcement={announcement} /></LazySection>}
-      {announcement && <AnnouncementPopup announcement={announcement} />}
     </>
   );
 }

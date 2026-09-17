@@ -141,7 +141,6 @@ export function AboutMe() {
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover object-[45%_50%] sm:object-[45%_50%] lg:object-[45%_50%]"
-                  priority
                 />
               </figure>
             </div>

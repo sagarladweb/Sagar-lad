@@ -67,7 +67,6 @@ export function SagarGallery() {
                   src={p.src}
                   alt={p.alt}
                   fill
-                  priority={idx === 0}
                   sizes="(max-width: 768px) 100vw, 768px"
                   className={`object-cover ${p.className} transition-transform duration-700 hover:scale-105`}
                 />
