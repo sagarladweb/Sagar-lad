@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -6,6 +6,7 @@ import { SiteFrame } from "@/components/SiteFrame";
 import { BrandingProvider } from "@/components/BrandingProvider";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { SITE } from "@/lib/site";
+import { brandColors } from "@/lib/brand-colors";
 import { HeartbeatMarker } from "@/components/HeartbeatMarker";
 import { prisma } from "@/lib/db";
 
@@ -42,6 +43,11 @@ const greatVibes = localFont({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: brandColors.blue.hex,
+  colorScheme: "dark light",
+};
+
 export const metadata: Metadata = {
   title: SITE.title,
   description: SITE.description,
@@ -76,21 +82,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: SITE.name,
     url: SITE.url,
-    images: [
-      {
-        url: `${SITE.url}/opengraph-image`,
-        width: 1200,
-        height: 630,
-        alt: `${SITE.name} — Author, Speaker & Human Potential Advocate`,
-      },
-    ],
     locale: SITE.locale,
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: SITE.title,
     description: SITE.description,
-    images: [`${SITE.url}/opengraph-image`],
   },
   icons: {
     icon: [
@@ -102,7 +99,9 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   other: {
-    "theme-color": "#0d21a1",
+    "theme-color": brandColors.blue.hex,
+    "msapplication-TileColor": brandColors.blue.hex,
+    "msapplication-navbutton-color": brandColors.blue.hex,
   },
 };
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { brandColors } from "./brand-colors";
 
 export const SITE = {
   name: "Sagar Lad",
@@ -6,7 +7,7 @@ export const SITE = {
   title: "Sagar Lad Official Website",
   description:
     "Official website of Sagar Lad — Published Author of 6+ books, TEDx Speaker.",
-  ogImage: "/opengraph-image",
+  ogImage: "/apple-touch-icon.png",
   locale: "en_IN",
 } as const;
 
@@ -18,7 +19,6 @@ export function pageMetadata({
   description,
   path,
   type = "website",
-  ogImage = SITE.ogImage,
 }: {
   title: string;
   description: string;
@@ -28,9 +28,6 @@ export function pageMetadata({
 }): Metadata {
   const url = `${SITE.url}${path}`;
   const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`;
-  const resolvedOgImage = ogImage.startsWith("http")
-    ? ogImage
-    : `${SITE.url}${ogImage.startsWith("/") ? "" : "/"}${ogImage}`;
 
   return {
     title: fullTitle,
@@ -42,20 +39,17 @@ export function pageMetadata({
       url,
       siteName: SITE.name,
       type,
-      images: [
-        {
-          url: resolvedOgImage,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
+      locale: SITE.locale,
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       title: fullTitle,
       description,
-      images: [resolvedOgImage],
+    },
+    other: {
+      "theme-color": brandColors.blue.hex,
+      "msapplication-TileColor": brandColors.blue.hex,
+      "msapplication-navbutton-color": brandColors.blue.hex,
     },
   };
 }
