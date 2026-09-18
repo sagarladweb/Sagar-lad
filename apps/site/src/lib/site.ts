@@ -28,7 +28,12 @@ export function pageMetadata({
   ogImage?: string;
 }): Metadata {
   const url = `${SITE.url}${path}`;
-  const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`;
+  const fullTitle =
+    title === SITE.name
+      ? SITE.title
+      : title.includes(SITE.name)
+      ? title
+      : `${title} — ${SITE.name}`;
   const resolvedOgImage = ogImage.startsWith("http")
     ? ogImage
     : `${SITE.url}${ogImage.startsWith("/") ? "" : "/"}${ogImage}`;

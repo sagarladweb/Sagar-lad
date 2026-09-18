@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const SITE = {
   name: "Sagar Lad",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? "https://sagarlad.com").trim().replace(/\/$/, ""),
-  title: "Sagar Lad — Author, Keynote Speaker & Data & AI Architect",
+  title: "Sagar Lad — Author, Speaker & Human Potential Advocate",
   description:
     "Official website of Sagar Lad — Published Author of 6+ books, TEDx Speaker.",
   ogImage: "/images/og-image.jpg",
@@ -24,7 +24,12 @@ export function pageMetadata({
   ogImage?: string;
 }): Metadata {
   const url = `${SITE.url}${path}`;
-  const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`;
+  const fullTitle =
+    title === SITE.name
+      ? SITE.title
+      : title.includes(SITE.name)
+      ? title
+      : `${title} — ${SITE.name}`;
   return {
     title: fullTitle,
     description,
