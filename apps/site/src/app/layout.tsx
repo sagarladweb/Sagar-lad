@@ -47,14 +47,13 @@ export const metadata: Metadata = {
   description: SITE.description,
   keywords: [
     "Sagar Lad",
-    "personal finance",
-    "money management",
-    "career advice",
-    "awareness",
-    "investing",
-    "books",
-    "productivity",
-    "India",
+    "Author",
+    "Keynote Speaker",
+    "TEDx Speaker",
+    "MIND UP",
+    "Books",
+    "Mentorship",
+    "Human Potential Advocate",
   ],
   metadataBase: new URL(SITE.url),
   robots: {
@@ -72,19 +71,26 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: SITE.name,
+    title: SITE.title,
     description: SITE.description,
     type: "website",
     siteName: SITE.name,
     url: SITE.url,
-    images: [{ url: SITE.ogImage, alt: SITE.name }],
+    images: [
+      {
+        url: `${SITE.url}/opengraph-image`,
+        width: 1200,
+        height: 630,
+        alt: `${SITE.name} — Author, Speaker & Human Potential Advocate`,
+      },
+    ],
     locale: SITE.locale,
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE.name,
+    title: SITE.title,
     description: SITE.description,
-    images: [SITE.ogImage],
+    images: [`${SITE.url}/opengraph-image`],
   },
   icons: {
     icon: [

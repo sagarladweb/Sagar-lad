@@ -5,8 +5,8 @@ export const SITE = {
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? "https://sagarlad.com").trim().replace(/\/$/, ""),
   title: "Sagar Lad Official Website",
   description:
-    "Practical frameworks on money, career, life and awareness — from author and public speaker Sagar Lad. Blog, books and more.",
-  ogImage: "/images/heroes/sagar-lad-author-mentor-guide-home-hero.webp",
+    "Official website of Sagar Lad — Published Author of 6+ books, TEDx Speaker.",
+  ogImage: "/opengraph-image",
   locale: "en_IN",
 } as const;
 
@@ -28,6 +28,10 @@ export function pageMetadata({
 }): Metadata {
   const url = `${SITE.url}${path}`;
   const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`;
+  const resolvedOgImage = ogImage.startsWith("http")
+    ? ogImage
+    : `${SITE.url}${ogImage.startsWith("/") ? "" : "/"}${ogImage}`;
+
   return {
     title: fullTitle,
     description,
@@ -38,13 +42,20 @@ export function pageMetadata({
       url,
       siteName: SITE.name,
       type,
-      images: [{ url: ogImage, alt: title }],
+      images: [
+        {
+          url: resolvedOgImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description,
-      images: [ogImage],
+      images: [resolvedOgImage],
     },
   };
 }
