@@ -12,7 +12,7 @@ import { BlogCard } from "@/components/blog/BlogCard";
 export const metadata: Metadata = pageMetadata({
   title: "Blog",
   description:
-    "Articles on money, life, career and everything in between by Sagar Lad.",
+    "Articles on life, career and everything in between by Sagar Lad.",
   path: "/blog",
 });
 
@@ -148,7 +148,7 @@ export default async function BlogPage({
 
             {/* Bio Description */}
             <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Writing aboutcareer growth, and intentional living. I believe
+              Writing about career growth, and intentional living. I believe
               practical ideas — not motivational fluff — are what actually move the
               needle. Here you&apos;ll find honest articles, free eBooks, and
               frameworks I&apos;ve used to build my personal brand.

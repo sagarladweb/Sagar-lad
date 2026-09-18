@@ -885,7 +885,7 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
       avatar: "",
       name: "Sagar Lad",
       role: "Author & Speaker",
-      bio: "I write practical frameworks on money, career, life and awareness every week.",
+      bio: "I write on career, life and awareness every week.",
       twitter: "https://x.com",
       linkedin: "https://linkedin.com",
       website: "https://sagarlad.com",
