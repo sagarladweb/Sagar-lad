@@ -83,11 +83,21 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     url: SITE.url,
     locale: SITE.locale,
+    images: [
+      {
+        url: `${SITE.url}/images/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: SITE.title,
+        type: "image/jpeg",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: SITE.title,
     description: SITE.description,
+    images: [`${SITE.url}/images/og-image.jpg`],
   },
   icons: {
     icon: [

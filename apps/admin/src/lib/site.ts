@@ -3,10 +3,10 @@ import type { Metadata } from "next";
 export const SITE = {
   name: "Sagar Lad",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? "https://sagarlad.com").trim().replace(/\/$/, ""),
-  title: "Sagar Lad Official Website",
+  title: "Sagar Lad — Author, Keynote Speaker & Data & AI Architect",
   description:
     "Official website of Sagar Lad — Published Author of 6+ books, TEDx Speaker.",
-  ogImage: "/images/heroes/sagar-lad-author-mentor-guide-home-hero.webp",
+  ogImage: "/images/og-image.jpg",
   locale: "en_IN",
 } as const;
 

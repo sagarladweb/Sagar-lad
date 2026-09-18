@@ -4,10 +4,10 @@ import { brandColors } from "./brand-colors";
 export const SITE = {
   name: "Sagar Lad",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? "https://sagarlad.com").trim().replace(/\/$/, ""),
-  title: "Sagar Lad Official Website",
+  title: "Sagar Lad — Author, Speaker & Data & Human Potential Advocate",
   description:
     "Official website of Sagar Lad — Published Author of 6+ books, TEDx Speaker.",
-  ogImage: "/apple-touch-icon.png",
+  ogImage: "/images/og-image.jpg",
   locale: "en_IN",
 } as const;
 
@@ -19,6 +19,7 @@ export function pageMetadata({
   description,
   path,
   type = "website",
+  ogImage = SITE.ogImage,
 }: {
   title: string;
   description: string;
@@ -28,6 +29,9 @@ export function pageMetadata({
 }): Metadata {
   const url = `${SITE.url}${path}`;
   const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`;
+  const resolvedOgImage = ogImage.startsWith("http")
+    ? ogImage
+    : `${SITE.url}${ogImage.startsWith("/") ? "" : "/"}${ogImage}`;
 
   return {
     title: fullTitle,
@@ -40,11 +44,20 @@ export function pageMetadata({
       siteName: SITE.name,
       type,
       locale: SITE.locale,
+      images: [
+        {
+          url: resolvedOgImage,
+          width: 1200,
+          height: 630,
+          alt: fullTitle,
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: fullTitle,
       description,
+      images: [resolvedOgImage],
     },
     other: {
       "theme-color": brandColors.blue.hex,
