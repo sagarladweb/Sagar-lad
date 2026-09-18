@@ -4,7 +4,7 @@ import { brandColors } from "./brand-colors";
 export const SITE = {
   name: "Sagar Lad",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? "https://sagarlad.com").trim().replace(/\/$/, ""),
-  title: "Sagar Lad — Author, Speaker & Data & Human Potential Advocate",
+  title: "Sagar Lad — Author, Speaker & Human Potential Advocate",
   description:
     "Official website of Sagar Lad — Published Author of 6+ books, TEDx Speaker.",
   ogImage: "/images/og-image.jpg",
