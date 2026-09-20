@@ -75,6 +75,42 @@ function useBlockData() {
 }
 
 /* ------------------------------------------------------------------ *
+ *  Social links — fetched from the same API as the Social tab
+ * ------------------------------------------------------------------ */
+type SocialLinkRow = { key: string; label: string; href: string; icon: string; active: boolean };
+
+let cachedSocials: SocialLinkRow[] | null = null;
+let socialsPromise: Promise<SocialLinkRow[]> | null = null;
+
+function useSocialLinks() {
+  const [socials, setSocials] = React.useState<SocialLinkRow[]>(cachedSocials ?? []);
+  const [loading, setLoading] = React.useState(!cachedSocials);
+
+  React.useEffect(() => {
+    if (cachedSocials) {
+      setSocials(cachedSocials);
+      setLoading(false);
+      return;
+    }
+    if (!socialsPromise) {
+      socialsPromise = fetch("/api/admin/socials")
+        .then((r) => r.json())
+        .then((d: SocialLinkRow[]) => {
+          cachedSocials = d.filter((s) => s.active);
+          return cachedSocials!;
+        })
+        .catch(() => []);
+    }
+    socialsPromise.then((d) => {
+      setSocials(d);
+      setLoading(false);
+    });
+  }, []);
+
+  return { socials, loading };
+}
+
+/* ------------------------------------------------------------------ *
  *  Tone palette used by callouts
  * ------------------------------------------------------------------ */
 const TONES: Record<string, { bg: string; border: string; accent: string }> = {
@@ -82,6 +118,33 @@ const TONES: Record<string, { bg: string; border: string; accent: string }> = {
   info: { bg: "#EFF6FF", border: "#BFDBFE", accent: "#1D4ED8" },
   warning: { bg: "#FEF2F2", border: "#FECACA", accent: "#B91C1C" },
   success: { bg: "#ECFDF5", border: "#A7F3D0", accent: "#047857" },
+};
+
+import {
+  FaYoutube,
+  FaInstagram,
+  FaXTwitter,
+  FaLinkedinIn,
+  FaFacebookF,
+  FaRedditAlien,
+  FaTelegram,
+  FaMedium,
+  FaPodcast,
+} from "react-icons/fa6";
+
+const SOCIAL_ICON_MAP: Record<string, { icon: typeof FaYoutube; color: string; label: string }> = {
+  youtube: { icon: FaYoutube, color: "#FF0000", label: "YouTube" },
+  instagram: { icon: FaInstagram, color: "#E4405F", label: "Instagram" },
+  x: { icon: FaXTwitter, color: "#000000", label: "X" },
+  linkedin: { icon: FaLinkedinIn, color: "#0A66C2", label: "LinkedIn" },
+  facebook: { icon: FaFacebookF, color: "#1877F2", label: "Facebook" },
+  reddit: { icon: FaRedditAlien, color: "#FF4500", label: "Reddit" },
+  telegram: { icon: FaTelegram, color: "#229ED9", label: "Telegram" },
+  medium: { icon: FaMedium, color: "#000000", label: "Medium" },
+  podcast: { icon: FaPodcast, color: "#8B5CF6", label: "Podcast" },
+  threads: { icon: FaInstagram, color: "#000000", label: "Threads" },
+  substack: { icon: Mail, color: "#FF6719", label: "Substack" },
+  website: { icon: ExternalLink, color: "#6B7280", label: "Website" },
 };
 
 const PLATFORM_LABEL: Record<string, string> = {
@@ -93,6 +156,112 @@ const PLATFORM_LABEL: Record<string, string> = {
   threads: "Threads",
   substack: "Substack",
 };
+
+/* ------------------------------------------------------------------ *
+ *  Social & Share — combined block with real social logos
+ * ------------------------------------------------------------------ */
+function SocialShareRenderer({ data: d }: { data: Record<string, unknown> }) {
+  const { socials } = useSocialLinks();
+  const blockPlatforms = (d.platforms ?? []) as {
+    platform: string;
+    url: string;
+    enabled: boolean;
+  }[];
+
+  // Merge: block platforms with DB URLs, then add any DB-only platforms
+  const dbByIcon: Record<string, SocialLinkRow> = {};
+  for (const s of socials) {
+    dbByIcon[s.icon] = s;
+  }
+  const merged = blockPlatforms.map((bp) => {
+    const db = dbByIcon[bp.platform];
+    return { ...bp, url: db?.href ?? bp.url, label: db?.label ?? PLATFORM_LABEL[bp.platform] ?? bp.platform };
+  });
+  // Add DB platforms not in block data
+  for (const s of socials) {
+    if (!merged.some((m) => m.platform === s.icon)) {
+      merged.push({ platform: s.icon, url: s.href, enabled: true, label: s.label });
+    }
+  }
+  const visiblePlatforms = merged.filter((p) => p.enabled);
+  const showSocials = d.showSocials !== false && visiblePlatforms.length > 0;
+  const showShare = d.showShare !== false;
+  const title = String(d.title ?? "");
+  const subtitle = String(d.subtitle ?? "");
+  const ctaLabel = String(d.ctaLabel ?? "");
+  const shareUrl = String(d.url ?? "");
+  const alignCenter = Boolean(d.alignCenter);
+
+  return (
+    <div className={cn("flex flex-col gap-4", alignCenter && "items-center text-center")}>
+      {title ? (
+        <p className="text-[18px] font-bold tracking-[-0.01em]">{title}</p>
+      ) : null}
+      {subtitle ? (
+        <p className="max-w-[46ch] text-[14px] leading-relaxed text-ink-soft">{subtitle}</p>
+      ) : null}
+
+      {showSocials ? (
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {visiblePlatforms.map((item, i) => {
+            const meta = SOCIAL_ICON_MAP[item.platform];
+            if (!meta) return null;
+            const Icon = meta.icon;
+            return (
+              <a
+                key={i}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-[13px] font-medium text-ink-soft transition hover:border-ink/20 hover:bg-canvas"
+              >
+                <Icon
+                  className="h-4 w-4 transition"
+                  style={{ color: meta.color }}
+                />
+                <span>{item.label}</span>
+              </a>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {showShare ? (
+        <div className="flex flex-col items-center gap-2.5">
+          <div className="flex flex-wrap justify-center gap-2">
+            {visiblePlatforms.map((item, i) => {
+              const meta = SOCIAL_ICON_MAP[item.platform];
+              if (!meta) return null;
+              const Icon = meta.icon;
+              return (
+                <a
+                  key={i}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] font-medium text-ink-soft transition hover:bg-canvas"
+                >
+                  <Icon className="h-3.5 w-3.5" style={{ color: meta.color }} />
+                  {item.label}
+                </a>
+              );
+            })}
+          </div>
+          {ctaLabel && shareUrl ? (
+            <a
+              href={shareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13.5px] font-semibold text-white transition hover:opacity-90"
+            >
+              {ctaLabel}
+            </a>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function PlatformPill({ platform }: { platform: string }) {
   return (
@@ -899,44 +1068,8 @@ function ColumnShell({
         </div>
       );
 
-    case "share":
-      return (
-        <div className="flex flex-col items-center gap-3 text-center">
-          <p className="text-[17px] font-semibold">{d.title}</p>
-          <p className="max-w-[46ch] text-[14px] leading-relaxed text-ink-soft">{d.body}</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {(d.networks ?? "x")
-              .split(",")
-              .map((network: string) => network.trim())
-              .filter(Boolean)
-              .map((network: string) => (
-                <PlatformPill key={network} platform={network} />
-              ))}
-          </div>
-          {d.ctaLabel ? (
-            <span className="mt-1 inline-flex h-9 items-center rounded-full bg-ink px-4 text-[13.5px] font-semibold text-white">
-              {d.ctaLabel}
-            </span>
-          ) : null}
-        </div>
-      );
-
-    case "social":
-      return (
-        <div
-          className={cn(
-            "flex flex-col gap-3",
-            d.alignCenter && "items-center text-center",
-          )}
-        >
-          {d.title ? <SectionLabel>{d.title}</SectionLabel> : null}
-          <div className="flex flex-wrap justify-center gap-2">
-            {((d.items ?? []) as { platform: string; url: string }[]).map((item, index) => (
-              <PlatformPill key={index} platform={item.platform} />
-            ))}
-          </div>
-        </div>
-      );
+    case "socialShare":
+      return <SocialShareRenderer data={d} />;
 
     case "signature":
       return (

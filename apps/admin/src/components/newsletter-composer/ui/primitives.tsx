@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { cva, type VariantProps } from "class-variance-authority";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Check, ChevronDown } from "lucide-react";
@@ -190,7 +191,7 @@ export function Slider({
 }
 
 /* ------------------------------------------------------------------ *
- *  Select — lightweight custom dropdown (no portal, no overflow issues)
+ *  Select — lightweight custom dropdown, portaled to avoid overflow clipping
  * ------------------------------------------------------------------ */
 export function Select({
   value,
@@ -206,53 +207,70 @@ export function Select({
   className?: string;
 }) {
   const [open, setOpen] = React.useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = React.useState<{ top: number; left: number; width: number }>({ top: 0, left: 0, width: 0 });
 
   React.useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
+  React.useEffect(() => {
+    if (!open || !triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    setPos({ top: rect.bottom + window.scrollY + 4, left: rect.left + window.scrollX, width: rect.width });
+  }, [open]);
+
   const selected = options.find((o) => o.value === value);
 
   return (
-    <div ref={ref} className={cn("relative", className)}>
+    <>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex h-9 w-full items-center justify-between gap-2 rounded-control border border-line bg-surface px-3 text-[13px] text-ink transition hover:bg-canvas"
+        className={cn(
+          "flex h-9 w-full items-center justify-between gap-2 rounded-control border border-line bg-surface px-3 text-[13px] text-ink transition hover:bg-canvas",
+          className,
+        )}
       >
         <span className={cn("truncate", !selected && "text-ink-muted")}>
           {selected?.label ?? placeholder}
         </span>
         <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-ink-muted transition-transform", open && "rotate-180")} />
       </button>
-      {open && (
-        <div className="absolute left-0 top-full z-[60] mt-1 max-h-60 w-full overflow-y-auto rounded-xl border border-line bg-surface shadow-lg">
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => {
-                onChange(option.value);
-                setOpen(false);
-              }}
-              className={cn(
-                "flex w-full items-center gap-2 px-3 py-2 text-[13px] text-left transition hover:bg-canvas",
-                option.value === value && "bg-brand-50 font-medium text-brand",
-              )}
+      {open
+        ? createPortal(
+            <div
+              className="fixed z-[9999] max-h-60 overflow-y-auto rounded-xl border border-line bg-surface shadow-lg"
+              style={{ top: pos.top, left: pos.left, width: pos.width }}
             >
-              {option.value === value && <Check className="h-3.5 w-3.5 shrink-0 text-brand" />}
-              <span className={cn(option.value !== value && "pl-5.5")}>{option.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+              {options.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(option.value);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full items-center gap-2 px-3 py-2 text-[13px] text-left transition hover:bg-canvas",
+                    option.value === value && "bg-brand-50 font-medium text-brand",
+                  )}
+                >
+                  {option.value === value && <Check className="h-3.5 w-3.5 shrink-0 text-brand" />}
+                  <span className={cn(option.value !== value && "pl-5.5")}>{option.label}</span>
+                </button>
+              ))}
+            </div>,
+            document.body,
+          )
+        : null}
+    </>
   );
 }
 

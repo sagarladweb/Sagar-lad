@@ -518,7 +518,6 @@ function TemplateGallery({ query }: { query: string }) {
     return matchesQuery;
   });
 
-  const featured = filtered.filter((template) => template.featured === true);
   const favouriteTemplates = TEMPLATES.filter((template) =>
     favorites.includes(template.id),
   );
@@ -599,20 +598,6 @@ function TemplateGallery({ query }: { query: string }) {
                   </Button>
                 </div>
               </div>
-            ))}
-          </div>
-        </Section>
-      ) : null}
-
-      {featured.length && !q ? (
-        <Section
-          title="Featured"
-          icon={<Star className="h-3.5 w-3.5" />}
-          count={featured.length}
-        >
-          <div className="grid grid-cols-1 gap-2.5 px-3">
-            {featured.map((template, index) => (
-              <TemplateCard key={template.id} template={template} index={index} />
             ))}
           </div>
         </Section>

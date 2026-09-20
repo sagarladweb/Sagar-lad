@@ -1,5 +1,4 @@
 import {
-  AtSign,
   BookOpen,
   BookMarked,
   BookCheck,
@@ -941,29 +940,55 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
     },
   },
 
-  share: {
-    type: "share",
-    label: "Share Box",
-    description: "Reader sharing prompt",
+  socialShare: {
+    type: "socialShare",
+    label: "Social & Share",
+    description: "Follow links + share prompt",
     category: "Newsletter",
     icon: Share2,
-    keywords: ["refer", "forward", "social"],
-    swatch: "#0EA5E9",
+    keywords: ["follow", "share", "social", "links"],
+    swatch: "#0F172A",
     defaultData: {
-      title: "Enjoying this issue?",
-      body: "Forward it to one friend who would find it useful.",
+      title: "Follow along & share",
+      subtitle: "Enjoyed this? Forward it to a friend.",
       url: "https://sagarlad.com/newsletter",
-      networks: "x,linkedin,email",
-      ctaLabel: "Share the issue",
+      ctaLabel: "Share this issue",
+      alignCenter: true,
+      showShare: true,
+      showSocials: true,
+      platforms: [
+        { platform: "x", url: "https://x.com/SagarLad692", enabled: true },
+        { platform: "linkedin", url: "https://www.linkedin.com/in/sagarlad/", enabled: true },
+        { platform: "instagram", url: "https://www.instagram.com/grow_with__sagar/", enabled: true },
+        { platform: "youtube", url: "https://www.youtube.com/@Sagarlad692", enabled: true },
+      ],
     },
     fields: [
       text("title", "Title"),
-      area("body", "Body"),
+      text("subtitle", "Subtitle"),
+      toggle("showSocials", "Show social links"),
+      toggle("showShare", "Show share prompt"),
+      toggle("alignCenter", "Center align"),
       text("url", "Share URL"),
-      text("networks", "Networks", {
-        hint: "Comma separated: x, linkedin, email",
-      }),
-      text("ctaLabel", "Button label"),
+      text("ctaLabel", "CTA label"),
+      repeat(
+        "platforms",
+        "Platforms",
+        [
+          pick("platform", "Platform", [
+            { label: "X / Twitter", value: "x" },
+            { label: "LinkedIn", value: "linkedin" },
+            { label: "Instagram", value: "instagram" },
+            { label: "YouTube", value: "youtube" },
+            { label: "Threads", value: "threads" },
+            { label: "Substack", value: "substack" },
+            { label: "Website", value: "website" },
+          ]),
+          text("url", "URL"),
+          toggle("enabled", "Visible"),
+        ],
+        { itemLabel: "Platform" },
+      ),
     ],
     styleOverride: {
       borderEnabled: true,
@@ -975,48 +1000,6 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
       paddingX: 20,
       align: "center",
     },
-  },
-
-  social: {
-    type: "social",
-    label: "Social Links",
-    description: "Row of profile links",
-    category: "Newsletter",
-    icon: AtSign,
-    keywords: ["twitter", "linkedin", "follow"],
-    swatch: "#0F172A",
-    defaultData: {
-      title: "Follow along",
-      alignCenter: true,
-      items: [
-        { platform: "instagram", url: "https://www.instagram.com/grow_with__sagar/" },
-        { platform: "youtube", url: "https://www.youtube.com/@Sagarlad692" },
-        { platform: "linkedin", url: "https://www.linkedin.com/in/sagarlad/" },
-        { platform: "x", url: "https://x.com/SagarLad692" },
-      ],
-    },
-    fields: [
-      text("title", "Title"),
-      toggle("alignCenter", "Center align"),
-      repeat(
-        "items",
-        "Links",
-        [
-          pick("platform", "Platform", [
-            { label: "X / Twitter", value: "x" },
-            { label: "LinkedIn", value: "linkedin" },
-            { label: "Instagram", value: "instagram" },
-            { label: "Website", value: "website" },
-            { label: "YouTube", value: "youtube" },
-            { label: "Threads", value: "threads" },
-            { label: "Substack", value: "substack" },
-          ]),
-          text("url", "URL"),
-        ],
-        { itemLabel: "Link" },
-      ),
-    ],
-    styleOverride: { gap: 10 },
   },
 
   signature: {
