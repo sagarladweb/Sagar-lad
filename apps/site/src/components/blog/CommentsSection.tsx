@@ -11,13 +11,13 @@ type Comment = {
   createdAt: string;
 };
 
-const INITIAL_COUNT = 4;
+const CHUNK_SIZE = 4;
 
 export function CommentsSection({ postSlug }: { postSlug: string }) {
   const [comments, setComments] = useState<Comment[] | null>(null);
   const [reload, setReload] = useState(0);
   const [error, setError] = useState("");
-  const [showAll, setShowAll] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,29 +36,33 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
 
   const afterPosted = useCallback(() => {
     setReload((n) => n + 1);
-    setShowAll(true);
+    setVisibleCount(CHUNK_SIZE);
   }, []);
 
-  const visibleComments = showAll
-    ? comments
-    : comments?.slice(0, INITIAL_COUNT);
-  const hiddenCount = comments ? comments.length - INITIAL_COUNT : 0;
+  const total = comments?.length ?? 0;
+  const visibleComments = comments?.slice(0, visibleCount) ?? [];
+  const hasMore = visibleCount < total;
 
   return (
     <section className="mt-10 sm:mt-14" aria-label="Comments section">
-      <div className="flex items-center justify-between pb-3 border-b border-border">
+      {/* Comment form — always first */}
+      <CommentForm postSlug={postSlug} onPosted={afterPosted} />
+
+      {/* Header with total count */}
+      <div className="flex items-center justify-between pb-3 border-b border-border mt-8 sm:mt-10">
         <h2 className="font-display text-lg sm:text-xl sm:text-2xl font-bold text-foreground">
-          {comments && comments.length > 0
-            ? `${comments.length} ${comments.length === 1 ? "Comment" : "Comments"}`
+          {total > 0
+            ? `${total} ${total === 1 ? "Comment" : "Comments"}`
             : "Discussion"}
         </h2>
-        {comments && comments.length > 0 && (
+        {total > 0 && (
           <span className="text-xs text-muted-foreground font-mono">
-            {comments.length} posted
+            {total} posted
           </span>
         )}
       </div>
 
+      {/* Comments list */}
       <div className="mt-5 sm:mt-6 space-y-3">
         {comments === null ? (
           <div className="rounded-2xl border border-border bg-card/40 p-5 sm:p-6 text-center text-sm text-muted-foreground">
@@ -66,15 +70,15 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
           </div>
         ) : (
           <>
-            {comments.length === 0 && (
+            {total === 0 && (
               <div className="rounded-2xl border border-dashed border-border bg-card/40 p-6 sm:p-8 text-center">
                 <p className="text-sm font-semibold text-foreground">No comments yet</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Start the conversation below!
+                  Be the first to share your thoughts above!
                 </p>
               </div>
             )}
-            {visibleComments?.map((c) => {
+            {visibleComments.map((c) => {
               const initial = (c.name || "A").trim().charAt(0).toUpperCase();
               return (
                 <div
@@ -99,20 +103,18 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
                 </div>
               );
             })}
-            {!showAll && hiddenCount > 0 && (
+            {hasMore && (
               <button
                 type="button"
-                onClick={() => setShowAll(true)}
+                onClick={() => setVisibleCount((n) => n + CHUNK_SIZE)}
                 className="w-full rounded-2xl border border-dashed border-border bg-card/40 py-3 text-sm font-semibold text-muted-foreground hover:text-foreground hover:border-brand/30 hover:bg-brand/5 transition-all"
               >
-                View all {comments.length} comments
+                Load more comments ({total - visibleCount} remaining)
               </button>
             )}
           </>
         )}
       </div>
-
-      <CommentForm postSlug={postSlug} onPosted={afterPosted} />
     </section>
   );
 }

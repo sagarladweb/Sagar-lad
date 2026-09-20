@@ -382,9 +382,6 @@ export function ModerationPanel() {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{c.content}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
-                        <Badge variant={c.approved ? "success" : "warning"}>
-                          {c.approved ? "Approved" : "Pending"}
-                        </Badge>
                         <a
                           href={`${SITE.url}/blog/${c.post.slug}`}
                           target="_blank"
