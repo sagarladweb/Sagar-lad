@@ -243,7 +243,7 @@ export const getFeaturedPosts = unstable_cache(
         where,
         select: {
           id: true, slug: true, title: true, coverImage: true,
-          publishedAt: true, excerpt: true, views: true, likes: true,
+          publishedAt: true, excerpt: true, content: true, views: true, likes: true,
           category: { select: { id: true, name: true, slug: true } },
         },
         orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
