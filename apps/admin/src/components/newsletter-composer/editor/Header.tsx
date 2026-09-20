@@ -149,10 +149,6 @@ function PublishButton() {
 
 export function Header() {
   const { openModal } = useUI();
-  const title = useEditorStore((s) => s.doc.title);
-  const issue = useEditorStore((s) => s.doc.issue);
-  const setTitle = useEditorStore((s) => s.setTitle);
-  const setIssue = useEditorStore((s) => s.setIssue);
   const device = useEditorStore((s) => s.device);
   const setDevice = useEditorStore((s) => s.setDevice);
   const undo = useEditorStore((s) => s.undo);
@@ -174,23 +170,8 @@ export function Header() {
           <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-0.5" />
           <span className="hidden sm:inline">Newsletters</span>
         </Link>
-        <div className="hidden min-w-0 flex-col md:flex">
-          <input
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Newsletter title"
-            className="w-[220px] truncate rounded-[6px] bg-transparent text-[14px] font-semibold tracking-[-0.01em] text-ink outline-none transition hover:bg-black/[0.03] focus:bg-black/[0.03]"
-          />
-          <div className="flex items-center gap-1.5">
-            <input
-              value={issue}
-              onChange={(event) => setIssue(event.target.value)}
-              placeholder="Issue"
-              className="w-[110px] rounded-[6px] bg-transparent text-[11.5px] font-medium uppercase tracking-[0.08em] text-ink-soft outline-none transition hover:bg-black/[0.03] focus:bg-black/[0.03]"
-            />
-            <span className="text-[11.5px] text-ink-muted/60">·</span>
-            <AutosaveStatus />
-          </div>
+        <div className="hidden items-center gap-1.5 md:flex">
+          <AutosaveStatus />
         </div>
 
         <Separator orientation="vertical" className="mx-1 hidden h-5 sm:block" />

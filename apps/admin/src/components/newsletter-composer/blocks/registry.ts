@@ -3,10 +3,8 @@ import {
   BookMarked,
   BookCheck,
   ChartBar,
-  CircleQuestionMark,
   Code,
   Columns2,
-  Columns3,
   FileText,
   Quote,
   Film,
@@ -366,15 +364,26 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
     description: "Two-up content grid",
     category: "Layout",
     icon: Columns2,
-    keywords: ["grid", "side by side"],
+    keywords: ["grid", "side by side", "columns"],
     swatch: "#7C3AED",
     defaultData: {
+      count: 2,
       columns: [
         { heading: "Signal", body: "What actually moved the numbers this week." },
         { heading: "Noise", body: "What everyone else was busy talking about." },
       ],
     },
     fields: [
+      {
+        key: "count",
+        type: "select",
+        label: "Columns",
+        section: "Layout",
+        options: [
+          { label: "2 columns", value: 2 },
+          { label: "3 columns", value: 3 },
+        ],
+      } as any,
       repeat(
         "columns",
         "Columns",
@@ -383,32 +392,6 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
       ),
     ],
     styleOverride: { gap: 20 },
-  },
-
-  columns3: {
-    type: "columns3",
-    label: "3 Columns",
-    description: "Three-up content grid",
-    category: "Layout",
-    icon: Columns3,
-    keywords: ["grid", "three"],
-    swatch: "#8B5CF6",
-    defaultData: {
-      columns: [
-        { heading: "Build", body: "Ship the smallest useful version." },
-        { heading: "Measure", body: "Watch one number that matters." },
-        { heading: "Learn", body: "Write down what surprised you." },
-      ],
-    },
-    fields: [
-      repeat(
-        "columns",
-        "Columns",
-        [text("heading", "Heading"), area("body", "Body")],
-        { itemLabel: "Column" },
-      ),
-    ],
-    styleOverride: { gap: 16 },
   },
 
   callout: {
@@ -599,47 +582,6 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
       ),
     ],
     styleOverride: { gap: 18 },
-  },
-
-  faq: {
-    type: "faq",
-    label: "FAQ",
-    description: "Expandable Q&A",
-    category: "Layout",
-    icon: CircleQuestionMark,
-    keywords: ["questions", "answers", "accordion"],
-    swatch: "#0891B2",
-    defaultData: {
-      title: "Reader questions",
-      expandFirst: true,
-      style: "bordered",
-      items: [
-        {
-          question: "How often do you publish?",
-          answer: "Every Tuesday, without exception. Consistency is the whole strategy.",
-        },
-        {
-          question: "Can I reply to this email?",
-          answer: "Yes — replies land straight in my inbox and I read all of them.",
-        },
-      ],
-    },
-    fields: [
-      text("title", "Section title"),
-      pick("style", "Accordion style", [
-        { label: "Bordered", value: "bordered" },
-        { label: "Plain", value: "plain" },
-        { label: "Cards", value: "cards" },
-      ]),
-      toggle("expandFirst", "Expand first by default"),
-      repeat(
-        "items",
-        "Questions",
-        [text("question", "Question"), area("answer", "Answer")],
-        { itemLabel: "Question" },
-      ),
-    ],
-    styleOverride: { gap: 10 },
   },
 
   /* ----------------------------- Media ----------------------------- */
@@ -881,7 +823,7 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
     keywords: ["bio", "about", "profile"],
     swatch: "#7C3AED",
     defaultData: {
-      avatar: "",
+      avatar: "/favicon-48x48.png",
       name: "Sagar Lad",
       role: "Author & Speaker",
       bio: "I write on career, life and awareness every week.",

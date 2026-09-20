@@ -9,14 +9,11 @@ import {
   Copy,
   Eye,
   Gauge,
-  Info,
   Lightbulb,
   Link2,
   Lock,
   LockOpen,
   Palette,
-  Settings2,
-  SlidersHorizontal,
   Square,
   Type as TypeIcon,
 } from "lucide-react";
@@ -439,7 +436,7 @@ function StyleTab({ block }: { block: Block }) {
             ]}
           />
         </Field>
-        {["columns2", "columns3"].includes(block.type) ? (
+        {block.type === "columns2" ? (
           <ToggleRow
             label="Stack on mobile"
             hint="Collapse columns on narrow screens"
@@ -776,32 +773,10 @@ export function RightPanel() {
               <Square className="h-4 w-4" />
             </span>
             <div>
-              <p className="text-[13.5px] font-semibold text-ink">Nothing selected</p>
+              <p className="text-[13.5px] font-semibold text-ink">Select a block</p>
               <p className="mt-1 text-[12px] leading-relaxed text-ink-muted">
-                Select a block on the canvas and its controls appear here — only
-                what's relevant, nothing more.
+                Click any block on the canvas to edit it.
               </p>
-            </div>
-            <div className="mt-1 w-full space-y-1.5 text-left">
-              {[
-                { icon: SlidersHorizontal, text: "Content · edit what's inside the block" },
-                { icon: Palette, text: "Style · typography, color, spacing, effects" },
-                { icon: Settings2, text: "Settings · visibility, links, accessibility" },
-              ].map((item) => (
-                <div
-                  key={item.text}
-                  className="flex items-center gap-2.5 rounded-control border border-line bg-canvas px-3 py-2"
-                >
-                  <item.icon className="h-3.5 w-3.5 shrink-0 text-ink-muted" />
-                  <span className="text-[11.5px] text-ink-soft">{item.text}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 flex items-center gap-2 rounded-control border border-line bg-canvas px-3 py-2">
-              <Info className="h-3.5 w-3.5 text-ink-muted" />
-              <span className="text-[11.5px] text-ink-soft">
-                {blocks.length} blocks · {blocks.length ? "1 selected required" : "add one to begin"}
-              </span>
             </div>
           </div>
         )}

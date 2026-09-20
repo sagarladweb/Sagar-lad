@@ -31,7 +31,6 @@ import { Button, Tooltip } from "@/components/newsletter-composer/ui/primitives"
 import { BlockContent } from "@/components/newsletter-composer/blocks/renderers";
 import { BLOCK_DEFS } from "@/components/newsletter-composer/blocks/registry";
 import { SlashMenu } from "@/components/newsletter-composer/editor/SlashMenu";
-import { createBlocks } from "@/components/newsletter-composer/lib/blockFactory";
 import { blockInnerStyle, blockWrapperStyle } from "@/components/newsletter-composer/lib/styleToCss";
 import { useEditorStore } from "@/components/newsletter-composer/store/editor-store";
 import { DEVICE_WIDTH, type Block, type CommentThread, type DeviceMode } from "@/components/newsletter-composer/types/editor";
@@ -503,7 +502,6 @@ function InsertLineDots({
  * ------------------------------------------------------------------ */
 function EmptyState() {
   const addBlock = useEditorStore((s) => s.addBlock);
-  const insertBlocks = useEditorStore((s) => s.insertBlocks);
   const setLeftTab = useEditorStore((s) => s.setLeftTab);
 
   return (
@@ -544,30 +542,10 @@ function EmptyState() {
         <Button
           variant="outline"
           size="default"
-          onClick={() =>
-            insertBlocks(
-              createBlocks([
-                [
-                  "heading",
-                  { eyebrow: "Issue 001", text: "Your headline goes here", level: "h1" },
-                ],
-                [
-                  "paragraph",
-                  {
-                    text: "Write the opening paragraph. One clear idea, then let the reader breathe.",
-                  },
-                ],
-                [
-                  "button",
-                  { label: "Primary action", url: "https://example.com", align: "left" },
-                ],
-              ]),
-              0,
-            )
-          }
+          onClick={() => addBlock("paragraph")}
         >
           <Plus className="h-4 w-4" />
-          Start blank
+          Add a block
         </Button>
       </div>
 
@@ -597,10 +575,6 @@ export function Canvas() {
   const selectBlock = useEditorStore((s) => s.selectBlock);
   const darkPreview = useEditorStore((s) => s.darkPreview);
   const showHidden = useEditorStore((s) => s.showHidden);
-  const docTitle = useEditorStore((s) => s.doc.title);
-  const docIssue = useEditorStore((s) => s.doc.issue);
-  const subject = useEditorStore((s) => s.doc.subject ?? "");
-  const previewText = useEditorStore((s) => s.doc.previewText ?? "");
 
   const visible = React.useMemo(
     () =>
@@ -647,17 +621,6 @@ export function Canvas() {
           {width ? <span className="text-ink-muted/50">{width}px</span> : null}
         </div>
 
-        {/* Inbox preview line */}
-        <div className="mb-3 w-full flex items-baseline gap-2 text-[13px]">
-          <span className="font-bold text-ink truncate">{docTitle || "Untitled"}</span>
-          {docIssue ? (
-            <span className="text-ink-muted text-[11px] font-medium uppercase tracking-wider">{docIssue}</span>
-          ) : null}
-          {previewText ? (
-            <span className="text-ink-muted truncate ml-auto">— {previewText}</span>
-          ) : null}
-        </div>
-
         <motion.div
           layout
           transition={{ type: "spring", stiffness: 420, damping: 36 }}
@@ -670,20 +633,7 @@ export function Canvas() {
             color: darkPreview ? "#E5E7EB" : undefined,
             maxWidth: width ?? "100%",
           }}
-        >
-          <div
-            className="flex items-center justify-between border-b px-7 py-3 text-[11px]"
-            style={{
-              borderColor: darkPreview ? "#1F2937" : "#F1EFE9",
-              color: darkPreview ? "#6B7280" : "#8B8F98",
-            }}
           >
-            <span className="max-w-[60%] truncate font-semibold uppercase tracking-[0.14em]">
-              {docTitle || "Untitled newsletter"}
-            </span>
-            <span>{docIssue}</span>
-          </div>
-
           <div className="px-7 py-8">
             {visible.length ? (
               <SortableContext
@@ -720,7 +670,6 @@ export function Canvas() {
               }}
             >
               <span>{visible.length} blocks</span>
-              <span>Sagar Lad · Newsletter Composer</span>
             </div>
           ) : null}
         </motion.div>

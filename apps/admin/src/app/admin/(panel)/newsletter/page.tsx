@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/db";
 import { assertPhase2 } from "@/lib/phase";
+import { SITE } from "@/lib/site";
 import { Mail, Users, Send, PenLine, Clock, AlertTriangle, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { CampaignList } from "@/components/admin/CampaignList";
 
 export const dynamic = "force-dynamic";
 
-const DAILY_LIMIT = parseInt(process.env.DAILY_EMAIL_LIMIT || process.env.NEWSLETTER_DAILY_LIMIT || "300", 10);
+const FALLBACK_LIMIT = parseInt(process.env.DAILY_EMAIL_LIMIT || process.env.NEWSLETTER_DAILY_LIMIT || "300", 10);
 
 export default async function NewsletterPage() {
   assertPhase2();
@@ -17,6 +18,7 @@ export default async function NewsletterPage() {
   let queued = 0;
   let inFlight = 0;
   let failedToday = 0;
+  let DAILY_LIMIT = FALLBACK_LIMIT;
   let recentCampaigns: {
     id: string;
     subject: string;
@@ -32,6 +34,28 @@ export default async function NewsletterPage() {
   try {
     const dayStart = new Date();
     dayStart.setHours(0, 0, 0, 0);
+
+    // Fetch real-time Brevo credits
+    const brevoKey = process.env.BREVO_API_KEY;
+    if (brevoKey) {
+      try {
+        const brevoRes = await fetch("https://api.brevo.com/v3/account", {
+          headers: { "api-key": brevoKey, Accept: "application/json" },
+          signal: AbortSignal.timeout(8000),
+        });
+        if (brevoRes.ok) {
+          const acct = await brevoRes.json();
+          const sendLimit = (acct.plan ?? []).find(
+            (p: { creditsType: string }) => p.creditsType === "sendLimit",
+          );
+          if (sendLimit?.credits) {
+            DAILY_LIMIT = Math.round(sendLimit.credits);
+          }
+        }
+      } catch {
+        // Fall back to env constant
+      }
+    }
 
     const [subCount, campCount, sent, queue, flight, failed, recentRows] = await Promise.all([
       prisma.newsletterSubscriber.count({ where: { unsubscribed: false } }),

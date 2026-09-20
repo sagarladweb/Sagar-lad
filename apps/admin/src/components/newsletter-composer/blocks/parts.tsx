@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Image as ImageIcon } from "lucide-react";
 import { cn } from "@/components/newsletter-composer/lib/utils";
+import { SITE } from "@/lib/site";
 
 /* ------------------------------------------------------------------ *
  *  Image with graceful empty state
@@ -129,38 +130,18 @@ export function Avatar({
   size?: number;
   className?: string;
 }) {
-  const initials = (name ?? "")
-    .split(" ")
-    .map((part) => part[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-
-  if (src) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={src}
-        alt={name ?? ""}
-        width={size}
-        height={size}
-        className={cn("shrink-0 rounded-full object-cover", className)}
-        style={{ width: size, height: size }}
-      />
-    );
-  }
+  const imgSrc = src || `${SITE.url}/favicon-48x48.png`;
 
   return (
-    <div
-      className={cn(
-        "flex shrink-0 items-center justify-center rounded-full bg-brand-50 font-semibold text-brand",
-        className,
-      )}
-      style={{ width: size, height: size, fontSize: size / 2.6 }}
-    >
-      {initials || "PS"}
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={imgSrc}
+      alt={name ?? ""}
+      width={size}
+      height={size}
+      className={cn("shrink-0 rounded-full object-cover", className)}
+      style={{ width: size, height: size }}
+    />
   );
 }
 

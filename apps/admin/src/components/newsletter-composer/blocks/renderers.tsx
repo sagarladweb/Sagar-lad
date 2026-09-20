@@ -228,25 +228,6 @@ function SocialShareRenderer({ data: d }: { data: Record<string, unknown> }) {
 
       {showShare ? (
         <div className="flex flex-col items-center gap-2.5">
-          <div className="flex flex-wrap justify-center gap-2">
-            {visiblePlatforms.map((item, i) => {
-              const meta = SOCIAL_ICON_MAP[item.platform];
-              if (!meta) return null;
-              const Icon = meta.icon;
-              return (
-                <a
-                  key={i}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] font-medium text-ink-soft transition hover:bg-canvas"
-                >
-                  <Icon className="h-3.5 w-3.5" style={{ color: meta.color }} />
-                  {item.label}
-                </a>
-              );
-            })}
-          </div>
           {ctaLabel && shareUrl ? (
             <a
               href={shareUrl}
@@ -269,69 +250,6 @@ function PlatformPill({ platform }: { platform: string }) {
       <Rss className="h-3.5 w-3.5 text-ink-muted" />
       {PLATFORM_LABEL[platform] ?? platform}
     </span>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- *  FAQ — interactive accordion inside the canvas
- * ------------------------------------------------------------------ */
-function FaqAccordion({ block }: { block: Block }) {
-  const items = (block.data.items ?? []) as {
-    question: string;
-    answer: string;
-  }[];
-  const [open, setOpen] = React.useState<number[]>(
-    block.data.expandFirst ? [0] : [],
-  );
-  const variant = block.data.style ?? "bordered";
-
-  return (
-    <div className="flex flex-col" style={{ gap: block.style.gap }}>
-      {block.data.title ? (
-        <p className="text-[18px] font-semibold tracking-[-0.01em]">
-          {String(block.data.title)}
-        </p>
-      ) : null}
-      {items.map((item: { question: string; answer: string }, index: number) => {
-        const isOpen = open.includes(index);
-        return (
-          <div
-            key={index}
-            className={cn(
-              variant === "cards" && "rounded-[14px] border border-line bg-white px-4",
-              variant === "bordered" && "border-b border-line px-0",
-              variant === "plain" && "px-0",
-            )}
-          >
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                setOpen((prev) =>
-                  prev.includes(index)
-                    ? prev.filter((i) => i !== index)
-                    : [...prev, index],
-                );
-              }}
-              className="flex w-full items-center justify-between gap-3 py-3 text-left"
-            >
-              <span className="text-[15px] font-medium">{item.question}</span>
-              <span
-                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-line text-[13px] text-ink-muted transition-transform"
-                style={{ transform: isOpen ? "rotate(45deg)" : undefined }}
-              >
-                +
-              </span>
-            </button>
-            {isOpen ? (
-              <p className="pb-3 text-[14px] leading-relaxed" style={{ opacity: 0.8 }}>
-                {item.answer}
-              </p>
-            ) : null}
-          </div>
-        );
-      })}
-    </div>
   );
 }
 
@@ -552,10 +470,9 @@ export function BlockContent({ block }: { block: Block }) {
       );
 
     /* ------------------------------ Layout ---------------------------- */
-    case "columns2":
-    case "columns3": {
+    case "columns2": {
       const columns = (d.columns ?? []) as { heading: string; body: string }[];
-      const count = block.type === "columns2" ? 2 : 3;
+      const count = (d.count as number) || 2;
       const visibleColumns = React.useMemo(
         () =>
           columns.map((column, index) => ({
@@ -708,37 +625,109 @@ function ColumnShell({
     case "table": {
       const headers = (d.headers ?? []) as { text: string }[];
       const rows = (d.rows ?? []) as { cells: string }[];
+
+      const updateHeader = (index: number, value: string) => {
+        const next = [...headers];
+        next[index] = { text: value };
+        updateData(block.id, { headers: next });
+      };
+
+      const updateCell = (rowIndex: number, cellIndex: number, value: string) => {
+        const next = [...rows];
+        const parts = splitCells(next[rowIndex].cells);
+        while (parts.length <= cellIndex) parts.push("");
+        parts[cellIndex] = value;
+        next[rowIndex] = { cells: parts.join("|") };
+        updateData(block.id, { rows: next });
+      };
+
+      const addRow = () => {
+        const colCount = headers.length || 3;
+        updateData(block.id, {
+          rows: [...rows, { cells: Array(colCount).fill("").join("|") }],
+        });
+      };
+
+      const addColumn = () => {
+        const newHeaders = [...headers, { text: "New" }];
+        const newRows = rows.map((row) => ({
+          cells: row.cells + "|",
+        }));
+        updateData(block.id, { headers: newHeaders, rows: newRows });
+      };
+
+      const removeRow = (rowIndex: number) => {
+        updateData(block.id, { rows: rows.filter((_, i) => i !== rowIndex) });
+      };
+
       return (
-        <div className="overflow-hidden rounded-[14px] border border-line">
-          <table className="w-full border-collapse text-left">
-            <thead>
-              <tr style={{ background: "#F7F6F2" }}>
-                {headers.map((header, index) => (
-                  <th
-                    key={index}
-                    className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted"
-                  >
-                    {header.text}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, rowIndex) => (
-                <tr
-                  key={rowIndex}
-                  className="border-t border-line"
-                  style={d.striped && rowIndex % 2 === 1 ? { background: "#FBFAF7" } : undefined}
-                >
-                  {splitCells(row.cells).map((cell, cellIndex) => (
-                    <td key={cellIndex} className="px-4 py-2.5 text-[14px]">
-                      {cell}
-                    </td>
+        <div className="flex flex-col gap-2">
+          <div className="overflow-hidden rounded-[14px] border border-line">
+            <table className="w-full border-collapse text-left">
+              <thead>
+                <tr style={{ background: "#F7F6F2" }}>
+                  {headers.map((header, index) => (
+                    <th
+                      key={index}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onBlur={(e) => updateHeader(index, e.currentTarget.textContent || "")}
+                      className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted outline-none focus:bg-blue-50"
+                    >
+                      {header.text}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.map((row, rowIndex) => (
+                  <tr
+                    key={rowIndex}
+                    className="group/row border-t border-line"
+                    style={d.striped && rowIndex % 2 === 1 ? { background: "#FBFAF7" } : undefined}
+                  >
+                    {splitCells(row.cells).map((cell, cellIndex) => (
+                      <td
+                        key={cellIndex}
+                        contentEditable
+                        suppressContentEditableWarning
+                        onBlur={(e) => updateCell(rowIndex, cellIndex, e.currentTarget.textContent || "")}
+                        className="px-4 py-2.5 text-[14px] outline-none focus:bg-blue-50"
+                      >
+                        {cell}
+                      </td>
+                    ))}
+                    <td className="w-8 px-1 py-2.5 text-center opacity-0 group-hover/row:opacity-100">
+                      <button
+                        type="button"
+                        onClick={() => removeRow(rowIndex)}
+                        className="text-ink-muted hover:text-red-500 text-[14px]"
+                        title="Remove row"
+                      >
+                        ×
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={addRow}
+              className="text-[12px] font-medium text-ink-muted hover:text-ink"
+            >
+              + Row
+            </button>
+            <button
+              type="button"
+              onClick={addColumn}
+              className="text-[12px] font-medium text-ink-muted hover:text-ink"
+            >
+              + Column
+            </button>
+          </div>
         </div>
       );
     }
@@ -801,9 +790,6 @@ function ColumnShell({
         </div>
       );
     }
-
-    case "faq":
-      return <FaqAccordion block={block} />;
 
     /* ------------------------------ Media ----------------------------- */
     case "image":

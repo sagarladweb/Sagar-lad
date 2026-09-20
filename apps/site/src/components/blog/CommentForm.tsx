@@ -51,7 +51,7 @@ export function CommentForm({
         setForm({ name: "", content: "" });
         setErrors({});
         setMessage(
-          "Thanks! Your comment is queued for approval. It's visible only to you until an admin approves it."
+          "Thanks! Your comment has been posted."
         );
         onPosted?.();
       } else {

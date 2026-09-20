@@ -19,11 +19,13 @@ async function sendBrevo({
   subject,
   html,
   unsubscribeToken,
+  skipShell = false,
 }: {
   to: string;
   subject: string;
   html: string;
   unsubscribeToken: string;
+  skipShell?: boolean;
 }) {
   const apiKey = process.env.BREVO_API_KEY;
   const fromEmail = process.env.BREVO_FROM_EMAIL;
@@ -48,7 +50,7 @@ async function sendBrevo({
         },
         to: [{ email: to }],
         subject,
-        htmlContent: buildEmailHtml(html, unsubscribeToken),
+        htmlContent: skipShell ? html : buildEmailHtml(html, unsubscribeToken),
       }),
     });
     if (!res.ok) {
@@ -63,8 +65,10 @@ async function sendBrevo({
 }
 
 // Send a single preview email to one address (e.g. the admin's own inbox).
+// The html parameter is already a complete email document from compileNewsletterToHtml,
+// so we pass it directly to Brevo without wrapping in emailShell again.
 export async function sendTestEmail(to: string, subject: string, html: string) {
-  await sendBrevo({ to, subject, html, unsubscribeToken: "test" });
+  await sendBrevo({ to, subject, html, unsubscribeToken: "test", skipShell: true });
 }
 
 // Create a campaign and snapshot every active subscriber into the queue.
@@ -161,14 +165,20 @@ export async function processNewsletterQueue() {
   for (let i = 0; i < batch.length; i += PARALLEL) {
     const chunk = batch.slice(i, i + PARALLEL);
     const results = await Promise.allSettled(
-      chunk.map((d) =>
-        sendBrevo({
+      chunk.map((d) => {
+        // Replace the placeholder unsubscribe token with the real per-subscriber token
+        const html = d.campaign.html.replace(
+          /\/api\/newsletter\/unsubscribe\?token=[^"&]*/,
+          `/api/newsletter/unsubscribe?token=${d.subscriber.unsubscribeToken}`
+        );
+        return sendBrevo({
           to: d.subscriber.email,
           subject: d.campaign.subject,
-          html: d.campaign.html,
+          html,
           unsubscribeToken: d.subscriber.unsubscribeToken,
-        }).then(() => d)
-      )
+          skipShell: true,
+        }).then(() => d);
+      })
     );
     await Promise.all(
       results.map((r, idx) => {

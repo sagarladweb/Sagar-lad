@@ -597,6 +597,12 @@ const DB_BLOCK_LABELS: Record<DBBlockType, string> = {
   blogPosts: "Blog Posts",
 };
 
+// API returns "videos" / "blogs" but block types are "videoFeed" / "blogPosts"
+const API_KEY_MAP: Record<string, string> = {
+  videoFeed: "videos",
+  blogPosts: "blogs",
+};
+
 let dbCache: Record<string, DBItem[]> | null = null;
 let dbPromise: Promise<Record<string, DBItem[]>> | null = null;
 
@@ -606,7 +612,8 @@ function useDBItems(blockType: DBBlockType) {
 
   React.useEffect(() => {
     if (dbCache) {
-      setItems(dbCache[blockType] ?? []);
+      const apiKey = API_KEY_MAP[blockType] ?? blockType;
+      setItems(dbCache[apiKey] ?? []);
       setLoading(false);
       return;
     }
@@ -620,7 +627,8 @@ function useDBItems(blockType: DBBlockType) {
         .catch(() => ({}));
     }
     dbPromise.then((d) => {
-      setItems(d[blockType] ?? []);
+      const apiKey = API_KEY_MAP[blockType] ?? blockType;
+      setItems(d[apiKey] ?? []);
       setLoading(false);
     });
   }, [blockType]);

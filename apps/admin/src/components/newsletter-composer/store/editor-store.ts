@@ -51,8 +51,8 @@ export function emptyDoc(): NewsletterDoc {
     issue: "Issue 001",
     author: "Sagar Lad",
     subject: "The Sagar Lad Letter",
-    previewText: "aka safar",
-    blocks: [],
+    previewText: "Newslatter",
+    blocks: [createBlock("hero")],
     updatedAt: Date.now(),
   };
 }

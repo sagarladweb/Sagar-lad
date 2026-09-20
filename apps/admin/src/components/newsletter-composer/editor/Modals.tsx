@@ -30,20 +30,17 @@ import {
   Input,
   Modal,
   Segmented,
-  Switch,
   Textarea,
 } from "@/components/newsletter-composer/ui/primitives";
-import { BlockContent } from "@/components/newsletter-composer/blocks/renderers";
-import { blockInnerStyle, blockWrapperStyle } from "@/components/newsletter-composer/lib/styleToCss";
 import { useUI } from "@/components/newsletter-composer/editor/ui-context";
 import { useEditorStore } from "@/components/newsletter-composer/store/editor-store";
-import type { Block, TemplateTheme, TemplateKind } from "@/components/newsletter-composer/types/editor";
+import type { Block } from "@/components/newsletter-composer/types/editor";
 import { estimateReadingTime, formatClock } from "@/components/newsletter-composer/lib/utils";
 import { TEMPLATES } from "@/components/newsletter-composer/templates/templates";
 import { compileNewsletterToHtml } from "@/components/newsletter-composer/lib/compiler";
 
 /* ------------------------------------------------------------------ *
- *  Read-only email rendering
+ *  Read-only email rendering — uses the same compiler as send/publish
  * ------------------------------------------------------------------ */
 function EmailPreview({
   blocks,
@@ -54,39 +51,39 @@ function EmailPreview({
   dark: boolean;
   width?: number;
 }) {
-  const title = useEditorStore((s) => s.doc.title);
   const issue = useEditorStore((s) => s.doc.issue);
+  const [dbData, setDbData] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    fetch("/api/admin/newsletter/blocks")
+      .then((r) => r.json())
+      .then(setDbData)
+      .catch(() => {});
+  }, []);
+
+  const html = React.useMemo(() => {
+    if (!blocks.length) return "";
+    return compileNewsletterToHtml(
+      { blocks, issue, style: {}, theme: "minimal" } as any,
+      "#",
+      dbData,
+    );
+  }, [blocks, issue, dbData]);
 
   return (
-    <div
-      className="mx-auto overflow-hidden rounded-[18px] border border-line"
-      style={{
-        maxWidth: width,
-        background: dark ? "#0B0F17" : "#FFFFFF",
-        color: dark ? "#E5E7EB" : undefined,
-      }}
-    >
-      <div
-        className="flex items-center justify-between border-b px-6 py-3 text-[11px]"
-        style={{ borderColor: dark ? "#1F2937" : "#F1EFE9", color: "#8B8F98" }}
-      >
-        <span className="font-semibold uppercase tracking-[0.14em]">{title}</span>
-        <span>{issue}</span>
-      </div>
-      <div className="space-y-6 px-6 py-7">
-        {blocks.map((block) => (
-          <div key={block.id} style={blockWrapperStyle(block)}>
-            <div style={blockInnerStyle(block)}>
-              <BlockContent block={block} />
-            </div>
-          </div>
-        ))}
-        {!blocks.length ? (
-          <p className="py-12 text-center text-[13px] text-ink-muted">
-            This issue is empty. Add blocks to see the preview.
-          </p>
-        ) : null}
-      </div>
+    <div className="mx-auto overflow-hidden rounded-[18px] border border-line" style={{ maxWidth: width }}>
+      {html ? (
+        <iframe
+          srcDoc={html}
+          title="Email preview"
+          className="w-full border-0"
+          style={{ height: 800, background: "#FFFFFF" }}
+        />
+      ) : (
+        <div className="py-12 text-center text-[13px] text-ink-muted">
+          This issue is empty. Add blocks to see the preview.
+        </div>
+      )}
     </div>
   );
 }
@@ -97,30 +94,20 @@ function EmailPreview({
 function PreviewModal() {
   const { modal, closeModal } = useUI();
   const blocks = useEditorStore((s) => s.doc.blocks);
-  const [dark, setDark] = React.useState(false);
   const [device, setDevice] = React.useState<"desktop" | "mobile">("desktop");
 
   return (
     <Modal
       open={modal === "preview"}
       onClose={closeModal}
-      title="Issue preview"
-      description={`Exactly what lands in the inbox · ${estimateReadingTime(blocks)} min read`}
+      title="Preview"
+      description={`${estimateReadingTime(blocks)} min read`}
       width="max-w-4xl"
       footer={
         <>
           <div className="flex items-center gap-2 text-[12px] text-ink-muted">
             <Eye className="h-3.5 w-3.5" />
             {blocks.length} blocks rendered
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-2 text-[12.5px] text-ink-soft">
-              Dark mode
-              <Switch checked={dark} onCheckedChange={setDark} />
-            </span>
-            <Button variant="outline" size="sm" onClick={closeModal}>
-              Close
-            </Button>
           </div>
         </>
       }
@@ -139,7 +126,7 @@ function PreviewModal() {
         </div>
         <EmailPreview
           blocks={blocks}
-          dark={dark}
+          dark={false}
           width={device === "desktop" ? 680 : 380}
         />
       </div>
@@ -203,7 +190,8 @@ function TestEmailModal() {
     setSending(true);
     setErrorMsg(null);
     try {
-      const html = compileNewsletterToHtml(doc, "test");
+      const dbData = await fetch("/api/admin/newsletter/blocks").then((r) => r.json()).catch(() => ({}));
+      const html = compileNewsletterToHtml(doc, "test", dbData);
       const res = await fetch("/api/admin/newsletter/test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -442,11 +430,12 @@ function PublishModal() {
     setPublishing(true);
     setPublishError(null);
     try {
+      const dbData = await fetch("/api/admin/newsletter/blocks").then((r) => r.json()).catch(() => ({}));
       const html = compileNewsletterToHtml({
         ...doc,
         subject: subject.trim(),
         previewText: previewText.trim(),
-      });
+      }, "test", dbData);
       const res = await fetch("/api/admin/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

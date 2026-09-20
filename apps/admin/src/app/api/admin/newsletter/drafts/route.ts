@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { buildTemplateBody, type NewsletterContent } from "@/lib/newsletterTemplates";
-import { compileNewsletterToHtml } from "@/components/newsletter-composer/lib/compiler";
+import { compileNewsletterToHtml, type DbData } from "@/components/newsletter-composer/lib/compiler";
 
 export const runtime = "nodejs";
 
@@ -13,6 +13,18 @@ const draftSchema = z.object({
   html: z.string().optional(),
   content: z.unknown(),
 });
+
+async function fetchDbData(): Promise<DbData> {
+  const [booksRead, booksPublished, ebooks, quotes, videos, blogs] = await Promise.all([
+    prisma.book.findMany({ where: { type: "READ", published: true, deletedAt: null }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }], select: { id: true, title: true, author: true, note: true, imageUrl: true, buyUrl: true } }),
+    prisma.book.findMany({ where: { type: "PUBLISHED", published: true, deletedAt: null }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }], select: { id: true, title: true, tagline: true, buyUrl: true, imageUrl: true } }),
+    prisma.book.findMany({ where: { type: "EBOOK", published: true, deletedAt: null }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }], select: { id: true, title: true, description: true, free: true, imageUrl: true, buyUrl: true } }),
+    prisma.quote.findMany({ orderBy: { createdAt: "desc" }, take: 30, select: { id: true, text: true, tag: true } }),
+    prisma.video.findMany({ where: { published: true, deletedAt: null }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }], take: 20, select: { id: true, title: true, embedUrl: true, thumbnail: true, slug: true } }),
+    prisma.post.findMany({ where: { published: true, deletedAt: null }, orderBy: { publishedAt: "desc" }, take: 20, select: { id: true, title: true, slug: true, excerpt: true, coverImage: true } }),
+  ]);
+  return { booksRead, booksPublished, ebooks, quotes, videos, blogs };
+}
 
 // Save (or update) an unsent newsletter so the admin can come back to it later.
 export async function POST(request: Request) {
@@ -30,7 +42,8 @@ export async function POST(request: Request) {
     let html = parsed.data.html || "";
     if (!html) {
       if (content && Array.isArray(content.blocks)) {
-        html = compileNewsletterToHtml(content);
+        const dbData = await fetchDbData().catch(() => ({} as DbData));
+        html = compileNewsletterToHtml(content, "test", dbData);
       } else if (content?.template) {
         html = buildTemplateBody(content.template ?? "letter", content as NewsletterContent);
       }
