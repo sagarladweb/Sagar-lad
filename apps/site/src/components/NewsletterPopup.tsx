@@ -135,7 +135,7 @@ export function NewsletterPopup() {
                 One practical idea. Every week.
               </h3>
               <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-                Unfiltered thoughts on money, career, and intentional living —
+                Unfiltered thoughts on career, and intentional living —
                 no fluff, ever.
               </p>
 

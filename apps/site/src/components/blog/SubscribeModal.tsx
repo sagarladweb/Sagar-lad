@@ -98,7 +98,7 @@ export function SubscribeModal() {
               One practical idea. Every week.
             </h2>
             <p className="mt-1 text-center text-xs text-muted-foreground">
-              Unfiltered thoughts on money, career, and intentional living.
+              Unfiltered thoughts on career, and intentional living.
             </p>
 
             {state === "success" ? (

@@ -7,7 +7,7 @@ import { NewsletterArchive } from "./NewsletterArchive";
 export const metadata: Metadata = pageMetadata({
   title: "Newsletter",
   description:
-    "The Sagar Lad Letter — practical ideas on money, career and life. Join thousands of readers.",
+    "The Sagar Lad Letter — practical ideas on career and life.",
   path: "/newsletter",
 });
 
@@ -63,7 +63,7 @@ export default async function NewsletterPage() {
                     Ideas that actually move the needle.
                   </h1>
                   <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
-                    One practical insight every week — on money, career, and intentional
+                    One practical insight every week — on career and productivity.
                     living. No motivational fluff. No clickbait.
                     {subscriberCount > 0 && (
                       <> Join <strong className="text-foreground">{subscriberCount.toLocaleString()}+</strong> readers.</>

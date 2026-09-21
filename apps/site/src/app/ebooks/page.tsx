@@ -8,7 +8,7 @@ import { getPublishedBooks } from "@/lib/content";
 export const metadata: Metadata = pageMetadata({
   title: "eBooks & Guides",
   description:
-    "Free and premium eBooks and guides by Sagar Lad on money, careers and productivity.",
+    "Free and premium eBooks and guides by Sagar Lad careers and productivity.",
   path: "/ebooks",
 });
 
@@ -29,7 +29,7 @@ export default async function EbooksPage() {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           name: "eBooks & Guides — Sagar Lad",
-          description: "Free and premium eBooks and guides by Sagar Lad on money, careers and productivity.",
+          description: "Free and premium eBooks and guides by Sagar Lad oncareers and productivity.",
           url: `${SITE.url}/ebooks`,
           author: { "@type": "Person", name: "Sagar Lad", url: SITE.url },
         }}
@@ -37,7 +37,7 @@ export default async function EbooksPage() {
       <PageHeader
         eyebrow="eBooks"
         title="Guides you can start today"
-        subtitle="Quick, practical reads to help you get moving on money, career and productivity."
+        subtitle="Quick, practical reads to help you get moving careerand productivity."
       />
       <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-8 pb-16 sm:pt-12 md:pt-16">
         <div className="text-center">

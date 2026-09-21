@@ -150,7 +150,7 @@ export async function processNewsletterQueue() {
     take: Math.min(BATCH_SIZE, remaining),
     include: {
       campaign: { select: { subject: true, html: true } },
-      subscriber: { select: { email: true, unsubscribeToken: true } },
+      subscriber: { select: { email: true, name: true, unsubscribeToken: true } },
     },
   });
   if (batch.length === 0) return { sent: 0, remaining };
@@ -166,11 +166,12 @@ export async function processNewsletterQueue() {
     const chunk = batch.slice(i, i + PARALLEL);
     const results = await Promise.allSettled(
       chunk.map((d) => {
-        // Replace the placeholder unsubscribe token with the real per-subscriber token
-        const html = d.campaign.html.replace(
-          /\/api\/newsletter\/unsubscribe\?token=[^"&]*/,
-          `/api/newsletter/unsubscribe?token=${d.subscriber.unsubscribeToken}`
-        );
+        const html = d.campaign.html
+          .replace(/\{name\}/g, d.subscriber.name || "there")
+          .replace(
+            /\/api\/newsletter\/unsubscribe\?token=[^"&]*/,
+            `/api/newsletter/unsubscribe?token=${d.subscriber.unsubscribeToken}`
+          );
         return sendBrevo({
           to: d.subscriber.email,
           subject: d.campaign.subject,

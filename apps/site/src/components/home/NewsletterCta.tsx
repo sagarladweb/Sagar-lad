@@ -94,8 +94,8 @@ export function NewsletterCta() {
                   One practical idea. Every week.
                 </h2>
                 <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Unfiltered thoughts on money, mindset, speaking and intentional
-                  living — one practical idea, every week. No spam, ever.
+                  Unfiltered thoughts on career, mindset, speaking and intentional
+                  living — one practical idea, every week.
                 </p>
 
               {state === "success" ? (

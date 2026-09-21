@@ -9,7 +9,7 @@ import { JsonLd } from "@/components/JsonLd";
 export const metadata: Metadata = pageMetadata({
   title: "Videos",
   description:
-    "Watch Sagar Lad's videos on money, career, relationships and life lessons.",
+    "Watch Sagar Lad's videos on career, mindset, relationships and life lessons.",
   path: "/videos",
 });
 
@@ -49,9 +49,6 @@ export default async function VideosPage() {
           <h2 className="font-display text-2xl sm:text-3xl font-bold">
             Subscribe for the full library
           </h2>
-          <p className="mt-3 text-background/70 text-sm max-w-lg mx-auto">
-            New videos every week on money, careers and life.
-          </p>
           <div className="mt-6 flex justify-center gap-3 flex-wrap">
             <a
               href="https://www.youtube.com/@Sagarlad692"

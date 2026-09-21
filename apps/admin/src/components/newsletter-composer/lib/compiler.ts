@@ -35,6 +35,8 @@ const SOCIAL_SVG: Record<string, { svg: string; color: string; label: string }> 
   linkedin: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>', color: "#0A66C2", label: "LinkedIn" },
   instagram: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>', color: "#E4405F", label: "Instagram" },
   youtube: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>', color: "#FF0000", label: "YouTube" },
+  tiktok: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.51a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.46V13a8.28 8.28 0 005.58 2.15v-3.46a4.85 4.85 0 01-5.58-2.74V2.93h3.45v3.76z"/></svg>', color: "#000000", label: "TikTok" },
+  whatsapp: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>', color: "#25D366", label: "WhatsApp" },
   threads: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.59 12c.025 3.086.718 5.496 2.057 7.164 1.432 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.34-.776-.963-1.394-1.813-1.79-.128 2.754-1.19 5.072-3.988 5.072-.036 0-.072 0-.108-.002-2.63-.148-4.593-1.532-5.36-3.798-.467-1.378-.473-3.022-.018-4.82.654-2.57 2.547-4.44 5.203-5.042.398-.09.805-.135 1.216-.135.36 0 .714.033 1.06.097-.013-.36-.02-.722-.02-1.087 0-1.79.278-3.202.826-4.19C12.12.68 13.082.15 14.35.028c.197-.018.397-.03.598-.036L12.186 24zM17.05 14.51c.126.882.04 1.637-.393 2.273-.873 1.28-2.832 1.547-4.253.595-.885-.594-1.412-1.62-1.475-2.844-.042-.833.112-1.68.447-2.422.878-1.943 3.173-2.953 5.572-2.153.16.054.315.114.467.178-.342-1.62-1.283-2.61-2.856-3.004-1.17-.294-2.417-.205-3.504.256-.465.197-.887.46-1.25.784l1.09 1.508c.264-.232.585-.413.945-.533.733-.247 1.535-.268 2.294-.06.978.268 1.63 1.03 1.887 2.136-.678-.177-1.39-.264-2.12-.264-2.473 0-4.68 1.357-5.812 3.557-.638 1.24-.856 2.662-.612 4.088.576 3.398 3.43 5.688 6.98 5.688.222 0 .445-.01.667-.028 3.648-.308 6.41-2.776 6.878-6.378.24-1.85-.33-3.48-1.575-4.672l.174-1.888z"/></svg>', color: "#000000", label: "Threads" },
   substack: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>', color: "#FF6719", label: "Substack" },
   website: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>', color: "#6B7280", label: "Website" },
@@ -209,12 +211,14 @@ function renderBlockHtml(block: Block): string {
     case "image": {
       if (!d.src) return "";
       const borderRadius = s.radius || 12;
+      const imgWidth = Number(d.width) || 100;
+      const imgStyle = `max-width:${imgWidth}%;height:auto;border-radius:${borderRadius}px;display:block;${align === "center" ? "margin:0 auto" : ""}${d.ratio && d.ratio !== "auto" ? `;aspect-ratio:${d.ratio};object-fit:cover` : ""}`;
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0">
           <tr>
             <td style="text-align:${align}">
               ${d.url ? `<a href="${esc(d.url)}" target="_blank" style="text-decoration:none">` : ""}
-                <img src="${esc(d.src)}" alt="${esc(d.alt || "")}" style="max-width:100%;height:auto;border-radius:${borderRadius}px;display:block;${align === "center" ? "margin:0 auto" : ""}" />
+                <img src="${esc(d.src)}" alt="${esc(d.alt || "")}" style="${imgStyle}" />
               ${d.url ? `</a>` : ""}
             </td>
           </tr>
@@ -222,6 +226,58 @@ function renderBlockHtml(block: Block): string {
             ${d.caption ? `<p style="margin:0;font-size:12px;color:#8b8f98">${esc(d.caption)}</p>` : ""}
             ${d.credit ? `<p style="margin:2px 0 0 0;font-size:10px;color:#b0afa8">${esc(d.credit)}</p>` : ""}
           </td></tr>` : ""}
+        </table>`;
+    }
+
+    case "greeting": {
+      const greetingAlign = s.align || "left";
+      const greetingFontSize = s.fontSize || 28;
+      return `
+        <div style="margin:20px 0;text-align:${greetingAlign}">
+          <p style="margin:0;font-family:${fontFamily};font-size:${greetingFontSize}px;font-weight:700;line-height:1.3;color:${textColor}">
+            ${esc(d.text || "Hello {name},")}
+          </p>
+        </div>`;
+    }
+
+    case "socialButtons": {
+      const platforms = (d.platforms ?? []) as { platform: string; url: string; enabled: boolean }[];
+      const visible = platforms.filter((p) => p.enabled);
+      const btns = visible.map((item) => {
+        const socialIcon = SOCIAL_SVG[item.platform];
+        const iconHtml = socialIcon
+          ? `<span style="display:inline-block;vertical-align:middle;margin-right:8px;color:${socialIcon.color}">${socialIcon.svg}</span>`
+          : "";
+        const label = socialIcon?.label || item.platform;
+        return `<td style="padding:0 6px 6px 0">
+          <a href="${esc(item.url || "#")}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:10px 24px;background:#f3f4f6;border-radius:24px;color:#111827;text-decoration:none;font-size:14px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+            ${iconHtml}<span style="vertical-align:middle">${esc(label)}</span>
+          </a>
+        </td>`;
+      }).join("");
+      return `
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:12px 0">
+          <tr>${btns}</tr>
+        </table>`;
+    }
+
+    case "socialButton": {
+      const platform = String(d.platform || "x");
+      const socialIcon = SOCIAL_SVG[platform];
+      const iconHtml = socialIcon
+        ? `<span style="display:inline-block;vertical-align:middle;margin-right:8px;color:${socialIcon.color}">${socialIcon.svg}</span>`
+        : "";
+      const platformName = socialIcon?.label || platform;
+      const label = String(d.name || `Follow on ${platformName}`);
+      return `
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:12px 0">
+          <tr>
+            <td>
+              <a href="${esc(d.url || "#")}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:10px 24px;background:#f3f4f6;border-radius:24px;color:#111827;text-decoration:none;font-size:14px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+                ${iconHtml}<span style="vertical-align:middle">${esc(label)}</span>
+              </a>
+            </td>
+          </tr>
         </table>`;
     }
 
@@ -274,6 +330,28 @@ function renderBlockHtml(block: Block): string {
     }
 
     case "signature": {
+      const logoVariant = String(d.logoVariant || "color");
+      const logoPath = logoVariant === "white" ? "/logos/site-logo-white.png" : "/logos/site-logo.png";
+      const logoSize = Number(d.logoSize) || 32;
+      const imageOnly = d.imageOnly === true;
+      const logoFilter = logoVariant === "black"
+        ? "filter:grayscale(1) brightness(0);"
+        : logoVariant === "white"
+          ? "filter:brightness(0) invert(1);"
+          : "";
+      const logoHtml = d.showLogo
+        ? `<img src="${esc(`${SITE.url}${logoPath}`)}" alt="" style="height:${logoSize}px;width:auto;display:block;margin-top:12px;${logoFilter}" />`
+        : "";
+      if (imageOnly && d.showLogo) {
+        return `
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 16px 0">
+            <tr>
+              <td style="border-top:1px solid #e5e7eb;padding-top:20px;text-align:left">
+                ${logoHtml}
+              </td>
+            </tr>
+          </table>`;
+      }
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 16px 0">
           <tr>
@@ -281,6 +359,7 @@ function renderBlockHtml(block: Block): string {
               <p style="margin:0 0 10px 0;font-size:15px;line-height:1.6;color:#374151">${esc(d.text || "Warm regards,")}</p>
               <p style="margin:0;font-family:Georgia,Cambria,'Times New Roman',serif;font-size:24px;font-style:italic;color:#111827">${esc(d.name || "Sagar")}</p>
               ${d.role ? `<p style="margin:4px 0 0 0;font-size:12.5px;color:#8b8f98">${esc(d.role)}</p>` : ""}
+              ${logoHtml}
             </td>
           </tr>
         </table>`;
@@ -558,8 +637,9 @@ function renderBlockHtml(block: Block): string {
       const videoUrlStr = String(d.url || d.embedUrl || "");
       const thumb = getVideoThumbnail(videoUrlStr, d.thumbnail ? String(d.thumbnail) : undefined);
       const videoUrl = videoUrlStr || "#";
+      const vidWidth = Number(d.width) || 100;
       return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb">
+        <table role="presentation" width="${vidWidth}%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb${vidWidth < 100 ? ";display:inline-table" : ""}">
           <tr>
             <td style="background:#0f172a;text-align:center;padding:0">
               <a href="${esc(videoUrl)}" target="_blank" style="text-decoration:none;display:block">
@@ -953,7 +1033,7 @@ export function compileNewsletterToHtml(
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f3ef;padding:32px 12px">
     <tr>
       <td align="center">
-        <table role="presentation" width="620" cellpadding="0" cellspacing="0" class="email-container" style="max-width:620px;width:620px;background-color:#ffffff;border-radius:16px;border:1px solid #ece9e2;overflow:hidden">
+        <table role="presentation" width="620" cellpadding="0" cellspacing="0" class="email-container" style="max-width:620px;width:620px;background-color:#ffffff;border-radius:20px;border:1px solid #e5e7eb;overflow:hidden">
           <tr>
             <td class="email-content" style="padding:36px 32px">
               ${blocksHtml}

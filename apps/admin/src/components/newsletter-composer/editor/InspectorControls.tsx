@@ -53,6 +53,7 @@ export function RichTextEditor({
 }) {
   const ref = React.useRef<HTMLDivElement>(null);
   const [focused, setFocused] = React.useState(false);
+  const [linkPopover, setLinkPopover] = React.useState<{ show: boolean; url: string }>({ show: false, url: "" });
 
   React.useEffect(() => {
     if (!ref.current) return;
@@ -67,18 +68,33 @@ export function RichTextEditor({
     onChange(ref.current?.innerHTML ?? "");
   };
 
+  const applyLink = () => {
+    if (linkPopover.url) {
+      exec("createLink", linkPopover.url);
+    }
+    setLinkPopover({ show: false, url: "" });
+  };
+
+  const openLinkPopover = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const node = sel.anchorNode;
+      const anchor = node?.parentElement?.closest("a") as HTMLAnchorElement | null;
+      if (anchor) {
+        setLinkPopover({ show: true, url: anchor.href || "" });
+      } else {
+        setLinkPopover({ show: true, url: "https://" });
+      }
+    } else {
+      setLinkPopover({ show: true, url: "https://" });
+    }
+  };
+
   const tools: { icon: React.ComponentType<{ className?: string }>; label: string; run: () => void }[] = [
     { icon: Bold, label: "Bold", run: () => exec("bold") },
     { icon: Italic, label: "Italic", run: () => exec("italic") },
     { icon: Underline, label: "Underline", run: () => exec("underline") },
-    {
-      icon: Link2,
-      label: "Link",
-      run: () => {
-        const url = window.prompt("Link URL", "https://");
-        if (url) exec("createLink", url);
-      },
-    },
+    { icon: Link2, label: "Link", run: openLinkPopover },
     {
       icon: CornerDownLeft,
       label: "Highlight",
@@ -113,6 +129,46 @@ export function RichTextEditor({
           </Tooltip>
         ))}
       </div>
+      {linkPopover.show ? (
+        <div className="flex items-center gap-2 border-b border-line bg-canvas/80 px-2 py-1.5">
+          <Link2 className="h-3.5 w-3.5 shrink-0 text-ink-muted" />
+          <input
+            type="url"
+            value={linkPopover.url}
+            onChange={(e) => setLinkPopover((prev) => ({ ...prev, url: e.target.value }))}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                applyLink();
+              }
+              if (e.key === "Escape") setLinkPopover({ show: false, url: "" });
+            }}
+            placeholder="https://..."
+            autoFocus
+            className="flex-1 rounded-md border border-line bg-white px-2 py-1 text-[12px] text-ink outline-none focus:border-brand"
+          />
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              applyLink();
+            }}
+            className="shrink-0 rounded-md bg-brand px-2 py-1 text-[11px] font-medium text-white hover:bg-brand/90"
+          >
+            Apply
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setLinkPopover({ show: false, url: "" });
+            }}
+            className="shrink-0 rounded-md px-1.5 py-1 text-[11px] text-ink-muted hover:bg-black/[0.05]"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : null}
       <div
         ref={ref}
         contentEditable

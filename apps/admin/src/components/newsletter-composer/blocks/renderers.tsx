@@ -130,6 +130,8 @@ import {
   FaTelegram,
   FaMedium,
   FaPodcast,
+  FaTiktok,
+  FaWhatsapp,
 } from "react-icons/fa6";
 
 const SOCIAL_ICON_MAP: Record<string, { icon: typeof FaYoutube; color: string; label: string }> = {
@@ -145,6 +147,8 @@ const SOCIAL_ICON_MAP: Record<string, { icon: typeof FaYoutube; color: string; l
   threads: { icon: FaInstagram, color: "#000000", label: "Threads" },
   substack: { icon: Mail, color: "#FF6719", label: "Substack" },
   website: { icon: ExternalLink, color: "#6B7280", label: "Website" },
+  tiktok: { icon: FaTiktok, color: "#000000", label: "TikTok" },
+  whatsapp: { icon: FaWhatsapp, color: "#25D366", label: "WhatsApp" },
 };
 
 const PLATFORM_LABEL: Record<string, string> = {
@@ -792,17 +796,18 @@ function ColumnShell({
     }
 
     /* ------------------------------ Media ----------------------------- */
-    case "image":
+    case "image": {
+      const imgWidth = Number(d.width) || 100;
       return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2" style={{ width: `${imgWidth}%` }}>
           <SmartImage
             src={d.src}
             alt={d.alt}
             className="rounded-[14px]"
             style={
               d.ratio && d.ratio !== "auto"
-                ? { aspectRatio: d.ratio, height: "auto" }
-                : undefined
+                ? { aspectRatio: d.ratio, height: "auto", width: "100%" }
+                : { width: "100%" }
             }
             label="Image"
           />
@@ -814,6 +819,7 @@ function ColumnShell({
           ) : null}
         </div>
       );
+    }
 
     case "banner":
       return (
@@ -889,9 +895,10 @@ function ColumnShell({
         </div>
       );
 
-    case "video":
+    case "video": {
+      const vidWidth = Number(d.width) || 100;
       return (
-        <div className="flex flex-col">
+        <div className="flex flex-col" style={{ width: `${vidWidth}%` }}>
           <div className="relative flex w-full items-center justify-center overflow-hidden rounded-t-[17px] bg-[#0F172A]">
             {d.thumbnail ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -918,6 +925,7 @@ function ColumnShell({
           </div>
         </div>
       );
+    }
 
     case "tweet":
       return (
@@ -943,6 +951,68 @@ function ColumnShell({
       );
 
     /* --------------------------- Newsletter --------------------------- */
+    case "greeting":
+      return (
+        <div
+          className={cn(
+            "font-serif",
+            d.align === "center" && "text-center",
+            d.align === "right" && "text-right",
+          )}
+          style={gradientTextStyle(s)}
+        >
+          <p className="text-[28px] font-bold leading-tight tracking-[-0.01em]">
+            {d.text || "Hello {name},"}
+          </p>
+        </div>
+      );
+
+    case "socialButton": {
+      const meta = SOCIAL_ICON_MAP[d.platform as string];
+      const Icon = meta?.icon ?? ExternalLink;
+      const platformColor = meta?.color ?? "#6B7280";
+      const platformLabel = meta?.label ?? (d.platform as string);
+      return (
+        <div className="flex items-center gap-3">
+          <a
+            href={d.url || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-line bg-surface px-5 py-2.5 text-[14px] font-semibold text-ink transition hover:border-ink/20 hover:bg-canvas"
+          >
+            <Icon className="h-4 w-4" style={{ color: platformColor }} />
+            <span>{d.name || `Follow on ${platformLabel}`}</span>
+          </a>
+        </div>
+      );
+    }
+
+    case "socialButtons": {
+      const platforms = (d.platforms ?? []) as { platform: string; url: string; enabled: boolean }[];
+      const visible = platforms.filter((p) => p.enabled);
+      return (
+        <div className="flex flex-wrap items-center gap-3">
+          {visible.map((item, i) => {
+            const meta = SOCIAL_ICON_MAP[item.platform];
+            if (!meta) return null;
+            const Icon = meta.icon;
+            return (
+              <a
+                key={i}
+                href={item.url || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2.5 rounded-full border border-line bg-surface px-5 py-2.5 text-[14px] font-semibold text-ink transition hover:border-ink/20 hover:bg-canvas"
+              >
+                <Icon className="h-4 w-4" style={{ color: meta.color }} />
+                <span>{meta.label}</span>
+              </a>
+            );
+          })}
+        </div>
+      );
+    }
+
     case "hero":
       return (
         <div className="flex flex-col gap-5">
@@ -1057,25 +1127,66 @@ function ColumnShell({
     case "socialShare":
       return <SocialShareRenderer data={d} />;
 
-    case "signature":
-      return (
-        <div className="flex items-center gap-3">
-          {d.avatar ? <Avatar src={d.avatar} name={d.name} size={44} /> : null}
-          <div className="flex flex-col">
-            <p style={{ opacity: 0.85 }}>{d.text}</p>
-            <p
-              className={cn("mt-2 font-semibold", !d.signatureStyle && "text-[15px]")}
-            >
-              {d.name}
-              {d.role ? (
-                <span className="ml-1.5 text-[13px] font-normal text-ink-muted">
-                  · {d.role}
-                </span>
-              ) : null}
-            </p>
+    case "signature": {
+      const logoVariant = (d.logoVariant as string) || "color";
+      const logoSrc =
+        logoVariant === "white"
+          ? "/logos/site-logo-white.png"
+          : "/logos/site-logo.png";
+      const showLogo = d.showLogo === true;
+      const imageOnly = d.imageOnly === true;
+      const logoSize = Number(d.logoSize) || 32;
+      const logoFilter =
+        logoVariant === "black"
+          ? { filter: "grayscale(1) brightness(0)" }
+          : logoVariant === "white"
+            ? { filter: "brightness(0) invert(1)" }
+            : undefined;
+
+      if (imageOnly && showLogo) {
+        return (
+          <div className="flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={logoSrc}
+              alt="Site logo"
+              style={{ height: `${logoSize}px`, width: "auto", objectFit: "contain", ...logoFilter }}
+            />
           </div>
+        );
+      }
+
+      return (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            {d.avatar ? <Avatar src={d.avatar} name={d.name} size={44} /> : null}
+            <div className="flex flex-col">
+              <p style={{ opacity: 0.85 }}>{d.text}</p>
+              <p
+                className={cn("mt-2 font-semibold", !d.signatureStyle && "text-[15px]")}
+              >
+                {d.name}
+                {d.role ? (
+                  <span className="ml-1.5 text-[13px] font-normal text-ink-muted">
+                    · {d.role}
+                  </span>
+                ) : null}
+              </p>
+            </div>
+          </div>
+          {showLogo ? (
+            <div className="mt-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={logoSrc}
+                alt="Site logo"
+                style={{ height: `${logoSize}px`, width: "auto", objectFit: "contain", ...logoFilter }}
+              />
+            </div>
+          ) : null}
         </div>
       );
+    }
 
     case "readingList": {
       const items = (d.items ?? []) as {

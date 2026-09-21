@@ -74,7 +74,7 @@ export default async function NewsletterIssuePage({ params }: Props) {
             Get the next issue straight to your inbox.
           </h2>
           <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-            One practical insight every week — on money, career, and intentional living.
+            One practical insight every week — career, mindsetand intentional living.
           </p>
           <form
             action="/api/newsletter"
