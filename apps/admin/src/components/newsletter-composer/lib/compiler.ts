@@ -11,6 +11,53 @@ function esc(str: unknown): string {
     .replace(/'/g, "&#039;");
 }
 
+function extractYouTubeId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function extractVimeoId(url: string): string | null {
+  const m = url.match(/vimeo\.com\/(\d+)/);
+  return m ? m[1] : null;
+}
+
+function getVideoThumbnail(url: string, existing?: string): string {
+  if (existing) return existing;
+  const ytId = extractYouTubeId(url);
+  if (ytId) return `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
+  const vimeoId = extractVimeoId(url);
+  if (vimeoId) return `https://vumbnail.com/${vimeoId}.jpg`;
+  return "";
+}
+
+const SOCIAL_SVG: Record<string, { svg: string; color: string; label: string }> = {
+  x: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>', color: "#000000", label: "X" },
+  linkedin: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>', color: "#0A66C2", label: "LinkedIn" },
+  instagram: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>', color: "#E4405F", label: "Instagram" },
+  youtube: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>', color: "#FF0000", label: "YouTube" },
+  threads: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.59 12c.025 3.086.718 5.496 2.057 7.164 1.432 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.34-.776-.963-1.394-1.813-1.79-.128 2.754-1.19 5.072-3.988 5.072-.036 0-.072 0-.108-.002-2.63-.148-4.593-1.532-5.36-3.798-.467-1.378-.473-3.022-.018-4.82.654-2.57 2.547-4.44 5.203-5.042.398-.09.805-.135 1.216-.135.36 0 .714.033 1.06.097-.013-.36-.02-.722-.02-1.087 0-1.79.278-3.202.826-4.19C12.12.68 13.082.15 14.35.028c.197-.018.397-.03.598-.036L12.186 24zM17.05 14.51c.126.882.04 1.637-.393 2.273-.873 1.28-2.832 1.547-4.253.595-.885-.594-1.412-1.62-1.475-2.844-.042-.833.112-1.68.447-2.422.878-1.943 3.173-2.953 5.572-2.153.16.054.315.114.467.178-.342-1.62-1.283-2.61-2.856-3.004-1.17-.294-2.417-.205-3.504.256-.465.197-.887.46-1.25.784l1.09 1.508c.264-.232.585-.413.945-.533.733-.247 1.535-.268 2.294-.06.978.268 1.63 1.03 1.887 2.136-.678-.177-1.39-.264-2.12-.264-2.473 0-4.68 1.357-5.812 3.557-.638 1.24-.856 2.662-.612 4.088.576 3.398 3.43 5.688 6.98 5.688.222 0 .445-.01.667-.028 3.648-.308 6.41-2.776 6.878-6.378.24-1.85-.33-3.48-1.575-4.672l.174-1.888z"/></svg>', color: "#000000", label: "Threads" },
+  substack: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>', color: "#FF6719", label: "Substack" },
+  website: { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>', color: "#6B7280", label: "Website" },
+};
+
+/** Wrap comma-separated words in highlight spans for email HTML */
+function highlightWords(text: string, words?: string): string {
+  if (!text || !words) return esc(text || "");
+  const list = words.split(",").map((w) => w.trim()).filter(Boolean);
+  if (!list.length) return esc(text);
+  const escaped = list.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const regex = new RegExp(`(${escaped.join("|")})`, "gi");
+  const parts = text.split(regex);
+  return parts
+    .map((part) => {
+      if (regex.test(part) && list.some((w) => w.toLowerCase() === part.toLowerCase())) {
+        return `<span style="background:#FDF0B5;border-radius:3px;padding:1px 2px">${esc(part)}</span>`;
+      }
+      return esc(part);
+    })
+    .join("");
+}
+
 function renderBlockHtml(block: Block): string {
   const d = block.data || {};
   const s = block.style || ({} as any);
@@ -31,20 +78,22 @@ function renderBlockHtml(block: Block): string {
         ? `<p style="margin:0 0 8px 0;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b8f98">${esc(d.eyebrow)}</p>`
         : "";
       const emoji = d.emoji ? `<span style="margin-right:10px">${esc(d.emoji)}</span>` : "";
+      const highlightedText = highlightWords(String(d.text || ""), String(d.highlight || ""));
       return `
         <div style="margin:20px 0 10px 0;text-align:${align}">
           ${eyebrow}
           <h${lvl} style="margin:0;font-family:${fontFamily};font-size:${size}px;font-weight:700;line-height:1.15;color:${textColor};letter-spacing:-0.02em">
-            ${emoji}${esc(d.text)}
+            ${emoji}${highlightedText}
           </h${lvl}>
         </div>`;
     }
 
     case "subheading": {
+      const highlightedSub = highlightWords(String(d.text || ""), String(d.highlight || ""));
       return `
         <div style="margin:14px 0 8px 0;text-align:${align}">
           <h2 style="margin:0;font-family:${fontFamily};font-size:22px;font-weight:500;line-height:1.3;color:${textColor}">
-            ${esc(d.text)}
+            ${highlightedSub}
           </h2>
         </div>`;
     }
@@ -66,14 +115,15 @@ function renderBlockHtml(block: Block): string {
 
     case "highlight": {
       const emoji = d.emoji ? `<span style="margin-right:10px;font-size:20px">${esc(d.emoji)}</span>` : "";
+      const noteHtml = d.note ? `<p style="margin:8px 0 0 0;font-size:13px;color:#6b7280;line-height:1.5">${esc(d.note)}</p>` : "";
       return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:10px;overflow:hidden">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0">
           <tr>
-            <td style="padding:18px 22px;background:#fffdf0;border-left:5px solid #ffd51d">
-              <p style="margin:0;font-family:${fontFamily};font-size:16px;font-weight:600;line-height:1.55;color:#111827">
+            <td style="padding:18px 22px;background:#FDF9EA;border-left:5px solid #F3E6BF;border-radius:0 10px 10px 0">
+              <p style="margin:0;font-family:Georgia,Cambria,'Times New Roman',serif;font-size:20px;font-weight:600;line-height:1.55;color:#111827">
                 ${emoji}${esc(d.text)}
               </p>
-              ${d.note ? `<p style="margin:8px 0 0 0;font-size:13px;color:#6b7280;line-height:1.5">${esc(d.note)}</p>` : ""}
+              ${noteHtml}
             </td>
           </tr>
         </table>`;
@@ -335,25 +385,33 @@ function renderBlockHtml(block: Block): string {
     case "featureGrid": {
       const items = (d.items || []) as { emoji: string; title: string; body: string }[];
       const cols = Number(d.columns) || 2;
-      const colWidth = cols === 2 ? "48%" : "31%";
-      const paddingRight = cols === 2 ? "4%" : "3.5%";
-      const cells = items
-        .map(
-          (it) =>
-            `<td width="${colWidth}" valign="top" style="padding:16px 12px;text-align:center;background:#fafaf8;border:1px solid #e5e7eb;border-radius:12px">
-              ${it.emoji ? `<p style="margin:0 0 10px 0;font-size:32px">${esc(it.emoji)}</p>` : ""}
-              <p style="margin:0 0 6px 0;font-size:15px;font-weight:700;color:#111827">${esc(it.title)}</p>
-              <p style="margin:0;font-size:13px;line-height:1.5;color:#6b7280">${esc(it.body)}</p>
-            </td>`
-        )
+      const colWidth = Math.floor(100 / cols) + "%";
+      const cellStyle = `padding:16px;text-align:center;background:#fafaf8;border:1px solid #e5e7eb;border-radius:14px;vertical-align:top`;
+      const rows: { emoji: string; title: string; body: string }[][] = [];
+      for (let i = 0; i < items.length; i += cols) {
+        rows.push(items.slice(i, i + cols));
+      }
+      const tableRows = rows
+        .map((row) => {
+          const cells = row
+            .map(
+              (it) =>
+                `<td width="${colWidth}" style="${cellStyle}">
+                  ${it.emoji ? `<p style="margin:0 0 10px 0;font-size:32px">${esc(it.emoji)}</p>` : ""}
+                  <p style="margin:0 0 6px 0;font-size:15px;font-weight:700;color:#111827">${esc(it.title)}</p>
+                  <p style="margin:0;font-size:13px;line-height:1.5;color:#6b7280">${esc(it.body)}</p>
+                </td>`
+            )
+            .join("");
+          return `<tr>${cells}</tr>`;
+        })
         .join("");
+      const titleHtml = d.title ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 14px 0"><tr><td style="text-align:center"><h3 style="margin:0;font-size:20px;font-weight:700;color:#111827">${esc(d.title)}</h3></td></tr></table>` : "";
       return `
-        <div style="margin:20px 0">
-          ${d.title ? `<h3 style="margin:0 0 16px 0;font-size:20px;font-weight:700;color:#111827;text-align:center">${esc(d.title)}</h3>` : ""}
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="8">
-            <tr>${cells}</tr>
-          </table>
-        </div>`;
+        ${titleHtml}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-spacing:14px">
+          ${tableRows}
+        </table>`;
     }
 
     case "table": {
@@ -428,17 +486,37 @@ function renderBlockHtml(block: Block): string {
     }
 
     case "banner": {
-      const bg = d.src ? `background-image:url('${esc(d.src)}');background-size:cover;background-position:center` : `background:${d.background || accent}`;
       const height = d.height || 260;
       const overlay = d.overlay ?? 0.25;
+      const bg = d.src ? `background-image:url('${esc(d.src)}');background-size:cover;background-position:center` : `background:${d.background || accent}`;
+      const overlayHtml = (d.title || d.subtitle) ? `<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,${overlay});padding:40px 28px;text-align:left">
+        ${d.title ? `<p style="margin:0 0 8px 0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Georgia,Cambria,serif">${esc(d.title)}</p>` : ""}
+        ${d.subtitle ? `<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5">${esc(d.subtitle)}</p>` : ""}
+      </div>` : "";
+      if (d.src) {
+        return `
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:12px;overflow:hidden">
+            <tr>
+              <td style="padding:0;height:${height}px;position:relative">
+                <img src="${esc(d.src)}" alt="${esc(d.title || "")}" style="width:100%;height:auto;display:block" />
+                ${(d.title || d.subtitle) ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="position:absolute;top:0;left:0;width:100%;height:100%">
+                  <tr>
+                    <td style="padding:40px 28px;background:rgba(0,0,0,${overlay});vertical-align:bottom">
+                      ${d.title ? `<p style="margin:0 0 8px 0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Georgia,Cambria,serif">${esc(d.title)}</p>` : ""}
+                      ${d.subtitle ? `<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5">${esc(d.subtitle)}</p>` : ""}
+                    </td>
+                  </tr>
+                </table>` : ""}
+              </td>
+            </tr>
+          </table>`;
+      }
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:12px;overflow:hidden">
           <tr>
-            <td style="padding:0;height:${height}px;${bg}">
-              <div style="background:rgba(0,0,0,${overlay});padding:40px 28px;text-align:left">
-                ${d.title ? `<p style="margin:0 0 8px 0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Georgia,Cambria,serif">${esc(d.title)}</p>` : ""}
-                ${d.subtitle ? `<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5">${esc(d.subtitle)}</p>` : ""}
-              </div>
+            <td style="padding:40px 28px;height:${height}px;background:${d.background || accent};vertical-align:bottom">
+              ${d.title ? `<p style="margin:0 0 8px 0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Georgia,Cambria,serif">${esc(d.title)}</p>` : ""}
+              ${d.subtitle ? `<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5">${esc(d.subtitle)}</p>` : ""}
             </td>
           </tr>
         </table>`;
@@ -477,20 +555,24 @@ function renderBlockHtml(block: Block): string {
     }
 
     case "video": {
+      const videoUrlStr = String(d.url || d.embedUrl || "");
+      const thumb = getVideoThumbnail(videoUrlStr, d.thumbnail ? String(d.thumbnail) : undefined);
+      const videoUrl = videoUrlStr || "#";
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb">
           <tr>
             <td style="background:#0f172a;text-align:center;padding:0">
-              <a href="${esc(d.url || d.embedUrl || "#")}" target="_blank" style="text-decoration:none;display:block">
-                ${d.thumbnail
-                  ? `<img src="${esc(d.thumbnail)}" alt="${esc(d.title || "")}" style="width:100%;height:auto;display:block;opacity:0.85" />`
-                  : `<div style="padding:60px 20px;color:#94a3b8;font-size:14px">Video thumbnail</div>`
+              <a href="${esc(videoUrl)}" target="_blank" style="text-decoration:none;display:block">
+                ${thumb
+                  ? `<img src="${esc(thumb)}" alt="${esc(d.title || "Video")}" style="width:100%;height:auto;display:block;opacity:0.85" />`
+                  : `<div style="padding:60px 20px;color:#94a3b8;font-size:14px">Video</div>`
                 }
               </a>
             </td>
           </tr>
           ${d.title ? `<tr><td style="padding:14px 18px;background:#ffffff">
             <p style="margin:0;font-size:15px;font-weight:600;color:#111827">${esc(d.title)}</p>
+            ${d.caption ? `<p style="margin:4px 0 0 0;font-size:13px;color:#6b7280">${esc(d.caption)}</p>` : ""}
           </td></tr>` : ""}
         </table>`;
     }
@@ -521,24 +603,23 @@ function renderBlockHtml(block: Block): string {
     }
 
     case "subscribe": {
+      const newsletterUrl = `${SITE.url}/newsletter`;
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb">
           <tr>
-            <td style="padding:28px 24px;background:#fafaf8;text-align:center">
-              ${d.title ? `<p style="margin:0 0 8px 0;font-size:20px;font-weight:700;color:#111827">${esc(d.title)}</p>` : ""}
-              ${d.body ? `<p style="margin:0 0 20px 0;font-size:14px;line-height:1.5;color:#6b7280">${esc(d.body)}</p>` : ""}
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <td style="padding:28px 24px;background:#111827;text-align:center">
+              ${d.title ? `<p style="margin:0 0 8px 0;font-size:20px;font-weight:700;color:#ffffff">${esc(d.title)}</p>` : ""}
+              ${d.body ? `<p style="margin:0 0 20px 0;font-size:14px;line-height:1.5;color:rgba(255,255,255,0.7)">${esc(d.body)}</p>` : ""}
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto">
                 <tr>
-                  <td>
-                    <input type="email" placeholder="${esc(d.placeholder || "Enter your email")}" style="width:100%;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;color:#111827;box-sizing:border-box" />
-                  </td>
-                  <td width="12"></td>
-                  <td>
-                    <a href="#" style="display:inline-block;padding:12px 24px;background:${accent};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px;white-space:nowrap">${esc(d.buttonLabel || "Subscribe")}</a>
+                  <td align="center" style="background:${accent};border-radius:8px">
+                    <a href="${esc(newsletterUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:14px 32px;color:#111827;text-decoration:none;font-size:15px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;border-radius:8px">
+                      ${esc(d.buttonLabel || "Subscribe")}
+                    </a>
                   </td>
                 </tr>
               </table>
-              ${d.note ? `<p style="margin:12px 0 0 0;font-size:11px;color:#9ca3af">${esc(d.note)}</p>` : ""}
+              ${d.note ? `<p style="margin:14px 0 0 0;font-size:12px;color:rgba(255,255,255,0.5)">${esc(d.note)}</p>` : ""}
             </td>
           </tr>
         </table>`;
@@ -546,15 +627,19 @@ function renderBlockHtml(block: Block): string {
 
     case "socialShare": {
       const platforms = (d.platforms || []) as { platform: string; url: string; enabled: boolean }[];
-      const pills = platforms
-        .filter((p) => p.enabled)
+      const visiblePlatforms = platforms.filter((p) => p.enabled);
+      const pills = visiblePlatforms
         .map(
-          (p) =>
-            `<td style="padding:0 4px">
-              <a href="${esc(p.url || "#")}" target="_blank" style="display:inline-block;padding:8px 18px;background:#f3f4f6;border-radius:20px;color:#374151;text-decoration:none;font-size:13px;font-weight:600">${esc(p.platform)}</a>
-            </td>`
+          (p) => {
+            const icon = SOCIAL_SVG[p.platform];
+            const iconHtml = icon ? `<span style="display:inline-block;vertical-align:middle;margin-right:6px;color:${icon.color}">${icon.svg}</span>` : "";
+            return `<td style="padding:0 4px">
+              <a href="${esc(p.url || "#")}" target="_blank" style="display:inline-block;padding:8px 18px;background:#f3f4f6;border-radius:20px;color:#374151;text-decoration:none;font-size:13px;font-weight:600">${iconHtml}<span style="vertical-align:middle">${esc(p.platform === "x" ? "X" : p.platform === "linkedin" ? "LinkedIn" : p.platform === "instagram" ? "Instagram" : p.platform === "youtube" ? "YouTube" : p.platform === "threads" ? "Threads" : p.platform === "substack" ? "Substack" : p.platform === "website" ? "Website" : p.platform)}</span></a>
+            </td>`;
+          }
         )
         .join("");
+      const ctaHtml = (d as any).ctaLabel ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px auto 0"><tr><td align="center" style="background:${accent};border-radius:8px"><a href="${esc(d.url || "#")}" target="_blank" style="display:inline-block;padding:12px 28px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px">${esc((d as any).ctaLabel)}</a></td></tr></table>` : "";
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0">
           <tr>
@@ -564,7 +649,7 @@ function renderBlockHtml(block: Block): string {
               <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto">
                 <tr>${pills}</tr>
               </table>
-              ${(d as any).ctaLabel ? `<p style="margin:16px 0 0 0"><a href="${esc(((d.platforms as any[])?.[0]?.url) || "#")}" target="_blank" style="display:inline-block;padding:12px 28px;background:${accent};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px">${esc((d as any).ctaLabel)}</a></p>` : ""}
+              ${ctaHtml}
             </td>
           </tr>
         </table>`;

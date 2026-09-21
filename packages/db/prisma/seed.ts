@@ -373,7 +373,7 @@ const SOCIAL_LINKS: {
     key: "instagram",
     label: "Instagram",
     handle: "@grow_with__sagar",
-    href: "https://www.instagram.com/grow_with__sagar/",
+    href: "https://www.instagram.com/mindup_with__sagar",
     icon: "instagram",
     color: "#E4405F",
     sortOrder: 2,

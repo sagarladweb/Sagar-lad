@@ -62,7 +62,7 @@ export default async function VideosPage() {
               <FaYoutube className="w-4 h-4" /> Subscribe on YouTube
             </a>
             <a
-              href="https://www.instagram.com/grow_with__sagar/"
+              href="https://www.instagram.com/mindup_with__sagar"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full border border-background/30 px-6 py-3 text-sm font-semibold hover:bg-background/10 transition-colors"

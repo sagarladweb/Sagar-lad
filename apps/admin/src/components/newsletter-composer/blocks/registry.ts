@@ -140,8 +140,17 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
     icon: Heading2,
     keywords: ["subtitle", "section"],
     swatch: "#3B82F6",
-    defaultData: { text: "Why small compounds faster than big" },
-    fields: [area("text", "Subheading text")],
+    defaultData: {
+      text: "Why small compounds faster than big",
+      highlight: "",
+    },
+    fields: [
+      area("text", "Subheading text"),
+      text("highlight", "Highlight words", {
+        placeholder: "small, compounds",
+        hint: "Comma-separated words get the accent highlight.",
+      }),
+    ],
     styleOverride: {
       fontFamily: "serif",
       fontSize: 26,
@@ -901,7 +910,7 @@ export const BLOCK_DEFS: Record<BlockType, BlockDef> = {
       platforms: [
         { platform: "x", url: "https://x.com/SagarLad692", enabled: true },
         { platform: "linkedin", url: "https://www.linkedin.com/in/sagarlad/", enabled: true },
-        { platform: "instagram", url: "https://www.instagram.com/grow_with__sagar/", enabled: true },
+        { platform: "instagram", url: "https://www.instagram.com/mindup_with__sagar", enabled: true },
         { platform: "youtube", url: "https://www.youtube.com/@Sagarlad692", enabled: true },
       ],
     },

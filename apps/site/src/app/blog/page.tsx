@@ -137,7 +137,7 @@ export default async function BlogPage({
                 <dt className="text-xs text-muted-foreground font-medium">Blogs</dt>
               </div>
               <div className="text-center sm:text-left">
-                <dd className="font-extrabold text-foreground text-base sm:text-lg">10K+</dd>
+                <dd className="font-extrabold text-foreground text-base sm:text-lg">20K+</dd>
                 <dt className="text-xs text-muted-foreground font-medium">Community</dt>
               </div>
               <div className="text-center sm:text-left">
@@ -157,7 +157,7 @@ export default async function BlogPage({
             {/* Both Action Buttons placed AT THE BOTTOM after Bio end, perfectly aligned */}
             <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-3">
               <a
-                href="https://www.instagram.com/grow_with__sagar/"
+                href="https://www.instagram.com/mindup_with__sagar"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 rounded-full bg-[#0095F6] text-white px-5 py-2.5 text-xs font-bold hover:opacity-90 transition-opacity shadow-sm"
