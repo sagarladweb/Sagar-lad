@@ -102,9 +102,17 @@ function renderBlockHtml(block: Block): string {
 
     case "paragraph": {
       const fontSize = s.fontSize || 16;
+      const paragraphContent = String(d.text || "");
+      // The paragraph field stores rich HTML from the editor — render without escaping
+      if (/<(p|div|h[1-6]|ul|ol|table|blockquote|pre)/i.test(paragraphContent)) {
+        return `
+          <div style="margin:0 0 18px 0;font-family:${fontFamily};font-size:${fontSize}px;line-height:1.7;color:${textColor};text-align:${align}">
+            ${paragraphContent}
+          </div>`;
+      }
       return `
         <p style="margin:0 0 18px 0;font-family:${fontFamily};font-size:${fontSize}px;line-height:1.7;color:${textColor};text-align:${align}">
-          ${esc(d.text || "").replace(/\n/g, "<br />")}
+          ${paragraphContent.replace(/\n/g, "<br />")}
         </p>`;
     }
 
@@ -209,6 +217,40 @@ function renderBlockHtml(block: Block): string {
     }
 
     case "image": {
+      const variant = (d.variant as string) || "image";
+
+      if (variant === "banner") {
+        const height = d.height || 260;
+        const overlay = d.overlay ?? 0.25;
+        if (d.src) {
+          return `
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:12px;overflow:hidden">
+              <tr>
+                <td style="padding:0;height:${height}px;position:relative">
+                  <img src="${esc(d.src)}" alt="${esc(d.title || "")}" style="width:100%;height:auto;display:block" />
+                  ${(d.title || d.subtitle) ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="position:absolute;top:0;left:0;width:100%;height:100%">
+                    <tr>
+                      <td style="padding:40px 28px;background:rgba(0,0,0,${overlay});vertical-align:bottom">
+                        ${d.title ? `<p style="margin:0 0 8px 0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Georgia,Cambria,serif">${esc(d.title)}</p>` : ""}
+                        ${d.subtitle ? `<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5">${esc(d.subtitle)}</p>` : ""}
+                      </td>
+                    </tr>
+                  </table>` : ""}
+                </td>
+              </tr>
+            </table>`;
+        }
+        return `
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:12px;overflow:hidden">
+            <tr>
+              <td style="padding:40px 28px;height:${height}px;background:${accent};vertical-align:bottom">
+                ${d.title ? `<p style="margin:0 0 8px 0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Georgia,Cambria,serif">${esc(d.title)}</p>` : ""}
+                ${d.subtitle ? `<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5">${esc(d.subtitle)}</p>` : ""}
+              </td>
+            </tr>
+          </table>`;
+      }
+
       if (!d.src) return "";
       const borderRadius = s.radius || 12;
       const imgWidth = Number(d.width) || 100;
@@ -240,45 +282,57 @@ function renderBlockHtml(block: Block): string {
         </div>`;
     }
 
-    case "socialButtons": {
-      const platforms = (d.platforms ?? []) as { platform: string; url: string; enabled: boolean }[];
-      const visible = platforms.filter((p) => p.enabled);
-      const btns = visible.map((item) => {
-        const socialIcon = SOCIAL_SVG[item.platform];
-        const iconHtml = socialIcon
-          ? `<span style="display:inline-block;vertical-align:middle;margin-right:8px;color:${socialIcon.color}">${socialIcon.svg}</span>`
-          : "";
-        const label = socialIcon?.label || item.platform;
-        return `<td style="padding:0 6px 6px 0">
-          <a href="${esc(item.url || "#")}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:10px 24px;background:#f3f4f6;border-radius:24px;color:#111827;text-decoration:none;font-size:14px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
-            ${iconHtml}<span style="vertical-align:middle">${esc(label)}</span>
-          </a>
-        </td>`;
-      }).join("");
-      return `
-        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:12px 0">
-          <tr>${btns}</tr>
-        </table>`;
-    }
+    case "socialShare": {
+      const shareTitle = d.title ? `<p style="margin:0 0 6px 0;font-size:18px;font-weight:700;color:#111827;text-align:${align}">${esc(d.title)}</p>` : "";
+      const shareSubtitle = d.subtitle ? `<p style="margin:0 0 16px 0;font-size:14px;line-height:1.6;color:#4b5563;text-align:${align}">${esc(d.subtitle)}</p>` : "";
 
-    case "socialButton": {
-      const platform = String(d.platform || "x");
-      const socialIcon = SOCIAL_SVG[platform];
-      const iconHtml = socialIcon
-        ? `<span style="display:inline-block;vertical-align:middle;margin-right:8px;color:${socialIcon.color}">${socialIcon.svg}</span>`
+      // Build URL lookup from platforms array
+      const spByPlat: Record<string, string> = {};
+      for (const p of ((d.platforms ?? []) as { platform: string; url: string }[])) {
+        spByPlat[p.platform] = p.url;
+      }
+
+      const ALL_PLATFORMS = ["x", "linkedin", "instagram", "youtube", "tiktok", "threads", "whatsapp", "substack", "website"] as const;
+      // Use custom order if provided
+      const platformOrder = (Array.isArray(d.platformOrder) && d.platformOrder.length > 0)
+        ? (d.platformOrder as string[]).filter((p: string) => ALL_PLATFORMS.includes(p as typeof ALL_PLATFORMS[number]))
+        : [...ALL_PLATFORMS];
+
+      const sharePlatforms = platformOrder
+        .filter((key) => Boolean(d[`platform_${key}`]))
+        .map((key) => {
+          const socialIcon = SOCIAL_SVG[key as keyof typeof SOCIAL_SVG];
+          if (!socialIcon) return null;
+          const url = spByPlat[key] || "#";
+          // Use custom label if provided
+          const customLabel = String(d[`platformLabel_${key}`] ?? "").trim();
+          const label = customLabel || socialIcon.label;
+          const iconHtml = `<span style="display:inline-block;vertical-align:middle;margin-right:6px;color:${socialIcon.color}">${socialIcon.svg}</span>`;
+          return `<td style="padding:0 4px 8px 4px">
+            <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:8px 18px;background:#f3f4f6;border-radius:20px;color:#111827;text-decoration:none;font-size:13px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+              ${iconHtml}<span style="vertical-align:middle">${esc(label)}</span>
+            </a>
+          </td>`;
+        })
+        .filter(Boolean);
+      const socialLinksHtml = sharePlatforms.length
+        ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 16px auto"><tr>${sharePlatforms.join("")}</tr></table>`
         : "";
-      const platformName = socialIcon?.label || platform;
-      const label = String(d.name || `Follow on ${platformName}`);
+
+      const showCta = d.showCta !== false;
+      const ctaBtn = showCta && d.ctaLabel && d.url
+        ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px 0"><tr><td align="${align}">
+            <a href="${esc(d.url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:12px 28px;background:#0d21a1;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">${esc(d.ctaLabel)}</a>
+          </td></tr></table>`
+        : "";
+
       return `
-        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:12px 0">
-          <tr>
-            <td>
-              <a href="${esc(d.url || "#")}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:10px 24px;background:#f3f4f6;border-radius:24px;color:#111827;text-decoration:none;font-size:14px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
-                ${iconHtml}<span style="vertical-align:middle">${esc(label)}</span>
-              </a>
-            </td>
-          </tr>
-        </table>`;
+        <div style="margin:20px 0;text-align:${align}">
+          ${shareTitle}
+          ${shareSubtitle}
+          ${socialLinksHtml}
+          ${ctaBtn}
+        </div>`;
     }
 
     case "hero": {
@@ -416,7 +470,7 @@ function renderBlockHtml(block: Block): string {
 
     case "columns2": {
       const cols = (d.columns || []) as { heading: string; body: string }[];
-      const colCount = (d.count as number) || 2;
+      const colCount = Number(d.count) || 2;
       const colWidth = colCount === 2 ? "48%" : "31%";
       const paddingRight = colCount === 2 ? "4%" : "3.5%";
       const cells = cols.slice(0, colCount).map(
@@ -620,19 +674,6 @@ function renderBlockHtml(block: Block): string {
         </table>`;
     }
 
-    case "gif": {
-      if (!d.src) return "";
-      return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0">
-          <tr>
-            <td style="text-align:${align}">
-              <img src="${esc(d.src)}" alt="${esc(d.alt || "")}" style="max-width:100%;height:auto;border-radius:10px;display:block;${align === "center" ? "margin:0 auto" : ""}" />
-              ${d.caption ? `<p style="margin:8px 0 0 0;font-size:12px;color:#8b8f98;text-align:center">${esc(d.caption)}</p>` : ""}
-            </td>
-          </tr>
-        </table>`;
-    }
-
     case "video": {
       const videoUrlStr = String(d.url || d.embedUrl || "");
       const thumb = getVideoThumbnail(videoUrlStr, d.thumbnail ? String(d.thumbnail) : undefined);
@@ -657,31 +698,6 @@ function renderBlockHtml(block: Block): string {
         </table>`;
     }
 
-    case "tweet": {
-      return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden">
-          <tr>
-            <td style="padding:18px 22px">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td valign="top">
-                    <p style="margin:0 0 2px 0;font-size:15px;font-weight:700;color:#111827">${esc(d.name || "")}</p>
-                    <p style="margin:0 0 12px 0;font-size:13px;color:#6b7280">${esc(d.handle || "")}</p>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin:0 0 12px 0;font-size:16px;line-height:1.6;color:#111827">${esc(d.body || "")}</p>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td>${d.date ? `<p style="margin:0;font-size:12px;color:#8b8f98">${esc(d.date)}</p>` : ""}</td>
-                  <td align="right">${d.url ? `<a href="${esc(d.url)}" target="_blank" style="color:${accent};font-size:13px;font-weight:600;text-decoration:none">View on X →</a>` : ""}</td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>`;
-    }
-
     case "subscribe": {
       const newsletterUrl = `${SITE.url}/newsletter`;
       return `
@@ -700,36 +716,6 @@ function renderBlockHtml(block: Block): string {
                 </tr>
               </table>
               ${d.note ? `<p style="margin:14px 0 0 0;font-size:12px;color:rgba(255,255,255,0.5)">${esc(d.note)}</p>` : ""}
-            </td>
-          </tr>
-        </table>`;
-    }
-
-    case "socialShare": {
-      const platforms = (d.platforms || []) as { platform: string; url: string; enabled: boolean }[];
-      const visiblePlatforms = platforms.filter((p) => p.enabled);
-      const pills = visiblePlatforms
-        .map(
-          (p) => {
-            const icon = SOCIAL_SVG[p.platform];
-            const iconHtml = icon ? `<span style="display:inline-block;vertical-align:middle;margin-right:6px;color:${icon.color}">${icon.svg}</span>` : "";
-            return `<td style="padding:0 4px">
-              <a href="${esc(p.url || "#")}" target="_blank" style="display:inline-block;padding:8px 18px;background:#f3f4f6;border-radius:20px;color:#374151;text-decoration:none;font-size:13px;font-weight:600">${iconHtml}<span style="vertical-align:middle">${esc(p.platform === "x" ? "X" : p.platform === "linkedin" ? "LinkedIn" : p.platform === "instagram" ? "Instagram" : p.platform === "youtube" ? "YouTube" : p.platform === "threads" ? "Threads" : p.platform === "substack" ? "Substack" : p.platform === "website" ? "Website" : p.platform)}</span></a>
-            </td>`;
-          }
-        )
-        .join("");
-      const ctaHtml = (d as any).ctaLabel ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px auto 0"><tr><td align="center" style="background:${accent};border-radius:8px"><a href="${esc(d.url || "#")}" target="_blank" style="display:inline-block;padding:12px 28px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px">${esc((d as any).ctaLabel)}</a></td></tr></table>` : "";
-      return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0">
-          <tr>
-            <td style="padding:24px;text-align:center;background:#fafaf8;border-radius:12px;border:1px solid #e5e7eb">
-              ${d.title ? `<p style="margin:0 0 6px 0;font-size:17px;font-weight:700;color:#111827">${esc(d.title)}</p>` : ""}
-              ${d.subtitle ? `<p style="margin:0 0 16px 0;font-size:13px;color:#6b7280">${esc(d.subtitle)}</p>` : ""}
-              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto">
-                <tr>${pills}</tr>
-              </table>
-              ${ctaHtml}
             </td>
           </tr>
         </table>`;
@@ -1023,14 +1009,15 @@ export function compileNewsletterToHtml(
   <title>${esc(doc.title || SITE.name)}</title>
   <style>
     @media only screen and (max-width: 620px) {
-      .email-container { width: 100% !important; }
+      .email-container { width: 100% !important; max-width: 100% !important; }
       .email-content { padding: 20px 16px !important; }
+      .email-outer { padding: 16px 8px !important; }
     }
   </style>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f3ef;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
   ${doc.previewText ? `<div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">${esc(doc.previewText)}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>` : ""}
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f3ef;padding:32px 12px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="email-outer" style="background-color:#f4f3ef;padding:32px 12px">
     <tr>
       <td align="center">
         <table role="presentation" width="620" cellpadding="0" cellspacing="0" class="email-container" style="max-width:620px;width:620px;background-color:#ffffff;border-radius:20px;border:1px solid #e5e7eb;overflow:hidden">
@@ -1039,26 +1026,21 @@ export function compileNewsletterToHtml(
               ${blocksHtml}
             </td>
           </tr>
-          <tr>
-            <td style="padding:24px 32px;background-color:#fafaf8;border-top:1px solid #ece9e2">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="text-align:center;font-size:12px;color:#8b8f98;line-height:1.7">
-                    <p style="margin:0 0 8px 0">You received this because you subscribed to ${esc(SITE.name)}.</p>
-                    <p style="margin:0">
-                      <a href="${esc(unsubscribeUrl)}" style="color:#6b7280;text-decoration:underline;font-weight:500">Unsubscribe</a>
-                      <span style="margin:0 8px;color:#d1d5db">|</span>
-                      <a href="${esc(SITE.url)}" style="color:#6b7280;text-decoration:underline;font-weight:500">${esc(SITE.name)}</a>
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+
         </table>
       </td>
     </tr>
   </table>
+  <script>
+    (function(){
+      function sendHeight(){
+        try{var h=document.body.scrollHeight;window.parent.postMessage({type:'email-preview-height',height:h},'*')}catch(e){}
+      }
+      if(document.readyState==='complete')sendHeight();
+      else window.addEventListener('load',sendHeight);
+      window.addEventListener('resize',sendHeight);
+    })();
+  </script>
 </body>
 </html>`;
 }

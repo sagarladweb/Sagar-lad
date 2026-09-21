@@ -7,10 +7,8 @@ import {
   CircleCheck,
   Clock,
   ExternalLink,
-  Heart,
   Mail,
   Play,
-  Repeat2,
   Rss,
   Square,
 } from "lucide-react";
@@ -23,6 +21,7 @@ import { gradientTextStyle } from "@/components/newsletter-composer/lib/styleToC
 import { useEditorStore } from "@/components/newsletter-composer/store/editor-store";
 import type { Block } from "@/components/newsletter-composer/types/editor";
 import { cn } from "@/components/newsletter-composer/lib/utils";
+import { SITE } from "@/lib/site";
 
 /* ------------------------------------------------------------------ *
  *  Shared hook for fetching newsletter block data
@@ -166,38 +165,43 @@ const PLATFORM_LABEL: Record<string, string> = {
  * ------------------------------------------------------------------ */
 function SocialShareRenderer({ data: d }: { data: Record<string, unknown> }) {
   const { socials } = useSocialLinks();
-  const blockPlatforms = (d.platforms ?? []) as {
-    platform: string;
-    url: string;
-    enabled: boolean;
-  }[];
-
-  // Merge: block platforms with DB URLs, then add any DB-only platforms
-  const dbByIcon: Record<string, SocialLinkRow> = {};
-  for (const s of socials) {
-    dbByIcon[s.icon] = s;
-  }
-  const merged = blockPlatforms.map((bp) => {
-    const db = dbByIcon[bp.platform];
-    return { ...bp, url: db?.href ?? bp.url, label: db?.label ?? PLATFORM_LABEL[bp.platform] ?? bp.platform };
-  });
-  // Add DB platforms not in block data
-  for (const s of socials) {
-    if (!merged.some((m) => m.platform === s.icon)) {
-      merged.push({ platform: s.icon, url: s.href, enabled: true, label: s.label });
-    }
-  }
-  const visiblePlatforms = merged.filter((p) => p.enabled);
-  const showSocials = d.showSocials !== false && visiblePlatforms.length > 0;
-  const showShare = d.showShare !== false;
   const title = String(d.title ?? "");
   const subtitle = String(d.subtitle ?? "");
   const ctaLabel = String(d.ctaLabel ?? "");
   const shareUrl = String(d.url ?? "");
-  const alignCenter = Boolean(d.alignCenter);
+  const showCta = d.showCta !== false;
+  const showSocials = d.showSocials !== false;
+
+  const ALL_PLATFORMS = ["x", "linkedin", "instagram", "youtube", "tiktok", "threads", "whatsapp", "substack", "website"] as const;
+
+  // Use custom order if provided
+  const platformOrder = (Array.isArray(d.platformOrder) && d.platformOrder.length > 0)
+    ? (d.platformOrder as string[]).filter((p: string) => ALL_PLATFORMS.includes(p as typeof ALL_PLATFORMS[number]))
+    : [...ALL_PLATFORMS];
+
+  // Build URL lookup from the platforms array and from socials DB
+  const platformUrls: Record<string, string> = {};
+  const blockPlatforms = (d.platforms ?? []) as { platform: string; url: string; enabled: boolean }[];
+  for (const bp of blockPlatforms) {
+    platformUrls[bp.platform] = bp.url;
+  }
+  for (const s of socials) {
+    if (!platformUrls[s.icon]) platformUrls[s.icon] = s.href;
+  }
+
+  const visiblePlatforms = platformOrder
+    .filter((key) => Boolean(d[`platform_${key}`]))
+    .map((key) => {
+      const meta = SOCIAL_ICON_MAP[key as keyof typeof SOCIAL_ICON_MAP];
+      if (!meta) return null;
+      // Use custom label if provided, otherwise use default
+      const customLabel = String(d[`platformLabel_${key}`] ?? "").trim();
+      return { key, icon: meta.icon, color: meta.color, label: customLabel || meta.label, url: platformUrls[key] || "#" };
+    })
+    .filter(Boolean) as { key: string; icon: React.ElementType; color: string; label: string; url: string }[];
 
   return (
-    <div className={cn("flex flex-col gap-4", alignCenter && "items-center text-center")}>
+    <div className="flex flex-col items-center gap-4 text-center">
       {title ? (
         <p className="text-[18px] font-bold tracking-[-0.01em]">{title}</p>
       ) : null}
@@ -205,24 +209,19 @@ function SocialShareRenderer({ data: d }: { data: Record<string, unknown> }) {
         <p className="max-w-[46ch] text-[14px] leading-relaxed text-ink-soft">{subtitle}</p>
       ) : null}
 
-      {showSocials ? (
+      {showSocials && visiblePlatforms.length > 0 ? (
         <div className="flex flex-wrap items-center justify-center gap-3">
-          {visiblePlatforms.map((item, i) => {
-            const meta = SOCIAL_ICON_MAP[item.platform];
-            if (!meta) return null;
-            const Icon = meta.icon;
+          {visiblePlatforms.map((item) => {
+            const Icon = item.icon;
             return (
               <a
-                key={i}
+                key={item.key}
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-[13px] font-medium text-ink-soft transition hover:border-ink/20 hover:bg-canvas"
               >
-                <Icon
-                  className="h-4 w-4 transition"
-                  style={{ color: meta.color }}
-                />
+                <Icon className="h-4 w-4 transition" style={{ color: item.color }} />
                 <span>{item.label}</span>
               </a>
             );
@@ -230,30 +229,17 @@ function SocialShareRenderer({ data: d }: { data: Record<string, unknown> }) {
         </div>
       ) : null}
 
-      {showShare ? (
-        <div className="flex flex-col items-center gap-2.5">
-          {ctaLabel && shareUrl ? (
-            <a
-              href={shareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13.5px] font-semibold text-white transition hover:opacity-90"
-            >
-              {ctaLabel}
-            </a>
-          ) : null}
-        </div>
+      {showCta && ctaLabel && shareUrl ? (
+        <a
+          href={shareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1 inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13.5px] font-semibold text-white transition hover:opacity-90"
+        >
+          {ctaLabel}
+        </a>
       ) : null}
     </div>
-  );
-}
-
-function PlatformPill({ platform }: { platform: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-[13px] font-medium text-ink-soft">
-      <Rss className="h-3.5 w-3.5 text-ink-muted" />
-      {PLATFORM_LABEL[platform] ?? platform}
-    </span>
   );
 }
 
@@ -404,17 +390,24 @@ export function BlockContent({ block }: { block: Block }) {
 
     case "list": {
       const items = (d.items ?? []) as { text: string }[];
+      const style = d.style ?? "bullet";
       return (
         <ul className="flex flex-col" style={{ gap: Math.max(6, s.gap - 4) }}>
           {items.map((item, index) => (
             <li key={index} className="flex items-start gap-3">
-              <span
-                className="mt-[2px] shrink-0 text-[13px] font-semibold"
-                style={{ color: s.accentColor }}
-              >
-                {d.style === "number" ? `${index + 1}.` : d.style === "arrow" ? "→" : "•"}
-              </span>
-              <span>{item.text}</span>
+              {style === "number" ? (
+                <span
+                  className="mt-[1px] flex h-[20px] w-[20px] shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
+                  style={{ background: s.accentColor }}
+                >
+                  {index + 1}
+                </span>
+              ) : style === "arrow" ? (
+                <span className="mt-[2px] shrink-0 text-[14px] font-semibold" style={{ color: s.accentColor }}>→</span>
+              ) : (
+                <span className="mt-[6px] h-[6px] w-[6px] shrink-0 rounded-full" style={{ background: s.accentColor }} />
+              )}
+              <span className="leading-relaxed">{item.text}</span>
             </li>
           ))}
         </ul>
@@ -440,16 +433,14 @@ export function BlockContent({ block }: { block: Block }) {
               >
                 <span
                   className={cn(
-                    "mt-[2px] flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[6px] border transition",
+                    "mt-[1px] flex h-[20px] w-[20px] shrink-0 items-center justify-center rounded-[6px] border-2 transition-all",
                     item.done ? "border-transparent" : "border-line-strong bg-white",
                   )}
-                  style={item.done ? { background: s.accentColor } : undefined}
+                  style={item.done ? { background: s.accentColor, borderColor: s.accentColor } : undefined}
                 >
                   {item.done ? <Check className="h-3 w-3 text-white" /> : null}
                 </span>
-                <span
-                  className={cn(item.done && "text-ink-muted line-through")}
-                >
+                <span className={cn("leading-relaxed", item.done && "text-ink-muted line-through")}>
                   {item.text}
                 </span>
               </button>
@@ -476,7 +467,7 @@ export function BlockContent({ block }: { block: Block }) {
     /* ------------------------------ Layout ---------------------------- */
     case "columns2": {
       const columns = (d.columns ?? []) as { heading: string; body: string }[];
-      const count = (d.count as number) || 2;
+      const count = Number(d.count) || 2;
       const visibleColumns = React.useMemo(
         () =>
           columns.map((column, index) => ({
@@ -797,6 +788,47 @@ function ColumnShell({
 
     /* ------------------------------ Media ----------------------------- */
     case "image": {
+      const variant = (d.variant as string) || "image";
+
+      if (variant === "banner") {
+        return (
+          <div
+            className="relative flex w-full items-end overflow-hidden rounded-[14px]"
+            style={{ height: d.height ?? 260, background: "#EDEBE5" }}
+          >
+            {d.src ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={d.src}
+                alt={d.title ?? ""}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : null}
+            <span
+              className="absolute inset-0"
+              style={{ background: `rgba(17,24,39,${d.overlay ?? 0.25})` }}
+            />
+            {d.title || d.subtitle ? (
+              <div className="relative z-10 flex flex-col gap-1 p-5">
+                {d.title ? (
+                  <p className="font-serif text-[26px] leading-tight text-white">{d.title}</p>
+                ) : null}
+                {d.subtitle ? (
+                  <p className="text-[14px] text-white/85">{d.subtitle}</p>
+                ) : null}
+              </div>
+            ) : !d.src ? (
+              <div className="relative z-10 flex w-full flex-col items-center justify-center gap-1.5 py-14 text-center">
+                <span className="text-[12px] font-medium text-ink-muted">Banner image</span>
+                <span className="text-[11px] text-ink-muted/80">
+                  Add an image URL in the inspector
+                </span>
+              </div>
+            ) : null}
+          </div>
+        );
+      }
+
       const imgWidth = Number(d.width) || 100;
       return (
         <div className="flex flex-col gap-2" style={{ width: `${imgWidth}%` }}>
@@ -885,16 +917,6 @@ function ColumnShell({
       );
     }
 
-    case "gif":
-      return (
-        <div className="flex flex-col gap-2">
-          <SmartImage src={d.src} alt={d.alt} className="rounded-[12px]" label="GIF" />
-          {d.caption ? (
-            <p className="text-center text-[13px] text-ink-muted">{d.caption}</p>
-          ) : null}
-        </div>
-      );
-
     case "video": {
       const vidWidth = Number(d.width) || 100;
       return (
@@ -927,29 +949,6 @@ function ColumnShell({
       );
     }
 
-    case "tweet":
-      return (
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <Avatar src={d.avatar} name={d.name} size={40} />
-            <div className="min-w-0">
-              <p className="text-[14.5px] font-semibold leading-tight">{d.name}</p>
-              <p className="text-[13px] text-ink-muted">{d.handle}</p>
-            </div>
-            <span className="ml-auto text-[12px] text-ink-muted">{d.date}</span>
-          </div>
-          <p className="text-[15.5px] leading-relaxed">{d.body}</p>
-          <div className="flex items-center gap-5 text-[12.5px] text-ink-muted">
-            <span className="inline-flex items-center gap-1.5">
-              <Heart className="h-3.5 w-3.5" /> {d.likes}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Repeat2 className="h-3.5 w-3.5" /> {d.reposts}
-            </span>
-          </div>
-        </div>
-      );
-
     /* --------------------------- Newsletter --------------------------- */
     case "greeting":
       return (
@@ -966,52 +965,6 @@ function ColumnShell({
           </p>
         </div>
       );
-
-    case "socialButton": {
-      const meta = SOCIAL_ICON_MAP[d.platform as string];
-      const Icon = meta?.icon ?? ExternalLink;
-      const platformColor = meta?.color ?? "#6B7280";
-      const platformLabel = meta?.label ?? (d.platform as string);
-      return (
-        <div className="flex items-center gap-3">
-          <a
-            href={d.url || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2.5 rounded-full border border-line bg-surface px-5 py-2.5 text-[14px] font-semibold text-ink transition hover:border-ink/20 hover:bg-canvas"
-          >
-            <Icon className="h-4 w-4" style={{ color: platformColor }} />
-            <span>{d.name || `Follow on ${platformLabel}`}</span>
-          </a>
-        </div>
-      );
-    }
-
-    case "socialButtons": {
-      const platforms = (d.platforms ?? []) as { platform: string; url: string; enabled: boolean }[];
-      const visible = platforms.filter((p) => p.enabled);
-      return (
-        <div className="flex flex-wrap items-center gap-3">
-          {visible.map((item, i) => {
-            const meta = SOCIAL_ICON_MAP[item.platform];
-            if (!meta) return null;
-            const Icon = meta.icon;
-            return (
-              <a
-                key={i}
-                href={item.url || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2.5 rounded-full border border-line bg-surface px-5 py-2.5 text-[14px] font-semibold text-ink transition hover:border-ink/20 hover:bg-canvas"
-              >
-                <Icon className="h-4 w-4" style={{ color: meta.color }} />
-                <span>{meta.label}</span>
-              </a>
-            );
-          })}
-        </div>
-      );
-    }
 
     case "hero":
       return (
@@ -1129,10 +1082,11 @@ function ColumnShell({
 
     case "signature": {
       const logoVariant = (d.logoVariant as string) || "color";
-      const logoSrc =
+      const logoPath =
         logoVariant === "white"
           ? "/logos/site-logo-white.png"
           : "/logos/site-logo.png";
+      const logoSrc = `${SITE.url}${logoPath}`;
       const showLogo = d.showLogo === true;
       const imageOnly = d.imageOnly === true;
       const logoSize = Number(d.logoSize) || 32;

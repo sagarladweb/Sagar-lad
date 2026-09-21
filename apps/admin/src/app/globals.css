@@ -1227,6 +1227,13 @@ li.is-active [data-dot] {
   padding: 0 0.15em;
   border-radius: 4px;
 }
+.rich-text blockquote {
+  border-left: 3px solid #0d21a1;
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  color: #4b5563;
+  font-style: italic;
+}
 
 .drop-cap p:first-of-type::first-letter,
 .drop-cap::first-letter {

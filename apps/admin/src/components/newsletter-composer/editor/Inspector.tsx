@@ -5,10 +5,13 @@ import {
   AlignCenterHorizontal,
   AlignEndHorizontal,
   AlignStartHorizontal,
+  ArrowDown,
+  ArrowUp,
   CircleCheck,
   Copy,
   Eye,
   Gauge,
+  GripVertical,
   Lightbulb,
   Link2,
   Lock,
@@ -140,17 +143,23 @@ function ContentTab({ block }: { block: Block }) {
             title={group.section}
             defaultOpen={index < 2}
           >
-            {group.fields.map((field) => (
-              <FieldRenderer
-                key={field.key}
-                field={field}
-                value={block.data[field.key]}
-                onChange={(value) => updateData(block.id, { [field.key]: value })}
-              />
-            ))}
+            {group.fields
+              .filter((field) => !field.hidden || !field.hidden(block.data))
+              .map((field) => (
+                <FieldRenderer
+                  key={field.key}
+                  field={field}
+                  value={block.data[field.key]}
+                  onChange={(value) => updateData(block.id, { [field.key]: value })}
+                />
+              ))}
           </AccordionSection>
         ))
       )}
+
+      {block.type === "socialShare" ? (
+        <PlatformOrderSection block={block} />
+      ) : null}
 
       {!groups.length && !isDBBlock ? (
         <div className="px-4 py-8 text-center text-[12.5px] text-ink-muted">
@@ -158,6 +167,71 @@ function ContentTab({ block }: { block: Block }) {
         </div>
       ) : null}
     </>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ *  Platform order section for socialShare
+ * ------------------------------------------------------------------ */
+const PLATFORM_LABELS: Record<string, string> = {
+  x: "X / Twitter",
+  linkedin: "LinkedIn",
+  instagram: "Instagram",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  threads: "Threads",
+  whatsapp: "WhatsApp",
+  substack: "Substack",
+  website: "Website",
+};
+
+function PlatformOrderSection({ block }: { block: Block }) {
+  const updateData = useEditorStore((s) => s.updateData);
+  const platformOrder = (Array.isArray(block.data.platformOrder) ? block.data.platformOrder : []) as string[];
+
+  const movePlatform = (index: number, direction: "up" | "down") => {
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= platformOrder.length) return;
+    const next = [...platformOrder];
+    [next[index], next[newIndex]] = [next[newIndex], next[index]];
+    updateData(block.id, { platformOrder: next });
+  };
+
+  return (
+    <AccordionSection title="Platform Order" defaultOpen={false}>
+      <p className="mb-2 text-[11px] text-ink-muted">Drag or use arrows to reorder platforms.</p>
+      <div className="flex flex-col gap-1">
+        {platformOrder.map((platform, index) => (
+          <div
+            key={platform}
+            className="flex items-center gap-2 rounded-md border border-line bg-surface px-2 py-1.5"
+          >
+            <GripVertical className="h-3.5 w-3.5 shrink-0 text-ink-muted" />
+            <span className="flex-1 truncate text-[12.5px] text-ink">
+              {PLATFORM_LABELS[platform] || platform}
+            </span>
+            <div className="flex shrink-0 gap-0.5">
+              <button
+                type="button"
+                onClick={() => movePlatform(index, "up")}
+                disabled={index === 0}
+                className="flex h-5 w-5 items-center justify-center rounded text-ink-muted hover:bg-black/[0.06] disabled:opacity-30"
+              >
+                <ArrowUp className="h-3 w-3" />
+              </button>
+              <button
+                type="button"
+                onClick={() => movePlatform(index, "down")}
+                disabled={index === platformOrder.length - 1}
+                className="flex h-5 w-5 items-center justify-center rounded text-ink-muted hover:bg-black/[0.06] disabled:opacity-30"
+              >
+                <ArrowDown className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </AccordionSection>
   );
 }
 

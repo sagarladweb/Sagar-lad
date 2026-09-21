@@ -53,7 +53,7 @@ export function RichTextEditor({
 }) {
   const ref = React.useRef<HTMLDivElement>(null);
   const [focused, setFocused] = React.useState(false);
-  const [linkPopover, setLinkPopover] = React.useState<{ show: boolean; url: string }>({ show: false, url: "" });
+  const [linkPopover, setLinkPopover] = React.useState<{ show: boolean; url: string; isEdit: boolean }>({ show: false, url: "", isEdit: false });
 
   React.useEffect(() => {
     if (!ref.current) return;
@@ -72,7 +72,12 @@ export function RichTextEditor({
     if (linkPopover.url) {
       exec("createLink", linkPopover.url);
     }
-    setLinkPopover({ show: false, url: "" });
+    setLinkPopover({ show: false, url: "", isEdit: false });
+  };
+
+  const removeLink = () => {
+    exec("unlink");
+    setLinkPopover({ show: false, url: "", isEdit: false });
   };
 
   const openLinkPopover = () => {
@@ -81,13 +86,46 @@ export function RichTextEditor({
       const node = sel.anchorNode;
       const anchor = node?.parentElement?.closest("a") as HTMLAnchorElement | null;
       if (anchor) {
-        setLinkPopover({ show: true, url: anchor.href || "" });
+        setLinkPopover({ show: true, url: anchor.href || "", isEdit: true });
       } else {
-        setLinkPopover({ show: true, url: "https://" });
+        setLinkPopover({ show: true, url: "https://", isEdit: false });
       }
     } else {
-      setLinkPopover({ show: true, url: "https://" });
+      setLinkPopover({ show: true, url: "https://", isEdit: false });
     }
+  };
+
+  const toggleHighlight = () => {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const node = sel.anchorNode;
+    const mark = node?.parentElement?.closest("mark");
+    if (mark) {
+      // Remove highlight: unwrap the mark tag
+      const parent = mark.parentNode;
+      while (mark.firstChild) {
+        parent?.insertBefore(mark.firstChild, mark);
+      }
+      parent?.removeChild(mark);
+      onChange(ref.current?.innerHTML ?? "");
+    } else {
+      exec("hiliteColor", "#FDF0B5");
+    }
+  };
+
+  const formatBlock = (tag: string) => {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    // Check if already in this block type
+    const node = sel.anchorNode;
+    const currentBlock = node?.parentElement?.closest(tag);
+    if (currentBlock) {
+      // Convert back to paragraph
+      document.execCommand("formatBlock", false, "<p>");
+    } else {
+      document.execCommand("formatBlock", false, `<${tag}>`);
+    }
+    onChange(ref.current?.innerHTML ?? "");
   };
 
   const tools: { icon: React.ComponentType<{ className?: string }>; label: string; run: () => void }[] = [
@@ -95,15 +133,11 @@ export function RichTextEditor({
     { icon: Italic, label: "Italic", run: () => exec("italic") },
     { icon: Underline, label: "Underline", run: () => exec("underline") },
     { icon: Link2, label: "Link", run: openLinkPopover },
-    {
-      icon: CornerDownLeft,
-      label: "Highlight",
-      run: () => exec("hiliteColor", "#FDF0B5"),
-    },
+    { icon: CornerDownLeft, label: "Highlight", run: toggleHighlight },
     { icon: Code, label: "Inline code", run: () => exec("formatBlock", "<pre>") },
     { icon: List, label: "Bullet list", run: () => exec("insertUnorderedList") },
     { icon: ListOrdered, label: "Number list", run: () => exec("insertOrderedList") },
-    { icon: Quote, label: "Quote", run: () => exec("formatBlock", "<blockquote>") },
+    { icon: Quote, label: "Quote", run: () => formatBlock("blockquote") },
   ];
 
   return (
@@ -141,7 +175,7 @@ export function RichTextEditor({
                 e.preventDefault();
                 applyLink();
               }
-              if (e.key === "Escape") setLinkPopover({ show: false, url: "" });
+              if (e.key === "Escape") setLinkPopover({ show: false, url: "", isEdit: false });
             }}
             placeholder="https://..."
             autoFocus
@@ -155,13 +189,25 @@ export function RichTextEditor({
             }}
             className="shrink-0 rounded-md bg-brand px-2 py-1 text-[11px] font-medium text-white hover:bg-brand/90"
           >
-            Apply
+            {linkPopover.isEdit ? "Update" : "Apply"}
           </button>
+          {linkPopover.isEdit ? (
+            <button
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                removeLink();
+              }}
+              className="shrink-0 rounded-md border border-line bg-white px-2 py-1 text-[11px] font-medium text-ink-muted hover:bg-red-50 hover:text-red-600"
+            >
+              Remove
+            </button>
+          ) : null}
           <button
             type="button"
             onMouseDown={(e) => {
               e.preventDefault();
-              setLinkPopover({ show: false, url: "" });
+              setLinkPopover({ show: false, url: "", isEdit: false });
             }}
             className="shrink-0 rounded-md px-1.5 py-1 text-[11px] text-ink-muted hover:bg-black/[0.05]"
           >

@@ -40,12 +40,8 @@ export type BlockType =
   | "image"
   | "banner"
   | "gallery"
-  | "gif"
   | "video"
-  | "tweet"
   | "greeting"
-  | "socialButton"
-  | "socialButtons"
   | "hero"
   | "authorCard"
   | "subscribe"
@@ -273,6 +269,7 @@ export interface FieldDef {
   fields?: FieldDef[];
   itemLabel?: string;
   addLabel?: string;
+  hidden?: (data: Record<string, unknown>) => boolean;
 }
 
 /* ------------------------------------------------------------------ *

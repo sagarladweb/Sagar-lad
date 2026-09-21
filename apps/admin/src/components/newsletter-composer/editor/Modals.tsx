@@ -53,12 +53,24 @@ function EmailPreview({
 }) {
   const issue = useEditorStore((s) => s.doc.issue);
   const [dbData, setDbData] = React.useState<any>(null);
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
+  const [iframeHeight, setIframeHeight] = React.useState(800);
 
   React.useEffect(() => {
     fetch("/api/admin/newsletter/blocks")
       .then((r) => r.json())
       .then(setDbData)
       .catch(() => {});
+  }, []);
+
+  React.useEffect(() => {
+    function onMessage(e: MessageEvent) {
+      if (e.data?.type === "email-preview-height" && typeof e.data.height === "number") {
+        setIframeHeight(Math.max(e.data.height, 200));
+      }
+    }
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
   }, []);
 
   const html = React.useMemo(() => {
@@ -74,10 +86,11 @@ function EmailPreview({
     <div className="mx-auto overflow-hidden rounded-[18px] border border-line" style={{ maxWidth: width }}>
       {html ? (
         <iframe
+          ref={iframeRef}
           srcDoc={html}
           title="Email preview"
           className="w-full border-0"
-          style={{ height: 800, background: "#FFFFFF" }}
+          style={{ height: iframeHeight, background: "#FFFFFF", transition: "height 0.15s ease" }}
         />
       ) : (
         <div className="py-12 text-center text-[13px] text-ink-muted">
