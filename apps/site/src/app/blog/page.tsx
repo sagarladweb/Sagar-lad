@@ -126,7 +126,7 @@ export default async function BlogPage({
                 Sagar Lad
               </h1>
               <p className="mt-1 text-sm font-medium text-muted-foreground">
-                Author · Speaker
+                Author · Speaker · Human Potential Coach
               </p>
             </div>
 

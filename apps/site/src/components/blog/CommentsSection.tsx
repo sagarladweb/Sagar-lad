@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { MessageCircle, X, ChevronDown } from "lucide-react";
 import { formatDate } from "@/lib/site";
 import { CommentForm } from "@/components/blog/CommentForm";
 
@@ -19,6 +20,41 @@ type Comment = Reply & {
 const ADMIN_NAME = "Sagar Lad";
 const CHUNK_SIZE = 4;
 
+function AdminAvatar({ size = "md" }: { size?: "sm" | "md" }) {
+  const dims = size === "sm" ? "w-6 h-6" : "w-8 h-8";
+  const text = size === "sm" ? "text-[10px]" : "text-xs";
+  return (
+    <div className={`${dims} rounded-full bg-brand text-white flex items-center justify-center font-display font-bold ${text} shrink-0 overflow-hidden`}>
+      <img
+        src="/favicon-48x48.png"
+        alt="Sagar Lad"
+        className="w-full h-full object-cover"
+        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+      />
+    </div>
+  );
+}
+
+function UserAvatar({ name, isAdmin }: { name: string; isAdmin: boolean }) {
+  const initial = (name || "A").trim().charAt(0).toUpperCase();
+  if (isAdmin) return <AdminAvatar />;
+  return (
+    <div className="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-display font-bold text-xs shrink-0">
+      {initial}
+    </div>
+  );
+}
+
+function ReplyAvatar({ name, isAdmin }: { name: string; isAdmin: boolean }) {
+  const initial = (name || "A").trim().charAt(0).toUpperCase();
+  if (isAdmin) return <AdminAvatar size="sm" />;
+  return (
+    <div className="w-6 h-6 rounded-full bg-brand/10 text-brand flex items-center justify-center font-display font-bold text-[10px] shrink-0">
+      {initial}
+    </div>
+  );
+}
+
 function CommentItem({
   c,
   postSlug,
@@ -29,125 +65,145 @@ function CommentItem({
   onPosted: () => void;
 }) {
   const [replyTo, setReplyTo] = useState<string | null>(null);
-  const initial = (c.name || "A").trim().charAt(0).toUpperCase();
+  const [showReplies, setShowReplies] = useState(true);
+  const replyFormRef = useRef<HTMLDivElement>(null);
   const isAdmin = c.name === ADMIN_NAME;
+  const hasReplies = c.replies && c.replies.length > 0;
+
+  useEffect(() => {
+    if (replyTo && replyFormRef.current) {
+      replyFormRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [replyTo]);
 
   return (
-    <div>
+    <div className="group/comment">
+      {/* Main comment card */}
       <div
-        className={`rounded-2xl border bg-card/60 p-3.5 sm:p-5 transition-all hover:border-border/80 ${
+        className={`rounded-2xl border bg-card/60 p-4 sm:p-5 transition-all ${
           isAdmin
-            ? "border-brand/30 bg-brand/[0.03]"
-            : "border-border"
+            ? "border-brand/30 bg-brand/[0.03] shadow-sm shadow-brand/5"
+            : "border-border hover:border-border/80"
         }`}
       >
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          <div
-            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-display font-bold text-[11px] sm:text-xs shrink-0 ${
-              isAdmin
-                ? "bg-brand text-white"
-                : "bg-brand/10 text-brand"
-            }`}
-          >
-            {isAdmin ? (
-              <img
-                src="/favicon-48x48.png"
-                alt="Sagar Lad"
-                className="w-full h-full rounded-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                  (e.target as HTMLImageElement).nextElementSibling?.textContent ?? "";
-                }}
-              />
-            ) : null}
-            {isAdmin ? <span className="sr-only">SL</span> : initial}
-          </div>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
-            <span className={`font-semibold text-sm ${isAdmin ? "text-brand" : "text-foreground"}`}>
-              {c.name}
-            </span>
-            {isAdmin && (
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-brand/10 text-brand px-1.5 py-0.5 rounded-full">
-                Author
+        {/* Header row */}
+        <div className="flex items-start gap-3">
+          <UserAvatar name={c.name} isAdmin={isAdmin} />
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span className={`font-semibold text-sm ${isAdmin ? "text-brand" : "text-foreground"}`}>
+                {c.name}
               </span>
-            )}
-            <span className="text-muted-foreground/60" aria-hidden="true">·</span>
-            <time className="text-muted-foreground text-[11px]" dateTime={c.createdAt}>
-              {formatDate(new Date(c.createdAt))}
-            </time>
+              {isAdmin && (
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-brand/10 text-brand px-1.5 py-0.5 rounded-full">
+                  Author
+                </span>
+              )}
+              <span className="text-muted-foreground/40" aria-hidden="true">·</span>
+              <time className="text-muted-foreground text-[11px]" dateTime={c.createdAt}>
+                {formatDate(new Date(c.createdAt))}
+              </time>
+            </div>
+            {/* Comment body */}
+            <p className="mt-2 text-[15px] leading-relaxed text-foreground/90">
+              {c.content}
+            </p>
+            {/* Action row */}
+            <div className="mt-3 flex items-center gap-3">
+              {!c.parentId && (
+                <button
+                  type="button"
+                  onClick={() => setReplyTo(replyTo ? null : c.id)}
+                  className={`inline-flex items-center gap-1.5 text-xs font-medium transition-colors rounded-full px-3 py-1 ${
+                    replyTo
+                      ? "bg-brand/10 text-brand"
+                      : "text-muted-foreground hover:text-brand hover:bg-brand/5"
+                  }`}
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  {replyTo ? "Cancel" : "Reply"}
+                </button>
+              )}
+              {hasReplies && (
+                <button
+                  type="button"
+                  onClick={() => setShowReplies(!showReplies)}
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showReplies ? "rotate-180" : ""}`} />
+                  {c.replies.length} {c.replies.length === 1 ? "reply" : "replies"}
+                </button>
+              )}
+            </div>
           </div>
         </div>
-        <p className="mt-2 sm:mt-2.5 text-sm leading-relaxed text-foreground/90 pl-9 sm:pl-11">
-          {c.content}
-        </p>
-        {/* Reply button — only for top-level comments */}
-        {!c.parentId && (
-          <div className="mt-2 pl-9 sm:pl-11">
-            <button
-              type="button"
-              onClick={() => setReplyTo(replyTo ? null : c.id)}
-              className="text-[11px] font-medium text-muted-foreground hover:text-brand transition-colors"
-            >
-              {replyTo ? "Cancel reply" : "Reply"}
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* Inline reply form */}
+      {/* Reply form — slides in below the comment */}
       {replyTo === c.id && (
-        <div className="ml-9 sm:ml-11">
-          <CommentForm
-            postSlug={postSlug}
-            parentId={c.id}
-            onPosted={() => {
-              setReplyTo(null);
-              onPosted();
-            }}
-            onCancel={() => setReplyTo(null)}
-          />
+        <div ref={replyFormRef} className="ml-6 sm:ml-11 mt-2 mb-1">
+          <div className="rounded-xl border border-brand/20 bg-brand/[0.02] p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-medium text-muted-foreground">
+                Replying to <span className="text-foreground font-semibold">{c.name}</span>
+              </p>
+              <button
+                type="button"
+                onClick={() => setReplyTo(null)}
+                className="text-muted-foreground hover:text-foreground transition-colors p-0.5"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <CommentForm
+              postSlug={postSlug}
+              parentId={c.id}
+              onPosted={() => {
+                setReplyTo(null);
+                onPosted();
+              }}
+              onCancel={() => setReplyTo(null)}
+            />
+          </div>
         </div>
       )}
 
-      {/* Replies */}
-      {c.replies && c.replies.length > 0 && (
-        <div className="ml-6 sm:ml-8 mt-2 space-y-2 border-l-2 border-brand/10 pl-3 sm:pl-4">
+      {/* Replies thread */}
+      {hasReplies && showReplies && (
+        <div className="ml-5 sm:ml-8 mt-2 pl-4 sm:pl-5 border-l-2 border-brand/15 space-y-2">
           {c.replies.map((r) => {
-            const rInitial = (r.name || "A").trim().charAt(0).toUpperCase();
             const rIsAdmin = r.name === ADMIN_NAME;
             return (
               <div
                 key={r.id}
-                className={`rounded-xl border bg-card/40 p-3 sm:p-4 ${
-                  rIsAdmin ? "border-brand/30 bg-brand/[0.03]" : "border-border"
+                className={`rounded-xl border p-3 sm:p-3.5 transition-all ${
+                  rIsAdmin
+                    ? "border-brand/25 bg-brand/[0.03] shadow-sm shadow-brand/5"
+                    : "border-border/60 bg-card/40 hover:border-border/80"
                 }`}
               >
-                <div className="flex items-center gap-2 sm:gap-2.5">
-                  <div
-                    className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-display font-bold text-[10px] sm:text-[11px] shrink-0 ${
-                      rIsAdmin ? "bg-brand text-white" : "bg-brand/10 text-brand"
-                    }`}
-                  >
-                    {rIsAdmin ? <span>SL</span> : rInitial}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
-                    <span className={`font-semibold text-[13px] ${rIsAdmin ? "text-brand" : "text-foreground"}`}>
-                      {r.name}
-                    </span>
-                    {rIsAdmin && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-brand/10 text-brand px-1.5 py-0.5 rounded-full">
-                        Author
+                <div className="flex items-start gap-2.5">
+                  <ReplyAvatar name={r.name} isAdmin={rIsAdmin} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                      <span className={`font-semibold text-[13px] ${rIsAdmin ? "text-brand" : "text-foreground"}`}>
+                        {r.name}
                       </span>
-                    )}
-                    <span className="text-muted-foreground/60" aria-hidden="true">·</span>
-                    <time className="text-muted-foreground text-[11px]" dateTime={r.createdAt}>
-                      {formatDate(new Date(r.createdAt))}
-                    </time>
+                      {rIsAdmin && (
+                        <span className="text-[9px] font-bold uppercase tracking-wider bg-brand/10 text-brand px-1.5 py-0.5 rounded-full">
+                          Author
+                        </span>
+                      )}
+                      <span className="text-muted-foreground/40" aria-hidden="true">·</span>
+                      <time className="text-muted-foreground text-[11px]" dateTime={r.createdAt}>
+                        {formatDate(new Date(r.createdAt))}
+                      </time>
+                    </div>
+                    <p className="mt-1.5 text-[13px] sm:text-sm leading-relaxed text-foreground/85">
+                      {r.content}
+                    </p>
                   </div>
                 </div>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-foreground/85 pl-8 sm:pl-9.5">
-                  {r.content}
-                </p>
               </div>
             );
           })}
@@ -194,16 +250,16 @@ export function CommentsSection({ postSlug }: { postSlug: string }) {
       {/* Comment form — always first */}
       <CommentForm postSlug={postSlug} onPosted={afterPosted} />
 
-      {/* Header with total count */}
+      {/* Header with count */}
       <div className="flex items-center justify-between pb-3 border-b border-border mt-8 sm:mt-10">
-        <h2 className="font-display text-lg sm:text-xl sm:text-2xl font-bold text-foreground">
+        <h2 className="font-display text-lg sm:text-xl font-bold text-foreground">
           {allCount > 0
             ? `${allCount} ${allCount === 1 ? "Comment" : "Comments"}`
             : "Discussion"}
         </h2>
         {allCount > 0 && (
           <span className="text-xs text-muted-foreground font-mono">
-            {allCount} posted
+            {total} thread{total !== 1 ? "s" : ""}
           </span>
         )}
       </div>
