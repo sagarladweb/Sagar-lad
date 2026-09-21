@@ -6,9 +6,9 @@ import { JsonLd } from "@/components/JsonLd";
 import { MentorshipClient } from "./MentorshipClient";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Mentorship",
+  title: "1:1 Mentorship with Sagar Lad — Mindset, Career & Productivity",
   description:
-    "Book a 1:1 mentorship session with Sagar Lad — career guidance, portfolio reviews and honest advice.",
+    "Book a 1:1 mentorship session with Sagar Lad — direct guidance on mindset, career direction, productivity, and the MINDUP Framework. Practical, honest, no fluff.",
   path: "/mentorship",
 });
 

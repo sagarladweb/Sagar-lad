@@ -5,7 +5,7 @@ import { SITE, formatDate, pageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "Terms of Use",
-  description: "The rules of the road for using the Sagar Lad website.",
+  description: "The rules of the road for using sagarlad.com — including content usage, affiliate disclosures, and limitations of liability.",
   path: "/terms",
 });
 
@@ -19,7 +19,7 @@ export default function TermsPage() {
           "@context": "https://schema.org",
           "@type": "WebPage",
           name: "Terms of Use — Sagar Lad",
-          description: "The rules of the road for using the Sagar Lad website.",
+          description: "The rules of the road for using sagarlad.com — including content usage, affiliate disclosures, and limitations of liability.",
           url: `${SITE.url}/terms`,
           author: { "@type": "Person", name: "Sagar Lad", url: SITE.url },
           dateModified: new Date().toISOString(),

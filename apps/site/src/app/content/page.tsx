@@ -7,9 +7,9 @@ import { getCategoriesWithFallback } from "@/lib/content";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Content",
+  title: "Content by Topic — Mindset, Career, Habits & More — Sagar Lad",
   description:
-    "Browse Sagar Lad's content by topic — habits, confidence, happiness, money and more. Videos and articles in one place.",
+    "Browse Sagar Lad's videos and articles by topic — mindset, career growth, habits, confidence, happiness, and more. Curated from YouTube, Instagram, and the blog.",
   path: "/content",
 });
 

@@ -10,9 +10,9 @@ import { FaYoutube } from "@/lib/icons";
 import { BlogCard } from "@/components/blog/BlogCard";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Blog",
+  title: "Blog — Articles on Mindset, Career Growth & Intentional Living — Sagar Lad",
   description:
-    "Articles on life, career and everything in between by Sagar Lad.",
+    "Practical articles on career growth, mindset, habits, and intentional living by Sagar Lad — author of The MIND UP Theory. No motivational fluff. Just ideas that move the needle.",
   path: "/blog",
 });
 

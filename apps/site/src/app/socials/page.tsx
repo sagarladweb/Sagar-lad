@@ -6,8 +6,8 @@ import { JsonLd } from "@/components/JsonLd";
 import { Pill } from "@/components/ui/Pill";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Social Links",
-  description: "Find Sagar Lad across all social platforms.",
+  title: "Connect with Sagar Lad — All Social Platforms",
+  description: "Find Sagar Lad on YouTube, Instagram, LinkedIn, X, and more. Follow for weekly videos on mindset, career growth, and intentional living.",
   path: "/socials",
 });
 

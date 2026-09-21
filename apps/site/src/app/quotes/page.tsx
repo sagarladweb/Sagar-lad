@@ -4,9 +4,9 @@ import { getQuotesWithFallback } from "@/lib/content";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Quotes",
+  title: "Quotes by Sagar Lad — On Mindset, Habits & Happiness",
   description:
-    "Short ideas on habits, confidence, money and happiness from Sagar Lad's writing and talks.",
+    "Short ideas on mindset, habits, confidence, and happiness from Sagar Lad's writing and TEDx talks. Words to carry with you.",
   path: "/quotes",
 });
 
@@ -57,7 +57,7 @@ export default async function QuotesPage() {
             Ideas to carry<br className="hidden sm:block" /> with you
           </h1>
           <p className="mt-5 max-w-xl mx-auto text-muted-foreground leading-relaxed text-base sm:text-lg">
-            Short lines on habits, confidence, money and happiness — distilled from
+            Short lines on habits, confidence, and happiness — distilled from
             the writing and talks.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3 text-xs text-muted-foreground">

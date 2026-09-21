@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Contact",
+  title: "Contact Sagar Lad — Speaking, Writing & Collaboration",
   description:
-    "Get in touch with Sagar Lad for inquiries, collaborations, or general questions.",
+    "Reach out to Sagar Lad for speaking engagements, book collaborations, mentorship inquiries, or general questions. Response within 24–48 hours.",
   path: "/contact",
 });
 

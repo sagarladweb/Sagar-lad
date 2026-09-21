@@ -9,9 +9,9 @@ import { SITE, pageMetadata } from "@/lib/site";
 import { getPublishedBooks } from "@/lib/content";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Books I've Read",
+  title: "Books I've Read — Reading List by Sagar Lad",
   description:
-    "A running list of the books that have shaped my thinking — with the one clear lesson each one left me with.",
+    "A running list of the books that shaped Sagar Lad's thinking — on mindset, career, relationships, and growth — with the one clear lesson each one left him with.",
   path: "/books-read",
 });
 
@@ -36,7 +36,7 @@ export default async function BooksReadPage() {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           name: "Books I've Read — Sagar Lad",
-          description: "A running list of the books that have shaped my thinking — with the one clear lesson each one left me with.",
+          description: "A running list of the books that shaped Sagar Lad's thinking — on mindset, career, relationships, and growth — with the one clear lesson each one left him with.",
           url: `${SITE.url}/books-read`,
           author: { "@type": "Person", name: "Sagar Lad", url: SITE.url },
         }}

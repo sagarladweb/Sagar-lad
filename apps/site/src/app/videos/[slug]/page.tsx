@@ -150,7 +150,7 @@ export async function generateMetadata({
     title: video.title,
     description: video.content
       ? video.content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 160)
-      : `Watch ${video.title} by Sagar Lad.`,
+      : `Watch ${video.title} — a video by Sagar Lad on mindset, career, and life.`,
     path: `/videos/${video.slug}`,
   });
 }

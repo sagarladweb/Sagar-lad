@@ -17,9 +17,9 @@ import { JsonLd } from "@/components/JsonLd";
 import { Pill } from "@/components/ui/Pill";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Public Speaking & Keynotes",
+  title: "Sagar Lad — TEDx Speaker & Keynote Speaker on Mindset, AI & Career Growth",
   description:
-    "Sagar Lad delivers high-impact keynotes on AI & Data Leadership, Financial Mindset, and Career Growth at summits, tech conferences, and campuses worldwide.",
+    "Book Sagar Lad for keynotes on mindset, AI, and career growth. TEDx speaker with talks at summits, tech conferences, and campuses worldwide. Watch the TEDx talk on the MIND UP framework.",
   path: "/speaking",
   ogImage: "/images/heroes/Speaking_hero.webp",
 });

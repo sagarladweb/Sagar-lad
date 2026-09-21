@@ -4,9 +4,9 @@ import { brandColors } from "./brand-colors";
 export const SITE = {
   name: "Sagar Lad",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? "https://sagarlad.com").trim().replace(/\/$/, ""),
-  title: "Sagar Lad — Author, Speaker & Human Potential Advocate",
+  title: "Sagar Lad — Author, TEDx Speaker & Human Potential Advocate",
   description:
-    "Official website of Sagar Lad — Published Author of 6+ books, TEDx Speaker.",
+    "Sagar Lad is the author of The MIND UP Theory, a TEDx speaker, and creator of the MINDUP Framework — helping people build an unshakable mindset for career growth, relationships, and life.",
   ogImage: "/images/og-image.jpg",
   locale: "en_IN",
 } as const;

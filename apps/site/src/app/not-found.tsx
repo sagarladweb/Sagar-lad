@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Page Not Found — Sagar Lad",
-  description: "The page you're looking for doesn't exist.",
+  description: "The page you're looking for doesn't exist. Head back to Sagar Lad's site for articles, books, and resources on mindset and career growth.",
   robots: { index: false, follow: true },
 };
 

@@ -5,7 +5,7 @@ import { SITE, formatDate, pageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
-  description: "How we collect, use and protect your information on sagarlad.com.",
+  description: "How sagarlad.com collects, uses, and protects your information. Read the full privacy policy.",
   path: "/privacy",
 });
 
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
           "@context": "https://schema.org",
           "@type": "WebPage",
           name: "Privacy Policy — Sagar Lad",
-          description: "How we collect, use and protect your information on sagarlad.com.",
+          description: "How sagarlad.com collects, uses, and protects your information.",
           url: `${SITE.url}/privacy`,
           author: { "@type": "Person", name: "Sagar Lad", url: SITE.url },
           dateModified: new Date().toISOString(),

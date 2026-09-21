@@ -7,9 +7,9 @@ import { JsonLd } from "@/components/JsonLd";
 import { Pill } from "@/components/ui/Pill";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Books by Sagar Lad",
+  title: "Books by Sagar Lad — The MIND UP Theory & More",
   description:
-    "Practical data & cloud books by Sagar Lad — Azure, Databricks and modern data architecture. Browse the full catalogue on Amazon.",
+    "Explore books by Sagar Lad — including The MIND UP Theory on building an unshakable mindset, and technical titles on Azure AI and data architecture. Available on Amazon in paperback and Kindle.",
   path: "/books",
 });
 
@@ -29,7 +29,7 @@ export default async function BooksPage() {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           name: "Books by Sagar Lad",
-          description: "Practical data & cloud books by Sagar Lad — Azure, Databricks and modern data architecture.",
+          description: "Explore books by Sagar Lad — including The MIND UP Theory on building an unshakable mindset, and technical titles on Azure AI and data architecture.",
           url: `${SITE.url}/books`,
           author: { "@type": "Person", name: "Sagar Lad", url: SITE.url },
         }}

@@ -1,4 +1,5 @@
-import { SITE, VISIBLE_POST_WHERE } from "@/lib/site";
+import type { Metadata } from "next";
+import { SITE, VISIBLE_POST_WHERE, pageMetadata } from "@/lib/site";
 import { getSiteSocials } from "@/lib/social-links";
 import { getCategoriesWithFallback, getFeaturedPostsWithFallback } from "@/lib/content";
 import { getHomeHero } from "@/lib/hero";
@@ -17,6 +18,13 @@ import { NewsletterCta } from "@/components/home/NewsletterCta";
 import { SagarGallery } from "@/components/home/SagarGallery";
 import { LifeRazor } from "@/components/home/LifeRazor";
 import { LazySection } from "@/components/home/LazySection";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Sagar Lad — Author, TEDx Speaker & Human Potential Advocate",
+  description:
+    "Sagar Lad is the author of The MIND UP Theory, a TEDx speaker, and creator of the MINDUP Framework — helping people build an unshakable mindset for career growth, relationships, and life.",
+  path: "/",
+});
 
 export const revalidate = 60;
 
@@ -54,7 +62,7 @@ export default async function HomePage() {
           name: SITE.name,
           url: SITE.url,
           sameAs: socials.map((s) => s.href),
-          knowsAbout: ["personal finance", "investing", "career", "data engineering"],
+          knowsAbout: ["mindset", "personal development", "career growth", "MIND UP Framework", "public speaking"],
         }}
       />
       <JsonLd

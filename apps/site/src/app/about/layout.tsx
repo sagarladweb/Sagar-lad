@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: "About",
+  title: "About Sagar Lad — Author, TEDx Speaker & Creator of MIND UP",
   description:
-    "Background, journey and timeline of Sagar Lad — author and public speaker with 15+ years in tech and data across multiple countries.",
+    "Sagar Lad is a TEDx speaker, published author, and creator of the MINDUP Framework. His journey from rock bottom to building a global community around The MIND UP Theory — on mindset, habits, and intentional living.",
   path: "/about",
 });
 

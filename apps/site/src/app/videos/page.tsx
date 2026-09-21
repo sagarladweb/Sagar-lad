@@ -7,9 +7,9 @@ import { VideoFeed } from "@/components/video/VideoFeed";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Videos",
+  title: "Videos — Mindset, Career & Life Lessons — Sagar Lad",
   description:
-    "Watch Sagar Lad's videos on career, mindset, relationships and life lessons.",
+    "Watch Sagar Lad's videos on mindset, career growth, relationships, and life lessons. New videos every week on YouTube — reels and clips play right here.",
   path: "/videos",
 });
 
@@ -35,7 +35,7 @@ export default async function VideosPage() {
       <PageHeader
         eyebrow="Videos"
         title="Learn by watching"
-        subtitle="New videos every week on YouTube — money, careers, life and everything in between. Reels and clips play right here, in-page."
+        subtitle="New videos every week on YouTube — mindset, career, life and everything in between. Reels and clips play right here, in-page."
       />
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 space-y-16">
         <section>

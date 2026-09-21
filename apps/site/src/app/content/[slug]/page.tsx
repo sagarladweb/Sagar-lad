@@ -150,8 +150,8 @@ export async function generateMetadata({
   );
   if (!category) return {};
   return pageMetadata({
-    title: `${category.name} — Content`,
-    description: `Videos and articles on ${category.name.toLowerCase()} by Sagar Lad.`,
+    title: `${category.name} — Videos & Articles by Sagar Lad`,
+    description: `Videos and articles on ${category.name.toLowerCase()} — curated from Sagar Lad's YouTube, Instagram, and blog. Practical insights you can act on.`,
     path: `/content/${category.slug}`,
   });
 }

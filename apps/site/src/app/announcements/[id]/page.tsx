@@ -31,8 +31,8 @@ export async function generateMetadata({
   if (!announcement || !announcement.active) return {};
 
   return {
-    title: `${announcement.title} | ${SITE.name}`,
-    description: announcement.description || `${SITE.name} — ${announcement.title}`,
+    title: `${announcement.title} — Sagar Lad`,
+    description: announcement.description || `${announcement.title} — an update from Sagar Lad on mindset, books, and upcoming projects.`,
     openGraph: {
       title: announcement.title,
       description: announcement.description || SITE.description,

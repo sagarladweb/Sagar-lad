@@ -5,9 +5,9 @@ import { pageMetadata } from "@/lib/site";
 import { NewsletterArchive } from "./NewsletterArchive";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Newsletter",
+  title: "The Sagar Lad Letter — Weekly Insights on Career & Mindset",
   description:
-    "The Sagar Lad Letter — practical ideas on career and life.",
+    "The Sagar Lad Letter — one practical insight every week on career growth, mindset, and intentional living. No motivational fluff. No clickbait. Join thousands of readers.",
   path: "/newsletter",
 });
 
