@@ -1,16 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
 import { getClientToken } from "@/lib/client-token";
 import { sanitizeText } from "@/lib/client-validators";
 
 export function CommentForm({
   postSlug,
   onPosted,
+  parentId,
+  onCancel,
 }: {
   postSlug: string;
   onPosted?: () => void;
+  parentId?: string;
+  onCancel?: () => void;
 }) {
   const [form, setForm] = useState({ name: "", content: "" });
   const [errors, setErrors] = useState<{ name?: string; content?: string }>({});
@@ -18,6 +22,8 @@ export function CommentForm({
     "idle"
   );
   const [message, setMessage] = useState("");
+
+  const isReply = Boolean(parentId);
 
   function validate(): boolean {
     const e: typeof errors = {};
@@ -44,15 +50,14 @@ export function CommentForm({
           content: form.content.trim(),
           postSlug,
           clientToken: getClientToken(),
+          parentId: parentId || undefined,
         }),
       });
       if (res.ok) {
         setState("success");
         setForm({ name: "", content: "" });
         setErrors({});
-        setMessage(
-          "Thanks! Your comment has been posted."
-        );
+        setMessage(isReply ? "Reply posted!" : "Thanks! Your comment has been posted.");
         onPosted?.();
       } else {
         const data = await res.json().catch(() => ({}));
@@ -68,15 +73,32 @@ export function CommentForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="mt-8 rounded-2xl border border-border bg-card/60 p-5 sm:p-6 space-y-4 shadow-sm"
+      className={`${
+        isReply
+          ? "mt-3 rounded-xl border border-border bg-background/60 p-4 space-y-3"
+          : "mt-8 rounded-2xl border border-border bg-card/60 p-5 sm:p-6 space-y-4 shadow-sm"
+      }`}
       noValidate
     >
-      <div>
-        <h3 className="font-display text-lg font-bold text-foreground">Leave a comment</h3>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Share your reflections or questions. Moderated for spam.
-        </p>
-      </div>
+      {!isReply && (
+        <div>
+          <h3 className="font-display text-lg font-bold text-foreground">Leave a comment</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Share your reflections or questions. Moderated for spam.
+          </p>
+        </div>
+      )}
+
+      {isReply && (
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-muted-foreground">Write a reply</p>
+          {onCancel && (
+            <button type="button" onClick={onCancel} className="text-muted-foreground hover:text-foreground">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      )}
 
       <div>
         <input
@@ -103,10 +125,10 @@ export function CommentForm({
             setForm({ ...form, content: e.target.value });
             if (errors.content) setErrors({ ...errors, content: undefined });
           }}
-          placeholder="Share your thoughts…"
-          aria-label="Comment"
+          placeholder={isReply ? "Write your reply…" : "Share your thoughts…"}
+          aria-label={isReply ? "Reply" : "Comment"}
           required
-          rows={4}
+          rows={isReply ? 3 : 4}
           className={`w-full rounded-xl border bg-background px-4 py-2.5 text-base sm:text-sm outline-none transition-all focus:border-brand focus:ring-2 focus:ring-brand/20 resize-y ${
             errors.content ? "border-red-500" : "border-border"
           }`}
@@ -121,11 +143,18 @@ export function CommentForm({
         <button
           type="submit"
           disabled={state === "loading"}
-          className="inline-flex items-center gap-2 rounded-full bg-brand text-white px-6 py-2.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-95 disabled:opacity-60"
+          className={`inline-flex items-center gap-2 rounded-full text-white px-5 py-2 text-sm font-semibold transition-all hover:opacity-90 active:scale-95 disabled:opacity-60 ${
+            isReply ? "bg-brand/90" : "bg-brand"
+          }`}
         >
           {state === "loading" && <Loader2 className="w-4 h-4 animate-spin" />}
-          Post comment
+          {isReply ? "Reply" : "Post comment"}
         </button>
+        {isReply && onCancel && (
+          <button type="button" onClick={onCancel} className="text-xs text-muted-foreground hover:text-foreground">
+            Cancel
+          </button>
+        )}
       </div>
 
       {state === "success" && (

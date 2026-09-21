@@ -27,15 +27,38 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    const comments = await dbSafe(
+    // Fetch all comments for this post (including replies) in one query
+    const allComments = await dbSafe(
       () =>
         prisma.comment.findMany({
           where: { postId: post.id },
           orderBy: { createdAt: "asc" },
-          select: { id: true, name: true, content: true, createdAt: true },
+          select: {
+            id: true,
+            name: true,
+            content: true,
+            createdAt: true,
+            parentId: true,
+          },
         }),
       []
     );
+
+    // Nest replies under their parents in a single pass — no extra DB calls
+    const topLevel: typeof allComments = [];
+    const replyMap = new Map<string, typeof allComments>();
+    for (const c of allComments) {
+      if (c.parentId) {
+        if (!replyMap.has(c.parentId)) replyMap.set(c.parentId, []);
+        replyMap.get(c.parentId)!.push(c);
+      } else {
+        topLevel.push(c);
+      }
+    }
+    const comments = topLevel.map((c) => ({
+      ...c,
+      replies: replyMap.get(c.id) ?? [],
+    }));
 
     return NextResponse.json({ comments });
   } catch {
@@ -70,6 +93,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
+    // Validate parentId if provided — must exist and belong to same post
+    const parentId = (body as Record<string, unknown>).parentId;
+    if (parentId && typeof parentId === "string") {
+      const parentComment = await dbSafe(
+        () => prisma.comment.findUnique({ where: { id: parentId }, select: { id: true, postId: true, parentId: true } }),
+        null
+      );
+      if (!parentComment || parentComment.postId !== post.id) {
+        return NextResponse.json({ error: "Invalid parent comment" }, { status: 400 });
+      }
+      // Only allow 1 level of nesting (can't reply to a reply)
+      if (parentComment.parentId) {
+        return NextResponse.json({ error: "Cannot reply to a reply" }, { status: 400 });
+      }
+    }
+
     const clientIp = getClientIp(request);
     const userAgent = request.headers.get("user-agent") || null;
 
@@ -85,6 +124,7 @@ export async function POST(request: Request) {
           postId: post.id,
           clientToken: parsed.data.clientToken || null,
           approved: true,
+          parentId: parentId && typeof parentId === "string" ? parentId : null,
         },
       });
     } catch {

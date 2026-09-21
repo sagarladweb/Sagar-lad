@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Trash2, Download, Search } from "lucide-react";
+import { Trash2, Download, Search, MessageCircle, Send, X } from "lucide-react";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button, IconButton } from "@/components/ui/Button";
 import { Badge, CountBadge } from "@/components/ui/Badge";
@@ -22,6 +22,7 @@ type Comment = {
   clientToken: string | null;
   userId: string | null;
   postId: string;
+  parentId: string | null;
   createdAt: string;
   post: { title: string; slug: string };
 };
@@ -131,6 +132,184 @@ function EnquiryList({
           </IconButton>
         </li>
       ))}
+    </ul>
+  );
+}
+
+function CommentList({
+  comments,
+  selected,
+  onToggle,
+  onDelete,
+  onReplyDone,
+}: {
+  comments: Comment[];
+  selected: Set<string>;
+  onToggle: (id: string) => void;
+  onDelete: (id: string) => void;
+  onReplyDone: () => void;
+}) {
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyContent, setReplyContent] = useState("");
+  const [replyLoading, setReplyLoading] = useState(false);
+
+  // Separate top-level and replies
+  const topLevel = comments.filter((c) => !c.parentId);
+  const repliesByParent = new Map<string, Comment[]>();
+  for (const c of comments) {
+    if (c.parentId) {
+      if (!repliesByParent.has(c.parentId)) repliesByParent.set(c.parentId, []);
+      repliesByParent.get(c.parentId)!.push(c);
+    }
+  }
+
+  async function submitReply(parentComment: Comment) {
+    if (!replyContent.trim()) return;
+    setReplyLoading(true);
+    try {
+      const res = await fetch("/api/admin/comments/reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ commentId: parentComment.id, content: replyContent.trim() }),
+      });
+      if (res.ok) {
+        setReplyTo(null);
+        setReplyContent("");
+        onReplyDone();
+      }
+    } finally {
+      setReplyLoading(false);
+    }
+  }
+
+  function renderComment(c: Comment, isReply = false) {
+    const replies = repliesByParent.get(c.id) ?? [];
+    return (
+      <li key={c.id} className={isReply ? "py-3 pl-6 border-l-2 border-accent/20" : "py-4"}>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3 min-w-0">
+            {!isReply && (
+              <input
+                type="checkbox"
+                checked={selected.has(c.id)}
+                onChange={() => onToggle(c.id)}
+                aria-label={`Select comment by ${c.name}`}
+                className="accent-[var(--accent)] mt-1"
+              />
+            )}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                {isReply && (
+                  <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+                    <MessageCircle className="w-3 h-3 text-accent" />
+                  </div>
+                )}
+                <span className={`font-semibold text-sm ${c.name === "Sagar Lad" ? "text-accent" : ""}`}>
+                  {c.name}
+                </span>
+                {c.name === "Sagar Lad" && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-accent/10 text-accent px-1.5 py-0.5 rounded-full">
+                    You
+                  </span>
+                )}
+                {c.email && (
+                  <a href={`mailto:${c.email}`} className="text-xs text-muted-foreground hover:text-accent">
+                    {c.email}
+                  </a>
+                )}
+                <span className="text-xs text-muted-foreground">on {c.post.title}</span>
+                <time className="text-xs text-muted-foreground" dateTime={c.createdAt}>
+                  {new Date(c.createdAt).toLocaleString()}
+                </time>
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{c.content}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+                <a
+                  href={`${SITE.url}/blog/${c.post.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-accent font-medium underline"
+                >
+                  Post: {c.post.slug}
+                </a>
+                {c.ip && (
+                  <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-muted-foreground">
+                    IP: {c.ip}
+                  </span>
+                )}
+                {c.userAgent && (
+                  <span className="rounded bg-muted px-1.5 py-0.5 text-muted-foreground truncate max-w-[240px]" title={c.userAgent}>
+                    UA: {c.userAgent}
+                  </span>
+                )}
+                {c.userId && (
+                  <span className="text-muted-foreground">User ID: {c.userId}</span>
+                )}
+                {c.clientToken && (
+                  <span className="text-muted-foreground">Token: {c.clientToken}</span>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {!isReply && (
+              <IconButton
+                variant="secondary"
+                onClick={() => {
+                  setReplyTo(replyTo === c.id ? null : c.id);
+                  setReplyContent("");
+                }}
+                title="Reply as Sagar Lad"
+              >
+                <MessageCircle className="w-4 h-4" />
+              </IconButton>
+            )}
+            <IconButton variant="danger" onClick={() => onDelete(c.id)} title="Delete comment">
+              <Trash2 className="w-4 h-4" />
+            </IconButton>
+          </div>
+        </div>
+
+        {/* Reply form */}
+        {replyTo === c.id && (
+          <div className="mt-3 ml-9 rounded-xl border border-accent/30 bg-accent/5 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-accent">Replying as Sagar Lad</span>
+              <button type="button" onClick={() => setReplyTo(null)} className="text-muted-foreground hover:text-foreground">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <textarea
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              placeholder="Write your reply…"
+              rows={3}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent resize-y"
+            />
+            <button
+              type="button"
+              disabled={replyLoading || !replyContent.trim()}
+              onClick={() => submitReply(c)}
+              className="inline-flex items-center gap-2 rounded-full bg-accent text-black px-4 py-1.5 text-xs font-semibold transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
+            >
+              {replyLoading ? "Posting…" : <><Send className="w-3 h-3" /> Reply</>}
+            </button>
+          </div>
+        )}
+
+        {/* Replies */}
+        {replies.length > 0 && (
+          <ul className="mt-2 space-y-2">
+            {replies.map((r) => renderComment(r, true))}
+          </ul>
+        )}
+      </li>
+    );
+  }
+
+  return (
+    <ul className="divide-y divide-border border-y border-border">
+      {topLevel.map((c) => renderComment(c))}
     </ul>
   );
 }
@@ -356,65 +535,13 @@ export function ModerationPanel() {
           {data.comments.length === 0 ? (
             <EmptyState text="No comments yet. Comments on blog posts will appear here automatically." />
           ) : (
-            <ul className="divide-y divide-border border-y border-border">
-              {data.comments.map((c) => (
-                <li key={c.id} className="py-4 flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <input
-                      type="checkbox"
-                      checked={selected.has(c.id)}
-                      onChange={() => toggle(c.id)}
-                      aria-label={`Select comment by ${c.name}`}
-                      className="accent-[var(--accent)] mt-1"
-                    />
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-sm">{c.name}</span>
-                        {c.email && (
-                          <a href={`mailto:${c.email}`} className="text-xs text-muted-foreground hover:text-accent">
-                            {c.email}
-                          </a>
-                        )}
-                        <span className="text-xs text-muted-foreground">on {c.post.title}</span>
-                        <time className="text-xs text-muted-foreground" dateTime={c.createdAt}>
-                          {new Date(c.createdAt).toLocaleString()}
-                        </time>
-                      </div>
-                      <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{c.content}</p>
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
-                        <a
-                          href={`${SITE.url}/blog/${c.post.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-muted-foreground hover:text-accent font-medium underline"
-                        >
-                          Post: {c.post.slug}
-                        </a>
-                        {c.ip && (
-                          <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-muted-foreground">
-                            IP: {c.ip}
-                          </span>
-                        )}
-                        {c.userAgent && (
-                          <span className="rounded bg-muted px-1.5 py-0.5 text-muted-foreground truncate max-w-[240px]" title={c.userAgent}>
-                            UA: {c.userAgent}
-                          </span>
-                        )}
-                        {c.userId && (
-                          <span className="text-muted-foreground">User ID: {c.userId}</span>
-                        )}
-                        {c.clientToken && (
-                          <span className="text-muted-foreground">Token: {c.clientToken}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <IconButton variant="danger" onClick={() => act("comment", [c.id])} title="Delete comment">
-                    <Trash2 className="w-4 h-4" />
-                  </IconButton>
-                </li>
-              ))}
-            </ul>
+            <CommentList
+              comments={data.comments}
+              selected={selected}
+              onToggle={toggle}
+              onDelete={(id) => act("comment", [id])}
+              onReplyDone={load}
+            />
           )}
         </div>
       ) : tab === "Subscribers" ? (

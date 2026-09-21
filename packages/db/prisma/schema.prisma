@@ -162,12 +162,16 @@ model Comment {
   post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId      String?
   user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  parentId    String?
+  parent      Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Comment[] @relation("CommentReplies")
   createdAt   DateTime @default(now())
 
   @@index([postId, approved, createdAt])
   @@index([approved])
   @@index([clientToken])
   @@index([createdAt])
+  @@index([parentId])
 }
 
 model NewsletterSubscriber {
