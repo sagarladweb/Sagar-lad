@@ -266,12 +266,13 @@ function CommentList({
               {/* Actions — stack vertically on mobile */}
               <div className="flex items-center gap-1.5 shrink-0">
                 <IconButton
-                  variant="secondary"
+                  variant="ghost"
                   onClick={() => {
                     setReplyTo(replyTo === c.id ? null : c.id);
                     setReplyContent("");
                   }}
                   title="Reply as Sagar Lad"
+                  className={replyTo === c.id ? "text-accent bg-accent/10" : "text-muted-foreground hover:text-accent"}
                 >
                   <MessageCircle className="w-4 h-4" />
                 </IconButton>
