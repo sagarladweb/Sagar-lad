@@ -35,7 +35,7 @@ import { TEMPLATES } from "@/components/newsletter-composer/templates/templates"
 import { useUI } from "@/components/newsletter-composer/editor/ui-context";
 import { createBlock } from "@/components/newsletter-composer/lib/blockFactory";
 import { useEditorStore } from "@/components/newsletter-composer/store/editor-store";
-import type { BlockDef, LeftTab, Template } from "@/components/newsletter-composer/types/editor";
+import type { BlockDef, LeftTab, SavedTemplate, Template } from "@/components/newsletter-composer/types/editor";
 import { cn } from "@/components/newsletter-composer/lib/utils";
 import { Copy } from "lucide-react";
 import type { DeviceMode } from "@/components/newsletter-composer/types/editor";
@@ -45,6 +45,12 @@ import type { DeviceMode } from "@/components/newsletter-composer/types/editor";
  * ------------------------------------------------------------------ */
 interface PreviewState {
   def: BlockDef;
+  left: number;
+  top: number;
+}
+
+interface TemplatePreviewState {
+  template: Template;
   left: number;
   top: number;
 }
@@ -136,6 +142,74 @@ function BlockPreview({ preview }: { preview: PreviewState }) {
 
       <div className="border-t border-line bg-canvas px-2.5 py-1 text-[10px] text-ink-muted">
         Click to insert · drag to place
+      </div>
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ *  Template hover preview — shows all blocks scaled down
+ * ------------------------------------------------------------------ */
+function TemplatePreview({ preview }: { preview: TemplatePreviewState }) {
+  const blocks = React.useMemo(() => preview.template.blocks(), [preview.template]);
+  const measureRef = React.useRef<HTMLDivElement>(null);
+  const [natural, setNatural] = React.useState(200);
+
+  React.useEffect(() => {
+    if (!measureRef.current) return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setNatural(entry.contentRect.height);
+    });
+    observer.observe(measureRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const bodyHeight = Math.max(PREVIEW_MIN_BODY, Math.min(natural * PREVIEW_SCALE, PREVIEW_MAX_BODY));
+  const clipped = natural * PREVIEW_SCALE > PREVIEW_MAX_BODY;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 4, scale: 0.98 }}
+      transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+      style={{ left: preview.left, top: preview.top }}
+      className="pointer-events-none fixed z-[70] w-[344px] overflow-hidden rounded-[16px] border border-line bg-surface shadow-lift"
+    >
+      <div className="flex items-center gap-2 border-b border-line px-2.5 py-1.5">
+        <span className="truncate text-[11.5px] font-semibold tracking-[-0.01em] text-ink">
+          {preview.template.name}
+        </span>
+        <span className="ml-auto shrink-0 text-[9px] font-semibold uppercase tracking-[0.1em] text-ink-muted/70">
+          Preview
+        </span>
+      </div>
+
+      <div className="relative overflow-hidden bg-white" style={{ height: bodyHeight }}>
+        <div
+          ref={measureRef}
+          className="px-7 py-6"
+          style={{
+            width: EMAIL_WIDTH,
+            transform: `scale(${PREVIEW_SCALE})`,
+            transformOrigin: "top left",
+          }}
+        >
+          <div aria-hidden>
+            {blocks.map((block) => (
+              <div key={block.id} className="mb-2">
+                <BlockContent block={block} />
+              </div>
+            ))}
+          </div>
+        </div>
+        {clipped ? (
+          <span className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent" />
+        ) : null}
+      </div>
+
+      <div className="border-t border-line bg-canvas px-2.5 py-1 text-[10px] text-ink-muted">
+        {blocks.length} blocks · {preview.template.readingTime} min read
       </div>
     </motion.div>
   );
@@ -356,11 +430,21 @@ function TemplateActionCard({ template, index, onDuplicate }: TemplateActionCard
   const toggleFavorite = useEditorStore((s) => s.toggleFavorite);
   const duplicateTemplate = useEditorStore((s) => s.duplicateTemplate);
   const isFavorite = favorites.includes(template.id);
+  const [hoverPreview, setHoverPreview] = React.useState<TemplatePreviewState | null>(null);
 
   const use = () => {
     applyTemplate(template, template.name);
     markTemplateUsed(template.id);
     toast(`${template.name} applied`, "success");
+  };
+
+  const handleMouseEnter = (event: React.MouseEvent) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setHoverPreview({
+      template,
+      left: rect.right + 12,
+      top: rect.top,
+    });
   };
 
   return (
@@ -376,6 +460,8 @@ function TemplateActionCard({ template, index, onDuplicate }: TemplateActionCard
         tabIndex={0}
         aria-label={`Preview ${template.name}`}
         onClick={() => openModal("template-preview", template)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={() => setHoverPreview(null)}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -451,6 +537,10 @@ function TemplateActionCard({ template, index, onDuplicate }: TemplateActionCard
           <span>Preview</span>
         </Button>
       </div>
+
+      <AnimatePresence>
+        {hoverPreview ? <TemplatePreview preview={hoverPreview} /> : null}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -466,6 +556,95 @@ function TemplateCard({ template, index }: { template: Template; index: number }
       index={index}
       onDuplicate={savedTemplate ? undefined : () => useEditorStore.getState().duplicateTemplate(template.id)}
     />
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ *  Saved template card — with rename capability
+ * ------------------------------------------------------------------ */
+function SavedTemplateCard({ template }: { template: SavedTemplate }) {
+  const applyTemplate = useEditorStore((s) => s.applyTemplate);
+  const deleteSavedTemplate = useEditorStore((s) => s.deleteSavedTemplate);
+  const renameSavedTemplate = useEditorStore((s) => s.renameSavedTemplate);
+  const { toast } = useUI();
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editName, setEditName] = React.useState(template.name);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const saveName = () => {
+    const trimmed = editName.trim();
+    if (trimmed && trimmed !== template.name) {
+      renameSavedTemplate(template.id, trimmed);
+      toast("Template renamed", "success");
+    }
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-[14px] border border-line bg-surface px-3 py-2.5">
+      <div className="min-w-0 flex-1">
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            onBlur={saveName}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") saveName();
+              if (e.key === "Escape") {
+                setEditName(template.name);
+                setIsEditing(false);
+              }
+            }}
+            className="w-full truncate rounded-md border border-brand bg-white px-2 py-0.5 text-[13px] font-semibold text-ink outline-none"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            className="group flex w-full items-center gap-1.5 text-left"
+          >
+            <span className="truncate text-[13px] font-semibold text-ink">
+              {template.name}
+            </span>
+            <PenLine className="h-3 w-3 shrink-0 text-ink-muted opacity-0 transition group-hover:opacity-100" />
+          </button>
+        )}
+        <p className="text-[11px] text-ink-muted">
+          {template.blocks.length} blocks
+        </p>
+      </div>
+      <div className="flex shrink-0 items-center gap-1">
+        <Button
+          size="sm"
+          variant="primary"
+          onClick={() => {
+            applyTemplate({ blocks: template.blocks }, template.name);
+            toast(`${template.name} applied`, "success");
+          }}
+        >
+          Use
+        </Button>
+        <Button
+          size="iconSm"
+          variant="ghost"
+          onClick={() => {
+            deleteSavedTemplate(template.id);
+            toast("Template deleted");
+          }}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -563,41 +742,7 @@ function TemplateGallery({ query }: { query: string }) {
         >
           <div className="flex flex-col gap-2 px-3">
             {savedTemplates.map((template) => (
-              <div
-                key={template.id}
-                className="flex items-center justify-between gap-2 rounded-[14px] border border-line bg-surface px-3 py-2.5"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-[13px] font-semibold text-ink">
-                    {template.name}
-                  </p>
-                  <p className="text-[11px] text-ink-muted">
-                    {template.blocks.length} blocks
-                  </p>
-                </div>
-                <div className="flex shrink-0 items-center gap-1">
-                  <Button
-                    size="sm"
-                    variant="primary"
-                    onClick={() => {
-                      applyTemplate({ blocks: template.blocks }, template.name);
-                      toast(`${template.name} applied`, "success");
-                    }}
-                  >
-                    Use
-                  </Button>
-                  <Button
-                    size="iconSm"
-                    variant="ghost"
-                    onClick={() => {
-                      deleteSavedTemplate(template.id);
-                      toast("Template deleted");
-                    }}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
+              <SavedTemplateCard key={template.id} template={template} />
             ))}
           </div>
         </Section>

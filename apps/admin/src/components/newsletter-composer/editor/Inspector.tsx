@@ -566,7 +566,7 @@ function AccessibilityChecks({ block }: { block: Block }) {
   const ratio = contrastRatio(block.style.textColor, effectiveBg);
   const grade = contrastGrade(ratio);
 
-  const altOk = block.type !== "image" && block.type !== "gif" ? null : Boolean(block.data.alt);
+  const altOk = block.type !== "image" ? null : Boolean(block.data.alt);
 
   const headingIssue = React.useMemo(() => {
     if (block.type !== "heading") return null;

@@ -287,6 +287,7 @@ export interface BlockDef {
   styleOverride?: Partial<BlockStyle>;
   settingsOverride?: Partial<BlockSettings>;
   swatch: string;
+  hidden?: boolean;
 }
 
 /* ------------------------------------------------------------------ *

@@ -135,6 +135,7 @@ export interface EditorState extends PersistedState {
   markTemplateUsed: (templateId: string) => void;
   saveAsTemplate: (name: string, theme?: TemplateTheme) => void;
   deleteSavedTemplate: (id: string) => void;
+  renameSavedTemplate: (id: string, name: string) => void;
 
   /* actions — lifecycle */
   hydrate: () => void;
@@ -528,6 +529,15 @@ export const useEditorStore = create<EditorState>((set, get) => {
     deleteSavedTemplate: (id) =>
       set((state) => {
         const next = state.savedTemplates.filter((t) => t.id !== id);
+        scheduleSave();
+        return { savedTemplates: next };
+      }),
+
+    renameSavedTemplate: (id, name) =>
+      set((state) => {
+        const next = state.savedTemplates.map((t) =>
+          t.id === id ? { ...t, name } : t
+        );
         scheduleSave();
         return { savedTemplates: next };
       }),
