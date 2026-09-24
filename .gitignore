@@ -52,11 +52,6 @@ dev.db-journal
 .builds/
 /apps/*/.builds/
 
-# mindup-score (local only)
-apps/site/src/app/mindup-score/
-apps/site/src/components/mindup-score/
-apps/site/public/images/mindup/
-
 # AI tool directories and config
 .claude/
 .opencode/
