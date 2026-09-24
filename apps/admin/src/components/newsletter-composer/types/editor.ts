@@ -29,7 +29,6 @@ export type BlockType =
   | "spacer"
   | "list"
   | "checklist"
-  | "code"
   | "columns2"
   | "callout"
   | "card"
@@ -38,7 +37,6 @@ export type BlockType =
   | "stats"
   | "timeline"
   | "image"
-  | "banner"
   | "gallery"
   | "video"
   | "greeting"
@@ -54,7 +52,6 @@ export type BlockType =
   | "booksRead"
   | "booksPublished"
   | "ebooks"
-  | "quotes"
   | "videoFeed"
   | "blogPosts";
 
@@ -235,6 +232,7 @@ export interface NewsletterDoc {
   author: string;
   subject?: string;
   previewText?: string;
+  fallbackName?: string;
   blocks: Block[];
   updatedAt: number;
 }

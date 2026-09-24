@@ -164,10 +164,10 @@ export default async function NewsletterPage() {
         </div>
       </div>
 
-      {/* Recent campaigns */}
+      {/* All campaigns */}
       <div>
         <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Campaigns
+          All campaigns ({campaignCount})
         </h2>
         {recentCampaigns.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border px-6 py-10 text-center">

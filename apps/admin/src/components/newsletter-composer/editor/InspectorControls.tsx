@@ -54,16 +54,48 @@ export function RichTextEditor({
   const ref = React.useRef<HTMLDivElement>(null);
   const [focused, setFocused] = React.useState(false);
   const [linkPopover, setLinkPopover] = React.useState<{ show: boolean; url: string; isEdit: boolean }>({ show: false, url: "", isEdit: false });
+  const savedRange = React.useRef<Range | null>(null);
+  const toolbarActive = React.useRef(false);
+
+  /* Save the user's selection whenever it changes inside the editor. */
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const save = () => {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && el.contains(sel.anchorNode)) {
+        savedRange.current = sel.getRangeAt(0).cloneRange();
+      }
+    };
+    el.addEventListener("mouseup", save);
+    document.addEventListener("selectionchange", save);
+    return () => {
+      el.removeEventListener("mouseup", save);
+      document.removeEventListener("selectionchange", save);
+    };
+  }, []);
 
   React.useEffect(() => {
     if (!ref.current) return;
-    if (!focused && ref.current.innerHTML !== value) {
+    if (!focused && !toolbarActive.current && ref.current.innerHTML !== value) {
       ref.current.innerHTML = value ?? "";
     }
   }, [value, focused]);
 
+  /** Restore saved selection and focus the editor — call before every toolbar action. */
+  const restoreSelection = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.focus();
+    if (savedRange.current) {
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(savedRange.current);
+    }
+  };
+
   const exec = (command: string, argument?: string) => {
-    ref.current?.focus();
+    restoreSelection();
     document.execCommand(command, false, argument);
     onChange(ref.current?.innerHTML ?? "");
   };
@@ -81,6 +113,7 @@ export function RichTextEditor({
   };
 
   const openLinkPopover = () => {
+    restoreSelection();
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
       const node = sel.anchorNode;
@@ -96,24 +129,78 @@ export function RichTextEditor({
   };
 
   const toggleHighlight = () => {
+    restoreSelection();
     const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return;
-    const node = sel.anchorNode;
-    const mark = node?.parentElement?.closest("mark");
-    if (mark) {
-      // Remove highlight: unwrap the mark tag
-      const parent = mark.parentNode;
-      while (mark.firstChild) {
-        parent?.insertBefore(mark.firstChild, mark);
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+    if (!ref.current) return;
+
+    const range = sel.getRangeAt(0);
+
+    // Walk both anchor and focus nodes up to the editor to find any <mark>
+    const findMarkAncestor = (node: Node): HTMLElement | null => {
+      let el = (node.nodeType === Node.TEXT_NODE ? node.parentElement : node) as HTMLElement | null;
+      while (el && el !== ref.current) {
+        if (el.tagName === "MARK") return el;
+        el = el.parentElement;
       }
-      parent?.removeChild(mark);
-      onChange(ref.current?.innerHTML ?? "");
+      return null;
+    };
+
+    const anchorMark = findMarkAncestor(range.startContainer);
+    const focusMark = findMarkAncestor(range.endContainer);
+
+    if (anchorMark || focusMark) {
+      // Remove highlight: collect all <mark> elements the selection touches
+      const allMarks = Array.from(ref.current.querySelectorAll("mark"));
+      const touched = allMarks.filter(mark => {
+        try {
+          const markRange = document.createRange();
+          markRange.selectNodeContents(mark);
+          return (
+            range.compareBoundaryPoints(Range.END_TO_START, markRange) < 0 &&
+            range.compareBoundaryPoints(Range.START_TO_END, markRange) > 0
+          );
+        } catch {
+          return false;
+        }
+      });
+
+      // If we found no range-overlapping marks but one of the endpoints is
+      // inside a <mark>, at least remove that single mark.
+      if (touched.length === 0) {
+        const single = anchorMark || focusMark;
+        if (single) touched.push(single);
+      }
+
+      touched.forEach(mark => {
+        const parent = mark.parentNode!;
+        while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+        parent.removeChild(mark);
+        // Clean up empty parents left behind
+        if (parent.nodeType === Node.ELEMENT_NODE && (parent as HTMLElement).innerHTML === "") {
+          parent.parentNode?.removeChild(parent);
+        }
+      });
+
+      onChange(ref.current.innerHTML);
     } else {
-      exec("hiliteColor", "#FDF0B5");
+      // Apply highlight — wrap selection in <mark>
+      try {
+        range.surroundContents(document.createElement("mark"));
+      } catch {
+        // surroundContents fails if selection spans multiple elements —
+        // extract → wrap → re-insert
+        const contents = range.extractContents();
+        const mark = document.createElement("mark");
+        mark.appendChild(contents);
+        range.insertNode(mark);
+      }
+      onChange(ref.current.innerHTML);
     }
   };
 
   const formatBlock = (tag: string) => {
+    restoreSelection();
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0) return;
     // Check if already in this block type
@@ -154,8 +241,10 @@ export function RichTextEditor({
               type="button"
               onMouseDown={(event) => {
                 event.preventDefault();
+                toolbarActive.current = true;
                 tool.run();
               }}
+              onMouseUp={() => { toolbarActive.current = false; }}
               className="flex h-6.5 w-6.5 items-center justify-center rounded-[7px] p-1 text-ink-muted transition hover:bg-black/[0.06] hover:text-ink"
             >
               <tool.icon className="h-3.5 w-3.5" />
@@ -221,10 +310,89 @@ export function RichTextEditor({
         suppressContentEditableWarning
         onFocus={() => setFocused(true)}
         onBlur={() => {
+          // Delay clearing toolbarActive so onMouseUp on the button fires first
+          setTimeout(() => { toolbarActive.current = false; }, 0);
           setFocused(false);
           onChange(ref.current?.innerHTML ?? "");
         }}
         onInput={() => onChange(ref.current?.innerHTML ?? "")}
+        onKeyDown={(e) => {
+          if (!ref.current) return;
+          const sel = window.getSelection();
+          if (!sel || sel.rangeCount === 0) return;
+
+          const node = sel.anchorNode;
+          const li = node?.parentElement?.closest("li");
+          const list = node?.parentElement?.closest("ul, ol");
+
+          // Handle Enter key in lists
+          if (e.key === "Enter" && list) {
+            e.preventDefault();
+            const li = sel.anchorNode?.parentElement?.closest("li");
+            const text = li?.textContent?.trim() || "";
+
+            // Double Enter on empty item = exit list
+            if (text === "" && li?.previousElementSibling?.textContent?.trim() === "") {
+              // Exit list: convert to paragraph
+              const p = document.createElement("p");
+              p.innerHTML = "<br>";
+              list?.parentNode?.insertBefore(p, list.nextSibling);
+              // Remove empty li
+              li?.remove();
+              // Remove empty list if no items left
+              if (list && list.children.length === 0) {
+                list.remove();
+              }
+              // Move cursor to new paragraph
+              const range = document.createRange();
+              range.setStart(p, 0);
+              range.collapse(true);
+              sel.removeAllRanges();
+              sel.addRange(range);
+              onChange(ref.current.innerHTML);
+              return;
+            }
+
+            // Create new list item
+            const newLi = document.createElement("li");
+            newLi.innerHTML = "<br>";
+            li?.parentNode?.insertBefore(newLi, li.nextSibling);
+
+            // Move cursor to new item
+            const range = document.createRange();
+            range.setStart(newLi, 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            onChange(ref.current.innerHTML);
+            return;
+          }
+
+          // Handle Backspace at start of empty list item = remove list formatting
+          if (e.key === "Backspace" && li) {
+            const text = li.textContent?.trim() || "";
+            if (text === "") {
+              e.preventDefault();
+              const parentList = li.parentElement;
+              const p = document.createElement("p");
+              p.innerHTML = "<br>";
+              parentList?.parentNode?.insertBefore(p, parentList);
+              li.remove();
+              // Remove empty list
+              if (parentList && parentList.children.length === 0) {
+                parentList.remove();
+              }
+              // Move cursor to new paragraph
+              const range = document.createRange();
+              range.setStart(p, 0);
+              range.collapse(true);
+              sel.removeAllRanges();
+              sel.addRange(range);
+              onChange(ref.current.innerHTML);
+              return;
+            }
+          }
+        }}
         data-placeholder={placeholder}
         style={{ minHeight }}
         className="rich-text max-h-72 overflow-y-auto scroll-thin px-3 py-2 text-[13px] leading-relaxed text-ink outline-none empty:before:text-ink-muted empty:before:content-[attr(data-placeholder)]"
@@ -421,15 +589,17 @@ function RepeatEditor({
                   className="overflow-hidden border-t border-line"
                 >
                   <div className="space-y-2.5 bg-canvas/50 px-2.5 py-2.5">
-                    {childFields.map((child) => (
-                      <FieldRenderer
-                        key={child.key}
-                        field={child}
-                        value={item[child.key]}
-                        onChange={(value) => update(index, child.key, value)}
-                        compact
-                      />
-                    ))}
+                    {childFields
+                      .filter((child) => !child.hidden || !child.hidden(item))
+                      .map((child) => (
+                        <FieldRenderer
+                          key={child.key}
+                          field={child}
+                          value={item[child.key]}
+                          onChange={(value) => update(index, child.key, value)}
+                          compact
+                        />
+                      ))}
                   </div>
                 </motion.div>
               ) : null}

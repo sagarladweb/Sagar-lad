@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../components/mindup-score";
+@source "./mindup-score";
 
 @theme inline {
   --color-background: var(--background);

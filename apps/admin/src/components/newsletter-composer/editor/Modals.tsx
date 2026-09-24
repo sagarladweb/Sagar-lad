@@ -15,6 +15,7 @@ import {
   Layers,
   Mail,
   Monitor,
+  RefreshCw,
   Rocket,
   Send,
   Settings,
@@ -34,7 +35,7 @@ import {
 } from "@/components/newsletter-composer/ui/primitives";
 import { useUI } from "@/components/newsletter-composer/editor/ui-context";
 import { useEditorStore } from "@/components/newsletter-composer/store/editor-store";
-import type { Block } from "@/components/newsletter-composer/types/editor";
+import type { Block, SavedTemplate } from "@/components/newsletter-composer/types/editor";
 import { estimateReadingTime, formatClock } from "@/components/newsletter-composer/lib/utils";
 import { TEMPLATES } from "@/components/newsletter-composer/templates/templates";
 import { compileNewsletterToHtml } from "@/components/newsletter-composer/lib/compiler";
@@ -212,6 +213,7 @@ function TestEmailModal() {
           to: storedEmail.trim(),
           subject: subject.trim() || `${docTitle} — ${issue}`,
           html,
+          fallbackName: doc.fallbackName || "",
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -768,48 +770,113 @@ function HistoryModal() {
 function SaveTemplateModal() {
   const { modal, closeModal, toast } = useUI();
   const saveAsTemplate = useEditorStore((s) => s.saveAsTemplate);
+  const updateSavedTemplate = useEditorStore((s) => s.updateSavedTemplate);
+  const savedTemplates = useEditorStore((s) => s.savedTemplates);
   const blocks = useEditorStore((s) => s.doc.blocks);
   const docTitle = useEditorStore((s) => s.doc.title);
+  const [name, setName] = React.useState(docTitle || "");
+  const [showDuplicateWarning, setShowDuplicateWarning] = React.useState(false);
+  const [duplicateTemplate, setDuplicateTemplate] = React.useState<SavedTemplate | null>(null);
 
-  /* No extra naming step — the template is saved under the newsletter's
-   * own title, so the user only ever confirms. */
+  // Check for duplicate template with same name and similar content
+  const checkDuplicate = (templateName: string) => {
+    const existing = savedTemplates.find((t) => t.name.toLowerCase() === templateName.toLowerCase());
+    if (!existing) return null;
+    // Compare blocks content (simplified comparison)
+    const currentBlocksStr = JSON.stringify(blocks.map((b) => ({ type: b.type, data: b.data })));
+    const existingBlocksStr = JSON.stringify(existing.blocks.map((b) => ({ type: b.type, data: b.data })));
+    if (currentBlocksStr === existingBlocksStr) {
+      return existing;
+    }
+    return null;
+  };
+
+  const handleSave = () => {
+    const trimmedName = name.trim() || "Untitled template";
+    const duplicate = checkDuplicate(trimmedName);
+    if (duplicate) {
+      setDuplicateTemplate(duplicate);
+      setShowDuplicateWarning(true);
+      return;
+    }
+    saveAsTemplate(trimmedName);
+    toast("Template saved", "success");
+    closeModal();
+  };
+
+  const handleUpdateExisting = () => {
+    if (duplicateTemplate) {
+      updateSavedTemplate(duplicateTemplate.id, duplicateTemplate.name);
+      toast(`${duplicateTemplate.name} updated`, "success");
+      closeModal();
+    }
+  };
+
   return (
     <Modal
       open={modal === "save-template"}
       onClose={closeModal}
-      title="Save as template"
-      description={`${blocks.length} blocks will be stored as a reusable template.`}
+      title={showDuplicateWarning ? "Template already exists" : "Save as template"}
+      description={
+        showDuplicateWarning
+          ? `A template named "${duplicateTemplate?.name}" with identical content already exists.`
+          : `${blocks.length} blocks will be stored as a reusable template.`
+      }
       width="max-w-md"
     >
       <div className="space-y-4 px-5 py-5">
-        <Field label="Newsletter name">
-          <div className="flex items-center gap-2 rounded-control border border-line bg-canvas px-3 py-2">
-            <Bookmark className="h-3.5 w-3.5 shrink-0 text-ink-muted" />
-            <span className="truncate text-[13px] font-semibold text-ink">
-              {docTitle || "Untitled newsletter"}
-            </span>
-          </div>
-        </Field>
+        {!showDuplicateWarning ? (
+          <Field label="Template name">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Weekly Issue #12"
+              autoFocus
+              className="w-full rounded-control border border-line bg-canvas px-3 py-2 text-[13px] font-medium text-ink outline-none placeholder:text-ink-muted/50 focus:border-brand focus:ring-2 focus:ring-brand/15"
+            />
+          </Field>
+        ) : null}
         <p className="rounded-control border border-line bg-canvas px-3 py-2 text-[11.5px] text-ink-muted">
-          Templates keep every block's content, style and settings. Find it later
-          under Templates → Your templates.
+          {showDuplicateWarning
+            ? "Choose to update the existing template or save as a new version."
+            : "Templates keep every block's content, style and settings. Find it later under Templates → Your templates."}
         </p>
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" type="button" onClick={closeModal}>
-            Cancel
+          <Button variant="ghost" type="button" onClick={() => { setShowDuplicateWarning(false); setDuplicateTemplate(null); }}>
+            {showDuplicateWarning ? "Back" : "Cancel"}
           </Button>
-          <Button
-            variant="primary"
-            type="button"
-            onClick={() => {
-              saveAsTemplate(docTitle.trim() || "Untitled newsletter");
-              toast("Template saved", "success");
-              closeModal();
-            }}
-          >
-            <Bookmark className="h-3.5 w-3.5" />
-            Save template
-          </Button>
+          {showDuplicateWarning ? (
+            <>
+              <Button variant="outline" type="button" onClick={handleUpdateExisting}>
+                <RefreshCw className="h-3.5 w-3.5" />
+                Update existing
+              </Button>
+              <Button
+                variant="primary"
+                type="button"
+                onClick={() => {
+                  // Force save as new template with a modified name
+                  const newName = `${name.trim()} (copy)`;
+                  saveAsTemplate(newName);
+                  toast("Template saved as copy", "success");
+                  closeModal();
+                }}
+              >
+                <Bookmark className="h-3.5 w-3.5" />
+                Save as copy
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="primary"
+              type="button"
+              onClick={handleSave}
+            >
+              <Bookmark className="h-3.5 w-3.5" />
+              Save template
+            </Button>
+          )}
         </div>
       </div>
     </Modal>

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { sendTestEmail } from "@/lib/newsletter";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -10,6 +11,7 @@ const testSchema = z.object({
   subject: z.string().trim().min(3).max(200),
   html: z.string().trim().min(10).max(100_000),
   to: z.string().trim().email().optional(),
+  fallbackName: z.string().trim().max(80).optional(),
 });
 
 // Send the composed email to the admin's own inbox (or a custom test email)
@@ -28,7 +30,17 @@ export async function POST(request: Request) {
   if (!to) return NextResponse.json({ error: "No email on your account", to: null }, { status: 400 });
 
   try {
-    await sendTestEmail(to, parsed.data.subject, sanitizeHtml(parsed.data.html));
+    // Look up the recipient in the subscriber list so we can personalise {name}
+    const subscriber = await prisma.newsletterSubscriber.findUnique({
+      where: { email: to },
+      select: { name: true },
+    });
+    const fallback = parsed.data.fallbackName || "there";
+    const subscriberName = subscriber?.name || fallback;
+
+    // Replace {name} BEFORE sanitisation so DOMPurify can't interfere with the braces
+    const html = sanitizeHtml(parsed.data.html.replace(/\{name\}/g, subscriberName));
+    await sendTestEmail(to, parsed.data.subject, html);
     return NextResponse.json({ ok: true, to });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";

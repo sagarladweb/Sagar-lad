@@ -486,19 +486,6 @@ function renderBlockHtml(block: Block): string {
         </table>`;
     }
 
-    case "code": {
-      const lang = d.language
-        ? `<div style="padding:10px 16px;background:#1e293b;border-bottom:1px solid #334155;font-size:12px;color:#94a3b8;font-family:monospace;text-transform:uppercase;letter-spacing:0.5px">${esc(d.language)}</div>`
-        : "";
-      return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:10px;overflow:hidden;border:1px solid #334155">
-          <tr><td>
-            ${lang}
-            <pre style="margin:0;padding:18px;background:#0f172a;overflow-x:auto;font-size:13px;line-height:1.65;color:#e2e8f0;font-family:'SF Mono',Consolas,'Liberation Mono',Menlo,monospace"><code>${esc(d.code || "")}</code></pre>
-          </td></tr>
-        </table>`;
-    }
-
     case "card": {
       const cardRadius = s.radius || 14;
       return `
@@ -615,43 +602,6 @@ function renderBlockHtml(block: Block): string {
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0">
           ${entries}
-        </table>`;
-    }
-
-    case "banner": {
-      const height = d.height || 260;
-      const overlay = d.overlay ?? 0.25;
-      const bg = d.src ? `background-image:url('${esc(d.src)}');background-size:cover;background-position:center` : `background:${d.background || accent}`;
-      const overlayHtml = (d.title || d.subtitle) ? `<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,${overlay});padding:40px 28px;text-align:left">
-        ${d.title ? `<p style="margin:0 0 8px 0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Georgia,Cambria,serif">${esc(d.title)}</p>` : ""}
-        ${d.subtitle ? `<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5">${esc(d.subtitle)}</p>` : ""}
-      </div>` : "";
-      if (d.src) {
-        return `
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:12px;overflow:hidden">
-            <tr>
-              <td style="padding:0;height:${height}px;position:relative">
-                <img src="${esc(d.src)}" alt="${esc(d.title || "")}" style="width:100%;height:auto;display:block" />
-                ${(d.title || d.subtitle) ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="position:absolute;top:0;left:0;width:100%;height:100%">
-                  <tr>
-                    <td style="padding:40px 28px;background:rgba(0,0,0,${overlay});vertical-align:bottom">
-                      ${d.title ? `<p style="margin:0 0 8px 0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Georgia,Cambria,serif">${esc(d.title)}</p>` : ""}
-                      ${d.subtitle ? `<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5">${esc(d.subtitle)}</p>` : ""}
-                    </td>
-                  </tr>
-                </table>` : ""}
-              </td>
-            </tr>
-          </table>`;
-      }
-      return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-radius:12px;overflow:hidden">
-          <tr>
-            <td style="padding:40px 28px;height:${height}px;background:${d.background || accent};vertical-align:bottom">
-              ${d.title ? `<p style="margin:0 0 8px 0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Georgia,Cambria,serif">${esc(d.title)}</p>` : ""}
-              ${d.subtitle ? `<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5">${esc(d.subtitle)}</p>` : ""}
-            </td>
-          </tr>
         </table>`;
     }
 
@@ -848,28 +798,6 @@ function renderBlockHtml(block: Block): string {
                       <span style="display:inline-block;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;${it.free !== false ? "background:#d1fae5;color:#065f46" : "background:#fef3c7;color:#92400e"}">${it.free !== false ? "Free" : "Premium"}</span>
                     </td>
                   </tr></table>
-                </td>
-              </tr>
-            </table>`
-        )
-        .join("");
-      return `
-        <div style="margin:20px 0">
-          ${d.title ? `<h3 style="margin:0 0 14px 0;font-size:20px;font-weight:700;color:#111827">${esc(d.title)}</h3>` : ""}
-          ${entries}
-        </div>`;
-    }
-
-    case "quotes": {
-      const items = (d.items || []) as { text: string; tag?: string }[];
-      const entries = items
-        .map(
-          (it) =>
-            `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px">
-              <tr>
-                <td style="padding:16px 20px;border-left:4px solid ${accent};background:#f9fafb;border-radius:0 10px 10px 0">
-                  <p style="margin:0 0 8px 0;font-family:Georgia,Cambria,serif;font-size:17px;font-style:italic;line-height:1.55;color:#1f2937">&ldquo;${esc(it.text)}&rdquo;</p>
-                  ${it.tag ? `<p style="margin:0;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280">${esc(it.tag)}</p>` : ""}
                 </td>
               </tr>
             </table>`

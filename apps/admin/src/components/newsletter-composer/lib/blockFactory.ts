@@ -17,15 +17,14 @@ export interface BlockOverrides {
   settings?: Partial<BlockSettings>;
 }
 
-/** Build a fully-formed block, merging registry defaults with overrides. */
-export function createBlock(type: BlockType, overrides: BlockOverrides = {}): Block {
-  const def = BLOCK_DEFS[type];
-  if (!def) {
-    throw new Error(`Unknown block type: ${type}`);
-  }
+/** Build a fully-formed block, merging registry defaults with overrides.
+ *  Returns null for unknown/legacy block types (e.g. removed "banner"). */
+export function createBlock(type: string, overrides: BlockOverrides = {}): Block | null {
+  const def = BLOCK_DEFS[type as BlockType];
+  if (!def) return null;
   return {
     id: overrides.id ?? uid(type),
-    type,
+    type: type as BlockType,
     data: { ...def.defaultData, ...(overrides.data ?? {}) },
     style: { ...DEFAULT_STYLE, ...def.styleOverride, ...(overrides.style ?? {}) },
     settings: {
@@ -45,9 +44,11 @@ export type BlockSpec = [
 ];
 
 export function createBlocks(specs: BlockSpec[]): Block[] {
-  return specs.map(([type, data, style, settings]) =>
-    createBlock(type, { data, style, settings }),
-  );
+  return specs
+    .map(([type, data, style, settings]) =>
+      createBlock(type, { data, style, settings }),
+    )
+    .filter(Boolean) as Block[];
 }
 
 /** Deep-ish clone with fresh ids — used by duplicate + templates. */

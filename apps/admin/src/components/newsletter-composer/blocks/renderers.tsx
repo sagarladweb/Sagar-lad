@@ -120,10 +120,10 @@ const TONES: Record<string, { bg: string; border: string; accent: string }> = {
 };
 
 import {
-  FaYoutube,
-  FaInstagram,
   FaXTwitter,
+  FaInstagram,
   FaLinkedinIn,
+  FaYoutube,
   FaFacebookF,
   FaRedditAlien,
   FaTelegram,
@@ -131,6 +131,9 @@ import {
   FaPodcast,
   FaTiktok,
   FaWhatsapp,
+  FaSpotify,
+  FaQuora,
+  FaAmazon,
 } from "react-icons/fa6";
 
 const SOCIAL_ICON_MAP: Record<string, { icon: typeof FaYoutube; color: string; label: string }> = {
@@ -140,9 +143,13 @@ const SOCIAL_ICON_MAP: Record<string, { icon: typeof FaYoutube; color: string; l
   linkedin: { icon: FaLinkedinIn, color: "#0A66C2", label: "LinkedIn" },
   facebook: { icon: FaFacebookF, color: "#1877F2", label: "Facebook" },
   reddit: { icon: FaRedditAlien, color: "#FF4500", label: "Reddit" },
+  quora: { icon: FaQuora, color: "#B92B27", label: "Quora" },
   telegram: { icon: FaTelegram, color: "#229ED9", label: "Telegram" },
   medium: { icon: FaMedium, color: "#000000", label: "Medium" },
   podcast: { icon: FaPodcast, color: "#8B5CF6", label: "Podcast" },
+  applepodcast: { icon: FaPodcast, color: "#9933CC", label: "Apple Podcast" },
+  spotify: { icon: FaSpotify, color: "#1DB954", label: "Spotify" },
+  kindle: { icon: FaAmazon, color: "#FF9900", label: "Kindle" },
   threads: { icon: FaInstagram, color: "#000000", label: "Threads" },
   substack: { icon: Mail, color: "#FF6719", label: "Substack" },
   website: { icon: ExternalLink, color: "#6B7280", label: "Website" },
@@ -172,18 +179,22 @@ function SocialShareRenderer({ data: d }: { data: Record<string, unknown> }) {
   const showCta = d.showCta !== false;
   const showSocials = d.showSocials !== false;
 
-  const ALL_PLATFORMS = ["x", "linkedin", "instagram", "youtube", "tiktok", "threads", "whatsapp", "substack", "website"] as const;
+  const ALL_PLATFORMS = ["x", "linkedin", "instagram", "youtube", "tiktok", "threads", "whatsapp", "substack", "website", "reddit", "quora", "spotify", "applepodcast", "kindle"] as const;
 
   // Use custom order if provided
   const platformOrder = (Array.isArray(d.platformOrder) && d.platformOrder.length > 0)
     ? (d.platformOrder as string[]).filter((p: string) => ALL_PLATFORMS.includes(p as typeof ALL_PLATFORMS[number]))
     : [...ALL_PLATFORMS];
 
-  // Build URL lookup from the platforms array and from socials DB
+  // Build URL lookup from platformUrl_* fields, platforms array, and socials DB
   const platformUrls: Record<string, string> = {};
+  for (const key of ALL_PLATFORMS) {
+    const urlField = String(d[`platformUrl_${key}`] ?? "").trim();
+    if (urlField) platformUrls[key] = urlField;
+  }
   const blockPlatforms = (d.platforms ?? []) as { platform: string; url: string; enabled: boolean }[];
   for (const bp of blockPlatforms) {
-    platformUrls[bp.platform] = bp.url;
+    if (!platformUrls[bp.platform]) platformUrls[bp.platform] = bp.url;
   }
   for (const s of socials) {
     if (!platformUrls[s.icon]) platformUrls[s.icon] = s.href;
@@ -304,9 +315,41 @@ export function BlockContent({ block }: { block: Block }) {
       );
 
     case "quote": {
+      const mode = (d.mode as string) || "manual";
+      
+      // Database mode: fetch and render quotes from library
+      if (mode === "database") {
+        const { data, loading } = useBlockData();
+        if (loading) return <LoadingState />;
+        const all = data?.quotes ?? [];
+        const selectedIds = (d.selectedIds as string[]) || [];
+        const items = selectedIds.length ? all.filter((i) => selectedIds.includes(i.id)) : all;
+        const title = d.title as string | undefined;
+        
+        if (!items.length) return <EmptyState label="quotes" />;
+        
+        return (
+          <div className="flex flex-col gap-5">
+            {title ? <h3 className="font-serif text-[22px] font-bold text-ink">{title}</h3> : null}
+            {items.map((item) => (
+              <div key={item.id} className="border-l-2 border-brand pl-4">
+                <p className="font-serif text-[17px] leading-relaxed text-ink italic">&ldquo;{item.text}&rdquo;</p>
+                {item.tag ? <p className="mt-1 text-[12px] text-ink-muted uppercase tracking-wider">{item.tag}</p> : null}
+              </div>
+            ))}
+          </div>
+        );
+      }
+      
+      // Manual mode: existing quote rendering
       const tone = d.tone ?? "bar";
+      const showBg = d.showBackground === true;
+      const bgColor = String(d.backgroundColor || "#F3F4F6");
       const body = (
-        <p className="font-serif leading-snug">{d.quote}</p>
+        <div
+          className="rich-text font-serif leading-snug"
+          dangerouslySetInnerHTML={{ __html: String(d.quote || "") }}
+        />
       );
       const attribution = (
         <div className="flex items-center gap-3">
@@ -324,34 +367,50 @@ export function BlockContent({ block }: { block: Block }) {
           </div>
         </div>
       );
-      if (tone === "card") {
+
+      const content = (() => {
+        if (tone === "card") {
+          return (
+            <div className="flex flex-col gap-4">
+              {body}
+              {attribution}
+            </div>
+          );
+        }
+        if (tone === "centered") {
+          return (
+            <div className="flex flex-col items-center gap-4 text-center">
+              {body}
+              {attribution}
+            </div>
+          );
+        }
         return (
-          <div className="flex flex-col gap-4">
-            {body}
-            {attribution}
+          <div className="flex gap-4">
+            <span
+              className="w-[3px] shrink-0 rounded-full"
+              style={{ background: s.accentColor }}
+            />
+            <div className="flex flex-col gap-3">
+              {body}
+              {attribution}
+            </div>
+          </div>
+        );
+      })();
+
+      if (showBg) {
+        return (
+          <div
+            className="rounded-[14px] px-6 py-5"
+            style={{ background: bgColor }}
+          >
+            {content}
           </div>
         );
       }
-      if (tone === "centered") {
-        return (
-          <div className="flex flex-col items-center gap-4 text-center">
-            {body}
-            {attribution}
-          </div>
-        );
-      }
-      return (
-        <div className="flex gap-4">
-          <span
-            className="w-[3px] shrink-0 rounded-full"
-            style={{ background: s.accentColor }}
-          />
-          <div className="flex flex-col gap-3">
-            {body}
-            {attribution}
-          </div>
-        </div>
-      );
+
+      return content;
     }
 
     case "divider": {
@@ -449,20 +508,6 @@ export function BlockContent({ block }: { block: Block }) {
         </ul>
       );
     }
-
-    case "code":
-      return (
-        <div className="flex flex-col gap-2">
-          {d.language ? (
-            <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-muted">
-              {d.language}
-            </span>
-          ) : null}
-          <pre className="overflow-x-auto font-mono text-[13px] leading-relaxed">
-            <code>{d.code ?? ""}</code>
-          </pre>
-        </div>
-      );
 
     /* ------------------------------ Layout ---------------------------- */
     case "columns2": {
@@ -853,44 +898,6 @@ function ColumnShell({
       );
     }
 
-    case "banner":
-      return (
-        <div
-          className="relative flex w-full items-end overflow-hidden rounded-[14px]"
-          style={{ height: d.height ?? 260, background: "#EDEBE5" }}
-        >
-          {d.src ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={d.src}
-              alt={d.title ?? ""}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-          ) : null}
-          <span
-            className="absolute inset-0"
-            style={{ background: `rgba(17,24,39,${d.overlay ?? 0.25})` }}
-          />
-          {d.title || d.subtitle ? (
-            <div className="relative z-10 flex flex-col gap-1 p-5">
-              {d.title ? (
-                <p className="font-serif text-[26px] leading-tight text-white">{d.title}</p>
-              ) : null}
-              {d.subtitle ? (
-                <p className="text-[14px] text-white/85">{d.subtitle}</p>
-              ) : null}
-            </div>
-          ) : !d.src ? (
-            <div className="relative z-10 flex w-full flex-col items-center justify-center gap-1.5 py-14 text-center">
-              <span className="text-[12px] font-medium text-ink-muted">Banner image</span>
-              <span className="text-[11px] text-ink-muted/80">
-                Add an image URL in the inspector
-              </span>
-            </div>
-          ) : null}
-        </div>
-      );
-
     case "gallery": {
       const items = (d.items ?? []) as { src: string; caption: string }[];
       const cols = Number(d.columns ?? 2);
@@ -1223,29 +1230,68 @@ function ColumnShell({
     }
 
     case "button": {
-      const variants: Record<string, string> = {
-        primary: "bg-brand text-white",
-        accent: "bg-gold text-ink",
-        outline: "border border-line-strong bg-white text-ink",
-        dark: "bg-ink text-white",
-      };
       const alignMap: Record<string, string> = {
         left: "justify-start",
         center: "justify-center",
         right: "justify-end",
       };
-      return (
-        <div className={cn("flex", alignMap[d.align ?? "center"])}>
+      /* support legacy single-button shape */
+      const buttons = Array.isArray(d.buttons)
+        ? d.buttons
+        : d.label
+          ? [{ label: d.label, url: d.url, icon: d.icon, variant: d.variant, platform: "none" }]
+          : [];
+
+      const renderButton = (btn: any, i: number) => {
+        const platform = btn.platform && btn.platform !== "none" ? btn.platform : null;
+        const socialInfo = platform ? SOCIAL_ICON_MAP[platform] : null;
+        const icon = btn.icon === "arrow" ? <ArrowRight className="h-4 w-4" /> : btn.icon === "external" ? <ExternalLink className="h-4 w-4" /> : null;
+
+        /* platform button: colored bg with white text */
+        if (platform && socialInfo) {
+          const IconComp = socialInfo.icon;
+          return (
+            <span
+              key={i}
+              className="inline-flex h-11 items-center gap-2 rounded-full px-6 text-[14.5px] font-semibold shadow-[0_8px_20px_-10px_rgba(17,24,39,0.4)] text-white"
+              style={{ backgroundColor: socialInfo.color }}
+            >
+              <IconComp className="h-4 w-4" />
+              {btn.label}
+            </span>
+          );
+        }
+
+        /* regular button variants */
+        const variants: Record<string, string> = {
+          primary: "bg-brand text-white",
+          accent: "bg-gold text-ink",
+          outline: "border-2 border-line-strong bg-white text-ink",
+          dark: "bg-ink text-white",
+        };
+        const v = btn.variant || "primary";
+
+        return (
           <span
+            key={i}
             className={cn(
               "inline-flex h-11 items-center gap-2 rounded-full px-6 text-[14.5px] font-semibold shadow-[0_8px_20px_-10px_rgba(17,24,39,0.4)]",
-              variants[d.variant ?? "primary"],
+              variants[v] || variants.primary,
             )}
           >
-            {d.label}
-            {d.icon === "arrow" ? <ArrowRight className="h-4 w-4" /> : null}
-            {d.icon === "external" ? <ExternalLink className="h-4 w-4" /> : null}
+            {btn.label}
+            {icon}
           </span>
+        );
+      };
+
+      return (
+        <div className={cn("flex flex-wrap items-center gap-3", alignMap[d.align ?? "center"])}>
+          {buttons.length === 0 ? (
+            <span className="text-[12px] text-ink-muted italic">No buttons added</span>
+          ) : (
+            buttons.map(renderButton)
+          )}
         </div>
       );
     }
@@ -1283,11 +1329,6 @@ function ColumnShell({
     case "ebooks": {
       const d = block.data as { title?: string; selectedIds?: string[] };
       return <EbooksRenderer title={d.title} selectedIds={d.selectedIds} />;
-    }
-
-    case "quotes": {
-      const d = block.data as { title?: string; selectedIds?: string[] };
-      return <QuotesRenderer title={d.title} selectedIds={d.selectedIds} />;
     }
 
     case "videoFeed": {

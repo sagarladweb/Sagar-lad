@@ -154,6 +154,10 @@ export function ToggleRow({
 
 /* ------------------------------------------------------------------ *
  *  Slider — thin adapter over the Radix slider (number in, number out)
+ *
+ *  Uses local state while dragging so the parent store isn't hit on
+ *  every pixel move.  The real onChange fires only on pointer-up via
+ *  onValueCommit, keeping the inspector snappy.
  * ------------------------------------------------------------------ */
 export function Slider({
   value,
@@ -172,18 +176,34 @@ export function Slider({
   className?: string;
   suffix?: string;
 }) {
+  const [local, setLocal] = React.useState(value);
+  const dragging = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!dragging.current) setLocal(value);
+  }, [value]);
+
   return (
     <div className={cn("flex items-center gap-3", className)}>
       <ShadcnSlider
         className="flex-1"
-        value={[value]}
+        value={[local]}
         min={min}
         max={max}
         step={step}
-        onValueChange={(next) => onChange(next[0] ?? min)}
+        onValueChange={(next) => {
+          dragging.current = true;
+          setLocal(next[0] ?? min);
+        }}
+        onValueCommit={(next) => {
+          dragging.current = false;
+          const v = next[0] ?? min;
+          setLocal(v);
+          onChange(v);
+        }}
       />
       <span className="w-12 shrink-0 text-right font-mono text-[11px] tabular-nums text-ink-soft">
-        {value}
+        {local}
         {suffix ?? ""}
       </span>
     </div>
@@ -208,15 +228,18 @@ export function Select({
 }) {
   const [open, setOpen] = React.useState(false);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
   const [pos, setPos] = React.useState<{ top: number; left: number; width: number }>({ top: 0, left: 0, width: 0 });
 
   React.useEffect(() => {
     if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) setOpen(false);
+    const handler = (e: PointerEvent) => {
+      const inTrigger = triggerRef.current?.contains(e.target as Node);
+      const inDropdown = dropdownRef.current?.contains(e.target as Node);
+      if (!inTrigger && !inDropdown) setOpen(false);
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
   }, [open]);
 
   React.useEffect(() => {
@@ -246,6 +269,8 @@ export function Select({
       {open
         ? createPortal(
             <div
+              ref={dropdownRef}
+              onPointerDown={(e) => e.stopPropagation()}
               className="fixed z-[9999] max-h-60 overflow-y-auto rounded-xl border border-line bg-surface shadow-lg"
               style={{ top: pos.top, left: pos.left, width: pos.width }}
             >
@@ -522,7 +547,7 @@ export function Tooltip({
 }
 
 /* ------------------------------------------------------------------ *
- *  Colour input
+ *  Colour input — local draft while typing, commit on blur / picker close
  * ------------------------------------------------------------------ */
 export function ColorInput({
   value,
@@ -533,30 +558,59 @@ export function ColorInput({
   onChange: (value: string) => void;
   allowTransparent?: boolean;
 }) {
-  const isTransparent = value === "transparent";
+  const [draft, setDraft] = React.useState(value);
+  const editing = React.useRef(false);
+  const pickerOpen = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!editing.current) setDraft(value);
+  }, [value]);
+
+  const commit = (v: string) => {
+    editing.current = false;
+    setDraft(v);
+    onChange(v);
+  };
+
+  const isTransparent = draft === "transparent";
   return (
     <div className="flex items-center gap-2 rounded-control border border-line bg-surface px-2 py-1.5">
       <label className="relative h-6 w-6 shrink-0 cursor-pointer overflow-hidden rounded-[7px] border border-line">
         <span
           className={cn("absolute inset-0", isTransparent && "checkerboard")}
-          style={{ background: isTransparent ? undefined : value }}
+          style={{ background: isTransparent ? undefined : draft }}
         />
         <input
           type="color"
-          value={isTransparent ? "#ffffff" : value}
-          onChange={(event) => onChange(event.target.value)}
+          value={isTransparent ? "#ffffff" : draft}
+          onPointerDown={() => { pickerOpen.current = true; }}
+          onChange={(event) => {
+            editing.current = true;
+            setDraft(event.target.value);
+          }}
+          onBlur={() => {
+            if (pickerOpen.current) {
+              pickerOpen.current = false;
+              editing.current = false;
+              onChange(draft);
+            }
+          }}
           className="absolute inset-0 cursor-pointer opacity-0"
         />
       </label>
       <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
+        value={draft}
+        onChange={(event) => {
+          editing.current = true;
+          setDraft(event.target.value);
+        }}
+        onBlur={() => commit(draft)}
         className="min-w-0 flex-1 bg-transparent font-mono text-[11px] uppercase text-ink outline-none"
       />
       {allowTransparent ? (
         <button
           type="button"
-          onClick={() => onChange(isTransparent ? "#FFFFFF" : "transparent")}
+          onClick={() => commit(isTransparent ? "#FFFFFF" : "transparent")}
           className="rounded-[6px] px-1.5 py-0.5 text-[10px] font-medium text-ink-muted transition hover:bg-black/[0.05] hover:text-ink"
         >
           {isTransparent ? "solid" : "none"}

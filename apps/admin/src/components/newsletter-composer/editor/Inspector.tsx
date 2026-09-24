@@ -16,6 +16,7 @@ import {
   Link2,
   Lock,
   LockOpen,
+  Mail,
   Palette,
   Square,
   Type as TypeIcon,
@@ -236,15 +237,33 @@ function PlatformOrderSection({ block }: { block: Block }) {
 }
 
 /* ------------------------------------------------------------------ *
+ *  Which style sections apply to which block types?
+ * ------------------------------------------------------------------ */
+const HIDDEN_STYLE_SECTIONS: Record<string, string[]> = {
+  image: ["Typography", "Colors", "Spacing", "Background"],
+  gallery: ["Typography", "Colors", "Spacing", "Background"],
+  divider: ["Typography", "Colors", "Spacing", "Background", "Effects"],
+  spacer: ["Typography", "Colors", "Spacing", "Background", "Effects"],
+};
+
+function useHiddenStyleSections(blockType: string) {
+  return React.useMemo(() => HIDDEN_STYLE_SECTIONS[blockType] ?? [], [blockType]);
+}
+
+/* ------------------------------------------------------------------ *
  *  STYLE TAB
  * ------------------------------------------------------------------ */
 function StyleTab({ block }: { block: Block }) {
   const updateStyle = useEditorStore((s) => s.updateStyle);
   const s = block.style;
   const set = (patch: Partial<BlockStyle>) => updateStyle(block.id, patch);
+  const hidden = useHiddenStyleSections(block.type);
+
+  const show = (section: string) => !hidden.includes(section);
 
   return (
     <>
+      {show("Typography") ? (
       <AccordionSection
         title="Typography"
         right={<TypeIcon className="h-3.5 w-3.5 text-ink-muted" />}
@@ -327,7 +346,9 @@ function StyleTab({ block }: { block: Block }) {
           />
         ) : null}
       </AccordionSection>
+      ) : null}
 
+      {show("Colors") ? (
       <AccordionSection
         title="Colors"
         right={<Palette className="h-3.5 w-3.5 text-ink-muted" />}
@@ -365,7 +386,9 @@ function StyleTab({ block }: { block: Block }) {
           />
         ) : null}
       </AccordionSection>
+      ) : null}
 
+      {show("Spacing") ? (
       <AccordionSection title="Spacing" defaultOpen={false}>
         <ControlGrid>
           <Field label="Padding top">
@@ -390,6 +413,7 @@ function StyleTab({ block }: { block: Block }) {
           <Slider value={s.gap} min={0} max={48} onChange={(v) => set({ gap: v })} suffix="px" />
         </Field>
       </AccordionSection>
+      ) : null}
 
       <AccordionSection title="Border & radius" defaultOpen={false}>
         <ToggleRow
@@ -430,6 +454,7 @@ function StyleTab({ block }: { block: Block }) {
         />
       </AccordionSection>
 
+      {show("Background") ? (
       <AccordionSection title="Background" defaultOpen={false}>
         <SegmentedChoice<BgType>
           value={s.bgType}
@@ -476,6 +501,7 @@ function StyleTab({ block }: { block: Block }) {
           </Field>
         ) : null}
       </AccordionSection>
+      ) : null}
 
       <AccordionSection title="Layout" defaultOpen={false}>
         <Field label="Section width">
@@ -520,6 +546,7 @@ function StyleTab({ block }: { block: Block }) {
         ) : null}
       </AccordionSection>
 
+      {show("Effects") ? (
       <AccordionSection title="Effects" defaultOpen={false}>
         <Field label="Entrance animation" hint="Editor preview only — never sent in email.">
           <Select
@@ -545,6 +572,7 @@ function StyleTab({ block }: { block: Block }) {
           onChange={(value) => set({ glow: value })}
         />
       </AccordionSection>
+      ) : null}
     </>
   );
 }
@@ -774,6 +802,71 @@ function SettingsTab({ block }: { block: Block }) {
 }
 
 /* ------------------------------------------------------------------ *
+ *  Newsletter-level settings (shown when no block is selected)
+ * ------------------------------------------------------------------ */
+function NewsletterSettingsPanel() {
+  const doc = useEditorStore((s) => s.doc);
+  const setTitle = useEditorStore((s) => s.setTitle);
+  const setIssue = useEditorStore((s) => s.setIssue);
+  const setSubject = useEditorStore((s) => s.setSubject);
+  const setFallbackName = useEditorStore((s) => s.setFallbackName);
+
+  return (
+    <div className="px-4 py-4 space-y-4">
+      <div className="flex items-center gap-2.5">
+        <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-brand-50 text-brand">
+          <Mail className="h-4 w-4" />
+        </span>
+        <div>
+          <p className="text-[13px] font-semibold text-ink">Newsletter settings</p>
+          <p className="text-[11px] text-ink-muted">Configure this issue and personalisation</p>
+        </div>
+      </div>
+
+      <AccordionSection title="Issue" defaultOpen>
+        <Field label="Title">
+          <Input
+            value={doc.title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="The Sagar Lad Letter"
+          />
+        </Field>
+        <Field label="Issue number">
+          <Input
+            value={doc.issue}
+            onChange={(e) => setIssue(e.target.value)}
+            placeholder="Issue 001"
+          />
+        </Field>
+        <Field label="Subject line" hint="Leave blank to auto-generate from title + issue.">
+          <Input
+            value={doc.subject ?? ""}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder={`${doc.title} — ${doc.issue}`}
+          />
+        </Field>
+      </AccordionSection>
+
+      <AccordionSection title="Personalisation" defaultOpen>
+        <Field
+          label="Fallback name"
+          hint="Used when {name} is in the greeting and the subscriber has no saved name."
+        >
+          <Input
+            value={doc.fallbackName ?? ""}
+            onChange={(e) => setFallbackName(e.target.value)}
+            placeholder="there"
+          />
+        </Field>
+        <p className="text-[11px] text-ink-muted leading-relaxed">
+          The greeting block supports <code className="rounded bg-canvas px-1 py-0.5 font-mono text-[10px]">{"{name}"}</code> which is replaced with each subscriber's first name. If a subscriber has no name, this fallback is used instead.
+        </p>
+      </AccordionSection>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
  *  Right panel shell
  * ------------------------------------------------------------------ */
 export function RightPanel() {
@@ -820,18 +913,20 @@ export function RightPanel() {
             </Tooltip>
           </div>
         </div>
-        <Segmented<InspectorTab>
-          layoutId="inspector-tabs"
-          fullWidth
-          size="sm"
-          value={inspectorTab}
-          onChange={setInspectorTab}
-          items={[
-            { value: "content", label: "Content" },
-            { value: "style", label: "Style" },
-            { value: "settings", label: "Settings" },
-          ]}
-        />
+        {block ? (
+          <Segmented<InspectorTab>
+            layoutId="inspector-tabs"
+            fullWidth
+            size="sm"
+            value={inspectorTab}
+            onChange={setInspectorTab}
+            items={[
+              { value: "content", label: "Content" },
+              { value: "style", label: "Style" },
+              { value: "settings", label: "Settings" },
+            ]}
+          />
+        ) : null}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto scroll-thin">
@@ -842,17 +937,7 @@ export function RightPanel() {
             {inspectorTab === "settings" ? <SettingsTab block={block} /> : null}
           </>
         ) : (
-          <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-canvas text-ink-muted">
-              <Square className="h-4 w-4" />
-            </span>
-            <div>
-              <p className="text-[13.5px] font-semibold text-ink">Select a block</p>
-              <p className="mt-1 text-[12px] leading-relaxed text-ink-muted">
-                Click any block on the canvas to edit it.
-              </p>
-            </div>
-          </div>
+          <NewsletterSettingsPanel />
         )}
       </div>
 

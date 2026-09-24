@@ -21,6 +21,7 @@ import {
   Star,
   Trash2,
   X,
+  RefreshCw,
 } from "lucide-react";
 import {
   Button,
@@ -79,7 +80,7 @@ const PREVIEW_CHROME = 44;
 const EMAIL_WIDTH = 720;
 
 function BlockPreview({ preview }: { preview: PreviewState }) {
-  const block = React.useMemo(() => createBlock(preview.def.type), [preview.def.type]);
+  const block = React.useMemo(() => createBlock(preview.def.type)!, [preview.def.type]);
   const { def } = preview;
   const measureRef = React.useRef<HTMLDivElement>(null);
   const [natural, setNatural] = React.useState(160);
@@ -560,10 +561,40 @@ function TemplateCard({ template, index }: { template: Template; index: number }
 }
 
 /* ------------------------------------------------------------------ *
- *  Saved template card — with rename capability
+ *  Saved template thumbnail — renders first 3 blocks scaled down
  * ------------------------------------------------------------------ */
-function SavedTemplateCard({ template }: { template: SavedTemplate }) {
+function SavedTemplateThumb({ template }: { template: SavedTemplate }) {
+  const blocks = React.useMemo(() => template.blocks.slice(0, 3), [template.blocks]);
+  const cover = template.theme?.cover ?? { from: "#F4F2EC", to: "#FFFFFF" };
+  return (
+    <div
+      className="relative h-[150px] w-full overflow-hidden rounded-[12px] border border-line"
+      style={{
+        background: `linear-gradient(150deg, ${cover.from}, ${cover.to})`,
+      }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 w-[720px] origin-top -translate-x-1/2 bg-white/70 px-6 py-4"
+        style={{ transform: "translateX(-50%) scale(0.27)" }}
+      >
+        {blocks.map((block) => (
+          <div key={block.id} className="mb-2">
+            <BlockContent block={block} />
+          </div>
+        ))}
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/85 to-transparent" />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ *  Saved template card — with thumbnail, rename, and actions
+ * ------------------------------------------------------------------ */
+function SavedTemplateCard({ template, isApplied }: { template: SavedTemplate; isApplied?: boolean }) {
   const applyTemplate = useEditorStore((s) => s.applyTemplate);
+  const updateSavedTemplate = useEditorStore((s) => s.updateSavedTemplate);
   const deleteSavedTemplate = useEditorStore((s) => s.deleteSavedTemplate);
   const renameSavedTemplate = useEditorStore((s) => s.renameSavedTemplate);
   const { toast } = useUI();
@@ -587,52 +618,79 @@ function SavedTemplateCard({ template }: { template: SavedTemplate }) {
     setIsEditing(false);
   };
 
+  const use = () => {
+    applyTemplate({ blocks: template.blocks }, template.name);
+    toast(`${template.name} applied`, "success");
+  };
+
+  const update = () => {
+    updateSavedTemplate(template.id);
+    toast(`${template.name} updated`, "success");
+  };
+
   return (
-    <div className="flex items-center justify-between gap-2 rounded-[14px] border border-line bg-surface px-3 py-2.5">
-      <div className="min-w-0 flex-1">
-        {isEditing ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            onBlur={saveName}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") saveName();
-              if (e.key === "Escape") {
-                setEditName(template.name);
-                setIsEditing(false);
-              }
-            }}
-            className="w-full truncate rounded-md border border-brand bg-white px-2 py-0.5 text-[13px] font-semibold text-ink outline-none"
-          />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setIsEditing(true)}
-            className="group flex w-full items-center gap-1.5 text-left"
-          >
-            <span className="truncate text-[13px] font-semibold text-ink">
-              {template.name}
-            </span>
-            <PenLine className="h-3 w-3 shrink-0 text-ink-muted opacity-0 transition group-hover:opacity-100" />
-          </button>
-        )}
-        <p className="text-[11px] text-ink-muted">
-          {template.blocks.length} blocks
-        </p>
+    <div className="group relative overflow-hidden rounded-card border border-line bg-surface p-2.5 transition-all hover:border-brand/40 hover:shadow-xs">
+      <div className="overflow-hidden rounded-[12px]">
+        <SavedTemplateThumb template={template} />
       </div>
-      <div className="flex shrink-0 items-center gap-1">
-        <Button
-          size="sm"
-          variant="primary"
-          onClick={() => {
-            applyTemplate({ blocks: template.blocks }, template.name);
-            toast(`${template.name} applied`, "success");
-          }}
-        >
-          Use
+
+      <div className="flex items-start justify-between gap-2 px-1 pt-2.5">
+        <div className="min-w-0 flex-1">
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onBlur={saveName}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") saveName();
+                if (e.key === "Escape") {
+                  setEditName(template.name);
+                  setIsEditing(false);
+                }
+              }}
+              className="w-full truncate rounded-md border border-brand bg-white px-2 py-0.5 text-[13px] font-semibold text-ink outline-none"
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="group/name flex w-full items-center gap-1.5 text-left"
+            >
+              <span className="truncate text-[13.5px] font-semibold tracking-[-0.01em] text-ink">
+                {template.name}
+              </span>
+              <PenLine className="h-3 w-3 shrink-0 text-ink-muted opacity-0 transition group-hover/name:opacity-100" />
+            </button>
+          )}
+          <div className="mt-1 flex items-center gap-1.5">
+            <span className="text-[10.5px] text-ink-muted">
+              {template.blocks.length} blocks
+            </span>
+            <span className="text-[10.5px] text-ink-muted/60">·</span>
+            <span className="text-[10.5px] text-ink-muted">
+              Saved {new Date(template.updatedAt).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 px-1 pb-1 pt-2">
+        <Button variant="primary" size="sm" className="flex-1" onClick={use}>
+          <Check className="h-3.5 w-3.5" />
+          <span>Use Template</span>
         </Button>
+        {isApplied ? (
+          <Button
+            size="iconSm"
+            variant="outline"
+            onClick={update}
+            title="Update template with current content"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+          </Button>
+        ) : null}
         <Button
           size="iconSm"
           variant="ghost"
@@ -682,6 +740,7 @@ function TemplateGallery({ query }: { query: string }) {
   const recents = useEditorStore((s) => s.recents);
   const favorites = useEditorStore((s) => s.favorites);
   const savedTemplates = useEditorStore((s) => s.savedTemplates);
+  const lastAppliedTemplateId = useEditorStore((s) => s.lastAppliedTemplateId);
   const deleteSavedTemplate = useEditorStore((s) => s.deleteSavedTemplate);
   const applyTemplate = useEditorStore((s) => s.applyTemplate);
   const { openModal, toast } = useUI();
@@ -742,7 +801,7 @@ function TemplateGallery({ query }: { query: string }) {
         >
           <div className="flex flex-col gap-2 px-3">
             {savedTemplates.map((template) => (
-              <SavedTemplateCard key={template.id} template={template} />
+              <SavedTemplateCard key={template.id} template={template} isApplied={template.id === lastAppliedTemplateId} />
             ))}
           </div>
         </Section>

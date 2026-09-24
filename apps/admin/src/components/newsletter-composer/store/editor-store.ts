@@ -52,7 +52,7 @@ export function emptyDoc(): NewsletterDoc {
     author: "Sagar Lad",
     subject: "The Sagar Lad Letter",
     previewText: "Newslatter",
-    blocks: [createBlock("hero")],
+    blocks: [createBlock("hero")!],
     updatedAt: Date.now(),
   };
 }
@@ -63,6 +63,7 @@ interface PersistedState {
   recents: string[];
   savedTemplates: SavedTemplate[];
   publishedAt: number | null;
+  lastAppliedTemplateId: string | null;
 }
 
 export interface EditorState extends PersistedState {
@@ -95,6 +96,7 @@ export interface EditorState extends PersistedState {
   setAuthor: (author: string) => void;
   setSubject: (subject: string) => void;
   setPreviewText: (previewText: string) => void;
+  setFallbackName: (fallbackName: string) => void;
 
   /* actions — blocks */
   addBlock: (type: BlockType, index?: number) => void;
@@ -134,6 +136,7 @@ export interface EditorState extends PersistedState {
   toggleFavorite: (templateId: string) => void;
   markTemplateUsed: (templateId: string) => void;
   saveAsTemplate: (name: string, theme?: TemplateTheme) => void;
+  updateSavedTemplate: (id: string, name?: string) => void;
   deleteSavedTemplate: (id: string) => void;
   renameSavedTemplate: (id: string, name: string) => void;
 
@@ -220,6 +223,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
     recents: [],
     savedTemplates: [],
     publishedAt: null,
+    lastAppliedTemplateId: null,
 
     selectedId: null,
     hoveredId: null,
@@ -250,10 +254,12 @@ export const useEditorStore = create<EditorState>((set, get) => {
     setAuthor: (author) => commit("author", (doc) => ({ ...doc, author })),
     setSubject: (subject) => commit("subject", (doc) => ({ ...doc, subject })),
     setPreviewText: (previewText) => commit("previewText", (doc) => ({ ...doc, previewText })),
+    setFallbackName: (fallbackName) => commit("fallbackName", (doc) => ({ ...doc, fallbackName })),
 
     /* ----------------------------- blocks ------------------------------ */
     addBlock: (type, index) => {
       const block = createBlock(type);
+      if (!block) return;
       const current = get().doc.blocks;
       const at = index === undefined ? current.length : index;
       commit(
@@ -429,6 +435,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
     /* ---------------------------- templates ---------------------------- */
     applyTemplate: (source, name) => {
       const fresh = cloneBlocks(resolveTemplateBlocks(source));
+      const templateId = typeof source === "object" && source !== null && "id" in source ? String(source.id) : null;
       commit(
         `template:${uid("t")}`,
         (doc) => ({
@@ -436,7 +443,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
           title: name ?? doc.title,
           blocks: fresh,
         }),
-        { selectedId: fresh[0]?.id ?? null, leftTab: "blocks" },
+        { selectedId: fresh[0]?.id ?? null, leftTab: "blocks", lastAppliedTemplateId: templateId },
       );
     },
 
@@ -449,7 +456,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
           title: name ?? doc.title,
           blocks: fresh,
         }),
-        { selectedId: fresh[0]?.id ?? null, leftTab: "blocks" },
+        { selectedId: fresh[0]?.id ?? null, leftTab: "blocks", lastAppliedTemplateId: null },
       );
     },
 
@@ -522,6 +529,23 @@ export const useEditorStore = create<EditorState>((set, get) => {
           blocks: snapshot(state.doc).blocks,
         };
         const next = [template, ...state.savedTemplates].slice(0, 40);
+        scheduleSave();
+        return { savedTemplates: next };
+      }),
+
+    updateSavedTemplate: (id, name) =>
+      set((state) => {
+        const template = state.savedTemplates.find((t) => t.id === id);
+        if (!template) return { savedTemplates: state.savedTemplates };
+        const themeVal = defaultThemeFor(state.doc.blocks);
+        const updated: SavedTemplate = {
+          ...template,
+          name: name ?? template.name,
+          updatedAt: Date.now(),
+          theme: themeVal,
+          blocks: snapshot(state.doc).blocks,
+        };
+        const next = state.savedTemplates.map((t) => (t.id === id ? updated : t));
         scheduleSave();
         return { savedTemplates: next };
       }),

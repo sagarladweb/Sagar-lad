@@ -15,16 +15,19 @@
     "@prisma/client": "^7.9.1",
     "@sagarlad/db": "*",
     "@supabase/supabase-js": "^2.112.1",
+    "clsx": "^2.1.1",
     "dompurify": "^3.4.13",
+    "framer-motion": "^13.4.1",
     "gsap": "^3.15.0",
     "jsdom": "^30.0.1",
     "lucide-react": "^1.28.0",
-    "next": "16.3.0",
+    "next": "16.3.6",
     "page-flip": "^2.0.7",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-pageflip": "^2.0.3",
     "sharp": "^0.35.3",
+    "tailwind-merge": "^3.7.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -34,7 +37,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.3.0",
+    "eslint-config-next": "16.3.6",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
