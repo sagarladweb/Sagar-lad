@@ -7,6 +7,7 @@ import { Plus, Pencil, Search, Trash2, Eye, Heart, ExternalLink, ChevronLeft, Ch
 import { showToast } from "@/components/admin/Toast";
 import { showConfirm } from "@/components/admin/ConfirmDialog";
 import { Button, IconButton } from "@/components/ui/Button";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { PublishedBadge } from "@/components/ui/Badge";
 import { SITE } from "@/lib/site";
 
@@ -58,11 +59,13 @@ function FilterTabs({
   );
 }
 
-export function PostsClientTable({ initialPosts }: { initialPosts: PostItem[] }) {
+export function PostsClientTable({ initialPosts, categories }: { initialPosts: PostItem[]; categories: string[] }) {
   const router = useRouter();
   const [posts, setPosts] = useState<PostItem[]>(initialPosts);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "published" | "draft" | "scheduled">("all");
+  const [category, setCategory] = useState<string>("all");
+  const [sort, setSort] = useState<"newest" | "views" | "likes" | "az">("newest");
   const [page, setPage] = useState(1);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [publishingId, setPublishingId] = useState<string | null>(null);
@@ -72,20 +75,28 @@ export function PostsClientTable({ initialPosts }: { initialPosts: PostItem[] })
   const isScheduled = (p: PostItem) =>
     !p.published && !!p.scheduledAt && new Date(p.scheduledAt) > new Date();
 
-  const filteredPosts = posts.filter((p) => {
-    const matchesSearch =
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.slug.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter =
-      filter === "all"
-        ? true
-        : filter === "published"
-          ? p.published
-          : filter === "scheduled"
-            ? isScheduled(p)
-            : !p.published && !isScheduled(p);
-    return matchesSearch && matchesFilter;
-  });
+  const filteredPosts = posts
+    .filter((p) => {
+      const matchesSearch =
+        p.title.toLowerCase().includes(search.toLowerCase()) ||
+        p.slug.toLowerCase().includes(search.toLowerCase());
+      const matchesFilter =
+        filter === "all"
+          ? true
+          : filter === "published"
+            ? p.published
+            : filter === "scheduled"
+              ? isScheduled(p)
+              : !p.published && !isScheduled(p);
+      const matchesCategory = category === "all" || (p.category?.name ?? "Uncategorized") === category;
+      return matchesSearch && matchesFilter && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (sort === "views") return b.views - a.views;
+      if (sort === "likes") return b.likes - a.likes;
+      if (sort === "az") return a.title.localeCompare(b.title);
+      return 0; // newest = server order (updatedAt desc)
+    });
 
   const pageCount = Math.max(1, Math.ceil(filteredPosts.length / PER_PAGE));
   const current = Math.min(page, pageCount);
@@ -157,28 +168,61 @@ export function PostsClientTable({ initialPosts }: { initialPosts: PostItem[] })
         </Link>
       </header>
 
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder="Search posts..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-accent"
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              placeholder="Search posts..."
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-accent"
+            />
+          </div>
+          <FilterTabs
+            filter={filter}
+            setFilter={setFilter}
+            setPage={setPage}
+            counts={{
+              all: posts.length,
+              published: posts.filter((p) => p.published).length,
+              scheduled: posts.filter((p) => isScheduled(p)).length,
+              draft: posts.filter((p) => !p.published && !isScheduled(p)).length,
+            }}
           />
         </div>
-        <FilterTabs
-          filter={filter}
-          setFilter={setFilter}
-          setPage={setPage}
-          counts={{
-            all: posts.length,
-            published: posts.filter((p) => p.published).length,
-            scheduled: posts.filter((p) => isScheduled(p)).length,
-            draft: posts.filter((p) => !p.published && !isScheduled(p)).length,
-          }}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="w-52">
+            <Dropdown
+              id="post-category-filter"
+              label="Filter by category"
+              value={category}
+              onChange={(v) => { setCategory(v); setPage(1); }}
+              options={[
+                { value: "all", label: "All categories" },
+                ...categories.map((c) => ({ value: c, label: c })),
+                ...(!categories.includes("Uncategorized")
+                  ? [{ value: "Uncategorized", label: "Uncategorized" }]
+                  : []),
+              ]}
+            />
+          </div>
+          <div className="w-52">
+            <Dropdown
+              id="post-sort"
+              label="Sort posts"
+              value={sort}
+              onChange={(v) => { setSort(v as typeof sort); setPage(1); }}
+              options={[
+                { value: "newest", label: "Newest first" },
+                { value: "views", label: "Most viewed" },
+                { value: "likes", label: "Most liked" },
+                { value: "az", label: "Title A–Z" },
+              ]}
+            />
+          </div>
+        </div>
       </div>
 
       {filteredPosts.length === 0 ? (

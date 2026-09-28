@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
 import { NO_STORE_HEADERS } from "@/lib/cache-headers";
+import { moveToTrash } from "@/lib/trash";
 import { slugify } from "@/lib/site";
 export const runtime = "nodejs";
 
@@ -113,6 +114,9 @@ export async function DELETE(request: Request) {
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   try {
+    const row = await prisma.category.findUnique({ where: { id } });
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    await moveToTrash("CATEGORY", row.id, row.name, row);
     await prisma.category.delete({ where: { id } });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";

@@ -134,6 +134,22 @@ const BookPage = forwardRef<HTMLDivElement, PageProps>(
 );
 BookPage.displayName = "BookPage";
 
+/* --- Blank endpaper: a real book ends with blank pages. Inserted only when
+   the sheet count is odd so the back cover always lands alone (book closes)
+   instead of pairing with the last content page in a spread. --- */
+const EndpaperPage = forwardRef<HTMLDivElement>(function EndpaperPage(_, ref) {
+  return (
+    <div
+      ref={ref}
+      data-density="soft"
+      className="page relative h-full w-full select-none overflow-hidden bg-[#fdfdfc]"
+      aria-hidden="true"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/[0.02] via-transparent to-black/[0.04]" />
+    </div>
+  );
+});
+
 export function FlipBook({
   title,
   coverImage,
@@ -157,13 +173,6 @@ export function FlipBook({
     height: 452,
     isSinglePage: true,
   });
-
-  const allPages = [
-    coverImage,
-    ...pages,
-    ...(backCoverImage ? [backCoverImage] : []),
-  ];
-  const totalPages = allPages.length;
 
   // Responsive sizing: Mobile (<768px) is strictly single page; Desktop (>=768px) is 2-page spread
   const updateDimensions = useCallback(() => {
@@ -298,7 +307,56 @@ export function FlipBook({
 
   const { width: w, height: h, isSinglePage } = dimensions;
   const spreadWidth = isSinglePage ? w : w * 2;
-  const readPct = totalPages > 0 ? Math.round(((currentPage + 1) / totalPages) * 100) : 0;
+
+  // Sheet plan: cover + content + optional blank endpaper + back cover.
+  // The endpaper pads odd totals to even in spread mode so the back cover
+  // always lands alone and the book visibly closes (desktop). Single-page
+  // mode needs no padding — one page shows at a time.
+  // (Built as a dense array: pageflip cloneElements every child, so no
+  // conditional `false` holes allowed.)
+  const baseCount = 1 + pages.length + (backCoverImage ? 1 : 0);
+  const showEndpaper = !isSinglePage && !!backCoverImage && baseCount % 2 === 1;
+  const totalPages = baseCount + (showEndpaper ? 1 : 0);
+
+  const sheets: React.ReactNode[] = [
+    <BookPage
+      key={`page-cover-${coverImage}`}
+      src={coverImage}
+      pageIndex={0}
+      totalPages={totalPages}
+      title={title}
+      isCover={true}
+      isBack={false}
+      isSinglePage={isSinglePage}
+    />,
+    ...pages.map((src, i) => (
+      <BookPage
+        key={`page-${i}-${src}`}
+        src={src}
+        pageIndex={i + 1}
+        totalPages={totalPages}
+        title={title}
+        isCover={false}
+        isBack={false}
+        isSinglePage={isSinglePage}
+      />
+    )),
+    ...(showEndpaper ? [<EndpaperPage key="endpaper" />] : []),
+    ...(backCoverImage
+      ? [
+          <BookPage
+            key={`page-back-${backCoverImage}`}
+            src={backCoverImage}
+            pageIndex={totalPages - 1}
+            totalPages={totalPages}
+            title={title}
+            isCover={false}
+            isBack={true}
+            isSinglePage={isSinglePage}
+          />,
+        ]
+      : []),
+  ];
 
   return (
     <div className="relative flex flex-col items-center justify-center gap-3 sm:gap-5 w-full max-w-full">
@@ -363,18 +421,7 @@ export function FlipBook({
             className="mx-auto select-none"
             style={{ background: "transparent" }}
           >
-            {allPages.map((src, i) => (
-              <BookPage
-                key={`page-${i}-${src}`}
-                src={src}
-                pageIndex={i}
-                totalPages={allPages.length}
-                title={title}
-                isCover={i === 0}
-                isBack={i === allPages.length - 1}
-                isSinglePage={isSinglePage}
-              />
-            ))}
+            {sheets}
           </HTMLFlipBook>
         </div>
 
@@ -417,11 +464,6 @@ export function FlipBook({
             <span className="text-neutral-400 tabular-nums">
               {totalPages}
             </span>
-          </div>
-
-          {/* Read Percentage */}
-          <div className="rounded-md bg-white/10 px-2 py-0.5 text-[11px] sm:text-xs font-mono font-bold text-[#FACC15] select-none tabular-nums tracking-wide">
-            {readPct}%
           </div>
 
           {/* Next Page Arrow */}

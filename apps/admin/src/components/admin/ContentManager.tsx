@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
-  Trash2,
   Pencil,
   ArrowUpRight,
+  Check,
 } from "lucide-react";
 import { showConfirm } from "@/components/admin/ConfirmDialog";
 import { showToast } from "@/components/admin/Toast";
@@ -33,6 +33,8 @@ export function ContentManager() {
   const [modal, setModal] = useState<{ id: string | null; name: string } | null>(
     null
   );
+  const [selecting, setSelecting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   async function load() {
     try {
@@ -72,26 +74,38 @@ export function ContentManager() {
     }
   }
 
-  async function remove(c: Category) {
-    const label = c._count.posts + c._count.videos;
-    const confirmMsg =
-      label > 0
-        ? `"${c.name}" has ${c._count.posts} post${c._count.posts === 1 ? "" : "s"} and ${c._count.videos} video${c._count.videos === 1 ? "" : "s"}. Deleting it removes the topic link but keeps the posts.`
-        : `Delete "${c.name}"?`;
+  async function removeSelected() {
+    if (selectedIds.length === 0) return;
+    const names = categories
+      .filter((c) => selectedIds.includes(c.id))
+      .map((c) => c.name);
     const ok = await showConfirm({
-      title: "Delete topic?",
-      message: confirmMsg,
+      title: `Delete ${selectedIds.length} topic${selectedIds.length === 1 ? "" : "s"}?`,
+      message: `Deleting ${names.slice(0, 3).join(", ")}${names.length > 3 ? ` and ${names.length - 3} more` : ""} removes the topic link but keeps the posts and videos.`,
     });
     if (!ok) return;
-    const res = await fetch(`/api/admin/categories?id=${c.id}`, {
-      method: "DELETE",
-    });
-    if (res.ok) {
-      showToast(`Topic "${c.name}" deleted.`);
+    setBusy(true);
+    try {
+      await Promise.all(
+        selectedIds.map((id) => fetch(`/api/admin/categories?id=${id}`, { method: "DELETE" }))
+      );
+      showToast(
+        selectedIds.length === 1
+          ? `Topic "${names[0]}" deleted.`
+          : `${selectedIds.length} topics deleted.`
+      );
+      setSelectedIds([]);
+      setSelecting(false);
       await load();
-    } else {
-      showToast("Could not delete topic.", undefined, "error");
+    } finally {
+      setBusy(false);
     }
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
   }
 
   const openModal = (c: { id: string | null; name: string }) => {
@@ -102,13 +116,43 @@ export function ContentManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          {categories.length} topic{categories.length === 1 ? "" : "s"} in the
-          Content menu
+          {selecting && selectedIds.length > 0
+            ? `${selectedIds.length} selected`
+            : `${categories.length} topic${categories.length === 1 ? "" : "s"} in the Content menu`}
         </p>
-        <Button onClick={() => openModal({ id: null, name: "" })} className="shrink-0">
-          <Plus className="w-4 h-4" /> Add topic
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          {categories.length > 0 && (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setSelecting((v) => !v);
+                setSelectedIds([]);
+              }}
+            >
+              {selecting ? "Cancel" : "Select"}
+            </Button>
+          )}
+          <Button onClick={() => openModal({ id: null, name: "" })} className="shrink-0">
+            <Plus className="w-4 h-4" /> Add topic
+          </Button>
+        </div>
       </div>
+
+      {selecting && selectedIds.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3">
+          <p className="text-sm font-medium">
+            {selectedIds.length} topic{selectedIds.length === 1 ? "" : "s"} selected
+          </p>
+          <div className="flex items-center gap-2">
+            <Button variant="secondary" onClick={() => setSelectedIds([])}>
+              Clear
+            </Button>
+            <Button onClick={removeSelected} disabled={busy} loading={busy} className="!bg-red-600 !text-white hover:!bg-red-700">
+              Delete selected
+            </Button>
+          </div>
+        </div>
+      )}
 
       {modal && (
         <Modal
@@ -151,52 +195,70 @@ export function ContentManager() {
         </p>
       ) : (
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {categories.map((c) => (
-            <li key={c.id} className="group relative">
-              <button
-                type="button"
-                onClick={() => router.push(`/admin/content/topics/${c.slug}`)}
-                aria-label={`View content in ${c.name}`}
-                className="flex h-full w-full flex-col gap-3 rounded-2xl border border-border bg-card card-grad p-4 text-left transition-shadow hover:shadow-lg"
-              >
-                <div className="flex items-start justify-between">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent/15 text-accent font-display font-bold text-lg">
-                    {c.name.charAt(0)}
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                    {c._count.posts + c._count.videos} item
-                    {c._count.posts + c._count.videos === 1 ? "" : "s"}
-                    <ArrowUpRight className="h-3 w-3" />
-                  </span>
-                </div>
-                <div>
-                  <p className="truncate font-medium">{c.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {c._count.posts} post{c._count.posts === 1 ? "" : "s"} ·{" "}
-                    {c._count.videos} video{c._count.videos === 1 ? "" : "s"}
-                  </p>
-                </div>
-              </button>
-              <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                <IconButton
-                  variant="secondary"
-                  onClick={() => openModal({ id: c.id, name: c.name })}
-                  title={`Rename topic ${c.name}`}
-                  className="border border-border bg-background shadow-sm"
+          {categories.map((c) => {
+            const checked = selectedIds.includes(c.id);
+            return (
+              <li key={c.id} className="group relative">
+                <button
+                  type="button"
+                  onClick={() =>
+                    selecting
+                      ? toggleSelect(c.id)
+                      : router.push(`/admin/content/topics/${c.slug}`)
+                  }
+                  aria-label={selecting ? `Select topic ${c.name}` : `View content in ${c.name}`}
+                  aria-pressed={selecting ? checked : undefined}
+                  className={`flex h-full w-full flex-col gap-3 rounded-2xl border bg-card card-grad p-4 text-left transition-shadow hover:shadow-lg ${
+                    checked ? "border-accent ring-2 ring-accent/30" : "border-border"
+                  }`}
                 >
-                  <Pencil className="w-4 h-4" />
-                </IconButton>
-                <IconButton
-                  variant="danger"
-                  onClick={() => remove(c)}
-                  title={`Delete topic ${c.name}`}
-                  className="border border-border bg-background shadow-sm"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </IconButton>
-              </div>
-            </li>
-          ))}
+                  <div className="flex items-start justify-between">
+                    {selecting ? (
+                      <span
+                        aria-hidden="true"
+                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg border transition-colors ${
+                          checked
+                            ? "border-accent bg-accent text-accent-foreground"
+                            : "border-border bg-background text-transparent"
+                        }`}
+                      >
+                        <Check className="h-4 w-4" strokeWidth={3} />
+                      </span>
+                    ) : (
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent/15 text-accent font-display font-bold text-lg">
+                        {c.name.charAt(0)}
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                      {c._count.posts + c._count.videos} item
+                      {c._count.posts + c._count.videos === 1 ? "" : "s"}
+                      {!selecting && <ArrowUpRight className="h-3 w-3" />}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="truncate font-medium">{c.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {c._count.posts} post{c._count.posts === 1 ? "" : "s"} ·{" "}
+                      {c._count.videos} video{c._count.videos === 1 ? "" : "s"}
+                    </p>
+                  </div>
+                </button>
+                {!selecting && (
+                  <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                    <IconButton
+                      variant="secondary"
+                      onClick={() => openModal({ id: c.id, name: c.name })}
+                      title={`Rename topic ${c.name}`}
+                      aria-label={`Rename topic ${c.name}`}
+                      className="border border-border bg-background shadow-sm"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </IconButton>
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

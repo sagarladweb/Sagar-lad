@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   Loader2,
   User,
-  KeyRound,
   Mail,
   Camera,
   AlertCircle,
@@ -21,12 +20,12 @@ type Props = {
   onOpenSecurity?: () => void;
 };
 
-const inputCls =
+export const inputCls =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent";
-const btnCls =
+export const btnCls =
   "inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground hover:opacity-90 disabled:opacity-50 transition-opacity";
 
-function Field({
+export function Field({
   label,
   children,
   hint,
@@ -44,7 +43,7 @@ function Field({
   );
 }
 
-function PasswordInput({
+export function PasswordInput({
   value,
   onChange,
   autoComplete,
@@ -79,7 +78,7 @@ function PasswordInput({
   );
 }
 
-function TileHeader({
+export function TileHeader({
   icon: Icon,
   title,
   subtitle,
@@ -118,15 +117,6 @@ export function ProfileForm({ initial, onOpenSecurity }: Props) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  const [curPassword, setCurPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [changingPassword, setChangingPassword] = useState(false);
-
-  const [curPasswordEmail, setCurPasswordEmail] = useState("");
-  const [newEmail, setNewEmail] = useState("");
-  const [changingEmail, setChangingEmail] = useState(false);
 
   async function handleAvatar(file: File | undefined | null) {
     if (!file) return;
@@ -235,51 +225,6 @@ export function ProfileForm({ initial, onOpenSecurity }: Props) {
     }
   }
 
-  async function changePassword() {
-    if (newPassword !== confirmPassword) {
-      showToast("Passwords do not match", undefined, "error");
-      return;
-    }
-    setChangingPassword(true);
-    try {
-      const res = await fetch("/api/admin/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "password", currentPassword: curPassword, newPassword }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.error ?? "Could not change password");
-      showToast("Password changed");
-      setCurPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err) {
-      showToast("Password change failed", err instanceof Error ? err.message : undefined, "error");
-    } finally {
-      setChangingPassword(false);
-    }
-  }
-
-  async function changeEmail() {
-    setChangingEmail(true);
-    try {
-      const res = await fetch("/api/admin/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "email", currentPassword: curPasswordEmail, newEmail }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.error ?? "Could not change email");
-      showToast("Email changed. Use your new email next time you sign in.");
-      setCurPasswordEmail("");
-      setNewEmail("");
-    } catch (err) {
-      showToast("Email change failed", err instanceof Error ? err.message : undefined, "error");
-    } finally {
-      setChangingEmail(false);
-    }
-  }
-
   return (
     <div onPaste={handleGlobalPaste} className="grid grid-cols-1 gap-4 md:grid-cols-12">
       {/* Featured: profile photo & name */}
@@ -379,76 +324,7 @@ export function ProfileForm({ initial, onOpenSecurity }: Props) {
         </button>
       </section>
 
-      {/* Change password */}
-      <section className="rounded-2xl border border-border bg-card card-grad p-6 md:col-span-6">
-        <TileHeader
-          icon={KeyRound}
-          title="Change password"
-          subtitle="At least 8 characters with letters and numbers."
-        />
-        <div className="mt-5 space-y-4">
-          <Field label="Current password">
-            <PasswordInput
-              value={curPassword}
-              onChange={setCurPassword}
-              autoComplete="current-password"
-            />
-          </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="New password">
-              <PasswordInput
-                value={newPassword}
-                onChange={setNewPassword}
-                autoComplete="new-password"
-              />
-            </Field>
-            <Field label="Confirm new password">
-              <PasswordInput
-                value={confirmPassword}
-                onChange={setConfirmPassword}
-                autoComplete="new-password"
-              />
-            </Field>
-          </div>
-          <div className="flex items-center justify-end">
-            <button type="button" onClick={changePassword} disabled={changingPassword} className={btnCls}>
-              {changingPassword && <Loader2 className="h-4 w-4 animate-spin" />} Change password
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Sign-in email */}
-      <section className="rounded-2xl border border-border bg-card card-grad p-6 md:col-span-6">
-        <TileHeader
-          icon={Mail}
-          title="Sign-in email"
-          subtitle={`Current email: ${initial.email ?? "—"}`}
-        />
-        <div className="mt-5 space-y-4">
-          <Field label="Current password">
-            <PasswordInput
-              value={curPasswordEmail}
-              onChange={setCurPasswordEmail}
-              autoComplete="current-password"
-            />
-          </Field>
-          <Field label="New email">
-            <input
-              type="email"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              className={inputCls}
-              autoComplete="email"
-            />
-          </Field>
-          <div className="flex items-center justify-end">
-            <button type="button" onClick={changeEmail} disabled={changingEmail} className={btnCls}>
-              {changingEmail && <Loader2 className="h-4 w-4 animate-spin" />} Update email
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* Change password + Sign-in email now live under the Security tab. */}
 
       {!initial.email && (
         <p

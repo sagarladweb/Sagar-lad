@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, ShieldCheck, LogOut, Clock, Activity, Mail } from "lucide-react";
+import { User, ShieldCheck, LogOut, Clock, Activity, Mail, Archive } from "lucide-react";
 import { ProfileForm } from "@/components/admin/ProfileForm";
 import { SecuritySettings } from "@/components/admin/SecuritySettings";
 import { SignOutButton } from "@/components/admin/SignOutButton";
 import { SystemHealthWidget } from "@/components/admin/SystemHealthWidget";
 import { NewsletterSettings } from "@/components/admin/NewsletterSettings";
+import { ArchiveClient } from "@/components/admin/ArchiveClient";
 
-type Tab = "profile" | "security" | "health" | "newsletter";
-const VALID_TABS: Tab[] = ["profile", "security", "health", "newsletter"];
+type Tab = "profile" | "security" | "health" | "newsletter" | "archive";
+const VALID_TABS: Tab[] = ["profile", "security", "health", "newsletter", "archive"];
 
 type SessionUser = {
   name?: string | null;
@@ -81,6 +82,15 @@ export function SettingsTabs({ session }: { session: SessionUser | null }) {
         >
           <Activity className="h-4 w-4" /> System Health
         </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "archive"}
+          onClick={() => switchTab("archive")}
+          className={tabBtn(tab === "archive")}
+        >
+          <Archive className="h-4 w-4" /> Archive
+        </button>
       </div>
 
       {tab === "profile" ? (
@@ -113,10 +123,17 @@ export function SettingsTabs({ session }: { session: SessionUser | null }) {
             Signed in as <span className="font-medium text-foreground">{session?.email}</span>. Your
             session stays active for 7 days, so you won&apos;t need to sign in again on this device.
           </div>
-          <SecuritySettings />
+          <SecuritySettings currentEmail={session?.email} />
         </div>
       ) : tab === "newsletter" ? (
         <NewsletterSettings />
+      ) : tab === "archive" ? (
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Everything you delete stays here for 15 days — restore it, or it is gone forever.
+          </p>
+          <ArchiveClient />
+        </div>
       ) : (
         <SystemHealthWidget />
       )}

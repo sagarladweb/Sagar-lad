@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
 import { NO_STORE_HEADERS } from "@/lib/cache-headers";
+import { moveToTrash } from "@/lib/trash";
 export const runtime = "nodejs";
 
 const bookSchema = z.object({
@@ -91,6 +92,9 @@ export async function DELETE(request: Request) {
   const id = url.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
   try {
+    const row = await prisma.book.findUnique({ where: { id } });
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    await moveToTrash("BOOK", row.id, row.title, row);
     await prisma.book.delete({ where: { id } });
     revalidatePublic();
     return NextResponse.json({ ok: true });

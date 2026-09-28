@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
 import { NO_STORE_HEADERS } from "@/lib/cache-headers";
+import { moveToTrash } from "@/lib/trash";
 export const runtime = "nodejs";
 
 const quoteSchema = z.object({
@@ -77,6 +78,9 @@ export async function DELETE(request: Request) {
   const id = url.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
   try {
+    const row = await prisma.quote.findUnique({ where: { id } });
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    await moveToTrash("QUOTE", row.id, row.text.slice(0, 120), row);
     await prisma.quote.delete({ where: { id } });
     revalidatePublic();
     return NextResponse.json({ ok: true });

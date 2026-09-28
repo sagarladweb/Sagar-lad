@@ -411,7 +411,7 @@ button:disabled {
 .cardstack-mindup-text {
   font-size: 15px !important;
   font-weight: 900 !important;
-  color: rgba(13,33,161,0.4) !important;
+  color: rgba(13,33,161,0.22) !important;
   letter-spacing: 0.25em !important;
   white-space: nowrap;
 }
@@ -795,7 +795,6 @@ button:disabled {
   color: #b42318;
 }
 .growth-tag {
-  margin-left: 8px;
   background: #0d21a1;
   color: #ffd51d;
   font-size: 9px;

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { logAudit } from "@/lib/audit";
+import { moveToTrash } from "@/lib/trash";
 
 export const runtime = "nodejs";
 
@@ -29,6 +30,7 @@ async function deleteSubscriber(id: string, request: Request) {
   const sub = await prisma.newsletterSubscriber.findUnique({ where: { id } });
   if (!sub) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  await moveToTrash("SUBSCRIBER", sub.id, sub.email, sub);
   await prisma.newsletterSubscriber.delete({ where: { id } });
   await logAudit("SUBSCRIBER_DELETE", {
     userId: session.user.id,

@@ -18,16 +18,17 @@ import {
   Repeat,
 } from "lucide-react";
 import { getDashboardStats, getDashboardExtras, getSocialLinksForDashboard } from "@/lib/content";
-import { getGaAnalytics } from "@/lib/analytics";
+import { getGaAnalytics, prettyPagePath } from "@/lib/analytics";
+import { activityLabel, timeAgo, DEVICE_ACTIONS } from "@/lib/activity";
 import { adminHeartbeat } from "@/lib/heartbeat";
 import { formatCompact } from "@/lib/charts";
 import { TrafficChart } from "@/components/admin/dashboard/TrafficChart";
 import { SystemHealth } from "@/components/admin/dashboard/SystemHealth";
 import { WorldMap } from "@/components/admin/dashboard/WorldMap";
 import { KPISection } from "@/components/admin/dashboard/KPISection";
+import { RecentPostsCard } from "@/components/admin/dashboard/RecentPostsCard";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { PublishedBadge } from "@/components/ui/Badge";
  
 export const dynamic = "force-dynamic";
  
@@ -45,7 +46,7 @@ export default async function DashboardPage() {
     videos: number;
     quotes: number;
     pendingComments: number;
-    activity: { action: string; createdAt: Date }[];
+    activity: { action: string; createdAt: Date; device: string | null }[];
   } = {
     activeSubs: 0,
     lastCampaign: null,
@@ -246,7 +247,12 @@ export default async function DashboardPage() {
             <ul className="space-y-2.5">
               {extras.activity.map((a, i) => (
                 <li key={i} className="flex items-center justify-between gap-3 text-sm">
-                  <span className="truncate">{activityLabel(a.action)}</span>
+                  <span className="min-w-0">
+                    <span className="block truncate">{activityLabel(a.action)}</span>
+                    {DEVICE_ACTIONS.has(a.action) && a.device && (
+                      <span className="block truncate text-xs text-muted-foreground">{a.device}</span>
+                    )}
+                  </span>
                   <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{timeAgo(a.createdAt)}</span>
                 </li>
               ))}
@@ -255,46 +261,22 @@ export default async function DashboardPage() {
         </Card>
       </section>
 
-      {/* Recent posts — 3 columns: Title, Status, Views */}
+      {/* Recent posts — tap Views to switch to Top performing */}
       <section>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Recent posts</h2>
-          <Link href="/admin/posts" className="inline-flex items-center gap-1 text-sm text-accent font-medium hover:underline">
-            View all <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-        {recentPosts.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No posts yet. <Link href="/admin/posts/new" className="text-accent font-medium">Write your first one →</Link>
-          </p>
-        ) : (
-          <div className="overflow-x-auto rounded-2xl border border-border/60 bg-card">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 text-left text-xs uppercase tracking-wider text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3">Title</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Views</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {recentPosts.map((p) => (
-                  <tr key={p.slug} className="hover:bg-muted/30 transition-colors duration-150">
-                    <td className="px-4 py-3 font-medium">{p.title}</td>
-                    <td className="px-4 py-3"><PublishedBadge published={p.published} /></td>
-                    <td className="px-4 py-3 tabular-nums text-right">{p.views}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <RecentPostsCard posts={recentPosts} />
       </section>
 
-      {/* Top pages table */}
+      {/* Top pages table — top 5 here, the rest on the full page */}
       {gaData.topPages.length > 0 && (
         <section>
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Top pages</h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Top pages</h2>
+            {gaData.topPages.length > 5 && (
+              <Link href="/admin/pages" className="inline-flex items-center gap-1 text-sm text-accent font-medium hover:underline">
+                View all <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
+          </div>
           <Card>
             <div className="overflow-x-auto -mx-5">
               <table className="w-full text-sm">
@@ -306,9 +288,14 @@ export default async function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {gaData.topPages.map((p) => (
+                  {gaData.topPages.slice(0, 5).map((p) => (
                     <tr key={p.path} className="hover:bg-muted/30 transition-colors duration-150">
-                      <td className="px-5 py-3 font-medium">{p.path}</td>
+                      <td className="px-5 py-3">
+                        <span className="block font-medium">{prettyPagePath(p.path)}</span>
+                        {prettyPagePath(p.path) !== p.path && (
+                          <span className="block text-xs text-muted-foreground tabular-nums">{p.path}</span>
+                        )}
+                      </td>
                       <td className="px-5 py-3 text-right tabular-nums">{formatCompact(p.pageviews)}</td>
                       <td className="px-5 py-3 text-right tabular-nums">{formatCompact(p.users)}</td>
                     </tr>
@@ -322,46 +309,4 @@ export default async function DashboardPage() {
 
     </div>
   );
-}
-
-const ACTIVITY_LABELS: Record<string, string> = {
-  LOGIN_OK: "Signed in",
-  POST_CREATE: "Created a post",
-  POST_UPDATE: "Updated a post",
-  POST_DELETE: "Deleted a post",
-  BOOK_CREATE: "Added a book",
-  BOOK_UPDATE: "Updated a book",
-  BOOK_DELETE: "Deleted a book",
-  VIDEO_CREATE: "Added a video",
-  VIDEO_UPDATE: "Updated a video",
-  VIDEO_DELETE: "Deleted a video",
-  QUOTE_CREATE: "Added a quote",
-  QUOTE_UPDATE: "Updated a quote",
-  QUOTE_DELETE: "Deleted a quote",
-  CATEGORY_CREATE: "Added a category",
-  CATEGORY_DELETE: "Deleted a category",
-  COMMENT_APPROVE: "Approved a comment",
-  COMMENT_DELETE: "Deleted a comment",
-  SUBSCRIBER_DELETE: "Removed a subscriber",
-  REQUEST_DELETE: "Deleted a request",
-  NEWSLETTER: "Sent a newsletter",
-  EBOOK_DOWNLOAD: "E-book download",
-  UPLOAD: "Uploaded a file",
-  PASSWORD_CHANGE: "Changed password",
-  PROFILE_UPDATE: "Updated profile",
-};
-
-function activityLabel(action: string) {
-  return ACTIVITY_LABELS[action] ?? action.toLowerCase().replace(/_/g, " ");
-}
-
-function timeAgo(date: Date) {
-  const secs = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (secs < 60) return "just now";
-  const mins = Math.floor(secs / 60);
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
 }

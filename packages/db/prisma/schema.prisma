@@ -81,11 +81,28 @@ model AuditLogEntry {
   action    String // e.g. LOGIN_OK, LOGIN_FAIL, POST_CREATE, POST_DELETE, CONTACT
   meta      Json?
   ip        String?
+  device    String? // e.g. "Chrome · Windows" parsed from user-agent at login
   createdAt DateTime @default(now())
 
   @@index([createdAt])
   @@index([userId])
   @@index([action])
+}
+
+// Soft-delete archive ("Archive box"). Every admin hard-delete snapshots the
+// row here first so it can be restored within 15 days; afterwards the trash
+// row (and the soft-deleted post it mirrors) is purged permanently.
+model TrashItem {
+  id         String   @id @default(cuid())
+  entityType String // POST | ANNOUNCEMENT | BOOK | VIDEO | QUOTE | CATEGORY | CAMPAIGN | SUBSCRIBER | COMMENT | ENQUIRY
+  entityId   String
+  title      String // human label shown in the Archive box
+  snapshot   Json // full row (plus relations where needed) for restore
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime // createdAt + 15 days
+
+  @@index([expiresAt])
+  @@index([entityType])
 }
 
 // ---------------------------------------------------------------------------

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
 import { NO_STORE_HEADERS } from "@/lib/cache-headers";
+import { moveToTrash } from "@/lib/trash";
 import { normalizeVideoUrl } from "@/lib/video";
 export const runtime = "nodejs";
 
@@ -117,6 +118,9 @@ export async function DELETE(request: Request) {
   const id = url.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
   try {
+    const row = await prisma.video.findUnique({ where: { id } });
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    await moveToTrash("VIDEO", row.id, row.title, row);
     await prisma.video.delete({ where: { id } });
     const revalidated = await revalidatePublic();
     if (!revalidated) console.warn("[videos] DELETE: cache revalidation failed — site may show stale data");

@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/requireAdmin";
 import { NO_STORE_HEADERS } from "@/lib/cache-headers";
 import { enqueueCampaign, processNewsletterQueue } from "@/lib/newsletter";
 import { logAudit } from "@/lib/audit";
+import { moveToTrash } from "@/lib/trash";
 import { sanitizeHtml } from "@/lib/sanitize";
 
 export const runtime = "nodejs";
@@ -146,6 +147,9 @@ export async function DELETE(request: Request) {
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   try {
+    const row = await prisma.newsletterCampaign.findUnique({ where: { id } });
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    await moveToTrash("CAMPAIGN", row.id, row.subject, row);
     // Delete deliveries first (foreign key), then the campaign
     await prisma.newsletterDelivery.deleteMany({ where: { campaignId: id } });
     await prisma.newsletterCampaign.deleteMany({ where: { id } });

@@ -62,7 +62,7 @@ export function ReadingProgress() {
     >
       <div
         ref={barRef}
-        className="h-full origin-left bg-gradient-to-r from-brand via-brand-light to-accent will-change-[transform] shadow-[0_1px_4px_rgba(13,33,161,0.2)]"
+        className="reading-progress-bar h-full origin-left bg-brand will-change-[transform] shadow-[0_1px_4px_rgba(13,33,161,0.2)]"
         style={{ transform: `scaleX(${progress})` }}
       />
     </div>

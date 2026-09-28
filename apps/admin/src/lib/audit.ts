@@ -37,6 +37,7 @@ export async function logAudit(
   opts: {
     userId?: string | null;
     ip?: string | null;
+    device?: string | null;
     meta?: Record<string, unknown> | null;
   } = {}
 ) {
@@ -46,6 +47,7 @@ export async function logAudit(
         action,
         userId: opts.userId ?? null,
         ip: opts.ip ?? null,
+        device: opts.device ?? null,
         meta: (opts.meta ?? null) as never,
       },
     });

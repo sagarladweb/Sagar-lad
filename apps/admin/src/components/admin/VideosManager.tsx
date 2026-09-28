@@ -357,6 +357,8 @@ export function VideosManager() {
         <Modal
           open
           title={editingId ? `Edit ${tab} video` : `New ${tab} video`}
+          subtitle={editingId ? "Update the details below — changes go live after saving." : "Paste the link and details — the video appears on the site after saving."}
+          icon={tab === "youtube" ? <FaYoutube className="w-5 h-5 text-red-600" /> : <FaInstagram className="w-5 h-5 text-pink-600" />}
           onClose={cancelEdit}
           wide
           footer={

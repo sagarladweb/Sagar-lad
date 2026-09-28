@@ -3,6 +3,7 @@ import { cache } from "react";
 import { prisma, dbSafe } from "@/lib/db";
 import { SITE } from "@/lib/site";
 import { isInstagramUrl } from "@/lib/instagram";
+import { pruneExpiredData } from "@/lib/trash";
 
 // Blog posts are deliberately NOT wrapped in unstable_cache here: they carry
 // Date fields that unstable_cache would stringify, and the post pages already
@@ -140,7 +141,7 @@ export function getDashboardStats() {
         prisma.newsletterSubscriber.count(),
         prisma.post.findMany({
           orderBy: { updatedAt: "desc" },
-          take: 5,
+          take: 10,
           select: { title: true, slug: true, published: true, views: true, likes: true },
         }),
         prisma.post.aggregate({ _sum: { views: true, likes: true } }),
@@ -152,7 +153,10 @@ export function getDashboardStats() {
 // Extra dashboard widgets: newsletter health, content inventory and a recent
 // admin-activity feed. Kept separate from getDashboardStats so the KPI page
 // can stay fast — these are optional panels.
+// Fire-and-forget retention sweep: audit entries, trash and soft-deleted
+// posts older than 15 days are purged server-side while this loads.
 export function getDashboardExtras() {
+  void pruneExpiredData().catch(() => {});
   return dbSafe(
     () =>
       Promise.all([
@@ -174,7 +178,7 @@ export function getDashboardExtras() {
         prisma.auditLogEntry.findMany({
           orderBy: { createdAt: "desc" },
           take: 5,
-          select: { action: true, createdAt: true },
+          select: { action: true, createdAt: true, device: true },
         }),
       ]).then(
         ([
@@ -219,7 +223,7 @@ export function getActivityHistory(skip = 0, take = 50) {
           orderBy: { createdAt: "desc" },
           skip,
           take,
-          select: { action: true, createdAt: true, ip: true },
+          select: { action: true, createdAt: true, ip: true, device: true },
         }),
         prisma.auditLogEntry.count(),
       ]).then(([entries, total]) => ({ entries, total })),

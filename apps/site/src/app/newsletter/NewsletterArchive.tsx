@@ -86,7 +86,7 @@ export function NewsletterArchive() {
     <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10 sm:py-16">
       <header className="mb-8 sm:mb-12">
         <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">
-          All issues
+          All Newslatter
         </h2>
       </header>
 

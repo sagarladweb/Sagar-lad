@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, FileText, Video, Pencil } from "lucide-react";
+import { ArrowLeft, FileText, Video } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { TopicPostCard } from "@/components/admin/TopicPostCard";
+import { TopicVideoCard } from "@/components/admin/TopicVideoCard";
 
 export const dynamic = "force-dynamic";
 
@@ -55,7 +57,7 @@ export default async function TopicDetailPage({
           pages.
         </p>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-8">
           <section className="space-y-3">
             <h2 className="flex items-center gap-2 font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">
               <FileText className="h-4 w-4 text-accent" />
@@ -66,33 +68,14 @@ export default async function TopicDetailPage({
                 No posts in this topic yet.
               </p>
             ) : (
-              <ul className="space-y-2.5">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {category.posts.map((p) => (
-                  <li
+                  <TopicPostCard
                     key={p.id}
-                    className="group flex items-center gap-3 rounded-2xl border border-border bg-card card-grad p-4 transition-shadow hover:shadow-lg"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{p.title}</p>
-                      <span
-                        className={
-                          p.published
-                            ? "text-xs text-emerald-600"
-                            : "text-xs text-muted-foreground"
-                        }
-                      >
-                        {p.published ? "Published" : "Hidden (draft)"}
-                      </span>
-                    </div>
-                    <Link
-                      href={`/admin/posts/${p.slug}/edit`}
-                      className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-accent hover:text-accent transition-colors"
-                    >
-                      <Pencil className="h-3.5 w-3.5" /> Edit
-                    </Link>
-                  </li>
+                    post={{ ...p, categoryName: category.name }}
+                  />
                 ))}
-              </ul>
+              </div>
             )}
           </section>
 
@@ -106,33 +89,14 @@ export default async function TopicDetailPage({
                 No videos in this topic yet.
               </p>
             ) : (
-              <ul className="space-y-2.5">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {category.videos.map((v) => (
-                  <li
+                  <TopicVideoCard
                     key={v.id}
-                    className="group flex items-center gap-3 rounded-2xl border border-border bg-card card-grad p-4 transition-shadow hover:shadow-lg"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{v.title}</p>
-                      <span
-                        className={
-                          v.published
-                            ? "text-xs text-emerald-600"
-                            : "text-xs text-muted-foreground"
-                        }
-                      >
-                        {v.published ? "Published" : "Hidden"}
-                      </span>
-                    </div>
-                    <Link
-                      href={`/admin/content?tab=videos&edit=${v.id}`}
-                      className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-accent hover:text-accent transition-colors"
-                    >
-                      <Pencil className="h-3.5 w-3.5" /> Edit
-                    </Link>
-                  </li>
+                    post={{ ...v, categoryName: category.name }}
+                  />
                 ))}
-              </ul>
+              </div>
             )}
           </section>
         </div>
@@ -146,11 +110,21 @@ async function getCategory(slug: string) {
     where: { slug },
     include: {
       posts: {
-        select: { id: true, title: true, slug: true, published: true },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          excerpt: true,
+          content: true,
+          coverImage: true,
+          published: true,
+          publishedAt: true,
+          views: true,
+        },
         orderBy: { createdAt: "desc" },
       },
       videos: {
-        select: { id: true, title: true, published: true },
+        select: { id: true, title: true, slug: true, thumbnail: true, published: true, createdAt: true },
         orderBy: { createdAt: "desc" },
       },
     },

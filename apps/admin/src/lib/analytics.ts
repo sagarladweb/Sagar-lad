@@ -59,6 +59,88 @@ function num(value?: string | number | null): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+// Normalise raw GA session sources into real display names and merge
+// duplicates (instagram.com + ig.com + l.instagram.com → Instagram, etc.)
+// so the Top sources card never shows "(direct)" or double entries.
+function prettySource(raw: string): string {
+  const s = raw.trim().toLowerCase();
+  if (!s || s === "(direct)" || s === "(none)" || s === "direct") return "Direct";
+  if (s.includes("google")) return "Google Search";
+  if (s.includes("youtube")) return "YouTube";
+  if (s.includes("facebook") || /(^|\.)fb\.com$/.test(s) || s === "fb" || s.startsWith("lm.facebook"))
+    return "Facebook";
+  if (s.includes("instagram") || /(^|\.)ig\.com$/.test(s) || s === "ig") return "Instagram";
+  if (s.includes("linkedin") || s.includes("lnkd")) return "LinkedIn";
+  if (s.includes("twitter") || s === "x.com" || s.endsWith(".x.com") || s === "t.co")
+    return "X (Twitter)";
+  if (s.includes("threads")) return "Threads";
+  if (s.includes("bing")) return "Bing";
+  if (s.includes("yahoo")) return "Yahoo";
+  if (s.includes("duckduckgo")) return "DuckDuckGo";
+  if (s.includes("pinterest")) return "Pinterest";
+  if (s.includes("reddit")) return "Reddit";
+  if (s.includes("whatsapp") || s === "wa.me") return "WhatsApp";
+  if (s.includes("telegram") || s === "t.me") return "Telegram";
+  if (s.includes("newsletter") || s.includes("email") || s.includes("mail")) return "Newsletter";
+  if (s.includes("github")) return "GitHub";
+  if (s.includes("chatgpt") || s.includes("openai")) return "ChatGPT";
+  // Fallback: prettify the hostname (strip www. + TLD, Title Case).
+  const host = s.replace(/^www\./, "").split("/")[0];
+  const first = host.split(".")[0];
+  return first.charAt(0).toUpperCase() + first.slice(1);
+}
+
+// Pages that must never appear in Top pages: sandbox experiments and
+// demo/seed posts. Top pages stays a clean list of the site's real pages.
+// Extend this list any time a new scratch/demo page shows up in GA.
+const TOP_PAGE_EXCLUDE = [
+  /sandbox/i,
+  /\/demo/i,
+  /\/test/i,
+  /nice-guy-good-man/i,
+  /from-promise-to-reality/i,
+  /human-magnet/i,
+  /brainflix/i,
+  /what-if-nothing-is-good-or-bad/i,
+  /positive-attitude-your-passport/i,
+];
+
+function isExcludedPage(path: string): boolean {
+  return TOP_PAGE_EXCLUDE.some((re) => re.test(path));
+}
+
+// Premium display names for page paths: "/" → "Home", "/blog" → "Blog",
+// "/blog/my-post" → "Blog / My Post". Keeps the raw path for reference.
+export function prettyPagePath(path: string): string {
+  if (!path || path === "/") return "Home";
+  const titleCase = (s: string) =>
+    s
+      .split("-")
+      .filter(Boolean)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ")
+      .slice(0, 48);
+  const KNOWN: Record<string, string> = {
+    blog: "Blog",
+    contact: "Contact",
+    books: "Books",
+    videos: "Videos",
+    quotes: "Quotes",
+    newsletter: "Newsletter",
+    about: "About",
+    hire: "Hire Me",
+    speaking: "Speaking",
+    press: "Press",
+    mindup: "MindUp",
+    "mindup-score": "MindUp Score",
+    ebook: "E-book",
+  };
+  const parts = path.split("?")[0].split("#")[0].split("/").filter(Boolean);
+  return parts
+    .map((p, i) => (i === 0 && KNOWN[p.toLowerCase()] ? KNOWN[p.toLowerCase()] : titleCase(p)))
+    .join("  /  ");
+}
+
 function toIsoDate(ymd: string): string {
   return `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
 }
@@ -153,7 +235,7 @@ async function fetchGaAnalytics(days: number): Promise<GaResult> {
         dimensions: [{ name: "pagePath" }],
         metrics: [{ name: "screenPageViews" }, { name: "totalUsers" }],
         orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
-        limit: 10,
+        limit: 25,
       }),
       client.runReport({
         property: `properties/${config.propertyId}`,
@@ -161,7 +243,7 @@ async function fetchGaAnalytics(days: number): Promise<GaResult> {
         dimensions: [{ name: "sessionSource" }],
         metrics: [{ name: "sessions" }],
         orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
-        limit: 8,
+        limit: 25,
       }),
       client.runReport({
         property: `properties/${config.propertyId}`,
@@ -222,15 +304,23 @@ async function fetchGaAnalytics(days: number): Promise<GaResult> {
             : 0,
         },
         daily,
-        topPages: (pages?.rows ?? []).map((row) => ({
-          path: row.dimensionValues?.[0]?.value ?? "/",
-          pageviews: num(row.metricValues?.[0]?.value),
-          users: num(row.metricValues?.[1]?.value),
-        })),
-        topSources: (sources?.rows ?? []).map((row) => ({
-          source: row.dimensionValues?.[0]?.value ?? "(direct)",
-          sessions: num(row.metricValues?.[0]?.value),
-        })),
+        topPages: (pages?.rows ?? [])
+          .filter((row) => !isExcludedPage(row.dimensionValues?.[0]?.value ?? "/"))
+          .map((row) => ({
+            path: row.dimensionValues?.[0]?.value ?? "/",
+            pageviews: num(row.metricValues?.[0]?.value),
+            users: num(row.metricValues?.[1]?.value),
+          })),
+        topSources: (() => {
+          const merged = new Map<string, number>();
+          for (const row of sources?.rows ?? []) {
+            const name = prettySource(row.dimensionValues?.[0]?.value ?? "(direct)");
+            merged.set(name, (merged.get(name) ?? 0) + num(row.metricValues?.[0]?.value));
+          }
+          return Array.from(merged.entries())
+            .map(([source, sessions]) => ({ source, sessions }))
+            .sort((a, b) => b.sessions - a.sessions);
+        })(),
         topDevices: (devices?.rows ?? []).map((row) => ({
           device: row.dimensionValues?.[0]?.value ?? "(unknown)",
           users: num(row.metricValues?.[0]?.value),

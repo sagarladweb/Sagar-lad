@@ -107,7 +107,7 @@ function SagarLogo({ light = false }: { light?: boolean }) {
         alt=""
         width={272}
         height={179}
-        className={`h-11 w-auto transition-opacity duration-500 ${
+        className={`reading-logo-white h-11 w-auto transition-opacity duration-500 ${
           light ? "opacity-100" : "opacity-0"
         }`}
         priority
@@ -117,7 +117,7 @@ function SagarLogo({ light = false }: { light?: boolean }) {
         alt="Sagar Lad"
         width={272}
         height={179}
-        className={`absolute top-0 left-0 h-11 w-auto transition-opacity duration-500 ${
+        className={`reading-logo-color absolute top-0 left-0 h-11 w-auto transition-opacity duration-500 ${
           light ? "opacity-0" : "opacity-100"
         }`}
         priority
@@ -623,15 +623,22 @@ export function Navbar() {
                 <Link
                   href="/"
                   onClick={() => setOpen(false)}
-                  className="flex items-center shrink-0"
+                  className="relative flex items-center shrink-0"
                   aria-label="Sagar Lad home"
                 >
+                  <Image
+                    src="/logos/site-logo-white.png"
+                    alt=""
+                    width={272}
+                    height={179}
+                    className="reading-logo-white h-11 w-auto opacity-0"
+                  />
                   <Image
                     src="/logos/site-logo.png"
                     alt="Sagar Lad"
                     width={272}
                     height={179}
-                    className="h-11 w-auto"
+                    className="reading-logo-color absolute top-0 left-0 h-11 w-auto"
                   />
                 </Link>
                 <button

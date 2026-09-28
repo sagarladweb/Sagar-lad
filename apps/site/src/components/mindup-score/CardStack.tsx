@@ -50,9 +50,9 @@ export function CardStack() {
   const [showText, setShowText] = useState(false);
 
   const mob = isMob();
-  const cardW = mob ? 80 : 112;
-  const cardH = mob ? 112 : 156;
-  const lineGap = mob ? 62 : 84;
+  const cardW = mob ? 76 : 112;
+  const cardH = mob ? 108 : 156;
+  const lineGap = mob ? 52 : 84;
 
   const scatterPos = useMemo(() => makeScatterPositions(6, mob, loopKey), [loopKey, mob]);
   const linePos = useMemo(

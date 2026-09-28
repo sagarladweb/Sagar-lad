@@ -98,3 +98,4 @@ graphify-out/
 # OS
 Thumbs.db
 newslatter/
+.playwright-mcp

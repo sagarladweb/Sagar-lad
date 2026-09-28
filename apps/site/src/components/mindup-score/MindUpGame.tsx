@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { playTick, playWin, playSiren, playSelect, playXp, unlockAudio } from "./sounds";
 import { CardStack } from "./CardStack";
 
@@ -14,13 +14,16 @@ import {
   ChevronRight,
   Clock,
   Download,
+  HeartHandshake,
   HeartPulse,
   KeyRound,
+  ListChecks,
   Loader2,
   RefreshCw,
   Rocket,
   Target,
   Timer,
+  TimerOff,
   Trophy,
   TrendingUp,
   UsersRound,
@@ -29,7 +32,7 @@ import {
 } from "lucide-react";
 
 type PillarId = "M" | "I" | "N" | "D" | "U" | "P";
-type Screen = "welcome" | "question" | "results";
+type Screen = "welcome" | "rules" | "question" | "results";
 
 type Pillar = {
   id: PillarId;
@@ -348,8 +351,12 @@ const motivation: { title: string; sub: string }[] = [
 /* ---------- helpers ---------- */
 
 function useCountUp(target: number, duration = 1400, delay = 200) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(duration <= 0 ? target : 0);
   useEffect(() => {
+    if (duration <= 0) {
+      setValue(target);
+      return;
+    }
     let raf = 0;
     const start = performance.now() + delay;
     const tick = (now: number) => {
@@ -453,7 +460,8 @@ function Logo() {
   );
 }
 
-function Welcome({ onStart }: { onStart: () => void }) {
+function Welcome({ onStart, cooldownMs }: { onStart: () => void; cooldownMs: number }) {
+  const locked = cooldownMs > 0;
   return (
     <div className="min-h-screen bg-[#fffdf2]">
       <main>
@@ -490,10 +498,25 @@ function Welcome({ onStart }: { onStart: () => void }) {
                 Discover where you stand, find your growth zone, and leave with one clear next move.
               </p>
               <div className="hidden lg:block mt-7">
-                <button onClick={onStart} className="btn-premium primary-button group inline-flex items-center gap-2.5">
-                  Start My MIND UP Journey
-                  <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+                <button
+                  onClick={onStart}
+                  disabled={locked}
+                  className="btn-premium primary-button group inline-flex items-center gap-2.5 disabled:opacity-60"
+                >
+                  {locked ? (
+                    <>Next attempt in {formatCooldown(cooldownMs)}</>
+                  ) : (
+                    <>
+                      Start My MIND UP Journey
+                      <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+                    </>
+                  )}
                 </button>
+                {locked && (
+                  <p className="mt-3 max-w-[420px] text-sm leading-6 text-[#60708b]">
+                    One assessment per 24 hours keeps your score honest. Come back soon.
+                  </p>
+                )}
               </div>
             </motion.div>
           </div>
@@ -545,11 +568,99 @@ function Welcome({ onStart }: { onStart: () => void }) {
 
       {/* Sticky CTA bar for mobile and tablet */}
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#f0e8bd] bg-white/95 px-4 py-3 backdrop-blur-md lg:hidden">
-        <button onClick={onStart} className="btn-premium primary-button group w-full flex items-center justify-center gap-2.5">
-          Start My MIND UP Journey
-          <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+        <button
+          onClick={onStart}
+          disabled={locked}
+          className="btn-premium primary-button group w-full flex items-center justify-center gap-2.5 disabled:opacity-60"
+        >
+          {locked ? (
+            <>Next attempt in {formatCooldown(cooldownMs)}</>
+          ) : (
+            <>
+              Start My MIND UP Journey
+              <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+            </>
+          )}
         </button>
       </div>
+    </div>
+  );
+}
+
+/* ---------- RULES ---------- */
+const RULES: { icon: typeof Timer; title: string; sub: string }[] = [
+  { icon: ListChecks, title: "12 questions", sub: "Two statements for each of the 6 MIND UP dimensions." },
+  { icon: Timer, title: "12 seconds each", sub: "The clock starts the moment you tap “Let's MIND UP” — not before." },
+  { icon: HeartHandshake, title: "Answer honestly", sub: "Go with how you have actually been living, not how you wish you were." },
+  { icon: Zap, title: "Reflect 5+ seconds, earn XP", sub: "Thoughtful answers earn up to 15 XP. Rushed taps under 5 seconds earn 0." },
+  { icon: TimerOff, title: "Time-out counts as missed", sub: "If the clock hits zero, that question is recorded as “Never”." },
+];
+
+function Rules({ onBegin, onBack }: { onBegin: () => void; onBack: () => void }) {
+  const reduceMotion = useReducedMotion();
+  return (
+    <div className="min-h-screen bg-[#fffdf2]">
+      <main className="mx-auto flex min-h-[calc(100vh-84px)] w-full max-w-[720px] flex-col justify-center px-5 py-6 sm:px-8 sm:py-10">
+        {/* Back — icon only, top side */}
+        <div className="mb-6 sm:mb-8">
+          <button
+            onClick={onBack}
+            aria-label="Back to welcome"
+            className="grid h-11 w-11 place-items-center rounded-full border border-[#f0e8bd] bg-white/70 text-[#0d21a1] transition-all duration-150 hover:border-[#0d21a1] active:scale-95"
+          >
+            <ArrowLeft size={18} />
+          </button>
+        </div>
+        <motion.div
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#b89300] sm:text-xs">
+            Before you begin
+          </p>
+          <h1 className="mt-3 text-balance text-[clamp(1.9rem,6vw,3rem)] font-bold leading-[1.05] tracking-[-0.04em] text-[#0d21a1]">
+            A few ground rules
+          </h1>
+          <p className="mt-3 max-w-[560px] text-[15px] leading-7 text-[#53617b] sm:text-base">
+            Two minutes, twelve honest answers, one clear picture of where you stand.
+          </p>
+
+          <ul className="mt-8 divide-y divide-[#f0e8bd] border-y border-[#f0e8bd]">
+            {RULES.map((rule, i) => (
+              <motion.li
+                key={rule.title}
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 18 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={reduceMotion ? { duration: 0 } : { delay: 0.08 + i * 0.07, duration: 0.45 }}
+                className="flex items-center gap-4 py-4"
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#0d21a1] text-[#ffd51d]">
+                  <rule.icon size={20} />
+                </span>
+                <span>
+                  <strong className="block text-[15px] font-bold text-[#17243f] sm:text-base">
+                    {rule.title}
+                  </strong>
+                  <span className="mt-0.5 block text-sm leading-6 text-[#60708b]">
+                    {rule.sub}
+                  </span>
+                </span>
+              </motion.li>
+            ))}
+          </ul>
+
+          <div className="mt-8">
+            <button
+              onClick={onBegin}
+              className="btn-premium primary-button group inline-flex w-full items-center justify-center gap-2.5"
+            >
+              Let&apos;s MIND UP
+              <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
+          </div>
+        </motion.div>
+      </main>
     </div>
   );
 }
@@ -595,7 +706,7 @@ function JourneyProgress({ questionIndex, secondsLeft, answers, timedOut }: { qu
       </div>
       <div className="mb-2 h-[5px] overflow-hidden rounded-full bg-[#f0e8bd]">
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-[#ffd51d] to-[#ffe45c]"
+          className="h-full rounded-full bg-gradient-to-r from-[#16a34a] to-[#4ade80]"
           initial={false}
           animate={{ width: `${overallPct}%` }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -655,6 +766,28 @@ function FlyInAnimation({
   const pillar = pillars[pillarIndex];
   const msg = motivation[pillarIndex];
   const isLast = pillarIndex === 5;
+  const reduceMotion = useReducedMotion();
+
+  // Reduced motion: static confirmation instead of flying/celebration layers.
+  if (reduceMotion) {
+    return (
+      <motion.div
+        className="flyin-layer"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        aria-hidden="true"
+      >
+        <div className="flyin-caption">
+          <span className="flyin-xp">
+            <Zap size={12} strokeWidth={3} /> {isMissed ? "Skipped (+0 XP)" : earnedXp > 0 ? `+${earnedXp} XP` : "+0 XP"}
+          </span>
+          <strong>{isLast ? "Journey complete!" : msg.title}</strong>
+          <em>{isLast ? `Total +${totalXp} XP` : isMissed ? "Time ran out" : pillar.badge}</em>
+        </div>
+      </motion.div>
+    );
+  }
 
   // Full-screen celebration for the last pillar (P)
   if (isLast) {
@@ -883,6 +1016,7 @@ function QuestionScreen({
   const current = questionList[questionIndex];
   const selected = answers[questionIndex];
   const isLocked = flyIn !== null;
+  const reduceMotion = useReducedMotion();
 
   const showBigTimer = secondsLeft <= 3 && flyIn === null;
 
@@ -918,10 +1052,10 @@ function QuestionScreen({
         <AnimatePresence mode="wait">
           <motion.div
             key={questionIndex}
-            initial={{ opacity: 0, x: 28 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 28 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
+            transition={{ duration: reduceMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-1 flex-col justify-center py-8 sm:py-12"
           >
             <div className="mb-5 flex flex-wrap items-center gap-3 sm:mb-7">
@@ -970,20 +1104,20 @@ function QuestionScreen({
           </p>
         </div>
 
-        {/* Big timer overlay — last 3 seconds */}
+        {/* Urgency timer — compact top chip, never covers the question */}
         <AnimatePresence>
           {showBigTimer && (
             <motion.div
               key="big-timer"
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.6 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center"
+              initial={reduceMotion ? { opacity: 0, x: "-50%" } : { opacity: 0, scale: 0.7, y: -8, x: "-50%" }}
+              animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
+              exit={{ opacity: 0, scale: 0.7, x: "-50%" }}
+              transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 22 }}
+              className="pointer-events-none fixed left-1/2 top-20 z-40"
             >
-              <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-[#0d21a1]/90 text-white shadow-[0_0_60px_rgba(13,33,161,0.5)] backdrop-blur-sm sm:h-40 sm:w-40">
-                <span className="text-5xl font-black tabular-nums sm:text-6xl">{secondsLeft}</span>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ffd51d] sm:text-xs">seconds</span>
+              <div className="flex h-[76px] w-[76px] flex-col items-center justify-center gap-0.5 rounded-full bg-[#0d21a1]/95 text-white shadow-[0_8px_30px_rgba(13,33,161,0.45)] backdrop-blur-sm">
+                <span className="text-[30px] font-black leading-none tabular-nums">{secondsLeft}</span>
+                <span className="text-[9px] font-black uppercase leading-none tracking-[0.18em] text-[#ffd51d]">sec</span>
               </div>
             </motion.div>
           )}
@@ -1022,10 +1156,13 @@ function QuestionScreen({
 /* ---------- RESULTS ---------- */
 function PremiumConfetti({ count = 96 }: { count?: number }) {
   const [visible, setVisible] = useState(true);
+  const reduceMotion = useReducedMotion();
   useEffect(() => {
     const t = window.setTimeout(() => setVisible(false), 5000);
     return () => window.clearTimeout(t);
   }, []);
+
+  if (reduceMotion) return null;
 
   const { pieces, sparkles } = useMemo(() => {
     const palette = ["#0d21a1", "#ffd51d", "#0d21a1", "#d9ae00", "#ffe88a", "#ffffff", "#d9ae00", "#f2e396"];
@@ -1223,7 +1360,8 @@ function ScoreRing({ score }: { score: number }) {
   const radius = 86;
   const circumference = 2 * Math.PI * radius;
   const dash = (score / 100) * circumference;
-  const display = useCountUp(score, 1500, 500);
+  const reduceMotion = useReducedMotion();
+  const display = useCountUp(score, reduceMotion ? 0 : 1500, reduceMotion ? 0 : 500);
   return (
     <div className="relative h-[200px] w-[200px] shrink-0 sm:h-[228px] sm:w-[228px]">
       <div className="absolute inset-[-14px] rounded-full bg-[radial-gradient(circle,rgba(13,33,161,0.12),transparent_65%)]" aria-hidden="true" />
@@ -1246,7 +1384,7 @@ function ScoreRing({ score }: { score: number }) {
           strokeDasharray={`${circumference} ${circumference}`}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: circumference - dash }}
-          transition={{ duration: 1.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: reduceMotion ? 0 : 1.6, delay: reduceMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -1824,6 +1962,7 @@ function NameModal({
 function ResultsScreen({
   scores,
   overall,
+  xp,
   previous,
   explorerName,
   setExplorerName,
@@ -1833,6 +1972,7 @@ function ResultsScreen({
 }: {
   scores: Record<PillarId, number>;
   overall: number;
+  xp: number;
   previous: StoredResult | null;
   explorerName: string;
   setExplorerName: (n: string) => void;
@@ -2131,11 +2271,13 @@ function ResultsScreen({
                         <Icon size={19} />
                       </span>
                       <div className="min-w-0">
-                        <div>
-                          <span className="mr-1.5 font-black text-[#0d21a1]">{pillar.id}</span>
-                          <span className="text-[14px] font-bold text-[#17243f] sm:text-[15px]">{pillar.shortTitle}</span>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span>
+                            <span className="mr-1.5 font-black text-[#0d21a1]">{pillar.id}</span>
+                            <span className="text-[14px] font-bold text-[#17243f] sm:text-[15px]">{pillar.shortTitle}</span>
+                          </span>
+                          {isGrowth && <span className="growth-tag">Growth zone</span>}
                         </div>
-                        {isGrowth && <span className="growth-tag mt-1 inline-block">Growth zone</span>}
                       </div>
                     </div>
                     <div className="h-2.5 overflow-hidden rounded-full bg-[#f0e8bd] sm:h-3">
@@ -2206,7 +2348,7 @@ function ResultsScreen({
               <p className="eyebrow">03 · MIND UP Explorer</p>
               <h2 className="section-title section-title-spaced mt-3 sm:mx-0 mx-auto">Congratulations, Explorer.</h2>
               <p className="mt-3 max-w-2xl text-[15px] leading-7 text-[#60708b] sm:text-base sm:mx-0 mx-auto">
-                You completed all 6 dimensions and earned <strong className="text-[#0d21a1]">+60 XP</strong>.
+                You completed all 6 dimensions and earned <strong className="text-[#0d21a1]">+{xp} XP</strong>.
                 {nameLocked ? " Your name is saved and locked." : " Add your name to the certificate, then download or share."}
               </p>
             </motion.div>
@@ -2379,7 +2521,8 @@ function ResultsScreen({
 }
 
 function PillarNumber({ value }: { value: number }) {
-  const display = useCountUp(value, 900, 100);
+  const reduceMotion = useReducedMotion();
+  const display = useCountUp(value, reduceMotion ? 0 : 900, reduceMotion ? 0 : 100);
   return (
     <strong className="text-left text-[22px] tracking-[-0.04em] text-[#0d21a1] sm:text-right sm:text-2xl">
       {display}
@@ -2412,6 +2555,32 @@ function clearGameState() {
     if (typeof window === "undefined") return;
     localStorage.removeItem(GAME_KEY);
   } catch {}
+}
+
+// One attempt per 24 hours (client-side, per browser). The timestamp is
+// stamped on completion; Welcome counts down until the next attempt.
+const QUIZ_COOLDOWN_KEY = "mind-up-last-completed";
+const QUIZ_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+
+function getCooldownRemaining(): number {
+  try {
+    if (typeof window === "undefined") return 0;
+    const raw = localStorage.getItem(QUIZ_COOLDOWN_KEY);
+    if (!raw) return 0;
+    const left = new Date(raw).getTime() + QUIZ_COOLDOWN_MS - Date.now();
+    return left > 0 ? left : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function formatCooldown(ms: number): string {
+  const mins = Math.ceil(ms / 60000);
+  if (mins < 1) return "less than a minute";
+  if (mins < 60) return `${mins}m`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
 export default function MindUpGame() {
@@ -2448,8 +2617,16 @@ export default function MindUpGame() {
     }
   });
   const [timedOut, setTimedOut] = useState<Record<number, boolean>>(saved?.timedOut ?? {});
+  const [cooldownLeft, setCooldownLeft] = useState(0);
   const advanceTimer = useRef<number | null>(null);
   const flyInTimer = useRef<number | null>(null);
+
+  // 24h cooldown countdown for the welcome screen.
+  useEffect(() => {
+    setCooldownLeft(getCooldownRemaining());
+    const t = window.setInterval(() => setCooldownLeft(getCooldownRemaining()), 30000);
+    return () => window.clearInterval(t);
+  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
@@ -2554,6 +2731,21 @@ export default function MindUpGame() {
   };
 
   const start = () => {
+    clearTimers();
+    setFlyIn(null);
+    setScreen("rules");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // The 12-second clock starts here — only after the rules are dismissed.
+  const beginQuiz = () => {
+    const remaining = getCooldownRemaining();
+    setCooldownLeft(remaining);
+    if (remaining > 0) {
+      setScreen("welcome");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     unlockAudio();
     clearTimers();
     setFlyIn(null);
@@ -2604,6 +2796,10 @@ export default function MindUpGame() {
       setPrevious(null);
     }
     window.localStorage.setItem("mind-up-latest-result", JSON.stringify(result));
+    try {
+      window.localStorage.setItem(QUIZ_COOLDOWN_KEY, new Date().toISOString());
+    } catch {}
+    setCooldownLeft(QUIZ_COOLDOWN_MS);
     clearGameState();
     setScreen("results");
     window.scrollTo(0, 0);
@@ -2658,6 +2854,12 @@ export default function MindUpGame() {
 
   const handleBack = () => {
     if (flyIn !== null) return;
+    if (
+      !window.confirm(
+        "Quit the assessment? Your answers so far will be lost."
+      )
+    )
+      return;
     clearTimers();
     home();
   };
@@ -2695,7 +2897,9 @@ export default function MindUpGame() {
     );
   }
 
-  if (screen === "welcome") return <Welcome onStart={start} />;
+  if (screen === "welcome") return <Welcome onStart={start} cooldownMs={cooldownLeft} />;
+  if (screen === "rules")
+    return <Rules onBegin={beginQuiz} onBack={() => setScreen("welcome")} />;
   if (screen === "question") {
     return (
       <QuestionScreen
@@ -2716,11 +2920,12 @@ export default function MindUpGame() {
     <ResultsScreen
       scores={scores}
       overall={overall}
+      xp={xp}
       previous={previous}
       explorerName={explorerName}
       setExplorerName={lockName}
       nameLocked={nameLocked}
-      onRetake={start}
+      onRetake={beginQuiz}
       onHome={home}
     />
   );

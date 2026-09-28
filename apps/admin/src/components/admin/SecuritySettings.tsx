@@ -10,10 +10,11 @@ import {
   Check,
 } from "lucide-react";
 import { showToast } from "@/components/admin/Toast";
+import { PasswordCard, EmailCard } from "@/components/admin/CredentialForms";
 
 type SetupState = { secret: string; qr: string } | null;
 
-export function SecuritySettings() {
+export function SecuritySettings({ currentEmail }: { currentEmail?: string | null }) {
   const [enabled, setEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -112,8 +113,7 @@ export function SecuritySettings() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      {recoveryCodes ? (
-        <div className={card}>
+      {recoveryCodes ? (        <div className={card}>
           <h2 className="flex items-center gap-2 font-semibold">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             2FA is now enabled
@@ -254,6 +254,8 @@ export function SecuritySettings() {
           )}
         </div>
       )}
+      <PasswordCard />
+      <EmailCard currentEmail={currentEmail} />
     </div>
   );
 }

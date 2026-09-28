@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/db";
 import { processNewsletterQueue } from "@/lib/newsletter";
-
+import { pruneExpiredData } from "@/lib/trash";
 export const runtime = "nodejs";
 
 function constantTimeCompare(a: string, b: string): boolean {
@@ -53,11 +53,16 @@ export async function GET(request: Request) {
     // 3. Drain newsletter queue (respects 300/day limit, chunking & schedules)
     newsletterResult = await processNewsletterQueue();
 
+    // 4. Retention sweep: audit entries, trash rows and soft-deleted posts
+    // older than 15 days are purged permanently.
+    const pruned = await pruneExpiredData();
+
     return NextResponse.json({
       status: "active",
       timestamp: now.toISOString(),
       publishedPosts,
       newsletter: newsletterResult,
+      pruned,
     });
   } catch (err) {
     console.error("[cron] keepalive failed:", err);

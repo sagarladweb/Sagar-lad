@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { moveToTrash } from "@/lib/trash";
 import { buildTemplateBody, type NewsletterContent } from "@/lib/newsletterTemplates";
 import { compileNewsletterToHtml, type DbData } from "@/components/newsletter-composer/lib/compiler";
 
@@ -93,6 +94,8 @@ export async function DELETE(request: Request) {
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   try {
+    const row = await prisma.newsletterCampaign.findFirst({ where: { id, draft: true } });
+    if (row) await moveToTrash("CAMPAIGN", row.id, `(Draft) ${row.subject}`, row);
     await prisma.newsletterCampaign.deleteMany({ where: { id, draft: true } });
     return NextResponse.json({ ok: true });
   } catch (err) {

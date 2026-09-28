@@ -43,6 +43,18 @@ const greatVibes = localFont({
   display: "swap",
 });
 
+// Lora (Google Font, self-hosted) — long-form reading face for blog
+// articles. Variable 400–700, latin subset; other scripts fall back to
+// the Georgia/serif stack below.
+const lora = localFont({
+  variable: "--font-lora",
+  src: [
+    { path: "./fonts/lora-400-700.woff2", weight: "400 700", style: "normal" },
+    { path: "./fonts/lora-italic-400-700.woff2", weight: "400 700", style: "italic" },
+  ],
+  display: "swap",
+});
+
 export const viewport: Viewport = {
   themeColor: brandColors.blue.hex,
   colorScheme: "dark light",
@@ -148,7 +160,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${beVietnamPro.variable} ${rethinkSans.variable} ${greatVibes.variable} h-full antialiased`}
+      className={`${beVietnamPro.variable} ${rethinkSans.variable} ${greatVibes.variable} ${lora.variable} h-full antialiased`}
     >
       <head>
         <script

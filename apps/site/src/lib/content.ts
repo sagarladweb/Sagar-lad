@@ -277,7 +277,7 @@ export const getRelatedPosts = unstable_cache(
     let related = await dbSafe(
       () => prisma.post.findMany({
         where,
-        select: { title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true },
+        select: { id: true, title: true, slug: true, excerpt: true, content: true, coverImage: true, publishedAt: true, views: true, likes: true, category: { select: { name: true, slug: true } } },
         orderBy: { publishedAt: "desc" },
         take: 3,
       }),
@@ -288,7 +288,7 @@ export const getRelatedPosts = unstable_cache(
       related = await dbSafe(
         () => prisma.post.findMany({
           where: { ...VISIBLE_POST_WHERE, NOT: { id: postId } },
-          select: { title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true },
+          select: { id: true, title: true, slug: true, excerpt: true, content: true, coverImage: true, publishedAt: true, views: true, likes: true, category: { select: { name: true, slug: true } } },
           orderBy: { publishedAt: "desc" },
           take: 3,
         }),

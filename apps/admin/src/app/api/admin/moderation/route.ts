@@ -5,6 +5,9 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
 import { NO_STORE_HEADERS } from "@/lib/cache-headers";
+import { moveToTrash } from "@/lib/trash";
+import { mobileBrandFromUA } from "@/lib/visitor";
+import { locateIps } from "@/lib/geo";
 export const runtime = "nodejs";
 
 export async function GET() {
@@ -26,7 +29,15 @@ export async function GET() {
       prisma.contactRequest.findMany({ orderBy: { createdAt: "desc" }, take: 500 }),
     ]);
 
-    return NextResponse.json({ subscribers, comments, enquiries }, { headers: NO_STORE_HEADERS });
+    // Minimal visitor context: mobile brand from UA + location when resolvable.
+    const locByIp = await locateIps(comments.map((c) => c.ip));
+    const enriched = comments.map((c) => ({
+      ...c,
+      brand: mobileBrandFromUA(c.userAgent),
+      location: locByIp.get(c.ip ?? "") ?? null,
+    }));
+
+    return NextResponse.json({ subscribers, comments: enriched, enquiries }, { headers: NO_STORE_HEADERS });
   } catch (err) {
     console.error("[moderation] GET failed:", (err as Error).message);
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
@@ -55,11 +66,23 @@ export async function PATCH(request: Request) {
   }
 
   try {
+    // Snapshot every row into the Archive box first so deletes are restorable.
     if (parsed.data.kind === "subscriber") {
+      const rows = await prisma.newsletterSubscriber.findMany({ where: { id: { in: ids } } });
+      for (const r of rows) await moveToTrash("SUBSCRIBER", r.id, r.email, r);
       await prisma.newsletterSubscriber.deleteMany({ where: { id: { in: ids } } });
     } else if (parsed.data.kind === "comment") {
+      const rows = await prisma.comment.findMany({
+        where: { id: { in: ids } },
+        include: { post: { select: { title: true } } },
+      });
+      for (const r of rows)
+        await moveToTrash("COMMENT", r.id, `${r.name} on “${r.post.title}”`, r);
       await prisma.comment.deleteMany({ where: { id: { in: ids } } });
     } else if (parsed.data.kind === "enquiry") {
+      const rows = await prisma.contactRequest.findMany({ where: { id: { in: ids } } });
+      for (const r of rows)
+        await moveToTrash("ENQUIRY", r.id, `${r.firstName} ${r.lastName ?? ""} · ${r.email}`.trim(), r);
       await prisma.contactRequest.deleteMany({ where: { id: { in: ids } } });
     }
 

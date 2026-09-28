@@ -5,14 +5,21 @@ export const dynamic = "force-dynamic";
 
 export default async function PostsPage() {
   let posts: Awaited<ReturnType<typeof getPosts>> = [];
+  let categories: string[] = [];
 
   try {
-    posts = await getPosts();
+    [posts, categories] = await Promise.all([
+      getPosts(),
+      prisma.category
+        .findMany({ orderBy: { name: "asc" }, select: { name: true } })
+        .then((rows) => rows.map((r) => r.name))
+        .catch(() => [] as string[]),
+    ]);
   } catch (err) {
     console.warn("[admin posts] DB query failed:", (err as Error).message);
   }
 
-  return <PostsClientTable initialPosts={posts} />;
+  return <PostsClientTable initialPosts={posts} categories={categories} />;
 }
 
 async function getPosts() {

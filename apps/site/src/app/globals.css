@@ -1632,3 +1632,107 @@ nav a:not([class*="rounded-full"]) {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* ---------- Blog reading experience (Lora + reading themes) ----------
+   Research-backed choice: Lora is a screen-optimized literary serif —
+   large x-height, moderate contrast, full weight range — repeatedly ranked
+   among the most readable Google Fonts for long-form blogs. Body 400/500,
+   emphasis 600/700, clear serif heading steps for visual hierarchy. */
+.article-reading {
+  --reading-size: 1.15rem;
+}
+
+/* Warm dark reading palette, applied on <body> so the full viewport —
+   article, header and footer — goes dark, not just the text column. */
+body[data-reading-theme="dark"] {
+  --background: #161511;
+  --foreground: #ece4d0;
+  --card: #1f1d16;
+  --card-foreground: #ece4d0;
+  --muted: #262319;
+  --muted-foreground: #a89d80;
+  --border: #35311f;
+  --input: #35311f;
+  background: var(--background);
+}
+body[data-reading-theme="dark"] .tip-content mark {
+  background: #6b5d1e;
+  color: #fff8e1;
+}
+body[data-reading-theme="dark"] .tip-content img {
+  opacity: 0.94;
+}
+/* Progress bar follows the theme: brand blue in light, yellow in dark. */
+body[data-reading-theme="dark"] .reading-progress-bar {
+  background: var(--accent);
+}
+/* White site logo while the dark reading theme is active. */
+body[data-reading-theme="dark"] .reading-logo-white {
+  opacity: 1 !important;
+}
+body[data-reading-theme="dark"] .reading-logo-color {
+  opacity: 0 !important;
+}
+
+.article-reading .tip-content {
+  font-family: var(--font-lora), Georgia, 'Times New Roman', serif;
+  font-size: var(--reading-size);
+  line-height: 1.85;
+  font-weight: 450;
+  letter-spacing: 0.002em;
+  color: var(--foreground);
+}
+/* Normalize whatever font the admin editor wrote with — the reading page
+   always renders in Lora so weight/size stay perfectly consistent. */
+.article-reading .tip-content [style*="font-family"],
+.article-reading .tip-content font {
+  font-family: inherit !important;
+}
+.article-reading .tip-content p {
+  margin: 1.35rem 0;
+}
+.article-reading .tip-content strong,
+.article-reading .tip-content b {
+  font-weight: 700;
+}
+.article-reading .tip-content h1,
+.article-reading .tip-content h2,
+.article-reading .tip-content h3,
+.article-reading .tip-content h4 {
+  font-family: var(--font-lora), Georgia, serif;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+.article-reading .tip-content h1 {
+  font-size: 2.05rem;
+  font-weight: 700;
+  line-height: 1.22;
+  margin: 3rem 0 1.25rem;
+}
+.article-reading .tip-content h2 {
+  font-size: 1.62rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 2.75rem 0 1rem;
+}
+.article-reading .tip-content h3 {
+  font-size: 1.32rem;
+  font-weight: 700;
+  line-height: 1.38;
+  margin: 2.25rem 0 0.75rem;
+}
+.article-reading .tip-content h4 {
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 1.9rem 0 0.6rem;
+}
+@media (max-width: 640px) {
+  .article-reading .tip-content h1 { font-size: 1.62rem; }
+  .article-reading .tip-content h2 { font-size: 1.38rem; }
+  .article-reading .tip-content h3 { font-size: 1.2rem; }
+  .article-reading .tip-content h4 { font-size: 1.05rem; }
+}
+.article-reading .tip-content li {
+  margin: 0.55rem 0;
+}

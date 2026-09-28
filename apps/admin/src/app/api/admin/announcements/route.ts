@@ -4,7 +4,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublic } from "@/lib/revalidate";
 import { NO_STORE_HEADERS } from "@/lib/cache-headers";
-
+import { moveToTrash } from "@/lib/trash";
 export const runtime = "nodejs";
 
 const fullSchema = z.object({
@@ -105,6 +105,9 @@ export async function DELETE(request: Request) {
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
 
+    const row = await prisma.announcement.findUnique({ where: { id } });
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    await moveToTrash("ANNOUNCEMENT", row.id, row.title, row);
     await prisma.announcement.delete({ where: { id } });
     try { await revalidatePublic(); } catch {}
     return NextResponse.json({ ok: true });

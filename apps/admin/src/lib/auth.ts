@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { isDbDown, markDbDown } from "@sagarlad/db";
 import { verifyTotp, matchRecoveryCode, consumeRecoveryCode } from "@/lib/totp";
 import { logAudit } from "@/lib/audit";
+import { deviceFromUA } from "@/lib/device";
 import {
   loginThrottleStatus,
   rateLimitByIp,
@@ -33,6 +34,10 @@ function getIp(authRequest: { headers?: Headers } | undefined) {
   const xff = authRequest?.headers?.get("x-forwarded-for");
   const ip = xff ? xff.split(",")[0].trim() : "unknown";
   return ip.length > 64 ? ip.slice(0, 64) : ip;
+}
+
+function getDevice(authRequest: { headers?: Headers } | undefined) {
+  return deviceFromUA(authRequest?.headers?.get("user-agent"));
 }
 
 // Cache the bcrypt hash of the env admin password so we don't recompute
@@ -77,17 +82,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       authorize: async (credentials, authRequest) => {
         const parsed = credentialsSchema.safeParse(credentials);
         if (!parsed.success) {
-          await logAudit("LOGIN_FAIL", { ip: getIp(authRequest) });
+          await logAudit("LOGIN_FAIL", { ip: getIp(authRequest), device: getDevice(authRequest) });
           return null;
         }
         const { email, password, otp } = parsed.data;
         const ip = getIp(authRequest);
+        const device = getDevice(authRequest);
 
         // Per-IP flood guard: scripts spray many emails — lock the source IP
         // down too, not just the account.
         const ipStatus = rateLimitByIp(ip, 10, 60_000);
         if (!ipStatus.ok) {
-          await logAudit("LOGIN_THROTTLED", { ip, meta: { email } });
+          await logAudit("LOGIN_THROTTLED", { ip, device, meta: { email } });
           throw new AccountLockedError();
         }
 
@@ -95,7 +101,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // trail is DB-backed, so it works across serverless instances).
         const status = await loginThrottleStatus(email, ip);
         if (status.locked) {
-          await logAudit("LOGIN_LOCKED", { ip, meta: { email } });
+          await logAudit("LOGIN_LOCKED", { ip, device, meta: { email } });
           throw new AccountLockedError();
         }
 
@@ -189,13 +195,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         if (!user || !user.passwordHash || !valid) {
-          await logAudit("LOGIN_FAIL", { ip, meta: { email } });
+          await logAudit("LOGIN_FAIL", { ip, device, meta: { email } });
           return null;
         }
 
         // Strictly restrict admin panel access to ADMIN role only
         if (user.role !== "ADMIN") {
-          await logAudit("LOGIN_FAIL", { ip, meta: { email, reason: "NOT_ADMIN" } });
+          await logAudit("LOGIN_FAIL", { ip, device, meta: { email, reason: "NOT_ADMIN" } });
           return null;
         }
 
@@ -215,7 +221,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
           } else {
             if (otp) {
-              await logAudit("LOGIN_FAIL", { userId: user.id, ip, meta: { email, reason: "2FA" } });
+              await logAudit("LOGIN_FAIL", { userId: user.id, ip, device, meta: { email, reason: "2FA" } });
             }
             throw new TwoFactorRequired();
           }
@@ -230,7 +236,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               data: { lastLoginAt: new Date(), lastLoginIp: ip },
             })
             .catch(() => {});
-          logAudit("LOGIN_OK", { userId: user.id, ip });
+          logAudit("LOGIN_OK", { userId: user.id, ip, device });
         }
 
         return {

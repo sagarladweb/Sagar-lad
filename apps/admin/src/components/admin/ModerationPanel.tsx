@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Trash2, Download, Search, MessageCircle, Send, X } from "lucide-react";
+import { Trash2, Download, Search, MessageCircle, Send, X, MapPin, Smartphone, CheckSquare, Square } from "lucide-react";
 import { Dropdown } from "@/components/ui/Dropdown";
-import { Button, IconButton } from "@/components/ui/Button";
-import { Badge, CountBadge } from "@/components/ui/Badge";
+import { IconButton } from "@/components/ui/Button";import { Badge, CountBadge } from "@/components/ui/Badge";
 import { SITE } from "@/lib/site";
 import { showToast } from "@/components/admin/Toast";
+import { showConfirm } from "@/components/admin/ConfirmDialog";
 
 const BADGE_KEY = "admin-moderation-last-viewed";
 
@@ -17,6 +17,8 @@ type Comment = {
   email: string | null;
   ip: string | null;
   userAgent: string | null;
+  brand: string | null;
+  location: string | null;
   content: string;
   approved: boolean;
   clientToken: string | null;
@@ -88,9 +90,13 @@ function EmptyState({ text }: { text: string }) {
 
 function EnquiryList({
   enquiries,
+  selected,
+  onToggle,
   onDelete,
 }: {
   enquiries: Enquiry[];
+  selected: Set<string>;
+  onToggle: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
   if (enquiries.length === 0) {
@@ -101,31 +107,40 @@ function EnquiryList({
     <ul className="divide-y divide-border border-y border-border">
       {enquiries.map((e) => (
         <li key={e.id} className="py-4 flex items-start justify-between gap-4">
-          <div className="min-w-0 space-y-1.5">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-sm">
-                {`${e.firstName} ${e.lastName ?? ""}`.trim()}
-              </span>
-              <Badge variant="muted">{e.type}</Badge>
-              <time className="text-xs text-muted-foreground" dateTime={e.createdAt}>
-                {new Date(e.createdAt).toLocaleString()}
-              </time>
-            </div>
-            <p className="text-sm">
-              <a href={`mailto:${e.email}`} className="text-accent hover:underline">
-                {e.email}
-              </a>
-              {e.phone && <span className="text-muted-foreground"> · {e.phone}</span>}
-            </p>
-            <p className="text-sm text-muted-foreground">{e.organization}</p>
-            {e.eventDate && (
-              <p className="text-sm text-muted-foreground">
-                Event date: {new Date(e.eventDate).toLocaleDateString()}
+          <div className="flex items-start gap-3 min-w-0">
+            <input
+              type="checkbox"
+              checked={selected.has(e.id)}
+              onChange={() => onToggle(e.id)}
+              aria-label={`Select enquiry from ${e.firstName} ${e.lastName ?? ""}`}
+              className="accent-[var(--accent)] mt-1 shrink-0"
+            />
+            <div className="min-w-0 space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-semibold text-sm">
+                  {`${e.firstName} ${e.lastName ?? ""}`.trim()}
+                </span>
+                <Badge variant="muted">{e.type}</Badge>
+                <time className="text-xs text-muted-foreground" dateTime={e.createdAt}>
+                  {new Date(e.createdAt).toLocaleString()}
+                </time>
+              </div>
+              <p className="text-sm">
+                <a href={`mailto:${e.email}`} className="text-accent hover:underline">
+                  {e.email}
+                </a>
+                {e.phone && <span className="text-muted-foreground"> · {e.phone}</span>}
               </p>
-            )}
-            {e.message && (
-              <p className="text-sm text-muted-foreground leading-relaxed">{e.message}</p>
-            )}
+              <p className="text-sm text-muted-foreground">{e.organization}</p>
+              {e.eventDate && (
+                <p className="text-sm text-muted-foreground">
+                  Event date: {new Date(e.eventDate).toLocaleDateString()}
+                </p>
+              )}
+              {e.message && (
+                <p className="text-sm text-muted-foreground leading-relaxed">{e.message}</p>
+              )}
+            </div>
           </div>
           <IconButton variant="danger" onClick={() => onDelete(e.id)} title="Delete inquiry">
             <Trash2 className="w-4 h-4" />
@@ -265,18 +280,24 @@ function CommentList({
               </div>
               {/* Actions — stack vertically on mobile */}
               <div className="flex items-center gap-1.5 shrink-0">
-                <IconButton
-                  variant="ghost"
+                <button
+                  type="button"
                   onClick={() => {
                     setReplyTo(replyTo === c.id ? null : c.id);
                     setReplyContent("");
                   }}
-                  title="Reply as Sagar Lad"
-                  className={replyTo === c.id ? "text-accent bg-accent/10" : "text-muted-foreground hover:text-accent"}
+                  aria-expanded={replyTo === c.id}
+                  aria-label={replyTo === c.id ? "Close reply form" : `Reply to ${c.name}`}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 active:scale-95 ${
+                    replyTo === c.id
+                      ? "bg-accent text-accent-foreground shadow-sm"
+                      : "border border-border text-muted-foreground hover:border-accent hover:bg-accent/5 hover:text-foreground"
+                  }`}
                 >
-                  <MessageCircle className="w-4 h-4" />
-                </IconButton>
-                <IconButton variant="danger" onClick={() => onDelete(c.id)} title="Delete comment">
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  Reply
+                </button>
+                <IconButton variant="danger" onClick={() => onDelete(c.id)} title="Delete comment" aria-label={`Delete comment by ${c.name}`}>
                   <Trash2 className="w-4 h-4" />
                 </IconButton>
               </div>
@@ -285,52 +306,94 @@ function CommentList({
             {/* Comment body */}
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{c.content}</p>
 
-            {/* Meta row */}
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
-              {c.ip && (
-                <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-muted-foreground">
-                  IP: {c.ip}
-                </span>
-              )}
-              {c.userAgent && (
-                <span className="rounded bg-muted px-1.5 py-0.5 text-muted-foreground truncate max-w-[200px] sm:max-w-[280px]" title={c.userAgent}>
-                  UA: {c.userAgent}
-                </span>
-              )}
-              {c.email && (
-                <a href={`mailto:${c.email}`} className="text-muted-foreground hover:text-accent sm:hidden">
-                  {c.email}
-                </a>
-              )}
-            </div>
+            {/* Meta row — brand + location only, kept minimal */}
+            {(c.brand || c.location) && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
+                {c.brand && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 font-medium">
+                    <Smartphone className="h-3 w-3" aria-hidden="true" />
+                    {c.brand}
+                  </span>
+                )}
+                {c.location && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 font-medium">
+                    <MapPin className="h-3 w-3" aria-hidden="true" />
+                    {c.location}
+                  </span>
+                )}
+              </div>
+            )}
+            {c.email && (
+              <a href={`mailto:${c.email}`} className="mt-2 inline-block text-[11px] text-muted-foreground hover:text-accent sm:hidden">
+                {c.email}
+              </a>
+            )}
 
-            {/* Reply form — inline */}
+            {/* Reply form — inline premium card */}
             {replyTo === c.id && (
-              <div className="mt-4 rounded-xl border border-accent/30 bg-accent/5 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-accent">Replying as Sagar Lad</span>
-                  <button type="button" onClick={() => setReplyTo(null)} className="text-muted-foreground hover:text-foreground">
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <textarea
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  placeholder="Write your reply…"
-                  rows={3}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent resize-y"
-                  autoFocus
-                />
-                <div className="flex items-center gap-2">
+              <div className="mt-4 max-w-2xl rounded-2xl border border-accent/25 bg-gradient-to-b from-accent/[0.07] to-transparent p-4 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.18)] sm:p-5">
+                <div className="flex items-center gap-2.5">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
+                    SL
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[13px] font-semibold">
+                      Replying as Sagar Lad
+                      <span className="ml-1.5 rounded-full bg-accent/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
+                        You
+                      </span>
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      to {c.name} on “{c.post.title}”
+                    </p>
+                  </div>
                   <button
                     type="button"
-                    disabled={replyLoading || !replyContent.trim()}
-                    onClick={() => submitReply(c)}
-                    className="inline-flex items-center gap-2 rounded-full bg-accent text-black px-4 py-1.5 text-xs font-semibold transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
+                    onClick={() => setReplyTo(null)}
+                    aria-label="Close reply form"
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
-                    {replyLoading ? "Posting…" : <><Send className="w-3 h-3" /> Reply</>}
+                    <X className="h-4 w-4" />
                   </button>
-                  <span className="text-[11px] text-muted-foreground">{replyContent.length}/1000</span>
+                </div>
+                <label htmlFor={`reply-${c.id}`} className="sr-only">
+                  Your reply
+                </label>
+                <textarea
+                  id={`reply-${c.id}`}
+                  value={replyContent}
+                  onChange={(e) => setReplyContent(e.target.value.slice(0, 1000))}
+                  placeholder={`Write a kind reply to ${c.name}…`}
+                  rows={3}
+                  className="mt-3 min-h-24 w-full resize-y rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm leading-relaxed outline-none transition-all placeholder:text-muted-foreground/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                  autoFocus
+                />
+                <div className="mt-3 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="text-[11px] text-muted-foreground tabular-nums">
+                    {replyContent.length}/1000
+                  </span>
+                  <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
+                    <button
+                      type="button"
+                      onClick={() => setReplyTo(null)}
+                      className="rounded-full px-4 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      disabled={replyLoading || !replyContent.trim()}
+                      onClick={() => submitReply(c)}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2 text-xs font-bold text-accent-foreground shadow-sm transition-all hover:brightness-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+                    >
+                      {replyLoading ? (
+                        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      ) : (
+                        <Send className="h-3.5 w-3.5" />
+                      )}
+                      {replyLoading ? "Posting…" : "Post reply"}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -413,6 +476,17 @@ export function ModerationPanel() {
 
   async function act(kind: "subscriber" | "comment" | "enquiry", ids: string[]) {
     if (!ids.length) return;
+    const what =
+      kind === "subscriber"
+        ? `${ids.length} subscriber${ids.length === 1 ? "" : "s"}`
+        : kind === "comment"
+          ? `${ids.length} comment${ids.length === 1 ? "" : "s"}`
+          : `${ids.length} ${ids.length === 1 ? "enquiry" : "enquiries"}`;
+    const ok = await showConfirm({
+      title: `Delete ${what}?`,
+      message: `Are you sure you want to delete ${what}? It will move to the Archive box where you can restore it within 15 days.`,
+    });
+    if (!ok) return;
     const res = await fetch("/api/admin/moderation", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -452,6 +526,22 @@ export function ModerationPanel() {
     download("subscribers.csv", [
       ["Email", "Subscribed at"],
       ...data.subscribers.map((s) => [s.email, new Date(s.createdAt).toLocaleString()]),
+    ]);
+  }
+
+  function exportEnquiriesCsv(filename: string, rows: Enquiry[]) {
+    download(filename, [
+      ["Name", "Email", "Phone", "Organization", "Type", "Event date", "Message", "Received at"],
+      ...rows.map((e) => [
+        `${e.firstName} ${e.lastName ?? ""}`.trim(),
+        e.email,
+        e.phone ?? "",
+        e.organization,
+        e.type,
+        e.eventDate ?? "",
+        e.message ?? "",
+        new Date(e.createdAt).toLocaleString(),
+      ]),
     ]);
   }
 
@@ -497,6 +587,32 @@ export function ModerationPanel() {
     Speaking: speakingEnquiries.length,
   };
 
+  // ── Unified tab-bar toolbar: select-all + bulk actions + export live in
+  // the tabs row itself so the icons are identical on every tab. ──
+  const activeKind: "comment" | "subscriber" | "enquiry" =
+    tab === "Comments" ? "comment" : tab === "Subscribers" ? "subscriber" : "enquiry";
+  const activeIds: string[] =
+    tab === "Comments"
+      ? (data?.comments.map((c) => c.id) ?? [])
+      : tab === "Subscribers"
+        ? filteredSubscribers.map((s) => s.id)
+        : tab === "Contact"
+          ? contactEnquiries.map((e) => e.id)
+          : speakingEnquiries.map((e) => e.id);
+  const activeSelected = activeIds.filter((id) => selected.has(id));
+  const allSelected = activeIds.length > 0 && activeSelected.length === activeIds.length;
+
+  function exportActive() {
+    if (tab === "Comments") exportCommentsCsv();
+    else if (tab === "Subscribers") exportSubscribersCsv();
+    else if (tab === "Contact") exportEnquiriesCsv("contact-enquiries.csv", contactEnquiries);
+    else exportEnquiriesCsv("speaking-enquiries.csv", speakingEnquiries);
+  }
+
+  function bulkDeleteSelected() {
+    void act(activeKind, activeSelected);
+  }
+
   return (
     <div className="space-y-6">
       <header>
@@ -506,72 +622,82 @@ export function ModerationPanel() {
         </p>
       </header>
 
-      <div className="flex gap-2 border-b border-border">
-        {TABS.map((t) => {
-          const hasNew =
-            (t === "Comments" && newCounts.comments > 0) ||
-            (t === "Subscribers" && newCounts.subscribers > 0) ||
-            ((t === "Contact" || t === "Speaking") && newCounts.enquiries > 0);
-          return (
-            <button
-              key={t}
-              type="button"
-              onClick={() => switchTab(t)}
-              className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
-                tab === t
-                  ? "border-accent text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <span className="inline-flex items-center gap-1.5">
-                {t}
-                {hasNew && (
-                  <span className="inline-block w-2 h-2 rounded-full bg-red-500 shrink-0" />
-                )}
-                <CountBadge count={counts[t]} active={tab === t} />
+      <div className="flex items-end justify-between gap-2 border-b border-border">
+        <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto">
+          {TABS.map((t) => {
+            const hasNew =
+              (t === "Comments" && newCounts.comments > 0) ||
+              (t === "Subscribers" && newCounts.subscribers > 0) ||
+              ((t === "Contact" || t === "Speaking") && newCounts.enquiries > 0);
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => switchTab(t)}
+                className={`-mb-px shrink-0 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                  tab === t
+                    ? "border-accent text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  {t}
+                  {hasNew && (
+                    <span className="inline-block w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                  )}
+                  <CountBadge count={counts[t]} active={tab === t} />
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        {data && (
+          <div className="flex shrink-0 items-center gap-1.5 pb-1.5">
+            {activeSelected.length > 0 && (
+              <span className="mr-0.5 rounded-full bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent tabular-nums">
+                {activeSelected.length}
               </span>
-            </button>
-          );
-        })}
+            )}
+            <IconButton
+              variant="secondary"
+              onClick={() => toggleAll(activeIds)}
+              disabled={activeIds.length === 0}
+              title={allSelected ? "Deselect all" : "Select all"}
+              aria-label={allSelected ? `Deselect all ${tab.toLowerCase()}` : `Select all ${tab.toLowerCase()}`}
+              aria-pressed={allSelected}
+            >
+              {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+            </IconButton>
+            {activeSelected.length > 0 && (
+              <div className="w-40">
+                <Dropdown
+                  id="bulk-actions"
+                  label="Bulk actions"
+                  value=""
+                  onChange={(v) => {
+                    if (v === "delete") bulkDeleteSelected();
+                  }}
+                  placeholder="Actions…"
+                  options={[{ value: "delete", label: "Delete selected" }]}
+                />
+              </div>
+            )}
+            <IconButton
+              variant="secondary"
+              onClick={exportActive}
+              title={`Export ${tab.toLowerCase()} CSV`}
+              aria-label={`Export ${tab.toLowerCase()} CSV`}
+            >
+              <Download className="h-4 w-4" />
+            </IconButton>
+          </div>
+        )}
       </div>
 
       {!data ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : tab === "Comments" ? (
         <div>
-          {data.comments.length > 0 && (
-            <div className="mb-4 flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={data.comments.length > 0 && data.comments.every((c) => selected.has(c.id))}
-                  onChange={() => toggleAll(data.comments.map((c) => c.id))}
-                  className="accent-[var(--accent)]"
-                />
-                Select all
-              </label>
-              {selected.size > 0 && (
-                <>
-                  <span className="text-xs text-muted-foreground">{selected.size} selected</span>
-                  <div className="w-52">
-                    <Dropdown
-                      id="comment-actions"
-                      label="Bulk actions"
-                      value=""
-                      onChange={(v) => {
-                        if (v === "delete") act("comment", [...selected]);
-                      }}
-                      placeholder="With selected…"
-                      options={[{ value: "delete", label: "Delete selected" }]}
-                    />
-                  </div>
-                </>
-              )}
-              <Button variant="secondary" size="sm" onClick={exportCommentsCsv} className="ml-auto">
-                <Download className="w-4 h-4" /> Export CSV
-              </Button>
-            </div>
-          )}
           {data.comments.length === 0 ? (
             <EmptyState text="No comments yet. Comments on blog posts will appear here automatically." />
           ) : (
@@ -594,12 +720,10 @@ export function ModerationPanel() {
                 value={subscriberFilter}
                 onChange={(e) => setSubscriberFilter(e.target.value)}
                 placeholder="Filter by email…"
+                aria-label="Filter subscribers by email"
                 className="w-full rounded-xl border border-border bg-background pl-9 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
-            <Button variant="secondary" size="sm" onClick={exportSubscribersCsv} disabled={data.subscribers.length === 0}>
-              <Download className="w-4 h-4" /> Export CSV
-            </Button>
           </div>
           {filteredSubscribers.length === 0 ? (
             <EmptyState text={subscriberFilter ? "No subscribers match your filter." : "No subscribers yet."} />
@@ -607,11 +731,20 @@ export function ModerationPanel() {
             <ul className="divide-y divide-border border-y border-border">
               {filteredSubscribers.map((s) => (
                 <li key={s.id} className="py-3 flex items-center justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="text-sm truncate">{s.email}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(s.createdAt).toLocaleString()}</p>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(s.id)}
+                      onChange={() => toggle(s.id)}
+                      aria-label={`Select subscriber ${s.email}`}
+                      className="accent-[var(--accent)] shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-sm truncate">{s.email}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(s.createdAt).toLocaleString()}</p>
+                    </div>
                   </div>
-                  <IconButton variant="danger" onClick={() => act("subscriber", [s.id])} title="Remove subscriber">
+                  <IconButton variant="danger" onClick={() => act("subscriber", [s.id])} title="Remove subscriber" aria-label={`Remove subscriber ${s.email}`}>
                     <Trash2 className="w-4 h-4" />
                   </IconButton>
                 </li>
@@ -621,61 +754,21 @@ export function ModerationPanel() {
         </div>
       ) : tab === "Contact" ? (
         <div>
-          <div className="mb-4 flex justify-end">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                if (!data) return;
-                download("contact-enquiries.csv", [
-                  ["Name", "Email", "Phone", "Organization", "Type", "Event date", "Message", "Received at"],
-                  ...contactEnquiries.map((e) => [
-                    `${e.firstName} ${e.lastName ?? ""}`.trim(),
-                    e.email,
-                    e.phone ?? "",
-                    e.organization,
-                    e.type,
-                    e.eventDate ?? "",
-                    e.message ?? "",
-                    new Date(e.createdAt).toLocaleString(),
-                  ]),
-                ]);
-              }}
-              disabled={contactEnquiries.length === 0}
-            >
-              <Download className="w-4 h-4" /> Export CSV
-            </Button>
-          </div>
-          <EnquiryList enquiries={contactEnquiries} onDelete={(id) => act("enquiry", [id])} />
+          <EnquiryList
+            enquiries={contactEnquiries}
+            selected={selected}
+            onToggle={toggle}
+            onDelete={(id) => act("enquiry", [id])}
+          />
         </div>
       ) : (
         <div>
-          <div className="mb-4 flex justify-end">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                if (!data) return;
-                download("speaking-enquiries.csv", [
-                  ["Name", "Email", "Phone", "Organization", "Type", "Event date", "Message", "Received at"],
-                  ...speakingEnquiries.map((e) => [
-                    `${e.firstName} ${e.lastName ?? ""}`.trim(),
-                    e.email,
-                    e.phone ?? "",
-                    e.organization,
-                    e.type,
-                    e.eventDate ?? "",
-                    e.message ?? "",
-                    new Date(e.createdAt).toLocaleString(),
-                  ]),
-                ]);
-              }}
-              disabled={speakingEnquiries.length === 0}
-            >
-              <Download className="w-4 h-4" /> Export CSV
-            </Button>
-          </div>
-          <EnquiryList enquiries={speakingEnquiries} onDelete={(id) => act("enquiry", [id])} />
+          <EnquiryList
+            enquiries={speakingEnquiries}
+            selected={selected}
+            onToggle={toggle}
+            onDelete={(id) => act("enquiry", [id])}
+          />
         </div>
       )}
     </div>

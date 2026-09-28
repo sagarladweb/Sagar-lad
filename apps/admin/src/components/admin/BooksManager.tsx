@@ -9,6 +9,7 @@ import {
   Pencil,
   Link2,
   FileUp,
+  BookOpen,
 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { showConfirm } from "@/components/admin/ConfirmDialog";
@@ -316,6 +317,8 @@ export function BooksManager({ initialFilter = "ALL" }: { initialFilter?: BookTy
         <Modal
           open
           title={editingId ? "Edit book" : "New book"}
+          subtitle={editingId ? "Update the details below — changes go live after saving." : "Fill in the details — the book appears on the site after saving."}
+          icon={<BookOpen className="w-5 h-5" />}
           onClose={cancelEdit}
           wide
           footer={
