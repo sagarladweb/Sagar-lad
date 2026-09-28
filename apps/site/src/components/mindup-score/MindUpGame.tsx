@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { playTick, playWin, playSiren } from "./sounds";
+import { playTick, playWin, playSiren, playSelect, playXp, unlockAudio } from "./sounds";
 import { CardStack } from "./CardStack";
 
 import {
@@ -2554,6 +2554,7 @@ export default function MindUpGame() {
   };
 
   const start = () => {
+    unlockAudio();
     clearTimers();
     setFlyIn(null);
     setSecondsLeft(QUESTION_SECONDS);
@@ -2614,10 +2615,14 @@ export default function MindUpGame() {
     if (nextIndex % 2 === 0) window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const submitAnswer = (value: number) => {
+  const submitAnswer = (value: number, silent = false) => {
     if (flyIn !== null) return;
     if (value < 1 || value > 5) return;
     if (answers[questionIndex] !== undefined) return;
+    if (!silent) {
+      unlockAudio();
+      playSelect();
+    }
 
     // Calculate time taken: QUESTION_SECONDS - secondsLeft + 1 (since we count down from 12 to 0)
     const timeTaken = QUESTION_SECONDS - secondsLeft + 1;
@@ -2633,6 +2638,7 @@ export default function MindUpGame() {
       const isLastPillar = questionIndex === 11;
       setFlyIn(pillarIdx);
       if (isLastPillar) playWin();
+      else window.setTimeout(() => playXp(), 350);
       flyInTimer.current = window.setTimeout(() => {
         setFlyIn(null);
         if (isLastPillar) {
@@ -2677,7 +2683,7 @@ export default function MindUpGame() {
     if (answers[questionIndex] !== undefined) return;
     playSiren();
     setTimedOut((prev) => ({ ...prev, [questionIndex]: true }));
-    submitAnswer(1);
+    submitAnswer(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen, flyIn, secondsLeft, questionIndex, answers]);
 
