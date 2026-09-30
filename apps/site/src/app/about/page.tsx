@@ -279,8 +279,15 @@ export default function AboutPage() {
     };
   }, []);
 
-  // When activeSection changes, auto-scroll active pill into view on mobile
+  // When activeSection changes, auto-scroll active pill into view on mobile.
+  // Skipped on mount: scrolling the page on load would hijack restores,
+  // deep links and first-visit top positioning.
+  const firstActiveSection = useRef(true);
   useEffect(() => {
+    if (firstActiveSection.current) {
+      firstActiveSection.current = false;
+      return;
+    }
     if (!navContainerRef.current) return;
     const activeEl = navContainerRef.current.querySelector<HTMLElement>(
       `[data-nav-pill="${activeSection}"]`
@@ -406,7 +413,7 @@ export default function AboutPage() {
             
             <p data-reveal className="mb-8 text-base sm:text-lg text-white font-medium leading-relaxed max-w-xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
               Data &amp; AI Architect by profession, TEDx Speaker, and
-              published author of 6+ books. Founder of the MIND UP Framework —
+              published author of 6+ books. Founder of the MIND UP Theory —
               a system for thinking clearly and acting intentionally.
             </p>
 

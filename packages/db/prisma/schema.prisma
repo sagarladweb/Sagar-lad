@@ -332,13 +332,21 @@ model SocialLink {
 }
 
 // Short sayings shown on /quotes and offered as newsletter suggestions.
+// slug/highlight/author/published power the premium quote cards; older rows
+// keep working with nulls (highlight defaults to yellow in code).
 model Quote {
-  id        String   @id @default(cuid())
-  text      String
-  tag       String
-  createdAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  text           String
+  tag            String
+  slug           String?  @unique
+  highlightText  String?
+  highlightColor String   @default("yellow")
+  author         String?
+  published      Boolean  @default(true)
+  createdAt      DateTime @default(now())
 
   @@index([createdAt])
+  @@index([published, createdAt])
 }
 
 model RateLimitEntry {

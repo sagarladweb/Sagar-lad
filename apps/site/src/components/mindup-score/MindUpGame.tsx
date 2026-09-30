@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { playTick, playWin, playSiren, playSelect, playXp, unlockAudio } from "./sounds";
 import { CardStack } from "./CardStack";
+import { RewardBooks } from "@/components/mindup/RewardBooks";
 
 import {
   ArrowLeft,
@@ -383,7 +384,7 @@ function getShareText(
   overall: number,
   status: string,
   scores: Record<PillarId, number>,
-  growth: Pillar,
+  growthZones: Pillar[],
   name?: string
 ) {
   const who = name ? `${name} scored` : "I scored";
@@ -392,7 +393,7 @@ function getShareText(
     "",
     ...pillars.map((p) => `${p.shortTitle}: ${roundedPillar(scores[p.id])}`),
     "",
-    `My growth zone: ${growth.title}`,
+    `My growth ${growthZones.length === 1 ? "zone" : "zones"}: ${growthZones.map((g) => g.title).join(", ")}`,
     "What's your MIND UP score? Take the 2-minute assessment:",
     QR_URL,
   ].join("\n");
@@ -1071,7 +1072,7 @@ function QuestionScreen({
                 {current.pillar.id} · {current.pillar.title}
               </span>
             </div>
-            <h1 className="max-w-[920px] text-balance text-[clamp(1.65rem,6vw,3.9rem)] font-bold leading-[1.12] tracking-[-0.045em] text-[#0d21a1]">
+            <h1 className="max-w-[920px] text-balance text-[clamp(1.65rem,6vw,3.9rem)] lg:text-[clamp(1.6rem,3.5vw,3rem)] font-bold leading-[1.12] tracking-[-0.045em] text-[#0d21a1]">
               <span className="mr-2 text-[#c2b280] sm:mr-3">{questionIndex + 1}.</span>
               {current.question}
             </h1>
@@ -1959,6 +1960,170 @@ function NameModal({
   );
 }
 
+/* Minimal gate before the certificate file is generated: email capture +
+   newsletter opt-in + one-line terms acceptance. The full terms live on
+   /terms — this modal only links them. */
+function ConsentModal({
+  open,
+  name,
+  onClose,
+  onDone,
+}: {
+  open: boolean;
+  name: string;
+  onClose: () => void;
+  onDone: () => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [newsletter, setNewsletter] = useState(true);
+  const [accepted, setAccepted] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setEmail("");
+      setAccepted(false);
+      setError(null);
+      setBusy(false);
+    }
+  }, [open ]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const valid = emailValid && accepted && !busy;
+
+  const submit = async () => {
+    if (!valid) return;
+    setBusy(true);
+    setError(null);
+    try {
+      if (newsletter) {
+        const res = await fetch("/api/newsletter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim(), name: name.trim() || undefined, acceptedTerms: true }),
+        });
+        if (!res.ok && res.status !== 409) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error ?? "Could not save email.");
+        }
+      }
+      onDone();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="modal-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.div
+            className="modal-card"
+            initial={{ scale: 0.9, y: 24, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.94, y: 12, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 260, damping: 22 }}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Before you download your certificate"
+          >
+            <button className="modal-close" onClick={onClose} aria-label="Close">
+              <X size={18} />
+            </button>
+            <h3 className="text-center text-2xl font-black tracking-[-0.04em] text-[#0d21a1]">
+              Almost yours
+            </h3>
+            <p className="mt-2 text-center text-sm leading-6 text-[#60708b]">
+              Where should we send your certificate updates? Your score
+              snapshot is personal and makes no professional claims — see{" "}
+              <a href="/terms" target="_blank" rel="noopener" className="font-semibold text-[#0d21a1] underline">
+                Terms
+              </a>
+              .
+            </p>
+            <label className="mt-5 block text-left text-xs font-black uppercase tracking-[0.16em] text-[#52617d]">
+              Email
+              <input
+                autoFocus
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void submit();
+                }}
+                placeholder="you@example.com"
+                maxLength={120}
+                className="modal-input"
+              />
+            </label>
+            <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-left">
+              <input
+                type="checkbox"
+                checked={newsletter}
+                onChange={(e) => setNewsletter(e.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 accent-[#0d21a1]"
+              />
+              <span className="text-sm leading-6 text-[#53617b]">
+                Email me occasional MIND UP insights.
+              </span>
+            </label>
+            <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-left">
+              <input
+                type="checkbox"
+                checked={accepted}
+                onChange={(e) => setAccepted(e.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 accent-[#0d21a1]"
+              />
+              <span className="text-sm leading-6 text-[#53617b]">
+                I accept the{" "}
+                <a href="/terms" target="_blank" rel="noopener" className="font-semibold text-[#0d21a1] underline">
+                  Terms &amp; Conditions
+                </a>{" "}
+                and{" "}
+                <a href="/privacy" target="_blank" rel="noopener" className="font-semibold text-[#0d21a1] underline">
+                  Privacy Policy
+                </a>
+                .
+              </span>
+            </label>
+            {error && (
+              <p className="mt-3 text-center text-sm font-semibold text-red-600" role="alert">
+                {error}
+              </p>
+            )}
+            <button
+              disabled={!valid}
+              onClick={() => void submit()}
+              className="primary-button mt-5 w-full disabled:opacity-50"
+            >
+              {busy ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}{" "}
+              Download certificate
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 function ResultsScreen({
   scores,
   overall,
@@ -1981,10 +2146,11 @@ function ResultsScreen({
   onHome: () => void;
 }) {
   const status = statusBands.find((band) => overall >= band.min)!;
-  const growth = pillars.reduce((lowest, item) => (scores[item.id] < scores[lowest.id] ? item : lowest));
-  const GrowthIcon = growth.icon;
+  const minScore = Math.min(...pillars.map((p) => scores[p.id]));
+  const growthZones = pillars.filter((p) => scores[p.id] === minScore);
   const [notice, setNotice] = useState("");
   const [nameOpen, setNameOpen] = useState(false);
+  const [consentOpen, setConsentOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<"download" | "instagram">("download");
   const [sharing, setSharing] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -2067,7 +2233,7 @@ function ResultsScreen({
     }, 1250);
   };
 
-  const shareText = getShareText(overall, status.label, scores, growth, explorerName || undefined);
+  const shareText = getShareText(overall, status.label, scores, growthZones, explorerName || undefined);
   const pageUrl = QR_URL;
 
   const doDownload = async (name: string) => {
@@ -2095,7 +2261,7 @@ function ResultsScreen({
       const file = blob
         ? new File([blob], `mind-up-${overall}.png`, { type: "image/png" })
         : null;
-      const caption = getShareText(overall, status.label, scores, growth, name || undefined);
+      const caption = getShareText(overall, status.label, scores, growthZones, name || undefined);
 
       // Automated path: native share with the certificate image attached (no manual download)
       if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -2124,7 +2290,7 @@ function ResultsScreen({
 
   const handleDownloadClick = () => {
     if (nameLocked || explorerName.trim().length >= 2) {
-      void doDownload(explorerName.trim());
+      setConsentOpen(true);
     } else {
       setPendingAction("download");
       setNameOpen(true);
@@ -2144,7 +2310,12 @@ function ResultsScreen({
     setExplorerName(name);
     setNameOpen(false);
     if (pendingAction === "instagram") void doInstagramShare(name);
-    else void doDownload(name);
+    else setConsentOpen(true);
+  };
+
+  const handleConsentDone = () => {
+    setConsentOpen(false);
+    void doDownload(explorerName.trim());
   };
 
   const handleLinkedIn = async () => {
@@ -2183,7 +2354,7 @@ function ResultsScreen({
   return (
     <div className="min-h-screen bg-white">
       <main>
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#ffd51d] via-[#ffe45c] to-[#ffd51d] px-4 pb-14 pt-12 sm:px-8 sm:pb-16 sm:pt-16 lg:px-12 lg:pb-20 lg:pt-20">
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#ffd51d]/85 via-[#ffe45c]/85 to-[#ffd51d]/85 px-4 pb-14 pt-12 sm:px-8 sm:pb-16 sm:pt-16 lg:px-12 lg:pb-20 lg:pt-20">
           <div className="absolute right-[-14rem] top-[-14rem] h-[36rem] w-[36rem] rounded-full border-[80px] border-[#0d21a1]/10" aria-hidden="true" />
           <div className="absolute left-[-12rem] bottom-[-16rem] h-[30rem] w-[30rem] rounded-full border-[64px] border-white/40" aria-hidden="true" />
           <div className="absolute left-[20%] top-[10%] h-[18rem] w-[18rem] rounded-full bg-[#0d21a1]/5 blur-3xl" aria-hidden="true" />
@@ -2256,7 +2427,7 @@ function ResultsScreen({
               {pillars.map((pillar, index) => {
                 const Icon = pillar.icon;
                 const val = roundedPillar(scores[pillar.id]);
-                const isGrowth = pillar.id === growth.id;
+                const isGrowth = growthZones.some((g) => g.id === pillar.id);
                 return (
                   <motion.div
                     key={pillar.id}
@@ -2299,42 +2470,55 @@ function ResultsScreen({
           <section className="result-section">
             <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} className="sm:text-left text-center">
               <p className="eyebrow">02 · Your next move</p>
-              <h2 className="section-title section-title-spaced mt-3 sm:mx-0 mx-auto">3 moves for your growth zone.</h2>
-              <div className="mt-6 flex max-w-md items-center gap-3 bg-[#fffbe6] p-4 sm:mx-0 mx-auto">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#ffd51d] text-[#1a35c4]">
-                  <GrowthIcon size={21} />
-                </span>
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#b89300]">Growth zone · {roundedPillar(scores[growth.id])}/100</p>
-                  <p className="text-[15px] font-black text-[#1a35c4]">{growth.title}</p>
-                </div>
-              </div>
+              <h2 className="section-title section-title-spaced mt-3 sm:mx-0 mx-auto">
+                {growthZones.length === 1
+                  ? "3 moves for your growth zone."
+                  : `Moves for your ${growthZones.length} growth zones.`}
+              </h2>
               <p className="mt-4 max-w-lg text-[15px] leading-7 text-[#60708b] sm:mx-0 mx-auto">
-                Based on your lowest score. Do these three — nothing else — for the next 7 days.
+                {growthZones.length === 1
+                  ? "Based on your lowest score. Do these three — nothing else — for the next 7 days."
+                  : "A tie for your lowest score. Pick one zone to start with — three moves, seven days."}
               </p>
             </motion.div>
-            <div className="mt-8 max-w-2xl">
-              <ol className="divide-y divide-[#f0e8bd] border-y border-[#f0e8bd]">
-                {growth.actions.slice(0, 3).map((action, index) => (
-                  <motion.li
-                    key={action}
-                    initial={{ opacity: 0, y: 14 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{ delay: index * 0.1 }}
-                    className="grid grid-cols-[46px_1fr] items-center gap-3 py-5 sm:grid-cols-[52px_1fr] sm:gap-4 sm:py-6"
-                  >
-                    <span className="rec-number">{index + 1}</span>
-                    <span className="text-[16px] font-bold leading-6 text-[#17243f] sm:text-lg sm:leading-7">{action}</span>
-                  </motion.li>
-                ))}
-              </ol>
-              <p className="mt-4 bg-[#ffd51d]/40 px-4 py-3 text-[13px] font-black uppercase tracking-[0.12em] text-[#1a35c4] sm:text-sm">
-                Focus: {growth.focus}
-              </p>
-              <p className="mt-4 border-l-4 border-[#ffd51d] pl-4 text-[15px] font-bold italic leading-7 text-[#334155]">
-                "{growth.reflection}"
-              </p>
+            <div className="mt-8 max-w-2xl space-y-10">
+              {growthZones.map((zone) => {
+                const ZoneIcon = zone.icon;
+                return (
+                  <div key={zone.id}>
+                    <div className="flex max-w-md items-center gap-3 bg-[#fffbe6] p-4 sm:mx-0 mx-auto">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#ffd51d] text-[#1a35c4]">
+                        <ZoneIcon size={21} />
+                      </span>
+                      <div>
+                        <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#b89300]">Growth zone · {roundedPillar(scores[zone.id])}/100</p>
+                        <p className="text-[15px] font-black text-[#1a35c4]">{zone.title}</p>
+                      </div>
+                    </div>
+                    <ol className="mt-5 divide-y divide-[#f0e8bd] border-y border-[#f0e8bd]">
+                      {zone.actions.slice(0, 3).map((action, index) => (
+                        <motion.li
+                          key={action}
+                          initial={{ opacity: 0, y: 14 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, margin: "-40px" }}
+                          transition={{ delay: index * 0.1 }}
+                          className="grid grid-cols-[46px_1fr] items-center gap-3 py-5 sm:grid-cols-[52px_1fr] sm:gap-4 sm:py-6"
+                        >
+                          <span className="rec-number">{index + 1}</span>
+                          <span className="text-[16px] font-bold leading-6 text-[#17243f] sm:text-lg sm:leading-7">{action}</span>
+                        </motion.li>
+                      ))}
+                    </ol>
+                    <p className="mt-4 bg-[#ffd51d]/40 px-4 py-3 text-[13px] font-black uppercase tracking-[0.12em] text-[#1a35c4] sm:text-sm">
+                      Focus: {zone.focus}
+                    </p>
+                    <p className="mt-4 border-l-4 border-[#ffd51d] pl-4 text-[15px] font-bold italic leading-7 text-[#334155]">
+                      "{zone.reflection}"
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </section>
 
@@ -2443,6 +2627,10 @@ function ResultsScreen({
 
           </section>
 
+          <section className="result-section">
+            <RewardBooks />
+          </section>
+
 
         </div>
       </main>
@@ -2458,6 +2646,13 @@ function ResultsScreen({
           onConfirm={handleNameConfirm}
         />
       )}
+
+      <ConsentModal
+        open={consentOpen}
+        name={explorerName.trim()}
+        onClose={() => setConsentOpen(false)}
+        onDone={handleConsentDone}
+      />
 
       <AnimatePresence>
         {showBanner && !bannerDismissed && (

@@ -29,7 +29,7 @@ const STATIC_PATHS: { path: string; priority: number; changeFrequency: "always" 
 
 const getCachedSitemapData = unstable_cache(
   async () => {
-    const [posts, videos] = await Promise.all([
+    const [posts, videos, quotes] = await Promise.all([
       dbSafe(
         () =>
           prisma.post.findMany({
@@ -46,15 +46,23 @@ const getCachedSitemapData = unstable_cache(
           }),
         []
       ),
+      dbSafe(
+        () =>
+          prisma.quote.findMany({
+            where: { published: true, slug: { not: null } },
+            select: { slug: true, createdAt: true },
+          }),
+        []
+      ),
     ]);
-    return { posts, videos };
+    return { posts, videos, quotes };
   },
-  ["sitemap-data-v1"],
+  ["sitemap-data-v2"],
   { revalidate: 300, tags: ["content"] }
 );
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { posts, videos } = await getCachedSitemapData();
+  const { posts, videos, quotes } = await getCachedSitemapData();
 
   return [
     ...STATIC_PATHS.map((p) => ({
@@ -76,6 +84,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: video.createdAt,
         changeFrequency: "monthly" as const,
         priority: 0.7,
+      })),
+    ...quotes
+      .filter((q) => q.slug)
+      .map((quote) => ({
+        url: `${SITE.url}/quotes/${quote.slug}`,
+        lastModified: quote.createdAt,
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
       })),
   ];
 }

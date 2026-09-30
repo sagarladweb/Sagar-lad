@@ -193,11 +193,11 @@ export function DownloadModal({
                 />
                 <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                   I agree to the{" "}
-                  <a href="/legal/privacy" target="_blank" className="underline hover:text-foreground">
+                  <a href="/privacy" target="_blank" className="underline hover:text-foreground">
                     Privacy Policy
                   </a>{" "}
                   and{" "}
-                  <a href="/legal/terms" target="_blank" className="underline hover:text-foreground">
+                  <a href="/terms" target="_blank" className="underline hover:text-foreground">
                     Terms &amp; Conditions
                   </a>
                 </span>

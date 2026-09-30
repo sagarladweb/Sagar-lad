@@ -120,19 +120,30 @@ export const getPublishedVideoBySlug = unstable_cache(
   { revalidate: 300, tags: ["content"] }
 );
 
+const QUOTE_SELECT = {
+  id: true,
+  text: true,
+  tag: true,
+  slug: true,
+  highlightText: true,
+  highlightColor: true,
+  author: true,
+} as const;
+
 export const getQuotes = unstable_cache(
   async () => {
     const result = await dbSafe(
       () => prisma.quote.findMany({
+        where: { published: true },
         orderBy: { createdAt: "asc" },
-        select: { id: true, text: true, tag: true },
+        select: QUOTE_SELECT,
       }),
       null,
     );
     if (result && result.length > 0) return result;
     return null;
   },
-  ["quotes-v2"],
+  ["quotes-v3"],
   { revalidate: 300, tags: ["content"] }
 );
 
@@ -140,6 +151,25 @@ export async function getQuotesWithFallback() {
   const cached = await getQuotes();
   return cached ?? [];
 }
+
+export const getQuoteBySlug = unstable_cache(
+  async (slug: string) => {
+    return dbSafe(async () => {
+      const bySlug = await prisma.quote.findFirst({
+        where: { slug, published: true },
+        select: QUOTE_SELECT,
+      });
+      if (bySlug) return bySlug;
+      // Legacy fallback: old shares may carry the row id.
+      return prisma.quote.findFirst({
+        where: { id: slug, published: true },
+        select: QUOTE_SELECT,
+      });
+    }, null);
+  },
+  ["quote-by-slug"],
+  { revalidate: 300, tags: ["content"] }
+);
 
 export const getPublishedBooks = unstable_cache(
   async (type?: "PUBLISHED" | "READ" | "EBOOK") => {

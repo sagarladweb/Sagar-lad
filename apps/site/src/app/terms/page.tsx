@@ -84,6 +84,33 @@ export default function TermsPage() {
             terms.
           </p>
         </section>
+        <section>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">7. Self-assessments &amp; certificates</h2>
+          <p>
+            Interactive assessments on this site, including the MIND UP score,
+            are self-reflection tools based entirely on your own answers. They
+            may be incomplete, biased or inaccurate, and they are not
+            psychological, medical or professional evaluations of any kind.
+          </p>
+          <p className="mt-3">
+            Certificates, scores, badges and rewards generated from these
+            assessments are personal milestone markers only. They confer no
+            qualification, certification, diagnosis or claim of ability, and
+            must not be presented as such to employers, institutions or any
+            third party.
+          </p>
+        </section>
+        <section>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">8. Downloads &amp; newsletter</h2>
+          <p>
+            Free downloads (e-books, certificates, images) may ask for your
+            name and email address. Providing them is voluntary where stated,
+            and required where stated. Ticking the newsletter option subscribes
+            you to occasional emails, which you can leave at any time using the
+            unsubscribe link in every email. Downloaded files are for your
+            personal use; redistribution or resale requires written permission.
+          </p>
+        </section>
         <p className="pt-4 border-t border-border text-xs">
           Last updated: {formatDate(new Date())}
         </p>

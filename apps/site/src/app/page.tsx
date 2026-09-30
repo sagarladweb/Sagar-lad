@@ -22,7 +22,7 @@ import { LazySection } from "@/components/home/LazySection";
 export const metadata: Metadata = pageMetadata({
   title: "Sagar Lad — Author, TEDx Speaker & Human Potential Advocate",
   description:
-    "Sagar Lad is the author of The MIND UP Theory, a TEDx speaker, and creator of the MINDUP Framework — helping people build an unshakable mindset for career growth, relationships, and life.",
+    "Sagar Lad is the author of The MIND UP Theory, a TEDx speaker, and creator of the MINDUP Theory — helping people build an unshakable mindset for career growth, relationships, and life.",
   path: "/",
 });
 

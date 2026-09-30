@@ -19,6 +19,7 @@
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@sagarlad/db": "*",
+    "@sagarlad/quote-card": "*",
     "@supabase/supabase-js": "^2.112.1",
     "@tiptap/core": "3.30.5",
     "@tiptap/extension-bubble-menu": "3.30.5",
