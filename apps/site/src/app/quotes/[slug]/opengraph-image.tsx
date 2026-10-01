@@ -1,7 +1,4 @@
 import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { getQuoteBySlug } from "@/lib/content";
 import {
@@ -10,72 +7,17 @@ import {
   quoteSize,
   splitHighlight,
 } from "@sagarlad/quote-card";
+import { FONT_500, FONT_700, LOGO_DATA_URI } from "./og-assets";
 
 export const runtime = "nodejs";
 export const size = { width: 1080, height: 1350 };
 export const contentType = "image/png";
 
 // Satori needs TrueType (woff2 unsupported) — dedicated OG copies of the
-// same Rethink Sans the site serves.
-//
-// Two hard-won constraints on how these files may be loaded:
-// 1. `new URL(..., import.meta.url)` with LITERAL paths only — webpack's
-//    file tracer cannot follow template literals, so the assets never made
-//    it into the Vercel serverless bundle when these were dynamic.
-// 2. `readFile`, never `fetch` — Node's fetch does not implement file://
-//    ("not implemented... yet"), so fetch() always threw and the site fell
-//    back to a font-less card (boxes instead of text, no logo).
-const FONT_URLS = {
-  "500": new URL("../../fonts/og-rethink-500.ttf", import.meta.url),
-  "700": new URL("../../fonts/og-rethink-700.ttf", import.meta.url),
-} as const;
-
-const LOGO_URL = new URL(
-  "../../../../public/logos/site-logo-black.png",
-  import.meta.url
-);
-
-async function assetBytes(url: URL): Promise<Buffer | null> {
-  try {
-    // Some bundlers inline small assets as data: URLs instead of emitting
-    // files — decode those in place.
-    if (url.protocol === "data:") {
-      return Buffer.from(url.href.slice(url.href.indexOf(",") + 1), "base64");
-    }
-    return await readFile(fileURLToPath(url));
-  } catch {
-    return null;
-  }
-}
-
-async function loadFont(weight: "500" | "700"): Promise<Buffer | null> {
-  const traced = await assetBytes(FONT_URLS[weight]);
-  if (traced) return traced;
-  // Not traced into the bundle (host without NFT) — fall back to the tree.
-  try {
-    return await readFile(
-      join(process.cwd(), "src/app/fonts", `og-rethink-${weight}.ttf`)
-    );
-  } catch {
-    return null;
-  }
-}
-
-async function loadLogo(): Promise<string | null> {
-  // Local file → data URI, so the stamp works everywhere (local, preview,
-  // production) without depending on a deployed URL.
-  let buf = await assetBytes(LOGO_URL);
-  if (!buf) {
-    try {
-      buf = await readFile(
-        join(process.cwd(), "public/logos/site-logo-black.png")
-      );
-    } catch {
-      return null;
-    }
-  }
-  return `data:image/png;base64,${buf.toString("base64")}`;
-}
+// same Rethink Sans the site serves, inlined as base64 in ./og-assets.ts.
+// No fs/network reads at request time: file:// fetch is unimplemented in
+// Node and the traced .ttf files were missing from the Vercel lambda, both
+// of which left the card rendering tofu boxes instead of text.
 
 function escapeXml(s: string): string {
   return s
@@ -154,9 +96,6 @@ type OgModel = {
   highlightBg: string;
   tokens: TokenRange[];
   isHot: boolean[];
-  regular: Buffer | null;
-  bold: Buffer | null;
-  logo: string | null;
 };
 
 /** All fallible I/O happens here; the component below only renders. */
@@ -194,13 +133,7 @@ async function loadOgModel(slug: string): Promise<OgModel | null> {
 
   const fontSize = tier === "short" ? 62 : tier === "medium" ? 52 : 44;
 
-  const [regular, bold, logo] = await Promise.all([
-    loadFont("500"),
-    loadFont("700"),
-    loadLogo(),
-  ]);
-
-  return { clean, who, fontSize, highlightBg, tokens, isHot, regular, bold, logo };
+  return { clean, who, fontSize, highlightBg, tokens, isHot };
 }
 
 export default async function QuoteOgImage({
@@ -216,14 +149,10 @@ export default async function QuoteOgImage({
     return null;
   });
   if (!model) return fallbackPng("A quote worth carrying with you.", "Sagar Lad");
-  // Satori throws "No fonts are loaded" when fonts is empty — that was the
-  // production 500. Without the brand fonts, serve the sharp fallback
-  // (valid PNG) instead of crashing.
-  if (!model.regular || !model.bold) return fallbackPng(model.clean, model.who);
 
   const fonts = [
-    { name: "Rethink", data: model.regular, weight: 500 as const },
-    { name: "Rethink", data: model.bold, weight: 700 as const },
+    { name: "Rethink", data: FONT_500, weight: 500 as const },
+    { name: "Rethink", data: FONT_700, weight: 700 as const },
   ];
   const quoteBody = model.tokens.map((r, i) => (
     <span key={i} style={model.isHot[i] ? { backgroundColor: model.highlightBg } : undefined}>
@@ -288,9 +217,13 @@ export default async function QuoteOgImage({
               marginTop: 28,
             }}
           >
-            {model.logo ? (
-              <img src={model.logo} alt="Sagar Lad" width={97} height={64} style={{ width: 97, height: 64 }} />
-            ) : null}
+            <img
+              src={LOGO_DATA_URI}
+              alt="Sagar Lad"
+              width={97}
+              height={64}
+              style={{ width: 97, height: 64 }}
+            />
           </div>
         </div>
 
