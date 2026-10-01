@@ -1,4 +1,7 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { getQuoteBySlug } from "@/lib/content";
 import {
@@ -12,19 +15,47 @@ export const runtime = "nodejs";
 export const size = { width: 1080, height: 1350 };
 export const contentType = "image/png";
 
-async function loadFont(weight: "500" | "700"): Promise<Buffer | null> {
-  // Satori needs TrueType (woff2 unsupported) — dedicated OG copies of the
-  // same Rethink Sans the site serves.
-  // Loaded via `new URL(..., import.meta.url)` (not process.cwd()) so Next's
-  // file tracer bundles the fonts into the production serverless function.
-  // The old process.cwd() + readFile path silently missed the bundle on
-  // Vercel → fonts: [] → Satori threw "No fonts are loaded" → HTTP 500.
+// Satori needs TrueType (woff2 unsupported) — dedicated OG copies of the
+// same Rethink Sans the site serves.
+//
+// Two hard-won constraints on how these files may be loaded:
+// 1. `new URL(..., import.meta.url)` with LITERAL paths only — webpack's
+//    file tracer cannot follow template literals, so the assets never made
+//    it into the Vercel serverless bundle when these were dynamic.
+// 2. `readFile`, never `fetch` — Node's fetch does not implement file://
+//    ("not implemented... yet"), so fetch() always threw and the site fell
+//    back to a font-less card (boxes instead of text, no logo).
+const FONT_URLS = {
+  "500": new URL("../../fonts/og-rethink-500.ttf", import.meta.url),
+  "700": new URL("../../fonts/og-rethink-700.ttf", import.meta.url),
+} as const;
+
+const LOGO_URL = new URL(
+  "../../../../public/logos/site-logo-black.png",
+  import.meta.url
+);
+
+async function assetBytes(url: URL): Promise<Buffer | null> {
   try {
-    const res = await fetch(
-      new URL(`../../fonts/og-rethink-${weight}.ttf`, import.meta.url)
+    // Some bundlers inline small assets as data: URLs instead of emitting
+    // files — decode those in place.
+    if (url.protocol === "data:") {
+      return Buffer.from(url.href.slice(url.href.indexOf(",") + 1), "base64");
+    }
+    return await readFile(fileURLToPath(url));
+  } catch {
+    return null;
+  }
+}
+
+async function loadFont(weight: "500" | "700"): Promise<Buffer | null> {
+  const traced = await assetBytes(FONT_URLS[weight]);
+  if (traced) return traced;
+  // Not traced into the bundle (host without NFT) — fall back to the tree.
+  try {
+    return await readFile(
+      join(process.cwd(), "src/app/fonts", `og-rethink-${weight}.ttf`)
     );
-    if (!res.ok) return null;
-    return Buffer.from(await res.arrayBuffer());
   } catch {
     return null;
   }
@@ -33,16 +64,17 @@ async function loadFont(weight: "500" | "700"): Promise<Buffer | null> {
 async function loadLogo(): Promise<string | null> {
   // Local file → data URI, so the stamp works everywhere (local, preview,
   // production) without depending on a deployed URL.
-  try {
-    const res = await fetch(
-      new URL("../../../../public/logos/site-logo-black.png", import.meta.url)
-    );
-    if (!res.ok) return null;
-    const buf = Buffer.from(await res.arrayBuffer());
-    return `data:image/png;base64,${buf.toString("base64")}`;
-  } catch {
-    return null;
+  let buf = await assetBytes(LOGO_URL);
+  if (!buf) {
+    try {
+      buf = await readFile(
+        join(process.cwd(), "public/logos/site-logo-black.png")
+      );
+    } catch {
+      return null;
+    }
   }
+  return `data:image/png;base64,${buf.toString("base64")}`;
 }
 
 function escapeXml(s: string): string {
