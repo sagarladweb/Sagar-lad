@@ -27,9 +27,9 @@ export function splitHighlight(
 ): [string, string, string] | null {
   const needle = (highlight ?? "").trim();
   if (!needle) return null;
-  const i = text.indexOf(needle);
+  const i = text.toLowerCase().indexOf(needle.toLowerCase());
   if (i === -1) return null;
-  return [text.slice(0, i), needle, text.slice(i + needle.length)];
+  return [text.slice(0, i), text.slice(i, i + needle.length), text.slice(i + needle.length)];
 }
 
 export function effectiveHighlightColor(

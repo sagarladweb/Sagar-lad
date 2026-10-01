@@ -12,8 +12,6 @@ export type QuoteRendererProps = QuoteData & {
   logoSrc?: string;
   /** Max width of the card in px. */
   maxWidth?: number;
-  /** Website domain name displayed centered at the bottom. Defaults to "sagarlad.com". */
-  websiteUrl?: string;
 };
 
 const DISPLAY_STACK =
@@ -23,7 +21,8 @@ const DISPLAY_STACK =
  * The one shared quote visual. Inline styles only — no CSS imports — so the
  * admin preview and the public page render pixel-identical output.
  *
- * Layout: center-aligned quote → right-aligned "- Author" → black site logo below → center-bottom "sagarlad.com".
+ * Layout: quote → "– Author" line → black logo stamp bottom-right.
+ * Blue highlight inverts to white text; yellow keeps ink.
  */
 export function QuoteRenderer({
   text,
@@ -32,14 +31,12 @@ export function QuoteRenderer({
   author,
   logoSrc = "/logos/site-logo-black.png",
   maxWidth = 760,
-  websiteUrl = "sagarlad.com",
 }: QuoteRendererProps) {
   const clean = text.replace(/\s+/g, " ").trim();
   const size = quoteSize(clean);
   const color = effectiveHighlightColor(highlightColor);
   const parts = splitHighlight(clean, highlightText);
   const who = (author ?? "").trim() || "Sagar Lad";
-  const displayAuthor = who.startsWith("-") || who.startsWith("–") ? who : `–${who}`;
 
   const fontSize =
     size === "short"
@@ -61,8 +58,8 @@ export function QuoteRenderer({
         key="m"
         style={{
           background: band,
-          borderRadius: 4,
-          padding: "0 0.12em",
+          borderRadius: 2,
+          padding: "0 0.08em",
           boxDecorationBreak: "clone",
           WebkitBoxDecorationBreak: "clone",
         }}
@@ -83,7 +80,7 @@ export function QuoteRenderer({
         padding: "clamp(2.5rem, 7vw, 5rem) clamp(1.75rem, 6vw, 4.5rem)",
         maxWidth,
         margin: "0 auto",
-        textAlign: "center",
+        textAlign: "left",
       }}
     >
       <blockquote
@@ -92,10 +89,9 @@ export function QuoteRenderer({
           fontFamily: DISPLAY_STACK,
           fontWeight: 700,
           fontSize,
-          lineHeight: 1.4,
+          lineHeight: 1.35,
           letterSpacing: "-0.01em",
           color: QUOTE_BRAND.ink,
-          textAlign: "center",
           textWrap: "balance" as const,
         }}
       >
@@ -110,20 +106,20 @@ export function QuoteRenderer({
 
       <figcaption
         style={{
-          marginTop: "2rem",
+          marginTop: "1.75rem",
           fontFamily: DISPLAY_STACK,
-          fontSize: "1.1rem",
+          fontSize: "1.05rem",
           fontWeight: 600,
           color: QUOTE_BRAND.ink,
           textAlign: "right",
         }}
       >
-        {displayAuthor}
+        –{who}
       </figcaption>
 
       <div
         style={{
-          marginTop: "1.25rem",
+          marginTop: "2rem",
           display: "flex",
           justifyContent: "flex-end",
         }}
@@ -131,34 +127,13 @@ export function QuoteRenderer({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={logoSrc}
-          alt={who}
-          width={120}
-          height={79}
+          alt="Sagar Lad"
+          width={272}
+          height={179}
           loading="lazy"
           decoding="async"
-          style={{ height: 38, width: "auto", opacity: 0.95 }}
+          style={{ height: 38, width: "auto", opacity: 0.9 }}
         />
-      </div>
-
-      <div
-        style={{
-          marginTop: "2.5rem",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <span
-          style={{
-            fontFamily: DISPLAY_STACK,
-            fontSize: "0.85rem",
-            fontWeight: 700,
-            letterSpacing: "0.28em",
-            color: QUOTE_BRAND.muted,
-          }}
-        >
-          {websiteUrl}
-        </span>
       </div>
     </figure>
   );

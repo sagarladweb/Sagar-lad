@@ -10,7 +10,9 @@ export function QuoteDownloadButton({ slug, fileName, iconOnly = false }: { slug
     if (busy) return;
     setBusy(true);
     try {
-      const res = await fetch(`/quotes/${slug}/opengraph-image`);
+      const res = await fetch(`/quotes/${encodeURIComponent(slug)}/opengraph-image?download=1&t=${Date.now()}`, {
+        cache: "no-store",
+      });
       if (!res.ok) throw new Error();
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -20,8 +22,8 @@ export function QuoteDownloadButton({ slug, fileName, iconOnly = false }: { slug
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     } catch {
-      // Fallback: open the image in a new tab.
-      window.open(`/quotes/${slug}/opengraph-image`, "_blank", "noopener");
+      // Fallback: open the image in a new tab with cache buster.
+      window.open(`/quotes/${encodeURIComponent(slug)}/opengraph-image?download=1&t=${Date.now()}`, "_blank", "noopener");
     } finally {
       setBusy(false);
     }

@@ -1,10 +1,9 @@
 import { ImageResponse } from "next/og";
-import sharp from "sharp";
 import { getQuoteBySlug } from "@/lib/content";
+import { prisma, dbSafe } from "@/lib/db";
 import {
   QUOTE_BRAND,
   effectiveHighlightColor,
-  quoteSize,
 } from "@sagarlad/quote-card";
 import { FONT_500, FONT_700, LOGO_DATA_URI } from "./og-assets";
 
@@ -12,130 +11,87 @@ export const runtime = "nodejs";
 export const size = { width: 1080, height: 1350 };
 export const contentType = "image/png";
 
-function escapeXml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function wrapLines(text: string, maxChars = 32, maxLines = 10): string[] {
-  const words = text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
-  const lines: string[] = [];
-  let line = "";
-  for (const w of words) {
-    const next = line ? `${line} ${w}` : w;
-    if (next.length > maxChars && line) {
-      lines.push(line);
-      line = w;
-    } else {
-      line = next;
-    }
-    if (lines.length >= maxLines) break;
-  }
-  if (lines.length < maxLines && line) lines.push(line);
-  return lines.slice(0, maxLines);
-}
-
-/**
- * Ultra-emergency PNG renderer using sharp with embedded base64 TrueType font.
- * Guarantees zero tofu boxes even if ImageResponse/Satori ever fails and host OS has no fonts.
- */
-async function emergencySharpPng(text: string, author: string): Promise<Response> {
-  const who = author.trim() || "Sagar Lad";
-  const authorDisplay = who.startsWith("-") || who.startsWith("–") ? who : `–${who}`;
-  const lines = wrapLines(text);
-  const startY = 620 - ((lines.length - 1) * 66) / 2;
-
-  const font700Base64 = FONT_700.toString("base64");
-
-  const body = lines
-    .map((l, i) => {
-      const isFirst = i === 0;
-      const isLast = i === lines.length - 1;
-      const prefix = isFirst ? `<tspan fill="${QUOTE_BRAND.blue}">\u201C</tspan>` : "";
-      const suffix = isLast ? `<tspan fill="${QUOTE_BRAND.blue}">\u201D</tspan>` : "";
-      return `<text x="540" y="${Math.round(startY + i * 66)}" text-anchor="middle" font-family="'Rethink', sans-serif" font-weight="bold" font-size="48" fill="${QUOTE_BRAND.ink}">${prefix}${escapeXml(l)}${suffix}</text>`;
-    })
-    .join("");
-
-  const svg =
-    `<svg width="1080" height="1350" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg">` +
-    `<defs>` +
-    `<style>` +
-    `@font-face { font-family: 'Rethink'; font-weight: 700; src: url('data:font/ttf;base64,${font700Base64}'); }` +
-    `</style>` +
-    `</defs>` +
-    `<rect width="1080" height="1350" fill="#FFF7E7"/>` +
-    body +
-    `<text x="984" y="1030" text-anchor="end" font-family="'Rethink', sans-serif" font-weight="600" font-size="34" fill="${QUOTE_BRAND.ink}">${escapeXml(authorDisplay)}</text>` +
-    `<image href="${LOGO_DATA_URI}" x="864" y="1054" width="120" height="79"/>` +
-    `<text x="540" y="1260" text-anchor="middle" font-family="'Rethink', sans-serif" font-weight="bold" font-size="28" letter-spacing="8" fill="${QUOTE_BRAND.muted}">sagarlad.com</text>` +
-    `</svg>`;
-
-  const buf = await sharp(Buffer.from(svg)).png().toBuffer();
-  return new Response(new Uint8Array(buf), {
-    headers: {
-      "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=86400",
-    },
-  });
-}
-
-function renderQuoteResponse(opts: {
+type CardModel = {
   clean: string;
-  author: string;
+  who: string;
+  fontSize: number;
   highlightText?: string | null;
   highlightColor?: string | null;
-}): Response {
-  const who = opts.author.trim() || "Sagar Lad";
-  const authorDisplay = who.startsWith("-") || who.startsWith("–") ? who : `–${who}`;
-  const tier = quoteSize(opts.clean);
+};
+
+function calculateFontSize(clean: string): number {
+  if (clean.length < 70) return 52;
+  if (clean.length < 130) return 46;
+  if (clean.length < 200) return 40;
+  return 34;
+}
+
+function renderQuoteCardImage(model: CardModel): ImageResponse {
+  const { clean, who, fontSize, highlightText, highlightColor } = model;
   const color = effectiveHighlightColor(
-    opts.highlightColor as "yellow" | "blue" | null
+    (highlightColor as "yellow" | "blue" | null) ?? "yellow"
   );
   const isBlue = color === "blue";
-  const highlightBg = isBlue ? "rgba(63,136,197,0.35)" : "rgba(255,203,0,0.5)";
+  const highlightBg = isBlue
+    ? "rgba(63,136,197,0.35)"
+    : "rgba(255,203,0,0.5)";
 
-  const hlNeedle = (opts.highlightText ?? "").trim();
-  const hlStart = hlNeedle ? opts.clean.indexOf(hlNeedle) : -1;
-  const hlEnd = hlStart !== -1 ? hlStart + hlNeedle.length : -1;
+  const authorDisplay =
+    who.startsWith("-") || who.startsWith("–") ? who : `–${who}`;
 
-  const rawTokens = opts.clean.split(/(\s+)/).filter(Boolean);
-  let pos = 0;
-  const tokens = rawTokens.map((t) => {
-    const s = pos;
-    pos += t.length;
-    return { t, s, e: pos };
+  const cleanLower = clean.toLowerCase();
+  const hlLower = (highlightText ?? "").trim().toLowerCase();
+  const hlStart = hlLower ? cleanLower.indexOf(hlLower) : -1;
+  const hlEnd = hlStart !== -1 ? hlStart + hlLower.length : -1;
+
+  const words = clean.split(/\s+/).filter(Boolean);
+  let charPos = 0;
+
+  const tokens = words.map((w) => {
+    const start = charPos;
+    const end = start + w.length;
+    charPos = end + 1;
+    const isHot = hlStart !== -1 && end > hlStart && start < hlEnd;
+    return { w, start, end, isHot };
   });
 
-  const isHot = tokens.map((r, i) => {
-    if (hlStart === -1) return false;
-    if (/^\s+$/.test(r.t)) {
-      const prev = tokens[i - 1];
-      const next = tokens[i + 1];
-      return !!prev && !!next && prev.s >= hlStart && prev.e <= hlEnd && next.s >= hlStart && next.e <= hlEnd;
-    }
-    return r.s >= hlStart && r.e <= hlEnd;
-  });
-
-  const quoteSpans = tokens.map((r, i) => {
-    const isFirst = i === 0;
+  const wordElements = tokens.map((t, i) => {
+    const isFirstHot = t.isHot && (!tokens[i - 1] || !tokens[i - 1].isHot);
+    const isLastHot = t.isHot && (!tokens[i + 1] || !tokens[i + 1].isHot);
     const isLast = i === tokens.length - 1;
+
+    let textToRender = t.w;
+    if (i === 0) textToRender = `\u201C${textToRender}`;
+    if (isLast) textToRender = `${textToRender}\u201D`;
+
+    if (t.isHot) {
+      return (
+        <span
+          key={i}
+          style={{
+            display: "flex",
+            backgroundColor: highlightBg,
+            paddingLeft: isFirstHot ? 8 : 0,
+            paddingRight: isLastHot ? 8 : 0,
+            paddingTop: 2,
+            paddingBottom: 2,
+            borderTopLeftRadius: isFirstHot ? 4 : 0,
+            borderBottomLeftRadius: isFirstHot ? 4 : 0,
+            borderTopRightRadius: isLastHot ? 4 : 0,
+            borderBottomRightRadius: isLastHot ? 4 : 0,
+          }}
+        >
+          {isLastHot ? textToRender : `${textToRender} `}
+        </span>
+      );
+    }
+
     return (
-      <span
-        key={i}
-        style={isHot[i] ? { backgroundColor: highlightBg, borderRadius: 4 } : undefined}
-      >
-        {isFirst && <span style={{ color: QUOTE_BRAND.blue }}>{"\u201C"}</span>}
-        {r.t}
-        {isLast && <span style={{ color: QUOTE_BRAND.blue }}>{"\u201D"}</span>}
+      <span key={i} style={{ display: "flex" }}>
+        {isLast ? textToRender : `${textToRender} `}
       </span>
     );
   });
-
-  const fontSize = tier === "short" ? 60 : tier === "medium" ? 50 : 42;
 
   const fonts = [
     { name: "Rethink", data: FONT_500, weight: 500 as const },
@@ -150,11 +106,12 @@ function renderQuoteResponse(opts: {
           height: 1350,
           display: "flex",
           flexDirection: "column",
-          background: "#FFF7E7",
-          padding: "110px 96px 90px",
+          backgroundColor: "#FFF7E7",
+          padding: "100px 96px 84px",
           fontFamily: "Rethink, sans-serif",
         }}
       >
+        {/* Main centered body */}
         <div
           style={{
             flex: 1,
@@ -163,65 +120,87 @@ function renderQuoteResponse(opts: {
             justifyContent: "center",
           }}
         >
+          {/* Center-aligned quote text with quotes at start & end */}
           <div
             style={{
-              fontSize,
-              fontWeight: 700,
-              lineHeight: 1.45,
-              color: QUOTE_BRAND.ink,
               display: "flex",
               flexWrap: "wrap",
               justifyContent: "center",
               textAlign: "center",
+              fontSize,
+              fontWeight: 700,
+              lineHeight: 1.45,
+              color: QUOTE_BRAND.ink,
+              marginBottom: 60,
+              paddingLeft: 24,
+              paddingRight: 24,
               whiteSpace: "pre-wrap",
             }}
           >
-            {quoteSpans}
+            {wordElements}
           </div>
 
+          {/* Right-aligned author */}
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              marginTop: 52,
-              fontSize: 34,
-              fontWeight: 600,
-              color: QUOTE_BRAND.ink,
+              alignItems: "center",
+              marginBottom: 32,
+              paddingRight: 24,
             }}
           >
-            {authorDisplay}
+            <span
+              style={{
+                fontSize: 34,
+                fontWeight: 600,
+                color: QUOTE_BRAND.ink,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {authorDisplay}
+            </span>
           </div>
 
+          {/* Right-aligned black site logo below author with clear separation */}
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              marginTop: 24,
+              alignItems: "center",
+              paddingRight: 24,
             }}
           >
             <img
               src={LOGO_DATA_URI}
-              alt={who}
+              alt="Sagar Lad"
               width={120}
               height={79}
-              style={{ width: 120, height: 79 }}
+              style={{
+                width: 120,
+                height: 79,
+                objectFit: "contain",
+              }}
             />
           </div>
         </div>
 
+        {/* Center bottom aligned website name */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
+            alignItems: "center",
+            marginTop: "auto",
           }}
         >
           <span
             style={{
-              fontSize: 28,
+              fontSize: 26,
               fontWeight: 700,
               letterSpacing: 8,
               color: QUOTE_BRAND.muted,
+              textTransform: "uppercase",
             }}
           >
             sagarlad.com
@@ -229,8 +208,50 @@ function renderQuoteResponse(opts: {
         </div>
       </div>
     ),
-    { width: 1080, height: 1350, fonts }
+    {
+      width: 1080,
+      height: 1350,
+      fonts,
+      headers: {
+        "Cache-Control": "public, max-age=60, stale-while-revalidate=86400",
+      },
+    }
   );
+}
+
+async function fetchQuote(slug: string) {
+  try {
+    const q = await getQuoteBySlug(slug);
+    if (q) return q;
+  } catch {
+    // unstable_cache may fail outside request context; fall through to direct DB query
+  }
+
+  return dbSafe(async () => {
+    const bySlug = await prisma.quote.findFirst({
+      where: { slug, published: true },
+      select: {
+        id: true,
+        slug: true,
+        text: true,
+        author: true,
+        highlightText: true,
+        highlightColor: true,
+      },
+    });
+    if (bySlug) return bySlug;
+    return prisma.quote.findFirst({
+      where: { id: slug, published: true },
+      select: {
+        id: true,
+        slug: true,
+        text: true,
+        author: true,
+        highlightText: true,
+        highlightColor: true,
+      },
+    });
+  }, null);
 }
 
 export default async function QuoteOgImage({
@@ -240,23 +261,34 @@ export default async function QuoteOgImage({
 }) {
   const { slug } = await params;
   try {
-    const quote = await getQuoteBySlug(slug).catch(() => null);
+    const rawSlug = decodeURIComponent(slug);
+    const quote = await fetchQuote(rawSlug);
+
     if (!quote) {
-      return renderQuoteResponse({
+      return renderQuoteCardImage({
         clean: "A quote worth carrying with you.",
-        author: "Sagar Lad",
+        who: "Sagar Lad",
+        fontSize: 48,
       });
     }
 
     const clean = quote.text.replace(/\s+/g, " ").trim();
-    return renderQuoteResponse({
+    const who = (quote.author ?? "").trim() || "Sagar Lad";
+    const fontSize = calculateFontSize(clean);
+
+    return renderQuoteCardImage({
       clean,
-      author: quote.author ?? "Sagar Lad",
+      who,
+      fontSize,
       highlightText: quote.highlightText,
       highlightColor: quote.highlightColor,
     });
   } catch (err) {
     console.error(`[og-quote] render failed for slug "${slug}":`, err);
-    return emergencySharpPng("A quote worth carrying with you.", "Sagar Lad");
+    return renderQuoteCardImage({
+      clean: "A quote worth carrying with you.",
+      who: "Sagar Lad",
+      fontSize: 48,
+    });
   }
 }
