@@ -64,6 +64,12 @@ function save(path: string) {
 // back/forward-button traversals restore the remembered position.
 let traverseArmed = false;
 
+// While a navigation settles, the async saves are suppressed. Link
+// clicks and popstate save synchronously (scroll still intact); without
+// this window the smooth route-change scroll-to-top races them and the
+// slot ends up holding 0 or a mid-animation value.
+let blockUntil = 0;
+
 export function ScrollToTop() {
   const pathname = usePathname();
   const pathRef = useRef(pathname);
@@ -88,9 +94,28 @@ export function ScrollToTop() {
   // "going back" (restore) is told apart from "going somewhere" (top).
   useEffect(() => {
     const onPopState = () => {
+      // DOM + scroll are still the outgoing page's at popstate time —
+      // capture before the route commit can scroll anything.
+      save(pathRef.current);
       traverseArmed = true;
     };
     window.addEventListener("popstate", onPopState);
+    // Capture phase runs before next/link's handler: record the
+    // position at the instant the CTA is pressed. Internal links also
+    // arm the suppression window (failsafe in case navigation never
+    // happens — it expires on its own).
+    const onDocClick = (e: Event) => {
+      const a = e.target instanceof Element ? e.target.closest("a[href]") : null;
+      if (!a) return;
+      save(pathRef.current);
+      try {
+        const url = new URL((a as HTMLAnchorElement).href, location.href);
+        if (url.origin === location.origin && url.pathname !== location.pathname) {
+          blockUntil = Date.now() + 2000;
+        }
+      } catch {}
+    };
+    document.addEventListener("click", onDocClick, true);
     let timer: ReturnType<typeof setTimeout> | null = null;
     const onScroll = () => {
       // Manual scroll by the user cancels any enforcement in progress.
@@ -98,6 +123,7 @@ export function ScrollToTop() {
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         timer = null;
+        if (Date.now() < blockUntil) return;
         save(pathRef.current);
       }, 250);
     };
@@ -116,6 +142,7 @@ export function ScrollToTop() {
     return () => {
       window.clearInterval(guard);
       window.removeEventListener("popstate", onPopState);
+      document.removeEventListener("click", onDocClick, true);
       window.removeEventListener("scroll", onScroll);
       document.removeEventListener("visibilitychange", onHide);
       window.removeEventListener("pagehide", onHide);
@@ -145,11 +172,14 @@ export function ScrollToTop() {
 
     const prev = lastPath.current;
     if (prev == null) {
-      // Fresh full load. A reload (normal or hard) starts blank.
+      // Fresh load. A reload (normal or hard) starts blank.
       wipeIfReloaded();
     } else if (prev !== pathname) {
-      // Genuine in-app navigation: persist the page we're leaving.
-      save(prev);
+      // The outgoing page's position was already captured synchronously
+      // (link click / popstate). Suppress the async saves briefly so the
+      // route-change scroll-to-top can't write a mid-animation 0 into
+      // the new page's slot.
+      blockUntil = Date.now() + 1000;
     }
     // NOTE: same-path remounts save nothing (scrollY may be mid-restore).
 

@@ -232,7 +232,19 @@
     ".builds/20261001-130850/types/**/*.ts",
     ".builds/20261001-130850/dev/types/**/*.ts",
     ".builds/20261001-131128/types/**/*.ts",
-    ".builds/20261001-131128/dev/types/**/*.ts"
+    ".builds/20261001-131128/dev/types/**/*.ts",
+    ".builds/20261004-220803/types/**/*.ts",
+    ".builds/20261004-220803/dev/types/**/*.ts",
+    ".builds/20261004-222919/types/**/*.ts",
+    ".builds/20261004-222919/dev/types/**/*.ts",
+    ".builds/20261004-223652/types/**/*.ts",
+    ".builds/20261004-223652/dev/types/**/*.ts",
+    ".builds/20261004-231625/types/**/*.ts",
+    ".builds/20261004-231625/dev/types/**/*.ts",
+    ".builds/20261004-235723/types/**/*.ts",
+    ".builds/20261004-235723/dev/types/**/*.ts",
+    ".builds/20261006-131535/types/**/*.ts",
+    ".builds/20261006-131535/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

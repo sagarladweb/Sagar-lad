@@ -51,15 +51,32 @@ export function createBlocks(specs: BlockSpec[]): Block[] {
     .filter(Boolean) as Block[];
 }
 
+/** Legacy drafts predate the overlay controls — seed them from Layout so the
+ *  pickers show what the canvas already renders. New blocks get defaults from
+ *  defaultData and never hit this. */
+function seedOverlayControls(block: Block): void {
+  if (block.type !== "image") return;
+  const d = block.data as Record<string, unknown>;
+  d.overlayVAlign ??= block.style?.vAlign ?? "flex-start";
+  d.overlayHAlign ??= block.style?.hAlign ?? "flex-start";
+  d.overlayFontSize ??= 15;
+}
+
+export function seedOverlayBlocks(blocks: Block[]): void {
+  for (const b of blocks) seedOverlayControls(b);
+}
+
 /** Deep-ish clone with fresh ids — used by duplicate + templates. */
 export function cloneBlock(block: Block): Block {
-  return {
+  const copy: Block = {
     ...block,
     id: uid(block.type),
     data: JSON.parse(JSON.stringify(block.data ?? {})),
     style: { ...block.style },
     settings: { ...block.settings, sectionName: "" },
   };
+  seedOverlayControls(copy);
+  return copy;
 }
 
 export function cloneBlocks(blocks: Block[]): Block[] {

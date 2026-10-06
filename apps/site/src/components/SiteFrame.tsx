@@ -67,10 +67,8 @@ function SiteFrameInner({
     announcement?.barStyle !== "hidden";
   const shouldShowBar = isBarEnabled && barText && announcement;
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    requestAnimationFrame(() => window.scrollTo(0, 0));
-  }, [pathname]);
+  // NOTE: scroll-to-top on route change is owned by ScrollToTop, which
+  // distinguishes forward navigations (top) from back/forward (restore).
 
   useEffect(() => {
     const MEDIA = "img, video, svg, picture, canvas";

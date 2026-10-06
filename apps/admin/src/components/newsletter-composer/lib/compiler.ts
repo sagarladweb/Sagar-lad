@@ -254,14 +254,33 @@ function renderBlockHtml(block: Block): string {
       if (!d.src) return "";
       const borderRadius = s.radius || 12;
       const imgWidth = Number(d.width) || 100;
+      const overlayHtml = String(d.overlayHtml || "");
       const imgStyle = `max-width:${imgWidth}%;height:auto;border-radius:${borderRadius}px;display:block;${align === "center" ? "margin:0 auto" : ""}${d.ratio && d.ratio !== "auto" ? `;aspect-ratio:${d.ratio};object-fit:cover` : ""}`;
+      const overlayTd = (() => {
+        if (!overlayHtml) return "";
+        // Older drafts predate the dedicated controls — fall back to Style → Layout.
+        const ovV = String(d.overlayVAlign ?? s.vAlign ?? "flex-start");
+        const ovH = String(d.overlayHAlign ?? s.hAlign ?? "flex-start");
+        const ovFs = Number(d.overlayFontSize) || 15;
+        const v = ovV === "center" ? "middle" : ovV === "flex-end" ? "bottom" : "top";
+        const t = ovH === "center" ? "center" : ovH === "flex-end" ? "right" : "left";
+        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="position:absolute;top:0;left:0;width:100%;height:100%;margin:0">
+                    <tr>
+                      <td style="background:rgba(17,24,39,${d.overlay ?? 0.25});padding:16px;box-sizing:border-box;vertical-align:${v};text-align:${t};color:#ffffff;font-size:${ovFs}px;line-height:1.5">${overlayHtml}</td>
+                    </tr>
+                  </table>`;
+      })();
+      const imgPart = `
+              ${d.url ? `<a href="${esc(d.url)}" target="_blank" style="text-decoration:none">` : ""}
+                <img src="${esc(d.src)}" alt="${esc(d.alt || "")}" style="${overlayHtml ? imgStyle.replace(`max-width:${imgWidth}%`, `width:100%`) : imgStyle}" />
+              ${d.url ? `</a>` : ""}`;
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0">
           <tr>
             <td style="text-align:${align}">
-              ${d.url ? `<a href="${esc(d.url)}" target="_blank" style="text-decoration:none">` : ""}
-                <img src="${esc(d.src)}" alt="${esc(d.alt || "")}" style="${imgStyle}" />
-              ${d.url ? `</a>` : ""}
+              ${overlayHtml
+                ? `<div style="position:relative;display:inline-block;max-width:${imgWidth}%;border-radius:${borderRadius}px;overflow:hidden;vertical-align:top">${imgPart}${overlayTd}</div>`
+                : imgPart}
             </td>
           </tr>
           ${d.caption || d.credit ? `<tr><td style="padding-top:8px;text-align:center">

@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { cloneBlock, cloneBlocks, createBlock } from "@/components/newsletter-composer/lib/blockFactory";
+import { cloneBlock, cloneBlocks, createBlock, seedOverlayBlocks } from "@/components/newsletter-composer/lib/blockFactory";
 import { uid } from "@/components/newsletter-composer/lib/utils";
 import { TEMPLATES } from "@/components/newsletter-composer/templates/templates";
 import type { Template } from "@/components/newsletter-composer/templates/templates";
@@ -36,7 +36,34 @@ function resolveTemplateBlocks(source: TemplateSource): Block[] {
 }
 
 export const STORAGE_KEY = "sagarlad.newsletter.composer.v1";
+const TEMPLATES_API = "/api/admin/newsletter/templates";
 const HISTORY_LIMIT = 80;
+
+/** Best-effort server sync — localStorage stays the instant-load cache. */
+async function pushTemplate(template: SavedTemplate) {
+  try {
+    const res = await fetch(TEMPLATES_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(template),
+    });
+    if (!res.ok) console.warn("[templates] push failed:", res.status, await res.text().catch(() => ""));
+  } catch (err) {
+    console.warn("[templates] push failed:", err);
+  }
+}
+
+async function pullTemplates(): Promise<Array<{ id: string; name: string; theme: unknown; blocks: Block[]; createdAt: number; updatedAt: number }> | null> {
+  try {
+    const res = await fetch(TEMPLATES_API);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return Array.isArray(data.templates) ? data.templates : null;
+  } catch {
+    return null;
+  }
+}
+
 
 /* ------------------------------------------------------------------ *
  *  Helpers
@@ -475,6 +502,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
           savedTemplates: [...s.savedTemplates, copy].slice(0, 40),
         }));
         scheduleSave();
+        void pushTemplate(copy);
         return;
       }
 
@@ -494,6 +522,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
         savedTemplates: [...s.savedTemplates, clone].slice(0, 40),
       }));
       scheduleSave();
+      void pushTemplate(clone);
       return;
     },
 
@@ -530,6 +559,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
         };
         const next = [template, ...state.savedTemplates].slice(0, 40);
         scheduleSave();
+        void pushTemplate(template);
         return { savedTemplates: next };
       }),
 
@@ -547,6 +577,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
         };
         const next = state.savedTemplates.map((t) => (t.id === id ? updated : t));
         scheduleSave();
+        void pushTemplate(updated);
         return { savedTemplates: next };
       }),
 
@@ -554,17 +585,19 @@ export const useEditorStore = create<EditorState>((set, get) => {
       set((state) => {
         const next = state.savedTemplates.filter((t) => t.id !== id);
         scheduleSave();
+        void fetch(`${TEMPLATES_API}?id=${encodeURIComponent(id)}`, { method: "DELETE" }).catch(
+          () => undefined,
+        );
         return { savedTemplates: next };
       }),
 
-    renameSavedTemplate: (id, name) =>
-      set((state) => {
-        const next = state.savedTemplates.map((t) =>
-          t.id === id ? { ...t, name } : t
-        );
-        scheduleSave();
-        return { savedTemplates: next };
-      }),
+    renameSavedTemplate: (id, name) => {
+      const next = get().savedTemplates.map((t) => (t.id === id ? { ...t, name } : t));
+      set({ savedTemplates: next });
+      const target = next.find((t) => t.id === id);
+      if (target) void pushTemplate(target);
+      scheduleSave();
+    },
 
     /* ---------------------------- lifecycle ---------------------------- */
     hydrate: () => {
@@ -574,6 +607,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
         if (raw) {
           const parsed = JSON.parse(raw) as Partial<PersistedState>;
           if (parsed.doc?.blocks) {
+            seedOverlayBlocks(parsed.doc.blocks);
             set({
               doc: parsed.doc,
               favorites: parsed.favorites ?? [],
@@ -584,13 +618,40 @@ export const useEditorStore = create<EditorState>((set, get) => {
               saveStatus: "saved",
               hydrated: true,
             });
-            return;
+            // Server list below replaces savedTemplates — fall through.
+          } else {
+            set({ hydrated: true });
           }
+        } else {
+          set({ hydrated: true });
         }
       } catch {
         /* corrupted storage — fall through to a clean document */
+        set({ hydrated: true });
       }
-      set({ hydrated: true });
+
+      // Pull the server copy (survives localStorage.clear() on logout).
+      // If any template action ran while in flight, local wins — that
+      // action already pushed its own change to the server.
+      const loaded = get().savedTemplates;
+      void pullTemplates().then((rows) => {
+        if (!rows || get().savedTemplates !== loaded) return;
+        const server: SavedTemplate[] = rows.map((r) => ({
+          id: r.id,
+          name: r.name,
+          kind: "saved",
+          theme: (r.theme as TemplateTheme | null) ?? defaultThemeFor(r.blocks),
+          blocks: r.blocks,
+          createdAt: r.createdAt,
+          updatedAt: r.updatedAt,
+        }));
+        const serverIds = new Set(server.map((t) => t.id));
+        const localOnly = loaded.filter((t) => !serverIds.has(t.id));
+        // ponytail: reference-equality check instead of a mutation counter —
+        // every template action replaces the array, so a new ref == touched
+        set({ savedTemplates: [...server, ...localOnly] });
+        for (const t of localOnly) void pushTemplate(t);
+      });
     },
 
     resetAll: () => {

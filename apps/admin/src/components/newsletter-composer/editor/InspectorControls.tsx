@@ -3,6 +3,9 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
   Bold,
   Code,
   CornerDownLeft,
@@ -221,6 +224,9 @@ export function RichTextEditor({
     { icon: Underline, label: "Underline", run: () => exec("underline") },
     { icon: Link2, label: "Link", run: openLinkPopover },
     { icon: CornerDownLeft, label: "Highlight", run: toggleHighlight },
+    { icon: AlignLeft, label: "Align left", run: () => exec("justifyLeft") },
+    { icon: AlignCenter, label: "Align center", run: () => exec("justifyCenter") },
+    { icon: AlignRight, label: "Align right", run: () => exec("justifyRight") },
     { icon: Code, label: "Inline code", run: () => exec("formatBlock", "<pre>") },
     { icon: List, label: "Bullet list", run: () => exec("insertUnorderedList") },
     { icon: ListOrdered, label: "Number list", run: () => exec("insertOrderedList") },

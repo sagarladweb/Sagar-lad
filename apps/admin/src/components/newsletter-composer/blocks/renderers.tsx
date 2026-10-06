@@ -875,19 +875,45 @@ function ColumnShell({
       }
 
       const imgWidth = Number(d.width) || 100;
+      const overlayHtml = String(d.overlayHtml || "");
+      // Older drafts predate the dedicated controls — fall back to Style → Layout.
+      const ovV = String(d.overlayVAlign ?? s.vAlign ?? "flex-start");
+      const ovH = String(d.overlayHAlign ?? s.hAlign ?? "flex-start");
+      const ovFs = Number(d.overlayFontSize) || 15;
+      const ovTextAlign = ovH === "center" ? "center" : ovH === "flex-end" ? "right" : "left";
       return (
         <div className="flex flex-col gap-2" style={{ width: `${imgWidth}%` }}>
-          <SmartImage
-            src={d.src}
-            alt={d.alt}
-            className="rounded-[14px]"
-            style={
-              d.ratio && d.ratio !== "auto"
-                ? { aspectRatio: d.ratio, height: "auto", width: "100%" }
-                : { width: "100%" }
-            }
-            label="Image"
-          />
+          <div className="relative overflow-hidden rounded-[14px]">
+            <SmartImage
+              src={d.src}
+              alt={d.alt}
+              style={
+                d.ratio && d.ratio !== "auto"
+                  ? { aspectRatio: d.ratio, height: "auto", width: "100%" }
+                  : { width: "100%" }
+              }
+              label="Image"
+            />
+            {overlayHtml ? (
+              <>
+                <span
+                  className="pointer-events-none absolute inset-0"
+                  style={{ background: `rgba(17,24,39,${d.overlay ?? 0.25})` }}
+                />
+                <div
+                  className="absolute inset-0 flex p-4"
+                  style={{ justifyContent: ovH, alignItems: ovV }}
+                >
+                  <div
+                    className="w-full text-white"
+                    style={{ fontSize: `${ovFs}px`, textAlign: ovTextAlign }}
+                  >
+                    <RichText html={overlayHtml} />
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </div>
           {d.caption ? (
             <p className="text-center text-[13px] text-ink-muted">{d.caption}</p>
           ) : null}

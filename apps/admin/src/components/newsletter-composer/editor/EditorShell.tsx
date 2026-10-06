@@ -139,6 +139,16 @@ function EditorBody() {
     hydrate();
   }, [hydrate]);
 
+  // Flush the 650ms save debounce on tab close so a just-saved template
+  // can't be lost to an immediate unload.
+  React.useEffect(() => {
+    const flush = () => {
+      if (useEditorStore.getState().hydrated) useEditorStore.getState().flushSave();
+    };
+    window.addEventListener("beforeunload", flush);
+    return () => window.removeEventListener("beforeunload", flush);
+  }, []);
+
   React.useEffect(() => {
     const handleOpenPalette = () => setPaletteOpen(true);
     window.addEventListener("composer:open-palette", handleOpenPalette);
