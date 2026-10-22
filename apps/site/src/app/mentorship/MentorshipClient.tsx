@@ -453,6 +453,9 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
   const rootRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [avatarSrc, setAvatarSrc] = useState<string>(
+    profileImage || "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp"
+  );
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -526,12 +529,13 @@ export function MentorshipClient({ profileImage }: { profileImage?: string | nul
             <div data-m-hero className="relative shrink-0 pb-3">
               <div className="relative h-36 w-36 sm:h-48 sm:w-48 rounded-full overflow-hidden border-2 border-border shadow-lg">
                 <Image
-                  src={profileImage ?? "/images/profile/about.webp"}
+                  src={avatarSrc}
                   alt="Sagar Lad"
                   fill
                   sizes="192px"
                   className="object-cover"
                   priority
+                  onError={() => setAvatarSrc("/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp")}
                 />
               </div>
               <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-accent text-accent-foreground px-3 py-1 text-[10px] font-bold shadow-sm">

@@ -1,8 +1,46 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { rateLimitByIp, getClientIp } from "@/lib/rate-limit";
+import { getEngagement } from "@/lib/engagement";
+import { getTotalBlogViewsWithFallback } from "@/lib/content";
 
 export const runtime = "nodejs";
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const postSlug = searchParams.get("postSlug");
+
+    if (postSlug) {
+      const post = await prisma.post.findUnique({
+        where: { slug: postSlug },
+        select: { views: true, publishedAt: true },
+      }).catch(() => null);
+
+      if (!post) {
+        return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      }
+
+      const algorithmViews = getEngagement(
+        postSlug,
+        new Date(post.publishedAt).toISOString()
+      ).views;
+      return NextResponse.json({ views: algorithmViews + (post.views ?? 0) });
+    }
+
+    const totalViews = await getTotalBlogViewsWithFallback();
+    return NextResponse.json(
+      { totalViews },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=15, stale-while-revalidate=30",
+        },
+      }
+    );
+  } catch {
+    return NextResponse.json({ totalViews: 0 });
+  }
+}
 
 export async function POST(request: Request) {
   try {

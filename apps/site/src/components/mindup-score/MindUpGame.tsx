@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { playTick, playWin, playSiren, playSelect, playXp, unlockAudio } from "./sounds";
 import { CardStack } from "./CardStack";
 import { RewardBooks } from "@/components/mindup/RewardBooks";
+import { QUESTION_BANK, getRandomAssessmentQuestions } from "./questionBank";
 
 import {
   ArrowLeft,
@@ -43,6 +44,7 @@ type Pillar = {
   icon: typeof Brain;
   image: string;
   questions: string[];
+  questionBank?: [string[], string[]];
   moveTitle: string;
   actions: string[];
   focus: string;
@@ -93,8 +95,12 @@ const pillars: Pillar[] = [
     icon: Brain,
     image: `${PUBLIC_BASE}master-your-mind.png`,
     questions: [
-      "I can manage my thoughts and emotions when I face challenges.",
-      "I learn from setbacks instead of allowing them to stop me.",
+      QUESTION_BANK.M1.versions[0],
+      QUESTION_BANK.M2.versions[0],
+    ],
+    questionBank: [
+      QUESTION_BANK.M1.versions,
+      QUESTION_BANK.M2.versions,
     ],
     moveTitle: "Your 7-Day Mindset Move",
     actions: [
@@ -114,8 +120,12 @@ const pillars: Pillar[] = [
     icon: HeartPulse,
     image: `${PUBLIC_BASE}invest-in-your-health.png`,
     questions: [
-      "I take care of my body through healthy habits such as sleep, movement and nutrition.",
-      "I make time to manage stress, recharge and protect my energy.",
+      QUESTION_BANK.I1.versions[0],
+      QUESTION_BANK.I2.versions[0],
+    ],
+    questionBank: [
+      QUESTION_BANK.I1.versions,
+      QUESTION_BANK.I2.versions,
     ],
     moveTitle: "Your 7-Day Health Move",
     actions: [
@@ -135,8 +145,12 @@ const pillars: Pillar[] = [
     icon: UsersRound,
     image: `${PUBLIC_BASE}relationship.png`,
     questions: [
-      "I make meaningful time for the people who matter to me.",
-      "I communicate openly, listen well and maintain healthy relationships.",
+      QUESTION_BANK.N1.versions[0],
+      QUESTION_BANK.N2.versions[0],
+    ],
+    questionBank: [
+      QUESTION_BANK.N1.versions,
+      QUESTION_BANK.N2.versions,
     ],
     moveTitle: "Your 7-Day Relationship Move",
     actions: [
@@ -156,8 +170,12 @@ const pillars: Pillar[] = [
     icon: Rocket,
     image: `${PUBLIC_BASE}develop-skills.png`,
     questions: [
-      "I regularly learn and develop skills that help me grow personally or professionally.",
-      "I use my time and energy effectively on work that matters to me.",
+      QUESTION_BANK.D1.versions[0],
+      QUESTION_BANK.D2.versions[0],
+    ],
+    questionBank: [
+      QUESTION_BANK.D1.versions,
+      QUESTION_BANK.D2.versions,
     ],
     moveTitle: "Your 7-Day Development Move",
     actions: [
@@ -177,8 +195,12 @@ const pillars: Pillar[] = [
     icon: KeyRound,
     image: `${PUBLIC_BASE}unlock-potential.png`,
     questions: [
-      "I have the confidence and courage to step outside my comfort zone.",
-      "I make time to discover my strengths, interests, purpose and potential.",
+      QUESTION_BANK.U1.versions[0],
+      QUESTION_BANK.U2.versions[0],
+    ],
+    questionBank: [
+      QUESTION_BANK.U1.versions,
+      QUESTION_BANK.U2.versions,
     ],
     moveTitle: "Your 7-Day Unlock Move",
     actions: [
@@ -198,8 +220,12 @@ const pillars: Pillar[] = [
     icon: TrendingUp,
     image: `${PUBLIC_BASE}progress.png`,
     questions: [
-      "I set goals and take consistent action toward them.",
-      "I regularly review my progress and adjust what I’m doing when necessary.",
+      QUESTION_BANK.P1.versions[0],
+      QUESTION_BANK.P2.versions[0],
+    ],
+    questionBank: [
+      QUESTION_BANK.P1.versions,
+      QUESTION_BANK.P2.versions,
     ],
     moveTitle: "Your 7-Day Progress Move",
     actions: [
@@ -1002,6 +1028,7 @@ function QuestionScreen({
   onAnswer,
   onBack,
   onHome,
+  questions,
 }: {
   questionIndex: number;
   answers: Record<number, number>;
@@ -1013,8 +1040,12 @@ function QuestionScreen({
   onAnswer: (value: number) => void;
   onBack: () => void;
   onHome: () => void;
+  questions?: string[];
 }) {
-  const current = questionList[questionIndex];
+  const currentPillar = pillars[Math.floor(questionIndex / 2)];
+  const currentQuestionText =
+    questions?.[questionIndex] ?? questionList[questionIndex]?.question ?? "";
+  const current = { pillar: currentPillar, question: currentQuestionText };
   const selected = answers[questionIndex];
   const isLocked = flyIn !== null;
   const reduceMotion = useReducedMotion();
@@ -2727,7 +2758,7 @@ function PillarNumber({ value }: { value: number }) {
 
 /* ---------- APP ---------- */
 const GAME_KEY = "mind-up-game-state";
-type GameState = { screen: Screen; questionIndex: number; answers: Record<number, number>; answerTimes: Record<number, number>; secondsLeft: number; explorerName: string; timedOut: Record<number, boolean> };
+type GameState = { screen: Screen; questionIndex: number; answers: Record<number, number>; answerTimes: Record<number, number>; secondsLeft: number; explorerName: string; timedOut: Record<number, boolean>; selectedQuestions?: string[] };
 
 function loadGameState(): GameState | null {
   try {
@@ -2782,9 +2813,20 @@ export default function MindUpGame() {
   const [saved, setSaved] = useState<ReturnType<typeof loadGameState> | null>(null);
   const [previous, setPrevious] = useState<StoredResult | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>(() => {
+    const s = loadGameState();
+    if (s?.selectedQuestions && s.selectedQuestions.length === 12) {
+      return s.selectedQuestions;
+    }
+    return getRandomAssessmentQuestions();
+  });
 
   useEffect(() => {
-    setSaved(loadGameState());
+    const s = loadGameState();
+    setSaved(s);
+    if (s?.selectedQuestions && s.selectedQuestions.length === 12) {
+      setSelectedQuestions(s.selectedQuestions);
+    }
     try {
       const stored = window.localStorage.getItem("mind-up-previous-result");
       setPrevious(stored ? (JSON.parse(stored) as StoredResult) : null);
@@ -2861,9 +2903,9 @@ export default function MindUpGame() {
     if (screen === "welcome") {
       clearGameState();
     } else if (screen === "question") {
-      saveGameState({ screen, questionIndex, answers, answerTimes, secondsLeft, explorerName, timedOut });
+      saveGameState({ screen, questionIndex, answers, answerTimes, secondsLeft, explorerName, timedOut, selectedQuestions });
     }
-  }, [screen, questionIndex, answers, answerTimes, secondsLeft, explorerName, timedOut]);
+  }, [screen, questionIndex, answers, answerTimes, secondsLeft, explorerName, timedOut, selectedQuestions]);
 
   const [nameLocked, setNameLocked] = useState(() => {
     try { return localStorage.getItem("mind-up-name-locked") === "1"; } catch { return false; }
@@ -2947,6 +2989,8 @@ export default function MindUpGame() {
     setSecondsLeft(QUESTION_SECONDS);
     setTimedOut({});
     setAnswerTimes({});
+    const newQuestions = getRandomAssessmentQuestions();
+    setSelectedQuestions(newQuestions);
     const stored = window.localStorage.getItem("mind-up-latest-result");
     if (stored) {
       try {
@@ -3108,6 +3152,7 @@ export default function MindUpGame() {
         onAnswer={handleAnswer}
         onBack={handleBack}
         onHome={home}
+        questions={selectedQuestions}
       />
     );
   }

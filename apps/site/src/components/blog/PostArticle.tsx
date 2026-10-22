@@ -217,7 +217,7 @@ function PostFooter({
         <span className="inline-flex items-center gap-2.5">
           <span className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted ring-1 ring-border">
             <Image
-              src={authorImage ?? "/images/profile/about.webp"}
+              src={authorImage || "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp"}
               alt={authorName}
               fill
               sizes="40px"

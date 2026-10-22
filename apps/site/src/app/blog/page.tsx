@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { getCategoriesWithFallback, getPublishedVideosWithFallback, getPostCountWithFallback, getVideoCountWithFallback, getPostListWithFallback } from "@/lib/content";
+import { getCategoriesWithFallback, getPublishedVideosWithFallback, getPostCountWithFallback, getVideoCountWithFallback, getPostListWithFallback, getTotalBlogViewsWithFallback } from "@/lib/content";
 import { SITE, VISIBLE_POST_WHERE, pageMetadata } from "@/lib/site";
 import { getProfileAvatar } from "@/lib/profile";
 import { BlogVideoGrid } from "@/components/blog/BlogVideoGrid";
 import { JsonLd } from "@/components/JsonLd";
 import { FaYoutube } from "@/lib/icons";
 import { BlogCard } from "@/components/blog/BlogCard";
+import { LiveTotalBlogViews } from "@/components/blog/LiveTotalBlogViews";
 
 export const metadata: Metadata = pageMetadata({
   title: "Blog — Articles on Mindset, Career Growth & Intentional Living — Sagar Lad",
@@ -36,9 +37,7 @@ export default async function BlogPage({
   const categorySlug = params.category?.trim() || undefined;
 
   const where: Record<string, unknown> = {
-    published: true,
-    deletedAt: null,
-    OR: [{ scheduledAt: null }, { scheduledAt: { lte: new Date() } }],
+    ...VISIBLE_POST_WHERE,
   };
   if (categorySlug) {
     where.category = { slug: categorySlug };
@@ -52,7 +51,7 @@ export default async function BlogPage({
   const isFiltered = Boolean(categorySlug || q);
 
   // Parallelize ALL data fetching concurrently in a single round-trip
-  const [categories, totalPosts, totalVideos, posts, filteredCount, videos, profile] = await Promise.all([
+  const [categories, totalPosts, totalVideos, posts, filteredCount, videos, profile, totalBlogViews] = await Promise.all([
     getCategoriesWithFallback(),
     getPostCountWithFallback(VISIBLE_POST_WHERE),
     getVideoCountWithFallback(),
@@ -66,6 +65,7 @@ export default async function BlogPage({
       ? getPublishedVideosWithFallback(PAGE_SIZE, undefined, (vpage - 1) * PAGE_SIZE)
       : Promise.resolve([]),
     getProfileAvatar(),
+    getTotalBlogViewsWithFallback(),
   ]);
 
   const total = isFiltered ? (filteredCount ?? 0) : totalPosts;
@@ -111,11 +111,12 @@ export default async function BlogPage({
           {/* Avatar Left */}
           <div className="relative h-28 w-28 sm:h-36 sm:w-36 rounded-full overflow-hidden border-2 border-border shadow-md shrink-0 bg-muted">
             <Image
-              src={profile.image}
+              src={profile.image || "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp"}
               alt="Sagar Lad"
               fill
               sizes="144px"
               className="object-cover"
+              priority
             />
           </div>
 
@@ -141,8 +142,8 @@ export default async function BlogPage({
                 <dt className="text-xs text-muted-foreground font-medium">Community</dt>
               </div>
               <div className="text-center sm:text-left">
-                <dd className="font-extrabold text-foreground text-base sm:text-lg">6</dd>
-                <dt className="text-xs text-muted-foreground font-medium">Books</dt>
+                <LiveTotalBlogViews initialViews={totalBlogViews} />
+                <dt className="text-xs text-muted-foreground font-medium">Total Views</dt>
               </div>
             </dl>
 

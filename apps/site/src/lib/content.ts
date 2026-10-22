@@ -3,6 +3,7 @@ import { cache } from "react";
 import { prisma, dbSafe } from "@/lib/db";
 import { isInstagramUrl } from "@/lib/instagram";
 import { VISIBLE_POST_WHERE } from "@/lib/site";
+import { getEngagement } from "@/lib/engagement";
 
 // Blog posts: Cached with unstable_cache for instant <5ms responses, deduped per-request with React cache.
 const getPostBySlugCached = unstable_cache(
@@ -233,6 +234,39 @@ export async function getVideoCountWithFallback() {
   return count ?? 0;
 }
 
+export const getTotalBlogViews = unstable_cache(
+  async () => {
+    const posts = await dbSafe(
+      () =>
+        prisma.post.findMany({
+          where: {
+            published: true,
+            deletedAt: null,
+            OR: [{ scheduledAt: null }, { scheduledAt: { lte: new Date() } }],
+          },
+          select: { slug: true, publishedAt: true, views: true },
+        }),
+      null
+    );
+    if (!posts || posts.length === 0) return 0;
+    return posts.reduce((sum, post) => {
+      const algorithmViews = getEngagement(
+        post.slug,
+        new Date(post.publishedAt).toISOString()
+      ).views;
+      const realViews = post.views ?? 0;
+      return sum + algorithmViews + realViews;
+    }, 0);
+  },
+  ["total-blog-views-v2"],
+  { revalidate: 60, tags: ["content", "posts"] }
+);
+
+export async function getTotalBlogViewsWithFallback() {
+  const count = await getTotalBlogViews();
+  return count ?? 0;
+}
+
 export const getPostList = unstable_cache(
   async (
     where: Record<string, unknown>,
@@ -243,7 +277,7 @@ export const getPostList = unstable_cache(
         where,
         select: {
           id: true, slug: true, title: true, coverImage: true,
-          publishedAt: true, excerpt: true, content: true, views: true, likes: true,
+          publishedAt: true, excerpt: true, views: true, likes: true,
           category: { select: { name: true, slug: true } },
         },
         orderBy: { publishedAt: "desc" },
@@ -273,7 +307,7 @@ export const getFeaturedPosts = unstable_cache(
         where,
         select: {
           id: true, slug: true, title: true, coverImage: true,
-          publishedAt: true, excerpt: true, content: true, views: true, likes: true,
+          publishedAt: true, excerpt: true, views: true, likes: true,
           category: { select: { id: true, name: true, slug: true } },
         },
         orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
@@ -307,7 +341,7 @@ export const getRelatedPosts = unstable_cache(
     let related = await dbSafe(
       () => prisma.post.findMany({
         where,
-        select: { id: true, title: true, slug: true, excerpt: true, content: true, coverImage: true, publishedAt: true, views: true, likes: true, category: { select: { name: true, slug: true } } },
+        select: { id: true, title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true, views: true, likes: true, category: { select: { name: true, slug: true } } },
         orderBy: { publishedAt: "desc" },
         take: 3,
       }),
@@ -318,7 +352,7 @@ export const getRelatedPosts = unstable_cache(
       related = await dbSafe(
         () => prisma.post.findMany({
           where: { ...VISIBLE_POST_WHERE, NOT: { id: postId } },
-          select: { id: true, title: true, slug: true, excerpt: true, content: true, coverImage: true, publishedAt: true, views: true, likes: true, category: { select: { name: true, slug: true } } },
+          select: { id: true, title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true, views: true, likes: true, category: { select: { name: true, slug: true } } },
           orderBy: { publishedAt: "desc" },
           take: 3,
         }),

@@ -59,7 +59,7 @@ export default async function SpeakingPage() {
               Speaking
             </span>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] drop-shadow-md">
-              Inspiring People to Think Bigger, Embrance AI, and Unlock Their Full Potential
+              Inspiring People to Think Bigger, Embrace AI, and Unlock Their Full Potential
             </h1>
             <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-2xl drop-shadow-sm font-medium">
               I deliver engaging keynotes on AI, Mindset, and Self-awareness, helping people navigate change, unlock their potential, and take meaningful action.

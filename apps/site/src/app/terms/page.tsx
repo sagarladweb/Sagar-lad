@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { JsonLd } from "@/components/JsonLd";
-import { SITE, formatDate, pageMetadata } from "@/lib/site";
+import { SITE, pageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Terms of Use",
-  description: "The rules of the road for using sagarlad.com — including content usage, affiliate disclosures, and limitations of liability.",
+  title: "Terms & Conditions",
+  description:
+    "Terms and conditions for using sagarlad.com — including content disclaimers, intellectual property, AI training restrictions, and limitations of liability.",
   path: "/terms",
 });
 
@@ -18,101 +20,125 @@ export default function TermsPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "WebPage",
-          name: "Terms of Use — Sagar Lad",
-          description: "The rules of the road for using sagarlad.com — including content usage, affiliate disclosures, and limitations of liability.",
+          name: "Terms & Conditions — Sagar Lad",
+          description:
+            "Terms and conditions for using sagarlad.com — including content disclaimers, intellectual property, AI training restrictions, and limitations of liability.",
           url: `${SITE.url}/terms`,
           author: { "@type": "Person", name: "Sagar Lad", url: SITE.url },
-          dateModified: new Date().toISOString(),
+          dateModified: "2026-10-01T00:00:00.000Z",
         }}
       />
       <PageHeader
         eyebrow="Legal"
-        title="Terms of Use"
-        subtitle="The rules of the road for using this website."
+        title="Terms & Conditions"
+        subtitle="Effective Date: October, 2026"
       />
       <div className="mx-auto max-w-3xl px-4 sm:px-6 py-14 space-y-10 text-sm text-muted-foreground leading-relaxed">
+        <div className="rounded-2xl border border-border bg-card p-5 text-foreground font-medium">
+          Welcome to SagarLad.com. By accessing or using this website, you agree to these terms.
+        </div>
+
         <section>
-          <h2 className="font-display text-lg font-bold text-foreground mb-2">1. Content accuracy</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">1. Content &amp; Disclaimer</h2>
           <p>
-            Content on this site, including articles, quotes, opinions and
-            investing ideas, is provided for general informational and
-            educational purposes only. It is not professional financial, legal,
-            medical or investment advice. Always do your own research and
-            consult a qualified professional before acting on anything you read
-            here.
+            All blogs, videos, articles, opinions, quotes, educational materials and investing-related content are provided for general informational and educational purposes only. They do not constitute professional, financial, investment, legal, medical or psychological advice, or a recommendation to buy, sell or hold any investment. You are responsible for your own decisions and should seek qualified professional advice where appropriate.
           </p>
         </section>
+
         <section>
-          <h2 className="font-display text-lg font-bold text-foreground mb-2">2. Intellectual property</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">2. Intellectual Property</h2>
           <p>
-            All original content — text, graphics, layouts, audio and branding —
-            is the property of Sagar Lad. You are welcome to share and reference
-            content with attribution and a link, but may not reproduce it
-            commercially or present it as your own without written permission.
+            Unless otherwise stated, all original content, including text, videos, audio, graphics, designs and branding, belongs to Sagar Lad or its respective rights holders. Sharing links with attribution is welcome. Reproduction, redistribution, modification or commercial use without prior permission is prohibited, except as permitted by applicable law. Third-party materials remain subject to their respective rights and licenses.
+          </p>
+          <p className="mt-3 rounded-lg border border-brand/30 bg-brand/5 p-3.5 text-foreground font-medium">
+            <strong>Artificial Intelligence (AI) Training Prohibition:</strong> Nobody may use, scrape, crawl, reproduce, extract, or process any content, text, data, videos, audio, or materials from this website to train, develop, fine-tune, or evaluate artificial intelligence (AI), machine learning models, or large language models (LLMs) without prior explicit written permission from Sagar Lad.
           </p>
         </section>
+
         <section>
-          <h2 className="font-display text-lg font-bold text-foreground mb-2">3. Bookings &amp; commercial engagements</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">3. Services &amp; Engagements</h2>
           <p>
-            Speaking engagements, workshops, mentorship and other paid services
-            are confirmed through separate written agreements. Those agreements
-            take precedence over anything stated on this page.
+            Mentorship, workshops, speaking engagements, consultations and other paid services may be governed by separate agreements. Where terms conflict, the applicable agreement prevails to the extent of the conflict.
           </p>
         </section>
+
         <section>
-          <h2 className="font-display text-lg font-bold text-foreground mb-2">4. User conduct</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">4. User Submissions</h2>
           <p>
-            When submitting comments, testimonials, questions or other content,
-            you agree not to post unlawful, abusive, defamatory, misleading or
-            infringing material. We reserve the right to moderate, edit or
-            remove any user content at our discretion.
+            You are responsible for comments, feedback, testimonials and other materials you submit. Do not post unlawful, misleading, abusive, defamatory or infringing content. We may moderate or remove submissions in accordance with applicable law.
           </p>
         </section>
+
         <section>
-          <h2 className="font-display text-lg font-bold text-foreground mb-2">5. Limitation of liability</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">5. Assessments &amp; Certificates</h2>
           <p>
-            This site is provided &quot;as is&quot;. We are not liable for any
-            loss or damage arising from your use of, or reliance on, the content
-            or services offered on this site.
+            Self-assessments, including MIND UP, and related scores, certificates, badges and rewards are intended for personal reflection and informational purposes only. They are not diagnoses, professional evaluations, accredited qualifications or guarantees of skills, abilities or outcomes.
           </p>
         </section>
+
         <section>
-          <h2 className="font-display text-lg font-bold text-foreground mb-2">6. Changes</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">6. Downloads &amp; Newsletter</h2>
           <p>
-            We may update these terms from time to time. Continued use of the
-            site after changes are posted constitutes acceptance of the updated
-            terms.
+            Downloads are subject to their stated usage conditions and are generally intended for personal use unless otherwise specified. Newsletter subscriptions are voluntary where indicated and may be cancelled at any time through the unsubscribe link. Personal information is handled in accordance with our{" "}
+            <Link href="/privacy" className="text-foreground underline underline-offset-4 hover:text-brand">
+              Privacy Policy
+            </Link>
+            .
           </p>
         </section>
+
         <section>
-          <h2 className="font-display text-lg font-bold text-foreground mb-2">7. Self-assessments &amp; certificates</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">7. Privacy Policy</h2>
           <p>
-            Interactive assessments on this site, including the MIND UP score,
-            are self-reflection tools based entirely on your own answers. They
-            may be incomplete, biased or inaccurate, and they are not
-            psychological, medical or professional evaluations of any kind.
-          </p>
-          <p className="mt-3">
-            Certificates, scores, badges and rewards generated from these
-            assessments are personal milestone markers only. They confer no
-            qualification, certification, diagnosis or claim of ability, and
-            must not be presented as such to employers, institutions or any
-            third party.
+            Our{" "}
+            <Link href="/privacy" className="text-foreground underline underline-offset-4 hover:text-brand">
+              Privacy Policy
+            </Link>{" "}
+            explains how personal information is collected, used, stored, shared and protected, including information provided through downloads, forms and newsletter subscriptions. Please review it before submitting personal information.
           </p>
         </section>
+
         <section>
-          <h2 className="font-display text-lg font-bold text-foreground mb-2">8. Downloads &amp; newsletter</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">8. Financial Disclosures &amp; Third-Party Content</h2>
           <p>
-            Free downloads (e-books, certificates, images) may ask for your
-            name and email address. Providing them is voluntary where stated,
-            and required where stated. Ticking the newsletter option subscribes
-            you to occasional emails, which you can leave at any time using the
-            unsubscribe link in every email. Downloaded files are for your
-            personal use; redistribution or resale requires written permission.
+            Where relevant, we may disclose sponsorships, affiliate relationships, financial interests or other material connections associated with our content. Investing-related content involves risk, and past performance does not guarantee future results. Third-party links and references are provided for convenience and do not necessarily imply endorsement.
           </p>
         </section>
-        <p className="pt-4 border-t border-border text-xs">
-          Last updated: {formatDate(new Date())}
+
+        <section>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">9. Limitation of Liability</h2>
+          <p>
+            To the extent permitted by applicable law, Sagar Lad shall not be liable for losses arising from reliance on website content, use of resources, service interruptions or third-party websites. Nothing in these terms excludes or limits liability where doing so is prohibited by law.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">10. Content Protection &amp; Legal Compliance</h2>
+          <p>
+            We maintain appropriate records of original content, publication dates, source materials and relevant licenses where practicable. Users must respect applicable intellectual property rights. Nothing in these terms overrides applicable law or guarantees immunity from legal claims.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-lg font-bold text-foreground mb-2">11. Changes &amp; Applicable Law</h2>
+          <p>
+            We may update these terms by publishing a revised version on this website. Changes take effect from the stated effective date, subject to applicable law. These terms are governed by the laws of India, subject to applicable mandatory legal requirements.
+          </p>
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card/60 p-5">
+          <h2 className="font-display text-base font-bold text-foreground mb-1.5">Contact</h2>
+          <p>
+            For permissions, legal concerns or questions about these terms, please use the contact details provided on{" "}
+            <Link href="/contact" className="text-foreground underline underline-offset-4 hover:text-brand font-medium">
+              SagarLad.com
+            </Link>
+            .
+          </p>
+        </section>
+
+        <p className="pt-4 border-t border-border text-xs text-muted-foreground">
+          Effective Date: October, 2026
         </p>
       </div>
     </>

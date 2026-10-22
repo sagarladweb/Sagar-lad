@@ -1,3 +1,10 @@
+import dns from "dns";
+
+// Force IPv4 first to eliminate 5-10 second macOS dual-stack IPv6 getaddrinfo hangs
+try {
+  dns.setDefaultResultOrder("ipv4first");
+} catch {}
+
 import pg from "pg";
 import { PrismaClient } from "./generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -5,13 +12,10 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   dbPool: pg.Pool | undefined;
+  heartbeatInterval: NodeJS.Timeout | undefined;
 };
 
-/* ── Recovery tracking ─────────────────────────────────────────── *
- * No cooldown short-circuit — every request always attempts the
- * query with retries. The retry delays give Supabase time to wake.
- * A success resets the failure counter.
- * ─────────────────────────────────────────────────────────────────── */
+/* ── Recovery tracking ─────────────────────────────────────────── */
 let consecutiveFailures = 0;
 
 function markDbUp() {
@@ -24,31 +28,53 @@ export function markDbDown() {
 }
 
 function createPool(): pg.Pool {
-  const url = process.env.DATABASE_URL || "";
+  let url = process.env.DATABASE_URL || "";
   if (!url) {
     throw new Error("DATABASE_URL is not set");
   }
 
-  const max = Math.min(Math.max(parseInt(process.env.DATABASE_POOL_MAX ?? "8", 10) || 8, 1), 10);
+  // Ensure PgBouncer transaction mode parameter is present
+  if (url.includes(":6543") && !url.includes("pgbouncer=true")) {
+    url += (url.includes("?") ? "&" : "?") + "pgbouncer=true";
+  }
+
+  const max = Math.min(Math.max(parseInt(process.env.DATABASE_POOL_MAX ?? "10", 10) || 10, 2), 15);
   const pool = new pg.Pool({
     connectionString: url,
     ssl: { rejectUnauthorized: false },
+    min: 2, // Keep 2 warm connections permanently ready in the pool
     max,
     family: 4,
     keepAlive: true,
     keepAliveInitialDelayMillis: 10000,
-    connectionTimeoutMillis: 10000,
-    idleTimeoutMillis: 30000,
-    query_timeout: 15000,
-    statement_timeout: 15000,
+    connectionTimeoutMillis: 8000,
+    idleTimeoutMillis: 300000, // 5 minutes instead of 30s
+    query_timeout: 10000,
+    statement_timeout: 10000,
+    statement_cache_size: 0, // PgBouncer transaction mode compatibility
   } as Record<string, unknown>);
 
   pool.on("error", (err) => {
-    console.error("[db] idle pool error");
+    console.error("[db] idle pool error:", (err as Error)?.message || err);
     if (isConnectionError(err)) {
       resetPool().catch(() => {});
     }
   });
+
+  // Keep-alive heartbeat: ping every 40s to keep Supabase PgBouncer sockets alive & hot
+  if (!globalForPrisma.heartbeatInterval && typeof setInterval !== "undefined") {
+    globalForPrisma.heartbeatInterval = setInterval(() => {
+      if (globalForPrisma.dbPool) {
+        globalForPrisma.dbPool.query("SELECT 1").catch(() => {});
+      }
+    }, 40000);
+    if (typeof globalForPrisma.heartbeatInterval.unref === "function") {
+      globalForPrisma.heartbeatInterval.unref();
+    }
+  }
+
+  // Pre-warm the pool in background immediately
+  pool.query("SELECT 1").then(markDbUp).catch(() => {});
 
   return pool;
 }
@@ -88,10 +114,7 @@ export const prisma = new Proxy({} as PrismaClient, {
   },
 });
 
-/* ── Connection-error detection ─────────────────────────────────── *
- * Only swallow connection/infrastructure errors — business logic
- * errors (constraint violations, auth failures) still propagate.
- * ─────────────────────────────────────────────────────────────────── */
+/* ── Connection-error detection ─────────────────────────────────── */
 const CONNECTION_ERROR_CODES = new Set([
   "P1001", "P1002", "P1003", "P1008", "P1010", "P1011", "P1012", "P1017",
   "ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "ENOTFOUND", "EPIPE",
@@ -117,33 +140,25 @@ function isConnectionError(err: unknown): boolean {
   );
 }
 
-/**
- * Reset the pg pool — destroys all idle connections and creates fresh ones.
- * Called when the DB wakes up from a pause to clear stale connections.
- */
 async function resetPool() {
   const pool = globalForPrisma.dbPool;
   if (!pool) return;
   try {
     await pool.end();
-  } catch {
-    // ignore
-  }
+  } catch {}
   globalForPrisma.dbPool = undefined;
   globalForPrisma.prisma = undefined;
 }
 
 /**
- * Run a DB query with retry logic.
- * Retries at 1s, 2s, 3s — fast enough to not block page loads when offline,
- * slow enough to cover Supabase free-tier cold starts.
- * Returns `fallback` if all retries fail.
+ * Run a DB query with fast single retry.
+ * Fast 200ms retry: recovers from transient socket recycle without stalling page loads.
+ * Returns `fallback` if retry fails so user never waits more than a few hundred ms.
  */
 export async function dbSafe<T>(query: () => Promise<T>, fallback: T): Promise<T> {
-  const RETRY_DELAYS = [1000, 2000, 3000];
-  const MAX_RETRIES = RETRY_DELAYS.length;
+  const RETRY_DELAY_MS = 200;
 
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+  for (let attempt = 0; attempt <= 1; attempt++) {
     try {
       const result = await query();
       markDbUp();
@@ -151,19 +166,15 @@ export async function dbSafe<T>(query: () => Promise<T>, fallback: T): Promise<T
     } catch (err) {
       if (!isConnectionError(err)) throw err;
 
-      if (attempt < MAX_RETRIES) {
-        // If attempt failed, clear stale sockets before next retry
-        if (attempt > 0) {
-          resetPool().catch(() => {});
-        }
-        await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt]));
+      if (attempt === 0) {
+        resetPool().catch(() => {});
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
         continue;
       }
 
       markDbDown();
-      // Reset pool on failure — next request gets fresh connections
       resetPool().catch(() => {});
-      console.warn("[db] connection error after retries, using fallback");
+      console.warn("[db] connection error after retry, using fallback");
       return fallback;
     }
   }

@@ -5,7 +5,7 @@
 export const METRICS = {
   // Profile
   booksPublished: "6",
-  yearsExperience: "15",
+  yearsExperience: "13",
   countriesTravelled: "25+",
   communityReached: "20K+",
 
