@@ -298,7 +298,9 @@
     ".builds/20261031-102139/types/**/*.ts",
     ".builds/20261031-102139/dev/types/**/*.ts",
     ".builds/20261031-102233/types/**/*.ts",
-    ".builds/20261031-102233/dev/types/**/*.ts"
+    ".builds/20261031-102233/dev/types/**/*.ts",
+    ".builds/20261101-090249/types/**/*.ts",
+    ".builds/20261101-090249/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

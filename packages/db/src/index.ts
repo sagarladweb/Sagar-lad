@@ -25,6 +25,9 @@ function markDbUp() {
 export function markDbDown() {
   consecutiveFailures++;
   console.warn(`[db] connection failed (failure #${consecutiveFailures})`);
+  if (consecutiveFailures >= 3) {
+    resetPool().catch(() => {});
+  }
 }
 
 function createPool(): pg.Pool {
@@ -39,6 +42,10 @@ function createPool(): pg.Pool {
   }
 
   const max = Math.min(Math.max(parseInt(process.env.DATABASE_POOL_MAX ?? "10", 10) || 10, 2), 15);
+  const connectionTimeoutMillis = parseInt(process.env.DATABASE_CONNECTION_TIMEOUT_MS ?? "20000", 10) || 20000;
+  const queryTimeoutMillis = parseInt(process.env.DATABASE_QUERY_TIMEOUT_MS ?? "20000", 10) || 20000;
+  const statementTimeoutMillis = parseInt(process.env.DATABASE_STATEMENT_TIMEOUT_MS ?? "20000", 10) || 20000;
+
   const pool = new pg.Pool({
     connectionString: url,
     ssl: { rejectUnauthorized: false },
@@ -47,10 +54,10 @@ function createPool(): pg.Pool {
     family: 4,
     keepAlive: true,
     keepAliveInitialDelayMillis: 10000,
-    connectionTimeoutMillis: 4000,
+    connectionTimeoutMillis,
     idleTimeoutMillis: 300000, // 5 minutes
-    query_timeout: 6000,
-    statement_timeout: 6000,
+    query_timeout: queryTimeoutMillis,
+    statement_timeout: statementTimeoutMillis,
     statement_cache_size: 0, // PgBouncer transaction mode compatibility
   } as Record<string, unknown>);
 
@@ -149,21 +156,21 @@ function isConnectionError(err: unknown): boolean {
 
 async function resetPool() {
   const pool = globalForPrisma.dbPool;
+  globalForPrisma.dbPool = undefined;
+  globalForPrisma.prisma = undefined;
   if (!pool) return;
   try {
     await pool.end();
   } catch {}
-  globalForPrisma.dbPool = undefined;
-  globalForPrisma.prisma = undefined;
 }
 
 /**
  * Run a DB query with fast single retry.
- * Fast 200ms retry: recovers from transient socket recycle without stalling page loads.
+ * Recovers from transient socket recycle without stalling page loads.
  * Returns `fallback` if retry fails so user never waits more than a few hundred ms.
  */
 export async function dbSafe<T>(query: () => Promise<T>, fallback: T): Promise<T> {
-  const RETRY_DELAY_MS = 200;
+  const RETRY_DELAY_MS = 300;
 
   for (let attempt = 0; attempt <= 1; attempt++) {
     try {
@@ -174,14 +181,14 @@ export async function dbSafe<T>(query: () => Promise<T>, fallback: T): Promise<T
       if (!isConnectionError(err)) throw err;
 
       if (attempt === 0) {
-        resetPool().catch(() => {});
+        // Do not call resetPool() here: destroying the shared pool breaks concurrent
+        // queries and forces a cold connection. pg-pool automatically evicts broken sockets.
         await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
         continue;
       }
 
       markDbDown();
-      resetPool().catch(() => {});
-      console.warn("[db] connection error after retry, using fallback");
+      console.warn("[db] connection error after retry, using fallback:", (err as Error)?.message || err);
       return fallback;
     }
   }
