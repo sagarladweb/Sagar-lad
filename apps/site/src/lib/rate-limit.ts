@@ -10,12 +10,21 @@ export function getClientIp(request: Request): string {
 // map reset per instance and only ever throttled one lambda at a time). One
 // upsert per request — acceptable because these endpoints already write to the
 // DB anyway. Expired rows are swept opportunistically so the table stays small.
+// In-memory shield: absorbs burst checks in RAM in < 0.1ms without hitting Supabase across the ocean
+const memRateLimit = new Map<string, { count: number; resetAt: number }>();
+
 let lastCleanup = 0;
 
 async function cleanup() {
   const now = Date.now();
   if (now - lastCleanup < 5 * 60_000) return;
   lastCleanup = now;
+
+  // Prune local memory map
+  for (const [k, v] of memRateLimit.entries()) {
+    if (v.resetAt <= now) memRateLimit.delete(k);
+  }
+
   await prisma.rateLimitEntry
     .deleteMany({ where: { resetAt: { lt: new Date(now - 24 * 60 * 60_000) } } })
     .catch(() => {});
@@ -31,23 +40,40 @@ export async function rateLimitByIp(
   const now = Date.now();
   const resetAt = new Date(now + windowMs);
 
-  const record = await prisma.rateLimitEntry.findUnique({ where: { key } });
-  if (!record || record.resetAt.getTime() <= now) {
-    await prisma.rateLimitEntry.upsert({
+  // Fast-path in RAM:
+  const mem = memRateLimit.get(key);
+  if (mem && mem.resetAt > now) {
+    if (mem.count >= limit) {
+      return { ok: false, retryAfter: Math.ceil((mem.resetAt - now) / 1000) };
+    }
+    mem.count++;
+  } else {
+    memRateLimit.set(key, { count: 1, resetAt: now + windowMs });
+  }
+
+  // Persist to DB asynchronously / safely without blocking if DB is slow
+  try {
+    const record = await prisma.rateLimitEntry.findUnique({ where: { key } }).catch(() => null);
+    if (!record || record.resetAt.getTime() <= now) {
+      await prisma.rateLimitEntry.upsert({
+        where: { key },
+        create: { key, count: 1, resetAt },
+        update: { count: 1, resetAt },
+      }).catch(() => {});
+      return { ok: true, retryAfter: 0 };
+    }
+
+    if (record.count >= limit) {
+      return { ok: false, retryAfter: Math.ceil((record.resetAt.getTime() - now) / 1000) };
+    }
+
+    await prisma.rateLimitEntry.update({
       where: { key },
-      create: { key, count: 1, resetAt },
-      update: { count: 1, resetAt },
-    });
-    return { ok: true, retryAfter: 0 };
+      data: { count: { increment: 1 } },
+    }).catch(() => {});
+  } catch {
+    // If DB has a network timeout, trust the in-memory rate limiter so user is not blocked
   }
 
-  if (record.count >= limit) {
-    return { ok: false, retryAfter: Math.ceil((record.resetAt.getTime() - now) / 1000) };
-  }
-
-  await prisma.rateLimitEntry.update({
-    where: { key },
-    data: { count: { increment: 1 } },
-  });
   return { ok: true, retryAfter: 0 };
 }

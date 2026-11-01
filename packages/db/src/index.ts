@@ -47,27 +47,34 @@ function createPool(): pg.Pool {
     family: 4,
     keepAlive: true,
     keepAliveInitialDelayMillis: 10000,
-    connectionTimeoutMillis: 8000,
-    idleTimeoutMillis: 300000, // 5 minutes instead of 30s
-    query_timeout: 10000,
-    statement_timeout: 10000,
+    connectionTimeoutMillis: 4000,
+    idleTimeoutMillis: 300000, // 5 minutes
+    query_timeout: 6000,
+    statement_timeout: 6000,
     statement_cache_size: 0, // PgBouncer transaction mode compatibility
   } as Record<string, unknown>);
 
   pool.on("error", (err) => {
-    console.error("[db] idle pool error:", (err as Error)?.message || err);
-    if (isConnectionError(err)) {
-      resetPool().catch(() => {});
+    // Normal idle socket recycle by PgBouncer; pg-pool removes it from the pool automatically
+    const msg = (err as Error)?.message || "";
+    if (
+      msg.includes("ETIMEDOUT") ||
+      msg.includes("ECONNRESET") ||
+      msg.includes("Connection terminated") ||
+      msg.includes("server closed the connection")
+    ) {
+      return;
     }
+    console.error("[db] idle pool error:", msg || err);
   });
 
-  // Keep-alive heartbeat: ping every 40s to keep Supabase PgBouncer sockets alive & hot
+  // Keep-alive heartbeat: ping every 25s to keep Supabase PgBouncer sockets alive & hot
   if (!globalForPrisma.heartbeatInterval && typeof setInterval !== "undefined") {
     globalForPrisma.heartbeatInterval = setInterval(() => {
       if (globalForPrisma.dbPool) {
         globalForPrisma.dbPool.query("SELECT 1").catch(() => {});
       }
-    }, 40000);
+    }, 25000);
     if (typeof globalForPrisma.heartbeatInterval.unref === "function") {
       globalForPrisma.heartbeatInterval.unref();
     }

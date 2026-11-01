@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { timingSafeCompare } from "@/lib/crypto";
+import { invalidateMemoryCache } from "@/lib/memory-cache";
 
 export const runtime = "nodejs";
 
@@ -44,5 +45,6 @@ export async function POST(req: Request) {
   for (const tag of TAGS) {
     revalidateTag(tag, "max");
   }
+  invalidateMemoryCache(TAGS);
   return NextResponse.json({ revalidated: true, paths: PATHS.length, tags: TAGS.length });
 }

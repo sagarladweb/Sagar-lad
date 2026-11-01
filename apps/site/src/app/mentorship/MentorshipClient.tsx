@@ -59,11 +59,25 @@ const TESTIMONIALS_ROW1 = [
       "Sagar helped me clarify my career path in just one session. His advice on cloud architecture was spot-on and I got promoted within 3 months.",
   },
   {
+    name: "Simon Noten",
+    role: "Organizer, Student-Led TEDx at AICS",
+    stars: 5,
+    quote:
+      "Sagar was a last minute addition to the student-led TEDx event I organized in 2026 at AICS. Despite the short time line Sagar was able to come up with an interesting talk on ways anyone can use AI to boost their productivity in an evolving job market. He was professional and responsive to feedback throughout the process.",
+  },
+  {
     name: "Priya Sharma",
     role: "Software Architect",
     stars: 5,
     quote:
       "Honest, practical, and no fluff. Sagar reviewed my resume and LinkedIn — the changes doubled my interview calls within weeks.",
+  },
+  {
+    name: "Rohin Sharma",
+    role: "Speaker & Storyteller, Toastmasters",
+    stars: 5,
+    quote:
+      "I've had the pleasure of knowing Sagar through Toastmasters and can confidently say that he is a fantastic speaker, writer, and storyteller. His authentic delivery and ability to weave his passion for technology into compelling stories truly set him apart. A keen learner and an excellent listener, Sagar brings both sincerity and depth to his communication. I highly recommend him.",
   },
   {
     name: "Rohit Verma",
@@ -77,14 +91,14 @@ const TESTIMONIALS_ROW1 = [
     role: "ML Engineer",
     stars: 5,
     quote:
-      "Sagar's guidance on positioning myself in the AI space was exactly what I needed. Landed my dream role within6 weeks of our session.",
+      "Sagar's guidance on positioning myself in the AI space was exactly what I needed. Landed my dream role within 6 weeks of our session.",
   },
   {
     name: "Aditya Rao",
     role: "Cloud Solutions Architect",
     stars: 5,
     quote:
-      "I was confused between two offer letters. Sagar helped me evaluate both with a clear framework — best30 minutes I ever spent.",
+      "I was confused between two offer letters. Sagar helped me evaluate both with a clear framework — best 30 minutes I ever spent.",
   },
 ];
 
@@ -95,6 +109,13 @@ const TESTIMONIALS_ROW2 = [
     stars: 5,
     quote:
       "Sagar's mentorship on Data & AI architecture was a game-changer. He broke down complex concepts into actionable steps I could follow immediately.",
+  },
+  {
+    name: "Michael Hoogkamer",
+    role: "Product Owner, Metadata Lake",
+    stars: 5,
+    quote:
+      "Working with Sagar on the Metadata Lake made my job as a Product Owner significantly easier. He wore multiple critical hats: architecting the solution, leading the engineering team, and getting hands-on to ensure foundational components were built right. Sagar is a true problem-solver who steers the team with patience and clarity.",
   },
   {
     name: "Vikram Singh",
@@ -115,14 +136,14 @@ const TESTIMONIALS_ROW2 = [
     role: "Data Platform Lead",
     stars: 5,
     quote:
-      "Resume was outdated for5 years. Sagar tore it apart constructively — the new version got me 3 interview calls in the first week.",
+      "Resume was outdated for 5 years. Sagar tore it apart constructively — the new version got me 3 interview calls in the first week.",
   },
   {
     name: "Meera Iyer",
     role: "Backend Engineer",
     stars: 4,
     quote:
-      "Practical, no-nonsense advice. Sagar helped me negotiate a40% salary hike by repositioning my experience the right way.",
+      "Practical, no-nonsense advice. Sagar helped me negotiate a 40% salary hike by repositioning my experience the right way.",
   },
 ];
 
@@ -234,7 +255,7 @@ function TestimonialCard({ t }: { t: { name: string; role: string; stars: number
       <div className="mb-2.5">
         <StarRating stars={t.stars} />
       </div>
-      <blockquote className="font-display text-[12px] sm:text-[13px] font-medium leading-relaxed text-foreground/80 line-clamp-4 flex-1">
+      <blockquote className="font-display text-[12px] sm:text-[13px] font-medium leading-relaxed text-foreground/80 line-clamp-4 flex-1 whitespace-pre-line">
         &ldquo;{t.quote}&rdquo;
       </blockquote>
       <div className="mt-3 pt-3 border-t border-border flex items-center gap-2.5">

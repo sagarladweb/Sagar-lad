@@ -20,16 +20,33 @@ const testimonials = [
   },
   {
     quote:
+      "Sagar was a last minute addition to the student-led TEDx event I organized in 2026 at AICS. Despite the short time line Sagar was able to come up with an interesting talk on ways anyone can use AI to boost their productivity in an evolving job market. He was professional and responsive to feedback throughout the process.",
+    name: "Simon Noten",
+    role: "Organizer, Student-Led TEDx at AICS",
+  },
+  {
+    quote:
+      "I've had the pleasure of knowing Sagar through Toastmasters and can confidently say that he is a fantastic speaker, writer, and storyteller. His authentic delivery and ability to weave his passion for technology into compelling stories truly set him apart. A keen learner and an excellent listener, Sagar brings both sincerity and depth to his communication. I highly recommend him.",
+    name: "Rohin Sharma",
+    role: "Speaker & Storyteller, Toastmasters",
+  },
+  {
+    quote:
       "Sagar is really good at what he does, he is always a team player to rely on and a continuous learner. It was a good learning experience working alongside him in setting up our applications initially.",
     name: "Vinod Kolli",
     role: "Domain Architect · Data Lineage · Data Marketplace · Data Governance",
   },
   {
-    // Lengthiest quote placed at the very last
     quote:
       "I worked with Sagar on different projects. Sagar is always keen to rapidly pick up additional knowledge that is required to get the job done. He also keeps his cool in stressful moments and clearly communicates with the other project team members in order to reach the team goal.",
     name: "Glenn De Boeck",
     role: "Head Digital Office & Business Analytics, ABN AMRO",
+  },
+  {
+    quote:
+      "Working with Sagar on the Metadata Lake made my job as a Product Owner significantly easier. He wore multiple critical hats: architecting the solution, leading the engineering team, and getting hands-on to ensure foundational components were built right.\n\nSagar is a true problem-solver. No matter how challenging the requirement, he has the breadth of knowledge and curiosity to find a robust technical answer. Just as importantly, he steers the team with patience and clarity, helping everyone around him level up. His dedication, rapid learning curve, and technical leadership were central to the success of our Metadata Lake.",
+    name: "Michael Hoogkamer",
+    role: "Product Owner, Metadata Lake",
   },
 ];
 
@@ -153,7 +170,7 @@ export function Testimonials() {
               onMouseLeave={() => setPaused(false)}
             >
               <QuoteIcon className="w-10 h-10 mx-auto text-brand-light shrink-0" aria-hidden="true" />
-              <blockquote className="mt-6 font-display text-xl sm:text-2xl md:text-3xl font-bold leading-snug min-h-[100px] sm:min-h-[120px] flex items-center justify-center px-2">
+              <blockquote className={`mt-6 font-display ${t.quote.length > 220 ? "text-base sm:text-lg md:text-xl font-medium leading-relaxed max-w-3xl mx-auto" : "text-xl sm:text-2xl md:text-3xl font-bold leading-snug"} min-h-[100px] sm:min-h-[120px] flex items-center justify-center px-2 whitespace-pre-line text-foreground/90`}>
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
               <p className="mt-6 font-semibold">{t.name}</p>

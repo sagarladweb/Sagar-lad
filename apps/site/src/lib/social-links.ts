@@ -47,6 +47,12 @@ const getSiteSocialsCached = unstable_cache(
   { revalidate: 300, tags: ["socials"] }
 );
 
+import { withMemoryCache } from "@/lib/memory-cache";
+
 export const getSiteSocials = cache(async (): Promise<SocialLink[]> => {
-  return getSiteSocialsCached();
+  return withMemoryCache(
+    "site:socials",
+    () => getSiteSocialsCached(),
+    { ttlMs: 10 * 60_000, swrMs: 60 * 60_000, tags: ["socials"] }
+  );
 });

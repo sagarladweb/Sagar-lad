@@ -38,6 +38,12 @@ const getLifeRazorCached = unstable_cache(
   { revalidate: 300, tags: ["liferazor"] }
 );
 
+import { withMemoryCache } from "@/lib/memory-cache";
+
 export const getLifeRazor = cache(async (): Promise<LifeRazorData> => {
-  return getLifeRazorCached();
+  return withMemoryCache(
+    "site:liferazor",
+    () => getLifeRazorCached(),
+    { ttlMs: 10 * 60_000, swrMs: 60 * 60_000, tags: ["liferazor"] }
+  );
 });

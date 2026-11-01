@@ -4,6 +4,7 @@ import { prisma, dbSafe } from "@/lib/db";
 import { isInstagramUrl } from "@/lib/instagram";
 import { VISIBLE_POST_WHERE } from "@/lib/site";
 import { getEngagement } from "@/lib/engagement";
+import { withMemoryCache } from "@/lib/memory-cache";
 
 // Blog posts: Cached with unstable_cache for instant <5ms responses, deduped per-request with React cache.
 const getPostBySlugCached = unstable_cache(
@@ -22,7 +23,11 @@ const getPostBySlugCached = unstable_cache(
 );
 
 export const getPostBySlug = cache(async (slug: string) => {
-  return getPostBySlugCached(slug);
+  return withMemoryCache(
+    `content:post-by-slug:${slug}`,
+    () => getPostBySlugCached(slug),
+    { ttlMs: 10 * 60_000, swrMs: 24 * 60 * 60_000, tags: ["content", "posts"] }
+  );
 });
 
 // No fallback data — when DB is down, show empty states instead of fake content.
@@ -63,8 +68,14 @@ export const getCategories = unstable_cache(
 
 // Wrapper: if cache returns null, it means DB was down — return empty
 export async function getCategoriesWithFallback() {
-  const cached = await getCategories();
-  return cached ?? [];
+  return withMemoryCache(
+    "content:categories",
+    async () => {
+      const cached = await getCategories();
+      return cached ?? [];
+    },
+    { ttlMs: 5 * 60_000, swrMs: 60 * 60_000, tags: ["content", "categories"] }
+  );
 }
 
 export const getPublishedVideos = unstable_cache(
@@ -99,11 +110,18 @@ export const getPublishedVideos = unstable_cache(
 );
 
 export async function getPublishedVideosWithFallback(take?: number, platform?: "youtube" | "instagram", skip?: number) {
-  const cached = await getPublishedVideos(take, platform, skip);
-  return cached ?? [];
+  const cacheKey = `content:videos:${take ?? "all"}:${platform ?? "all"}:${skip ?? 0}`;
+  return withMemoryCache(
+    cacheKey,
+    async () => {
+      const cached = await getPublishedVideos(take, platform, skip);
+      return cached ?? [];
+    },
+    { ttlMs: 5 * 60_000, swrMs: 60 * 60_000, tags: ["content", "videos"] }
+  );
 }
 
-export const getPublishedVideoBySlug = unstable_cache(
+const getPublishedVideoBySlugCached = unstable_cache(
   async (slug: string) => {
     return dbSafe(
       () => prisma.video.findFirst({
@@ -120,6 +138,14 @@ export const getPublishedVideoBySlug = unstable_cache(
   ["video-by-slug-v2"],
   { revalidate: 300, tags: ["content"] }
 );
+
+export const getPublishedVideoBySlug = cache(async (slug: string) => {
+  return withMemoryCache(
+    `content:video:${slug}`,
+    () => getPublishedVideoBySlugCached(slug),
+    { ttlMs: 10 * 60_000, swrMs: 24 * 60 * 60_000, tags: ["content", "videos"] }
+  );
+});
 
 const QUOTE_SELECT = {
   id: true,
@@ -149,11 +175,17 @@ export const getQuotes = unstable_cache(
 );
 
 export async function getQuotesWithFallback() {
-  const cached = await getQuotes();
-  return cached ?? [];
+  return withMemoryCache(
+    "content:quotes",
+    async () => {
+      const cached = await getQuotes();
+      return cached ?? [];
+    },
+    { ttlMs: 10 * 60_000, swrMs: 24 * 60 * 60_000, tags: ["content", "quotes"] }
+  );
 }
 
-export const getQuoteBySlug = unstable_cache(
+const getQuoteBySlugCached = unstable_cache(
   async (slug: string) => {
     return dbSafe(async () => {
       const bySlug = await prisma.quote.findFirst({
@@ -172,7 +204,15 @@ export const getQuoteBySlug = unstable_cache(
   { revalidate: 300, tags: ["content"] }
 );
 
-export const getPublishedBooks = unstable_cache(
+export const getQuoteBySlug = cache(async (slug: string) => {
+  return withMemoryCache(
+    `content:quote:${slug}`,
+    () => getQuoteBySlugCached(slug),
+    { ttlMs: 10 * 60_000, swrMs: 24 * 60 * 60_000, tags: ["content", "quotes"] }
+  );
+});
+
+const getPublishedBooksCached = unstable_cache(
   async (type?: "PUBLISHED" | "READ" | "EBOOK") => {
     const books = await dbSafe(
       () => prisma.book.findMany({
@@ -188,15 +228,21 @@ export const getPublishedBooks = unstable_cache(
       null,
     );
     if (books && books.length > 0) {
-      console.log(`[content] getPublishedBooks(${type ?? "all"}): ${books.length} books from DB`);
       return books;
     }
-    console.warn(`[content] getPublishedBooks: DB down, returning empty`);
     return [];
   },
   ["books-v2"],
   { revalidate: 300, tags: ["content"] }
 );
+
+export async function getPublishedBooks(type?: "PUBLISHED" | "READ" | "EBOOK") {
+  return withMemoryCache(
+    `content:books:${type ?? "all"}`,
+    () => getPublishedBooksCached(type),
+    { ttlMs: 5 * 60_000, swrMs: 60 * 60_000, tags: ["content", "books"] }
+  );
+}
 
 // ── Blog listing helpers ──────────────────────────────────────────────
 
@@ -213,8 +259,14 @@ export const getPostCount = unstable_cache(
 );
 
 export async function getPostCountWithFallback(where?: Record<string, unknown>) {
-  const count = await getPostCount(where);
-  return count ?? 0;
+  return withMemoryCache(
+    `content:post-count:${JSON.stringify(where ?? {})}`,
+    async () => {
+      const count = await getPostCount(where);
+      return count ?? 0;
+    },
+    { ttlMs: 5 * 60_000, swrMs: 60 * 60_000, tags: ["content", "posts"] }
+  );
 }
 
 export const getVideoCount = unstable_cache(
@@ -230,8 +282,14 @@ export const getVideoCount = unstable_cache(
 );
 
 export async function getVideoCountWithFallback() {
-  const count = await getVideoCount();
-  return count ?? 0;
+  return withMemoryCache(
+    "content:video-count",
+    async () => {
+      const count = await getVideoCount();
+      return count ?? 0;
+    },
+    { ttlMs: 5 * 60_000, swrMs: 60 * 60_000, tags: ["content", "videos"] }
+  );
 }
 
 export const getTotalBlogViews = unstable_cache(
@@ -263,8 +321,14 @@ export const getTotalBlogViews = unstable_cache(
 );
 
 export async function getTotalBlogViewsWithFallback() {
-  const count = await getTotalBlogViews();
-  return count ?? 0;
+  return withMemoryCache(
+    "content:total-blog-views",
+    async () => {
+      const count = await getTotalBlogViews();
+      return count ?? 0;
+    },
+    { ttlMs: 60_000, swrMs: 15 * 60_000, tags: ["content", "posts"] }
+  );
 }
 
 export const getPostList = unstable_cache(
@@ -296,8 +360,15 @@ export async function getPostListWithFallback(
   where: Record<string, unknown>,
   opts: { take: number; skip: number }
 ) {
-  const posts = await getPostList(where, opts);
-  return posts ?? [];
+  const cacheKey = `content:post-list:${JSON.stringify(where)}:${opts.take}:${opts.skip}`;
+  return withMemoryCache(
+    cacheKey,
+    async () => {
+      const posts = await getPostList(where, opts);
+      return posts ?? [];
+    },
+    { ttlMs: 5 * 60_000, swrMs: 60 * 60_000, tags: ["content", "posts"] }
+  );
 }
 
 export const getFeaturedPosts = unstable_cache(
@@ -322,16 +393,18 @@ export const getFeaturedPosts = unstable_cache(
 );
 
 export async function getFeaturedPostsWithFallback(where: Record<string, unknown>, take: number) {
-  const posts = await getFeaturedPosts(where, take);
-  if (posts && posts.length > 0) {
-    console.log(`[content] getFeaturedPosts: ${posts.length} posts from DB`);
-    return posts;
-  }
-  console.warn("[content] getFeaturedPosts: DB down, returning empty");
-  return [];
+  const cacheKey = `content:featured-posts:${take}:${JSON.stringify(where)}`;
+  return withMemoryCache(
+    cacheKey,
+    async () => {
+      const posts = await getFeaturedPosts(where, take);
+      return posts ?? [];
+    },
+    { ttlMs: 5 * 60_000, swrMs: 60 * 60_000, tags: ["content", "posts"] }
+  );
 }
 
-export const getRelatedPosts = unstable_cache(
+const getRelatedPostsCached = unstable_cache(
   async (postId: string, categoryId: string | null) => {
     const where = {
       ...VISIBLE_POST_WHERE,
@@ -365,6 +438,14 @@ export const getRelatedPosts = unstable_cache(
   { revalidate: 300, tags: ["content"] }
 );
 
+export const getRelatedPosts = async (postId: string, categoryId: string | null) => {
+  return withMemoryCache(
+    `content:related:${postId}:${categoryId ?? "none"}`,
+    () => getRelatedPostsCached(postId, categoryId),
+    { ttlMs: 10 * 60_000, swrMs: 24 * 60 * 60_000, tags: ["content", "posts"] }
+  );
+};
+
 // Active announcement — cached with unstable_cache, busted instantly by revalidatePublic() via "announcements" tag
 const getActiveAnnouncementCached = unstable_cache(
   async () => {
@@ -382,5 +463,9 @@ const getActiveAnnouncementCached = unstable_cache(
 );
 
 export const getActiveAnnouncement = cache(async () => {
-  return getActiveAnnouncementCached();
+  return withMemoryCache(
+    "content:active-announcement",
+    () => getActiveAnnouncementCached(),
+    { ttlMs: 2 * 60_000, swrMs: 30 * 60_000, tags: ["announcements"] }
+  );
 });

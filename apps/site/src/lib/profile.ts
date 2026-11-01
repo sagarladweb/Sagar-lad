@@ -1,9 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { prisma, dbSafe } from "@/lib/db";
+import { withMemoryCache } from "@/lib/memory-cache";
 
 const DEFAULT_AVATAR = "/images/profile/sagar-lad-friend-mentor-casual-outdoor-1.webp";
 
-export const getProfileAvatar = unstable_cache(
+const getProfileAvatarCached = unstable_cache(
   async () => {
     try {
       const user = await dbSafe(
@@ -29,4 +30,12 @@ export const getProfileAvatar = unstable_cache(
   ["profile-avatar-v2"],
   { revalidate: 604800, tags: ["profile"] }
 );
+
+export async function getProfileAvatar() {
+  return withMemoryCache(
+    "profile:avatar",
+    () => getProfileAvatarCached(),
+    { ttlMs: 24 * 60 * 60_000, swrMs: 7 * 24 * 60 * 60_000, tags: ["profile"] }
+  );
+}
 
